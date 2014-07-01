@@ -7,6 +7,6 @@ import java.util.List;
  *
  * @param <R> The type of the return value
  */
-public interface Func<R> {
-    R execute();
+public interface Func0<R> {
+    R run();
 }

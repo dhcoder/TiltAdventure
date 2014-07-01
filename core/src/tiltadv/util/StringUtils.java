@@ -1,55 +1,96 @@
 package tiltadv.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class StringUtils {
 
     /**
      * Format a string using C# style formatting, i.e. using {0} instead of %0$s.
-     *
+     * <p/>
      * See <a href="http://msdn.microsoft.com/en-us/library/system.string.format.aspx#Format_Brief">Microsoft's
      * String.Format documentation</a> for more information. Note that this method doesn't support numeric formatting,
      * such as {0.2f}.
      *
      * @param input The formatting string.
-     * @param args Various args whose string values will be used in the final string.
+     * @param args  Various args whose string values will be used in the final string.
      */
     public static String format(String input, Object... args) {
+        StringBuilder builder = new StringBuilder();
 
-        // We want to replace {{ -> { and }} -> }, but we need to worry about {{0}}, which should change to {0} and not
-        // ever insert the value of arg[0]. The way we do this here is by creating special intermediate place-holder
-        // characters for { and } and convert them at the end.
-        // (FYI, this is a somewhat lazy approach - the real way to do this would be to parse the input string
-        // ourselves, one character at a time, and build up our final string that way. But this way is much easier and
-        // good enough for our current needs.)
-        final String ESCAPE_BRACES_L = "{{";
-        final String ESCAPE_BRACES_R = "}}";
-        // We use hex values 0xFFFE and 0xFFFF because they are guaranteed to never be real characters, see
-        // http://en.wikipedia.org/wiki/Mapping_of_Unicode_characters#Non-characters
-        final String BRACES_INDEX_L = Character.toString((char)0xFFFE);
-        final String BRACES_INDEX_R = Character.toString((char)0xFFFF);
-
-        StringBuilder stringBuilder = new StringBuilder(input);
-
-        replace(stringBuilder, ESCAPE_BRACES_L, BRACES_INDEX_L);
-        replace(stringBuilder, ESCAPE_BRACES_R, BRACES_INDEX_R);
-
-        for (int i = 0; i < args.length; ++i) {
-            String indexString = "{" + i + "}";
-            String argString = args[i].toString();
-            replace(stringBuilder, indexString, argString);
+        List<String> argStrings = new ArrayList<String>(args.length);
+        for (Object arg : args) {
+            argStrings.add(arg.toString());
         }
 
-        replace(stringBuilder, BRACES_INDEX_L, "{");
-        replace(stringBuilder, BRACES_INDEX_R, "}");
+        final int STATE_CONSUME_TEXT = 0;
+        final int STATE_GOT_LEFT_BRACE = 1;
+        final int STATE_GOT_RIGHT_BRACE = 2;
+        final int STATE_PARSING_INDEX = 3;
 
-        return stringBuilder.toString();
+        int state = STATE_CONSUME_TEXT;
+        int formatIndex = 0;
+
+        for (int i = 0; i < input.length(); ++i) {
+            char c = input.charAt(i);
+            switch (state) {
+                case STATE_CONSUME_TEXT:
+                    if (c == '{') {
+                        state = STATE_GOT_LEFT_BRACE;
+                    } else if (c == '}') {
+                        state = STATE_GOT_RIGHT_BRACE;
+                    } else {
+                        builder.append(c);
+                    }
+                    break;
+                case STATE_GOT_LEFT_BRACE:
+                    if (c == '{') {
+                        state = STATE_CONSUME_TEXT;
+                        builder.append('{');
+                    } else if (Character.isDigit(c)) {
+                        state = STATE_PARSING_INDEX;
+                        formatIndex = Character.digit(c, 10);
+                    } else {
+                        throwUnexpectedCharException(input, c);
+                    }
+                    break;
+                case STATE_PARSING_INDEX:
+                    if (Character.isDigit(c)) {
+                        formatIndex *= 10;
+                        formatIndex += Character.digit(c, 10);
+                    } else if (c == '}') {
+                        if (formatIndex >= argStrings.size()) {
+                            format("Format index {0} out of bounds ({1} arg(s))", formatIndex, argStrings.size());
+                        } else {
+                            state = STATE_CONSUME_TEXT;
+                            builder.append(argStrings.get(formatIndex));
+                        }
+                    } else {
+                        throwUnexpectedCharException(input, c);
+                    }
+                    break;
+                case STATE_GOT_RIGHT_BRACE:
+                    if (c == '}') {
+                        state = STATE_CONSUME_TEXT;
+                        builder.append('}');
+                    } else {
+                        throwUnexpectedCharException(input, c);
+                    }
+                    break;
+                default:
+                    assert false; // Unhandled state, should be impossible to get here.
+            }
+        }
+
+        if (state != STATE_CONSUME_TEXT) {
+            throw new IllegalArgumentException(format("Unexpected end of format string \"{0}\"", input));
+        }
+
+        return builder.toString();
     }
 
-    private static void replace(StringBuilder builder, String from, String to) {
-        int insertPosition;
-        int fromIndex = 0;
-        while ((insertPosition = builder.indexOf(from, fromIndex)) >= 0) {
-            builder.replace(insertPosition, insertPosition + from.length(), to);
-            fromIndex = insertPosition + to.length();
-        }
+    private static void throwUnexpectedCharException(final String input, final char c) {
+        throw new IllegalArgumentException(
+            format("Unexpected char '{0}' parsing string \"{1}\"", c, input));
     }
 }

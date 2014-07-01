@@ -6,5 +6,5 @@ package tiltadv.util.lambda;
  * @param <R> The type of the return value
  */
 public interface Func1<R, T> {
-    R execute(T arg);
+    R run(T arg);
 }
