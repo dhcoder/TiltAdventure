@@ -3,11 +3,20 @@ package tiltadv;
 import tiltadv.util.lambda.Action0;
 
 import static junit.framework.TestCase.fail;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static tiltadv.util.StringUtils.format;
 
 public class TestUtils {
 
-    public static void assertException(String reason, Class<? extends Exception> exceptionClass, Action0 action) {
+    /**
+     * Confirm that an expected exception happens when the passed in action is run or fail the test.
+     *
+     * @param reason         A message which explains what should have happened in case the test fails.
+     * @param exceptionClass The type of exception which should get thrown.
+     * @param action         A method which should throw an exception as a side-effect of being run.
+     */
+    public static void assertException(final String reason, final Class<? extends Exception> exceptionClass,
+        final Action0 action) {
+
         boolean wasExceptionThrown = false;
 
         try {
@@ -17,8 +26,8 @@ public class TestUtils {
         }
 
         if (!wasExceptionThrown) {
-            reason = "Expected exception: " + exceptionClass.toString() + "\n" + reason;
-            fail(reason);
+            String finalReason = format("Expected exception: {0}\n{1}", exceptionClass, reason);
+            fail(finalReason);
         }
     }
 }

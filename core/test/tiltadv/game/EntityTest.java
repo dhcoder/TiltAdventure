@@ -2,10 +2,12 @@ package tiltadv.game;
 
 import org.junit.Test;
 import tiltadv.game.components.Component;
+import tiltadv.util.lambda.Action0;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static tiltadv.TestUtils.assertException;
 
 public class EntityTest {
 
@@ -13,13 +15,13 @@ public class EntityTest {
 
         private Entity owner;
 
-        @Override
-        public void initialize(Entity owner) {
-            this.owner = owner;
-        }
-
         public Entity getOwner() {
             return owner;
+        }
+
+        @Override
+        public void initialize(final Entity owner) {
+            this.owner = owner;
         }
     }
 
@@ -28,7 +30,7 @@ public class EntityTest {
      */
     private class SourceComponent implements Component {
         @Override
-        public void initialize(Entity owner) {
+        public void initialize(final Entity owner) {
         }
     }
 
@@ -39,13 +41,13 @@ public class EntityTest {
 
         private SourceComponent sourceComponent;
 
-        @Override
-        public void initialize(Entity owner) {
-            sourceComponent = owner.getComponent(SourceComponent.class);
-        }
-
         public SourceComponent getSourceComponent() {
             return sourceComponent;
+        }
+
+        @Override
+        public void initialize(final Entity owner) {
+            sourceComponent = owner.getComponent(SourceComponent.class);
         }
     }
 
@@ -76,5 +78,19 @@ public class EntityTest {
         Entity entity = new Entity(dependentComponent, sourceComponent);
 
         assertThat(sourceComponent, equalTo(dependentComponent.getSourceComponent()));
+    }
+
+    @Test
+    public void moreThanOneComponentOfTheSameTypeThrowsException() {
+
+        final DummyComponent dummy1 = new DummyComponent();
+        final DummyComponent dummy2 = new DummyComponent();
+
+        assertException("Duplicate component types not allowed", IllegalArgumentException.class, new Action0() {
+            @Override
+            public void run() {
+                Entity entity = new Entity(dummy1, dummy2);
+            }
+        });
     }
 }

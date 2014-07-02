@@ -22,7 +22,7 @@ public class StringUtils {
      * @param input The formatting string.
      * @param args  Various args whose string values will be used in the final string.
      */
-    public static String format(String input, Object... args) {
+    public static String format(final String input, final Object... args) {
         StringBuilder builder = new StringBuilder();
 
         List<String> argStrings = new ArrayList<String>(args.length);
