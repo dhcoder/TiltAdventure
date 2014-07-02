@@ -77,7 +77,6 @@ public class StringUtilsTest {
                 format("Yeah this isn't good: {0");
             }
         });
-
     }
 
     @Test
@@ -110,6 +109,13 @@ public class StringUtilsTest {
             @Override
             public void run() {
                 format("Numeric qualifiers like {0d} and {1f} aren't necessary and don't work");
+            }
+        });
+
+        assertException("Format index cannot be empty", IllegalArgumentException.class, new Action0() {
+            @Override
+            public void run() {
+                format("Empty braces {} make format cry.");
             }
         });
     }

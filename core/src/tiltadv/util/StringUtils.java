@@ -5,6 +5,13 @@ import java.util.List;
 
 public class StringUtils {
 
+    private enum FormatState {
+        CONSUME_TEXT, // Directly consume regular characters from input string
+        GOT_LEFT_BRACE, // Got a left brace, start looking for format indices
+        GOT_RIGHT_BRACE, // Got a right brace, see if we're closing off a format index
+        PARSING_INDEX, // We're in between braces, parsing a format index
+    }
+
     /**
      * Format a string using C# style formatting, i.e. using {0} instead of %0$s.
      * <p/>
@@ -23,56 +30,52 @@ public class StringUtils {
             argStrings.add(arg.toString());
         }
 
-        final int STATE_CONSUME_TEXT = 0;
-        final int STATE_GOT_LEFT_BRACE = 1;
-        final int STATE_GOT_RIGHT_BRACE = 2;
-        final int STATE_PARSING_INDEX = 3;
-
-        int state = STATE_CONSUME_TEXT;
+        FormatState state = FormatState.CONSUME_TEXT;
         int formatIndex = 0;
 
         for (int i = 0; i < input.length(); ++i) {
             char c = input.charAt(i);
             switch (state) {
-                case STATE_CONSUME_TEXT:
+                case CONSUME_TEXT:
                     if (c == '{') {
-                        state = STATE_GOT_LEFT_BRACE;
+                        state = FormatState.GOT_LEFT_BRACE;
                     } else if (c == '}') {
-                        state = STATE_GOT_RIGHT_BRACE;
+                        state = FormatState.GOT_RIGHT_BRACE;
                     } else {
                         builder.append(c);
                     }
                     break;
-                case STATE_GOT_LEFT_BRACE:
+                case GOT_LEFT_BRACE:
                     if (c == '{') {
-                        state = STATE_CONSUME_TEXT;
-                        builder.append('{');
+                        builder.append('{'); // Two left braces -> '{'
+                        state = FormatState.CONSUME_TEXT;
                     } else if (Character.isDigit(c)) {
-                        state = STATE_PARSING_INDEX;
+                        state = FormatState.PARSING_INDEX;
                         formatIndex = Character.digit(c, 10);
                     } else {
                         throwUnexpectedCharException(input, c);
                     }
                     break;
-                case STATE_PARSING_INDEX:
+                case PARSING_INDEX:
                     if (Character.isDigit(c)) {
                         formatIndex *= 10;
                         formatIndex += Character.digit(c, 10);
                     } else if (c == '}') {
                         if (formatIndex >= argStrings.size()) {
-                            format("Format index {0} out of bounds ({1} arg(s))", formatIndex, argStrings.size());
+                            format("Format index {0} out of bounds ({1} arg(s)) in string {2}", formatIndex,
+                                argStrings.size(), input);
                         } else {
-                            state = STATE_CONSUME_TEXT;
+                            state = FormatState.CONSUME_TEXT;
                             builder.append(argStrings.get(formatIndex));
                         }
                     } else {
                         throwUnexpectedCharException(input, c);
                     }
                     break;
-                case STATE_GOT_RIGHT_BRACE:
+                case GOT_RIGHT_BRACE:
                     if (c == '}') {
-                        state = STATE_CONSUME_TEXT;
-                        builder.append('}');
+                        builder.append('}'); // Two right braces -> '}'
+                        state = FormatState.CONSUME_TEXT;
                     } else {
                         throwUnexpectedCharException(input, c);
                     }
@@ -82,7 +85,7 @@ public class StringUtils {
             }
         }
 
-        if (state != STATE_CONSUME_TEXT) {
+        if (state != FormatState.CONSUME_TEXT) {
             throw new IllegalArgumentException(format("Unexpected end of format string \"{0}\"", input));
         }
 
@@ -90,7 +93,6 @@ public class StringUtils {
     }
 
     private static void throwUnexpectedCharException(final String input, final char c) {
-        throw new IllegalArgumentException(
-            format("Unexpected char '{0}' parsing string \"{1}\"", c, input));
+        throw new IllegalArgumentException(format("Unexpected char '{0}' parsing string \"{1}\"", c, input));
     }
 }
