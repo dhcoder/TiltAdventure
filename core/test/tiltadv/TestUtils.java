@@ -17,16 +17,22 @@ public class TestUtils {
     public static void assertException(final String reason, final Class<? extends Exception> exceptionClass,
         final Action0 action) {
 
-        boolean wasExceptionThrown = false;
+        Exception exceptionThrown = null;
 
         try {
             action.run();
         } catch (Exception e) {
-            wasExceptionThrown = e.getClass() == exceptionClass;
+            exceptionThrown = e;
         }
 
-        if (!wasExceptionThrown) {
-            fail(format("Expected exception: {0}\n{1}", exceptionClass, reason));
+        if (exceptionThrown == null || exceptionThrown.getClass() != exceptionClass) {
+            StringBuilder builder = new StringBuilder();
+            builder.append(format("{0}\n", reason));
+            builder.append(format("Expected: {0}\n", exceptionClass));
+            if (exceptionThrown != null) {
+                builder.append(format("Actual: {0}", exceptionThrown.getClass()));
+            }
+            fail(builder.toString());
         }
     }
 }
