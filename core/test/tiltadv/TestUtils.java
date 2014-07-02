@@ -26,8 +26,7 @@ public class TestUtils {
         }
 
         if (!wasExceptionThrown) {
-            String finalReason = format("Expected exception: {0}\n{1}", exceptionClass, reason);
-            fail(finalReason);
+            fail(format("Expected exception: {0}\n{1}", exceptionClass, reason));
         }
     }
 }
