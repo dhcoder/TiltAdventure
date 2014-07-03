@@ -50,7 +50,7 @@ public class Entity {
             throw new IllegalStateException("Required component not found on this entity.");
         }
 
-        return componentOpt.get();
+        return componentOpt.value();
     }
 
     /**

@@ -4,7 +4,7 @@ import org.junit.Test;
 import tiltadv.util.lambda.Action0;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 import static tiltadv.TestUtils.assertException;
 
 public final class OptTest {
@@ -13,78 +13,73 @@ public final class OptTest {
 
     @Test
     public void defaultOptionalHasNoValue() {
-        Opt<String> emptyValue = new Opt<String>();
-        assertThat(emptyValue.hasValue(), equalTo(false));
+        Opt<String> stringOpt = new Opt<String>();
+        assertThat(stringOpt.hasValue(), equalTo(false));
     }
 
     @Test
     public void createOptionalWithValueWorks() {
-        Opt<String> stringValue = new Opt<String>(DUMMY_VALUE);
-        assertThat(stringValue.hasValue(), equalTo(true));
-        assertThat(stringValue.get(), equalTo(DUMMY_VALUE));
+        Opt<String> stringOpt = new Opt<String>(DUMMY_VALUE);
+        assertThat(stringOpt.hasValue(), equalTo(true));
+        assertThat(stringOpt.value(), equalTo(DUMMY_VALUE));
 
         String nullString = null;
-        Opt<String> emptyValue = new Opt<String>((String)null);
-        assertThat(emptyValue.hasValue(), equalTo(false));
+        Opt<String> emptyStringOpt = new Opt<String>((String)null);
+        assertThat(emptyStringOpt.hasValue(), equalTo(false));
     }
 
     @Test
     public void createOptionalByCopyWorks() {
-        Opt<String> emptyValue = new Opt<String>();
-        Opt<String> stringValue = new Opt<String>(DUMMY_VALUE);
+        Opt<String> emptyStringOpt = new Opt<String>();
+        Opt<String> stringOpt = new Opt<String>(DUMMY_VALUE);
+        Opt<String> emtpyStringOptCopy = new Opt<String>(emptyStringOpt);
+        Opt<String> stringOptCopy = new Opt<String>(stringOpt);
 
-        Opt<String> emptyValueCopy = new Opt<String>(emptyValue);
-        Opt<String> stringValueCopy = new Opt<String>(stringValue);
-
-        assertThat(emptyValueCopy.hasValue(), equalTo(false));
-        assertThat(stringValueCopy.hasValue(), equalTo(true));
-        assertThat(stringValueCopy.get(), equalTo(DUMMY_VALUE));
+        assertThat(emtpyStringOptCopy.hasValue(), equalTo(false));
+        assertThat(stringOptCopy.hasValue(), equalTo(true));
+        assertThat(stringOptCopy.value(), equalTo(DUMMY_VALUE));
     }
 
     @Test
     public void settingOptionalValueWorks() {
+        Opt<String> stringOpt = new Opt<String>();
+        assertThat(stringOpt.hasValue(), equalTo(false));
 
-        Opt<String> stringValue = new Opt<String>();
-        assertThat(stringValue.hasValue(), equalTo(false));
+        stringOpt.set(DUMMY_VALUE);
+        assertThat(stringOpt.hasValue(), equalTo(true));
+        assertThat(stringOpt.value(), equalTo(DUMMY_VALUE));
 
-        stringValue.set(DUMMY_VALUE);
-        assertThat(stringValue.hasValue(), equalTo(true));
-        assertThat(stringValue.get(), equalTo(DUMMY_VALUE));
-
-        stringValue.set(null);
-        assertThat(stringValue.hasValue(), equalTo(false));
+        stringOpt.set(null);
+        assertThat(stringOpt.hasValue(), equalTo(false));
     }
-
 
     @Test
     public void clearOptionalWorks() {
-        Opt<String> stringValue = new Opt<String>(DUMMY_VALUE);
-        assertThat(stringValue.hasValue(), equalTo(true));
-        stringValue.clear();
-        assertThat(stringValue.hasValue(), equalTo(false));
+        Opt<String> stringOpt = new Opt<String>(DUMMY_VALUE);
+        assertThat(stringOpt.hasValue(), equalTo(true));
+
+        stringOpt.clear();
+        assertThat(stringOpt.hasValue(), equalTo(false));
     }
 
     @Test
     public void testOptionalEquality() {
-        Opt<String> stringValue = new Opt<String>(DUMMY_VALUE);
-        Opt<String> stringValueDuplicate = new Opt<String>(DUMMY_VALUE);
+        Opt<String> stringOpt = new Opt<String>(DUMMY_VALUE);
+        Opt<String> stringOptDuplicate = new Opt<String>(DUMMY_VALUE);
         Opt<String> emptyValue = new Opt<String>();
-
-        assertThat(stringValue.equals(stringValueDuplicate), equalTo(true));
-        assertThat(stringValue.equals(emptyValue), equalTo(false));
-
-        assertThat(stringValue.hashCode(), equalTo(stringValueDuplicate.hashCode()));
+        assertThat(stringOpt.equals(stringOptDuplicate), equalTo(true));
+        assertThat(stringOpt.equals(emptyValue), equalTo(false));
+        assertThat(stringOpt.hashCode(), equalTo(stringOptDuplicate.hashCode()));
     }
 
     @Test
     public void getValueWithoutValueThrowsException() {
-        final Opt<String> emptyValue = new Opt<String>();
-        assertException("Can't get a value from a valueless optional", IllegalStateException.class, new Action0() {
+        final Opt<String> emptyStringOpt = new Opt<String>();
+        assertException("Can't value a value from a valueless optional", IllegalStateException.class, new Action0() {
             @Override
             public void run() {
-                String result = emptyValue.get();
+                String result = emptyStringOpt.value();
             }
         });
     }
-
 }

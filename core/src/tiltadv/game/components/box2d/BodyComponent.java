@@ -33,7 +33,7 @@ public final class BodyComponent implements SingletonComponent {
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         body = world.createBody(bodyDef);
 
-        for (FixtureComponent component : fixtureComponentsOpt.get().getComponents()) {
+        for (FixtureComponent component : fixtureComponentsOpt.value().getComponents()) {
             body.createFixture(component.getFixtureDef());
         }
     }
