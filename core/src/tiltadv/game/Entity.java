@@ -15,11 +15,6 @@ public class Entity {
     private final Map<Class<? extends Component>, Component> components =
         new HashMap<Class<? extends Component>, Component>();
 
-    @SuppressWarnings("unchecked") // We always map Class<T> to T, so the cast below is safe
-    public <T extends Component> T getComponent(final Class<T> classType) {
-        return (T)components.get(classType);
-    }
-
     public Entity(final Component... components) {
         for (Component component : components) {
 
@@ -34,5 +29,10 @@ public class Entity {
         for (Component component : components) {
             component.initialize(this);
         }
+    }
+
+    @SuppressWarnings("unchecked") // We always map Class<T> to T, so the cast below is safe
+    public <T extends Component> T getComponent(final Class<T> classType) {
+        return (T)components.get(classType);
     }
 }

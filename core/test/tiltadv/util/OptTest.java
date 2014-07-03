@@ -8,7 +8,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.*;
 import static tiltadv.TestUtils.assertException;
 
-public class OptTest {
+public final class OptTest {
 
     private static final String DUMMY_VALUE = "dummy";
 

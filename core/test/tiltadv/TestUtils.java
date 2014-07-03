@@ -5,7 +5,7 @@ import tiltadv.util.lambda.Action0;
 import static junit.framework.TestCase.fail;
 import static tiltadv.util.StringUtils.format;
 
-public class TestUtils {
+public final class TestUtils {
 
     /**
      * Confirm that an expected exception happens when the passed in action is run or fail the test.

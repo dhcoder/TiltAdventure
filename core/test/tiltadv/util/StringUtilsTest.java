@@ -8,7 +8,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static tiltadv.TestUtils.assertException;
 import static tiltadv.util.StringUtils.format;
 
-public class StringUtilsTest {
+public final class StringUtilsTest {
 
     @Test
     public void formatHandlesBasicValues() {

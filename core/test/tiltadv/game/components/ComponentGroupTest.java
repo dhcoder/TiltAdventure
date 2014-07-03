@@ -9,7 +9,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static tiltadv.TestUtils.assertException;
 
-public class ComponentGroupTest {
+public final class ComponentGroupTest {
 
     private class DummyComponent implements Component {
 

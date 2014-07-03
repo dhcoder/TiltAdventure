@@ -2,7 +2,6 @@ package tiltadv.game.components;
 
 import tiltadv.game.Entity;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 

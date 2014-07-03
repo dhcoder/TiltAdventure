@@ -38,19 +38,6 @@ public final class Opt<T> {
     }
 
     /**
-     * Sets this optional to a new value. This value shouldn't be null - use {@link #clearValue()} instead if you need
-     * to clear the current value.
-     *
-     * @throws IllegalArgumentException if the passed in value is null.
-     */
-    public void setValue(T value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Can't set an optional to null! Use clearValue instead.");
-        }
-        this.value = value;
-    }
-
-    /**
      * Clears the value of this optional.
      */
     public void clearValue() {
@@ -71,6 +58,19 @@ public final class Opt<T> {
     }
 
     /**
+     * Sets this optional to a new value. This value shouldn't be null - use {@link #clearValue()} instead if you need
+     * to clear the current value.
+     *
+     * @throws IllegalArgumentException if the passed in value is null.
+     */
+    public void setValue(T value) {
+        if (value == null) {
+            throw new IllegalArgumentException("Can't set an optional to null! Use clearValue instead.");
+        }
+        this.value = value;
+    }
+
+    /**
      * Returns true if this optional currently has a value set.
      */
     public boolean hasValue() {
@@ -79,12 +79,12 @@ public final class Opt<T> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
 
-        Opt rhs = (Opt) o;
+        Opt rhs = (Opt)o;
 
-        if (value != null ? !value.equals(rhs.value) : rhs.value != null) return false;
+        if (value != null ? !value.equals(rhs.value) : rhs.value != null) { return false; }
 
         return true;
     }

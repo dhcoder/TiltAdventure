@@ -1,7 +1,5 @@
 package tiltadv.util.lambda;
 
-import java.util.List;
-
 /**
  * Interface for a callback that returns a value.
  *

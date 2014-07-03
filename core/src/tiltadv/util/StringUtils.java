@@ -3,7 +3,7 @@ package tiltadv.util;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StringUtils {
+public final class StringUtils {
 
     private enum FormatState {
         CONSUME_TEXT, // Directly consume regular characters from input string
