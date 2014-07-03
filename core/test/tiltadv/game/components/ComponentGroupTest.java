@@ -11,7 +11,7 @@ import static tiltadv.TestUtils.assertException;
 
 public final class ComponentGroupTest {
 
-    private class DummyComponent implements Component {
+    private class Component1 implements Component {
 
         private Entity owner;
 
@@ -25,32 +25,55 @@ public final class ComponentGroupTest {
         }
     }
 
-    private class DummyComponents extends ComponentGroup<DummyComponent> {
-        private DummyComponents(final DummyComponent... components) {
+    private class ComponentGroup1 extends ComponentGroup<Component1> {
+        private ComponentGroup1(final Component1... components) {
+            super(components);
+        }
+    }
+
+    private class Component2 implements Component {
+        @Override
+        public void initialize(final Entity owner) { }
+    }
+
+    private class ComponentGroup2 extends ComponentGroup<Component2> {
+        private ComponentGroup2(final Component2... components) {
             super(components);
         }
     }
 
     @Test
     public void componentGroupsInitializeMultipleComponents() {
-        DummyComponent dummy1 = new DummyComponent();
-        DummyComponent dummy2 = new DummyComponent();
-        DummyComponents dummyComponents = new DummyComponents(dummy1, dummy2);
-        assertThat(dummy1.getOwner(), nullValue());
-        assertThat(dummy2.getOwner(), nullValue());
+        Component1 component1 = new Component1();
+        Component1 component2 = new Component1();
+        ComponentGroup1 componentGroup1 = new ComponentGroup1(component1, component2);
+        assertThat(component1.getOwner(), nullValue());
+        assertThat(component2.getOwner(), nullValue());
 
-        Entity entity = new Entity(dummyComponents);
-        assertThat(dummy1.getOwner(), equalTo(entity));
-        assertThat(dummy2.getOwner(), equalTo(entity));
+        Entity entity = new Entity(componentGroup1);
+        assertThat(component1.getOwner(), equalTo(entity));
+        assertThat(component2.getOwner(), equalTo(entity));
+    }
+
+    @Test
+    public void entityCanHandleAddingDifferentComponentGroups() {
+        Component1 component1 = new Component1();
+        Component2 component2 = new Component2();
+        ComponentGroup1 componentGroup1 = new ComponentGroup1(component1);
+        ComponentGroup2 componentGroup2 = new ComponentGroup2(component2);
+
+        Entity entity = new Entity(componentGroup1, componentGroup2);
+        assertThat(entity.getComponent(ComponentGroup1.class), equalTo(componentGroup1));
+        assertThat(entity.getComponent(ComponentGroup2.class), equalTo(componentGroup2));
     }
 
     @Test
     public void duplicateComponentsThrowsException() {
-        final DummyComponent dummyComponent = new DummyComponent();
+        final Component1 component1 = new Component1();
         assertException("Duplicates not allowed in component group", IllegalArgumentException.class, new Action0() {
             @Override
             public void run() {
-                DummyComponents dummyComponents = new DummyComponents(dummyComponent, dummyComponent);
+                new ComponentGroup1(component1, component1);
             }
         });
     }

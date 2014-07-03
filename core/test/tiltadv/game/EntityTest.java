@@ -1,7 +1,10 @@
 package tiltadv.game;
 
+import com.sun.tracing.dtrace.DependencyClass;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 import tiltadv.game.components.Component;
+import tiltadv.game.components.SingletonComponent;
 import tiltadv.util.lambda.Action0;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -11,7 +14,7 @@ import static tiltadv.TestUtils.assertException;
 
 public class EntityTest {
 
-    private class DummyComponent implements Component {
+    private class DummyComponent implements SingletonComponent {
 
         private Entity owner;
 
@@ -28,7 +31,7 @@ public class EntityTest {
     /**
      * This class exists only to be found by a {@link DependentComponent}
      */
-    private class SourceComponent implements Component {
+    private class SourceComponent implements SingletonComponent {
         @Override
         public void initialize(final Entity owner) {
         }
@@ -37,7 +40,7 @@ public class EntityTest {
     /**
      * This class expects to find a {@link SourceComponent} on the {@link Entity} it's attached to.
      */
-    private class DependentComponent implements Component {
+    private class DependentComponent implements SingletonComponent {
 
         private SourceComponent sourceComponent;
 
@@ -58,6 +61,17 @@ public class EntityTest {
 
         Entity entity = new Entity(dummyComponent);
         assertThat(entity, equalTo(dummyComponent.getOwner()));
+    }
+
+    @Test
+    public void getComponentReturnsExpectedValues() {
+        DummyComponent dummyComponent = new DummyComponent();
+        DependentComponent dependentComponent = new DependentComponent();
+
+        Entity entity = new Entity(dummyComponent, dependentComponent);
+        assertThat(entity.getComponent(DummyComponent.class), equalTo(dummyComponent));
+        assertThat(entity.getComponent(DependentComponent.class), equalTo(dependentComponent));
+        assertThat(entity.getComponent(SourceComponent.class), nullValue());
     }
 
     @Test

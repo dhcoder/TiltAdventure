@@ -8,7 +8,7 @@ import tiltadv.game.Entity;
  */
 public interface Component {
     /**
-     * Initializes this component, called after the parent {@link tiltadv.game.Entity} is created.
+     * Initializes this component, called after the parent {@link Entity} is created.
      *
      * @param owner The entity that owns this component. May be useful to use this to fetch other components this
      *              component relies on.

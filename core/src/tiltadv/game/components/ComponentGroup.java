@@ -6,17 +6,25 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * A collection of {@link Component}s. An {@link Entity} cannot contain more than one component with the same type as
- * another, as most components are singletons, but in the case where having multiple components of the same type makes
- * sense, you should use a component group instead.
+ * A collection of {@link Component}s.
  * <p/>
- * This class is abstract because Java generics use type-erasure, and if you just passed ComponentGroup{T}'s around, one
- * wouldn't be distinguishable from another. Instead, inherit from this class, for example,
- * {@code class ScriptComponents extends ComponentGroup<ScriptComponent>}
+ * An {@link Entity} can only directly contain {@link SingletonComponent}s, but if it makes sense to add multiple
+ * components of the same type, you should do so using a component group.
+ * <p/>
+ * This class is abstract because Java generics use type-erasure, and if you just passed {@code ComponentGroup<T>}'s
+ * around, one wouldn't be distinguishable from another. You can get around this limitation by inheriting from this
+ * class, for example:
+ * <pre>
+ * class ScriptComponents extends {@code ComponentGroup<ScriptComponent>} {
+ *    public ScriptComponents(final ScriptComponent... components) {
+ *       super(components);
+ *    }
+ * }
+ * </pre>
  */
-public abstract class ComponentGroup<T extends Component> implements Component {
+public abstract class ComponentGroup<T extends Component> implements SingletonComponent {
 
-    private Set<Component> components;
+    private final Set<Component> components;
 
     public ComponentGroup(final T... components) {
         this.components = new HashSet<Component>(components.length);
@@ -26,6 +34,10 @@ public abstract class ComponentGroup<T extends Component> implements Component {
             }
             this.components.add(component);
         }
+    }
+
+    public Iterable<Component> getComponents() {
+        return components;
     }
 
     @Override
