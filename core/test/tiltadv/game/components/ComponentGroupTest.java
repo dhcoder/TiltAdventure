@@ -70,8 +70,8 @@ public final class ComponentGroupTest {
         ComponentGroup2 componentGroup2 = new ComponentGroup2(component2);
 
         Entity entity = new Entity(componentGroup1, componentGroup2);
-        assertThat(entity.getExpectedComponent(ComponentGroup1.class), equalTo(componentGroup1));
-        assertThat(entity.getExpectedComponent(ComponentGroup2.class), equalTo(componentGroup2));
+        assertThat(entity.getComponent(ComponentGroup1.class).value(), equalTo(componentGroup1));
+        assertThat(entity.getComponent(ComponentGroup2.class).value(), equalTo(componentGroup2));
     }
 
     @Test

@@ -5,7 +5,6 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 import tiltadv.game.Entity;
 import tiltadv.game.components.SingletonComponent;
-import tiltadv.util.Opt;
 
 /**
  * A component that wraps a Box2D body.
@@ -24,16 +23,13 @@ public final class BodyComponent implements SingletonComponent {
 
     @Override
     public void initialize(final Entity owner) {
-        Opt<FixtureComponents> fixtureComponentsOpt = owner.getComponent(FixtureComponents.class);
-        if (!fixtureComponentsOpt.hasValue()) {
-            throw new IllegalStateException("No fixtures found on entity!");
-        }
+        FixtureComponents fixtureComponents = owner.getComponent(FixtureComponents.class).value();
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         body = world.createBody(bodyDef);
 
-        for (FixtureComponent component : fixtureComponentsOpt.value().getComponents()) {
+        for (FixtureComponent component : fixtureComponents.getComponents()) {
             body.createFixture(component.getFixtureDef());
         }
     }

@@ -32,25 +32,11 @@ public class Entity {
     }
 
     /**
-     * Returns the component that matches the input type, if found. Use {@link #getExpectedComponent(Class)} if the
-     * component has to exist.
+     * Returns the component that matches the input type, if found.
      */
     @SuppressWarnings("unchecked") // We always map Class<T> to T, so the cast below is safe
     public <T extends SingletonComponent> Opt<T> getComponent(final Class<T> classType) {
         return new Opt((T)components.get(classType));
-    }
-
-    /**
-     * Like {@link #getComponent(Class)} but throws {@link IllegalStateException} if the component is not found.
-     */
-    public <T extends SingletonComponent> T getExpectedComponent(final Class<T> classType)
-        throws IllegalStateException {
-        Opt<T> componentOpt = getComponent(classType);
-        if (!componentOpt.hasValue()) {
-            throw new IllegalStateException("Required component not found on this entity.");
-        }
-
-        return componentOpt.value();
     }
 
     /**

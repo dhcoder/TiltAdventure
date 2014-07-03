@@ -60,7 +60,7 @@ public class EntityTest {
 
         @Override
         public void initialize(final Entity owner) {
-            sourceComponent = owner.getExpectedComponent(SourceComponent.class);
+            sourceComponent = owner.getComponent(SourceComponent.class).value();
         }
 
         @Override
@@ -90,8 +90,8 @@ public class EntityTest {
         DummyComponent dummyComponent = new DummyComponent();
         SourceComponent sourceComponent = new SourceComponent();
         Entity entity = new Entity(dummyComponent, sourceComponent);
-        assertThat(entity.getExpectedComponent(DummyComponent.class), equalTo(dummyComponent));
-        assertThat(entity.getExpectedComponent(SourceComponent.class), equalTo(sourceComponent));
+        assertThat(entity.getComponent(DummyComponent.class).value(), equalTo(dummyComponent));
+        assertThat(entity.getComponent(SourceComponent.class).value(), equalTo(sourceComponent));
         assertThat(entity.getComponent(DependentComponent.class).hasValue(), equalTo(false));
     }
 
