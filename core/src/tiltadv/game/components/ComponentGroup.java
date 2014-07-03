@@ -24,11 +24,11 @@ import java.util.Set;
  */
 public abstract class ComponentGroup<T extends Component> implements SingletonComponent {
 
-    private final Set<Component> components;
+    private final Set<T> components;
 
     public ComponentGroup(final T... components) {
-        this.components = new HashSet<Component>(components.length);
-        for (Component component : components) {
+        this.components = new HashSet<T>(components.length);
+        for (T component : components) {
             if (this.components.contains(component)) {
                 throw new IllegalArgumentException("Duplicate component added to component group");
             }
@@ -36,14 +36,21 @@ public abstract class ComponentGroup<T extends Component> implements SingletonCo
         }
     }
 
-    public Iterable<Component> getComponents() {
+    public final Iterable<T> getComponents() {
         return components;
     }
 
     @Override
     public final void initialize(final Entity owner) {
-        for (Component component : components) {
+        for (T component : components) {
             component.initialize(owner);
+        }
+    }
+
+    @Override
+    public final void dispose() {
+        for (T component : components) {
+            component.dispose();
         }
     }
 }

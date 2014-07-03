@@ -4,10 +4,11 @@ package tiltadv.util;
  * A class which represents an nullable value - that is, like a reference, it either has a value or not. Unlike a
  * reference, if an Opt doesn't have a value and you try to access it, it will throw an {@link IllegalStateException}.
  * <p/>
- * The practice encouraged by this class is to never use nulls directly - instead, assume a reference always indicates
- * a non-null value. If you have a method that needs to sometimes return null, or perhaps take in argument where it
- * makes sense for it to sometime be null, use this class instead. It marks the use-case explicitly and forces good
- * habits in the programmer by having them explicitly check for the existence of a value before using it.
+ * The practice encouraged by this class is to never pass around nulls directly - instead,
+ * assume a reference always indicates a non-null value. If you have a method that needs to sometimes return null,
+ * or perhaps take in argument where it makes sense for it to sometime be null, use this class instead. It marks the
+ * use-case explicitly and forces good habits in the programmer by having them explicitly check for the existence of
+ * a value before using it.
  */
 public final class Opt<T> {
 
@@ -21,27 +22,24 @@ public final class Opt<T> {
     }
 
     /**
-     * Create an optional with an initial value. This value shouldn't be null - use the default constructor instead if
-     * you need a valueless optional.
-     *
-     * @throws IllegalArgumentException if the passed in value is null.
+     * Create an optional with an initial value.
      */
-    public Opt(T value) throws IllegalArgumentException {
-        setValue(value);
+    public Opt(final T value) {
+        set(value);
     }
 
     /**
      * Create an optional from another optional.
      */
-    public Opt(Opt<T> rhs) {
+    public Opt(final Opt<T> rhs) {
         this.value = rhs.value;
     }
 
     /**
      * Clears the value of this optional.
      */
-    public void clearValue() {
-        value = null;
+    public void clear() {
+        set(null);
     }
 
     /**
@@ -50,23 +48,18 @@ public final class Opt<T> {
      *
      * @throws IllegalStateException if this optional doesn't currently have a value.
      */
-    public T getValue() {
+    public T get() {
         if (value == null) {
-            throw new IllegalStateException("getValue called on an optional without a value.");
+            throw new IllegalStateException("get called on an optional without a value.");
         }
         return value;
     }
 
     /**
-     * Sets this optional to a new value. This value shouldn't be null - use {@link #clearValue()} instead if you need
-     * to clear the current value.
-     *
-     * @throws IllegalArgumentException if the passed in value is null.
+     * Sets this optional to a new value. Setting this to null clears the optional, although you are encouraged to use
+     * {@link #clear()} if possible, for readability.
      */
-    public void setValue(T value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Can't set an optional to null! Use clearValue instead.");
-        }
+    public void set(final T value) {
         this.value = value;
     }
 
@@ -78,14 +71,11 @@ public final class Opt<T> {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
-
         Opt rhs = (Opt)o;
-
         if (value != null ? !value.equals(rhs.value) : rhs.value != null) { return false; }
-
         return true;
     }
 

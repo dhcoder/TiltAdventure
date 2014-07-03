@@ -23,6 +23,9 @@ public final class ComponentGroupTest {
         public void initialize(final Entity owner) {
             this.owner = owner;
         }
+
+        @Override
+        public void dispose() { }
     }
 
     private class ComponentGroup1 extends ComponentGroup<Component1> {
@@ -34,6 +37,10 @@ public final class ComponentGroupTest {
     private class Component2 implements Component {
         @Override
         public void initialize(final Entity owner) { }
+
+        @Override
+        public void dispose() {
+        }
     }
 
     private class ComponentGroup2 extends ComponentGroup<Component2> {
@@ -63,8 +70,8 @@ public final class ComponentGroupTest {
         ComponentGroup2 componentGroup2 = new ComponentGroup2(component2);
 
         Entity entity = new Entity(componentGroup1, componentGroup2);
-        assertThat(entity.getComponent(ComponentGroup1.class), equalTo(componentGroup1));
-        assertThat(entity.getComponent(ComponentGroup2.class), equalTo(componentGroup2));
+        assertThat(entity.getExpectedComponent(ComponentGroup1.class), equalTo(componentGroup1));
+        assertThat(entity.getExpectedComponent(ComponentGroup2.class), equalTo(componentGroup2));
     }
 
     @Test
