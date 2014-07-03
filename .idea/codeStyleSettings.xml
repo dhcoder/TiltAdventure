@@ -17,9 +17,10 @@
         </XML>
         <codeStyleSettings language="JAVA">
           <option name="KEEP_LINE_BREAKS" value="false" />
-          <option name="KEEP_BLANK_LINES_IN_DECLARATIONS" value="1" />
-          <option name="KEEP_BLANK_LINES_IN_CODE" value="1" />
+          <option name="KEEP_BLANK_LINES_IN_DECLARATIONS" value="0" />
+          <option name="KEEP_BLANK_LINES_IN_CODE" value="0" />
           <option name="KEEP_BLANK_LINES_BEFORE_RBRACE" value="0" />
+          <option name="BLANK_LINES_AFTER_CLASS_HEADER" value="1" />
           <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
           <option name="SPACE_AFTER_TYPE_CAST" value="false" />
           <option name="CALL_PARAMETERS_WRAP" value="1" />
@@ -50,6 +51,16 @@
             <option name="CONTINUATION_INDENT_SIZE" value="4" />
           </indentOptions>
           <arrangement>
+            <groups>
+              <group>
+                <type>GETTERS_AND_SETTERS</type>
+                <order>KEEP</order>
+              </group>
+              <group>
+                <type>OVERRIDDEN_METHODS</type>
+                <order>KEEP</order>
+              </group>
+            </groups>
             <rules>
               <rule>
                 <match>
