@@ -113,6 +113,16 @@ public class EntityTest {
     }
 
     @Test
+    public void emptyEntityThrowsException() {
+        assertException("Empty entities are not allowed", IllegalArgumentException.class, new Action0() {
+            @Override
+            public void run() {
+                Entity entity = new Entity();
+            }
+        });
+    }
+
+    @Test
     public void moreThanOneComponentOfTheSameTypeThrowsException() {
         final DummyComponent dummy1 = new DummyComponent();
         final DummyComponent dummy2 = new DummyComponent();

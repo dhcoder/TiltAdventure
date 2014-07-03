@@ -19,6 +19,11 @@ public class Entity {
         new HashMap<Class<? extends SingletonComponent>, SingletonComponent>();
 
     public Entity(final SingletonComponent... components) {
+
+        if (components.length == 0) {
+            throw new IllegalArgumentException("Attempted to create Entity with no components");
+        }
+
         for (SingletonComponent component : components) {
             if (this.components.get(component.getClass()) != null) {
                 throw new IllegalArgumentException(
@@ -26,6 +31,7 @@ public class Entity {
             }
             this.components.put(component.getClass(), component);
         }
+
         for (SingletonComponent component : components) {
             component.initialize(this);
         }
