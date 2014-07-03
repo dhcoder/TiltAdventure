@@ -14,4 +14,9 @@ public interface Component {
      *              component relies on.
      */
     void initialize(Entity owner);
+
+    /**
+     * Clears up any resources used by this component.
+     */
+    void dispose();
 }

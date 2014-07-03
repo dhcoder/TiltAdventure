@@ -1,9 +1,6 @@
 package tiltadv.game;
 
-import com.sun.tracing.dtrace.DependencyClass;
-import org.hamcrest.Matchers;
 import org.junit.Test;
-import tiltadv.game.components.Component;
 import tiltadv.game.components.SingletonComponent;
 import tiltadv.util.lambda.Action0;
 
@@ -17,6 +14,11 @@ public class EntityTest {
     private class DummyComponent implements SingletonComponent {
 
         private Entity owner;
+        private boolean disposed;
+
+        public boolean isDisposed() {
+            return disposed;
+        }
 
         public Entity getOwner() {
             return owner;
@@ -26,15 +28,23 @@ public class EntityTest {
         public void initialize(final Entity owner) {
             this.owner = owner;
         }
+
+        @Override
+        public void dispose() {
+            disposed = true;
+        }
     }
 
     /**
      * This class exists only to be found by a {@link DependentComponent}
      */
     private class SourceComponent implements SingletonComponent {
+
         @Override
-        public void initialize(final Entity owner) {
-        }
+        public void initialize(final Entity owner) { }
+
+        @Override
+        public void dispose() { }
     }
 
     /**
@@ -50,35 +60,45 @@ public class EntityTest {
 
         @Override
         public void initialize(final Entity owner) {
-            sourceComponent = owner.getComponent(SourceComponent.class);
+            sourceComponent = owner.getExpectedComponent(SourceComponent.class);
         }
+
+        @Override
+        public void dispose() { }
     }
 
     @Test
     public void componentGetsInitializedWithItsOwningEntity() {
         DummyComponent dummyComponent = new DummyComponent();
         assertThat(dummyComponent.getOwner(), nullValue());
-
         Entity entity = new Entity(dummyComponent);
         assertThat(entity, equalTo(dummyComponent.getOwner()));
     }
 
     @Test
+    public void componentGetsDisposedWithEntity() {
+        DummyComponent dummyComponent = new DummyComponent();
+        Entity entity = new Entity(dummyComponent);
+        assertThat(dummyComponent.isDisposed(), equalTo(false));
+
+        entity.dispose();
+        assertThat(dummyComponent.isDisposed(), equalTo(true));
+    }
+
+    @Test
     public void getComponentReturnsExpectedValues() {
         DummyComponent dummyComponent = new DummyComponent();
-        DependentComponent dependentComponent = new DependentComponent();
-
-        Entity entity = new Entity(dummyComponent, dependentComponent);
-        assertThat(entity.getComponent(DummyComponent.class), equalTo(dummyComponent));
-        assertThat(entity.getComponent(DependentComponent.class), equalTo(dependentComponent));
-        assertThat(entity.getComponent(SourceComponent.class), nullValue());
+        SourceComponent sourceComponent = new SourceComponent();
+        Entity entity = new Entity(dummyComponent, sourceComponent);
+        assertThat(entity.getExpectedComponent(DummyComponent.class), equalTo(dummyComponent));
+        assertThat(entity.getExpectedComponent(SourceComponent.class), equalTo(sourceComponent));
+        assertThat(entity.getComponent(DependentComponent.class).hasValue(), equalTo(false));
     }
 
     @Test
     public void dependantComponentCanFindOtherComponent() {
         SourceComponent sourceComponent = new SourceComponent();
         DependentComponent dependantComponent = new DependentComponent();
-
         Entity entity = new Entity(sourceComponent, dependantComponent);
         assertThat(sourceComponent, equalTo(dependantComponent.getSourceComponent()));
     }
@@ -87,19 +107,15 @@ public class EntityTest {
     public void dependantComponentCanFindOtherComponent_EntityConstructedReverseOrder() {
         SourceComponent sourceComponent = new SourceComponent();
         DependentComponent dependentComponent = new DependentComponent();
-
         // Constructor order shouldn't matter here, even if we pass in dependantComponent first
         Entity entity = new Entity(dependentComponent, sourceComponent);
-
         assertThat(sourceComponent, equalTo(dependentComponent.getSourceComponent()));
     }
 
     @Test
     public void moreThanOneComponentOfTheSameTypeThrowsException() {
-
         final DummyComponent dummy1 = new DummyComponent();
         final DummyComponent dummy2 = new DummyComponent();
-
         assertException("Duplicate component types not allowed", IllegalArgumentException.class, new Action0() {
             @Override
             public void run() {
