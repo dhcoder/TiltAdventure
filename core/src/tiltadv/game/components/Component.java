@@ -7,6 +7,7 @@ import tiltadv.game.Entity;
  * defined by what components drive it.
  */
 public interface Component {
+
     /**
      * Initializes this component, called after the parent {@link Entity} is created.
      *
