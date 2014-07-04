@@ -1,7 +1,7 @@
 package tiltadv.game;
 
 import org.junit.Test;
-import tiltadv.game.components.SingletonComponent;
+import tiltadv.game.components.Component;
 import tiltadv.util.lambda.Action0;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -11,7 +11,7 @@ import static tiltadv.TestUtils.assertException;
 
 public class EntityTest {
 
-    private class DummyComponent implements SingletonComponent {
+    private class DummyComponent implements Component {
 
         private Entity owner;
         private boolean disposed;
@@ -38,7 +38,7 @@ public class EntityTest {
     /**
      * This class exists only to be found by a {@link DependentComponent}
      */
-    private class SourceComponent implements SingletonComponent {
+    private class SourceComponent implements Component {
 
         @Override
         public void initialize(final Entity owner) { }
@@ -50,7 +50,7 @@ public class EntityTest {
     /**
      * This class expects to find a {@link SourceComponent} on the {@link Entity} it's attached to.
      */
-    private class DependentComponent implements SingletonComponent {
+    private class DependentComponent implements Component {
 
         private SourceComponent sourceComponent;
 
@@ -118,18 +118,6 @@ public class EntityTest {
             @Override
             public void run() {
                 Entity entity = new Entity();
-            }
-        });
-    }
-
-    @Test
-    public void moreThanOneComponentOfTheSameTypeThrowsException() {
-        final DummyComponent dummy1 = new DummyComponent();
-        final DummyComponent dummy2 = new DummyComponent();
-        assertException("Duplicate component types not allowed", IllegalArgumentException.class, new Action0() {
-            @Override
-            public void run() {
-                Entity entity = new Entity(dummy1, dummy2);
             }
         });
     }
