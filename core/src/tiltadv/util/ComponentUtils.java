@@ -17,10 +17,10 @@ public final class ComponentUtils {
      * @return the singleton component, in case the calling class needs a reference to it.
      * @throws IllegalStateException if there is more than one component that matches the class type parameter.
      */
-    public static Component requireSingleInstance(final Entity entity, final Class<? extends Component> classType)
+    public static <T extends Component> T requireSingleInstance(final Entity entity, final Class<T> classType)
         throws IllegalStateException {
 
-        List<? extends Component> matchingComponents = entity.getComponents(classType);
+        List<T> matchingComponents = entity.getComponents(classType);
         if (matchingComponents.size() != 1) {
             throw new IllegalStateException(
                 format("Entity has {0} instances of component {1}, should only have 1", matchingComponents.size(),
@@ -37,10 +37,10 @@ public final class ComponentUtils {
      * @return the matching components, so that the calling class doesn't have to re-request it.
      * @throws IllegalStateException if there aren't any components that match the class type parameter.
      */
-    public static List<? extends Component> requireComponents(final Entity entity,
-        final Class<? extends Component> classType) throws IllegalStateException {
+    public static <T extends Component> List<T> requireComponents(final Entity entity, final Class<T> classType)
+        throws IllegalStateException {
 
-        List<? extends Component> matchingComponents = entity.getComponents(classType);
+        List<T> matchingComponents = entity.getComponents(classType);
         if (matchingComponents.size() == 0) {
             throw new IllegalStateException(
                 format("Entity doesn't have any instances of {0}, should have at least 1", classType));

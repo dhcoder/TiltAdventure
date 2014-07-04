@@ -5,8 +5,6 @@ import tiltadv.game.Entity;
 import tiltadv.game.components.Component;
 import tiltadv.util.lambda.Action0;
 
-import java.util.List;
-
 import static junit.framework.TestCase.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
@@ -36,7 +34,8 @@ public class ComponentUtilsTest {
 
         @Override
         public void initialize(final Entity owner) {
-            requireSingleInstance(owner, SingletonComponent.class);
+            SingletonComponent singletonComponent = requireSingleInstance(owner, SingletonComponent.class);
+            assertThat(singletonComponent, equalTo(this));
             initialized = true;
         }
 
@@ -49,7 +48,9 @@ public class ComponentUtilsTest {
         SingletonComponent singletonComponent = new SingletonComponent();
         Entity entity = new Entity(singletonComponent);
 
-        assertThat(requireSingleInstance(entity, SingletonComponent.class), equalTo((Component)singletonComponent));
+        // Some testing is done in SingletonComponent.initialize(). This quick check here verifies that those tests
+        // completed.
+        assertThat(singletonComponent.isInitialized(), equalTo(true));
     }
 
     @Test
@@ -59,8 +60,7 @@ public class ComponentUtilsTest {
 
         Entity entity = new Entity(component1, component2);
 
-        assertThat((List<DummyComponent>)requireComponents(entity, DummyComponent.class),
-            containsInAnyOrder(component1, component2));
+        assertThat(requireComponents(entity, DummyComponent.class), containsInAnyOrder(component1, component2));
     }
 
     @Test

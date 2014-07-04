@@ -35,8 +35,7 @@ public final class BodyComponent implements Component {
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         body = world.createBody(bodyDef);
 
-        List<FixtureComponent> fixtureComponents =
-            (List<FixtureComponent>)requireComponents(owner, FixtureComponent.class);
+        List<FixtureComponent> fixtureComponents = requireComponents(owner, FixtureComponent.class);
 
         for (FixtureComponent component : fixtureComponents) {
             body.createFixture(component.getFixtureDef());
