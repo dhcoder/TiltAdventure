@@ -3,7 +3,7 @@ package tiltadv.util;
 import org.junit.Test;
 import tiltadv.game.Entity;
 import tiltadv.game.components.Component;
-import tiltadv.util.lambda.Action0;
+import tiltadv.util.lambda.Action;
 
 import static junit.framework.TestCase.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -68,7 +68,7 @@ public class ComponentUtilsTest {
         DummyComponent dummyComponent = new DummyComponent();
         final Entity entity = new Entity(dummyComponent);
 
-        assertException("requireSingleInstance fails if no instances", IllegalStateException.class, new Action0() {
+        assertException("requireSingleInstance fails if no instances", IllegalStateException.class, new Action() {
             @Override
             public void run() {
                 requireSingleInstance(entity, SingletonComponent.class);
@@ -82,7 +82,7 @@ public class ComponentUtilsTest {
         final SingletonComponent singletonComponent2 = new SingletonComponent();
 
         assertException("requireSingleInstance fails if multiple instances", IllegalStateException.class,
-            new Action0() {
+            new Action() {
                 @Override
                 public void run() {
                     Entity entity = new Entity(singletonComponent1, singletonComponent2);
@@ -96,7 +96,7 @@ public class ComponentUtilsTest {
         SingletonComponent singletonComponent = new SingletonComponent();
         final Entity entity = new Entity(singletonComponent);
 
-        assertException("requireSingleInstance fails if no instances", IllegalStateException.class, new Action0() {
+        assertException("requireSingleInstance fails if no instances", IllegalStateException.class, new Action() {
             @Override
             public void run() {
                 requireComponents(entity, DummyComponent.class);

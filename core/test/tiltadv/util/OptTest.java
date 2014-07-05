@@ -1,7 +1,7 @@
 package tiltadv.util;
 
 import org.junit.Test;
-import tiltadv.util.lambda.Action0;
+import tiltadv.util.lambda.Action;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -75,7 +75,7 @@ public final class OptTest {
     @Test
     public void getValueWithoutValueThrowsException() {
         final Opt<String> emptyStringOpt = new Opt<String>();
-        assertException("Can't value a value from a valueless optional", IllegalStateException.class, new Action0() {
+        assertException("Can't value a value from a valueless optional", IllegalStateException.class, new Action() {
             @Override
             public void run() {
                 String result = emptyStringOpt.value();
