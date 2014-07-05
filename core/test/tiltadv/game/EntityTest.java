@@ -2,7 +2,7 @@ package tiltadv.game;
 
 import org.junit.Test;
 import tiltadv.game.components.Component;
-import tiltadv.util.lambda.Action0;
+import tiltadv.util.lambda.Action;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
@@ -114,7 +114,7 @@ public class EntityTest {
 
     @Test
     public void emptyEntityThrowsException() {
-        assertException("Empty entities are not allowed", IllegalArgumentException.class, new Action0() {
+        assertException("Empty entities are not allowed", IllegalArgumentException.class, new Action() {
             @Override
             public void run() {
                 Entity entity = new Entity();

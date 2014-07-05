@@ -1,6 +1,6 @@
 package tiltadv;
 
-import tiltadv.util.lambda.Action0;
+import tiltadv.util.lambda.Action;
 
 import static junit.framework.TestCase.fail;
 import static tiltadv.util.StringUtils.format;
@@ -15,7 +15,7 @@ public final class TestUtils {
      * @param action         A method which should throw an exception as a side-effect of being run.
      */
     public static void assertException(final String reason, final Class<? extends Exception> exceptionClass,
-        final Action0 action) {
+        final Action action) {
 
         Exception exceptionThrown = null;
 
