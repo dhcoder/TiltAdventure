@@ -1,7 +1,7 @@
 package tiltadv.util.event;
 
 /**
- * A class which can register listeners which are triggered on an event happening.
+ * An interface for registering {@link EventHandler}s which will be triggered when an event happens.
  */
 public interface EventListener {
 

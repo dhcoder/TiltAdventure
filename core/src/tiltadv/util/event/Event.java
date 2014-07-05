@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class Event implements EventListener {
 
-    private List<EventHandler> listeners = new ArrayList<EventHandler>();
+    private final List<EventHandler> listeners = new ArrayList<EventHandler>();
 
     @Override
     public void addListener(final EventHandler listener) {
@@ -26,9 +26,19 @@ public class Event implements EventListener {
     /**
      * Fire this event, triggering all listeners.
      */
-    public void fire(Object sender) {
-        for (Action1 listener : listeners) {
+    public void fire(final Object sender) {
+        for (EventHandler listener : listeners) {
             listener.run(sender);
         }
+    }
+
+    /**
+     * Release all listening handlers.
+     *
+     * This is useful to do when the event is no longer used, as a listener it's holding on to may otherwise keep it
+     * alive longer than expected.
+     */
+    public void clear() {
+        listeners.clear();
     }
 }

@@ -1,7 +1,7 @@
 package tiltadv.util.lambda;
 
 /**
- * Interface for a callback that takes two arguments and don't return anything.
+ * Interface for a callback that takes two arguments and doesn't return anything.
  */
 public interface Action2<T1, T2> {
 
