@@ -21,6 +21,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="d9n.utils" exported="" />
     <orderEntry type="library" exported="" name="gdx-1.2.0" level="project" />
     <orderEntry type="library" exported="" name="gdx-box2d-1.2.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="junit-4.11" level="project" />
