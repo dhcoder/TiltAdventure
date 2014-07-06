@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/TiltAdventure.iml" filepath="$PROJECT_DIR$/TiltAdventure.iml" />
       <module fileurl="file://$PROJECT_DIR$/android/android.iml" filepath="$PROJECT_DIR$/android/android.iml" />
       <module fileurl="file://$PROJECT_DIR$/core/core.iml" filepath="$PROJECT_DIR$/core/core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/d9n.utils/d9n.utils.iml" filepath="$PROJECT_DIR$/d9n.utils/d9n.utils.iml" />
       <module fileurl="file://$PROJECT_DIR$/desktop/desktop.iml" filepath="$PROJECT_DIR$/desktop/desktop.iml" />
     </modules>
   </component>
