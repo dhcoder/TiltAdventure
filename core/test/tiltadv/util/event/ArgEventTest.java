@@ -24,8 +24,8 @@ public class ArgEventTest {
 
         private final ArgEvent<IntArgs> intEvent = new ArgEvent<IntArgs>();
 
-        public ArgEventListener<IntArgs> getIntEvent() {
-            return intEvent;
+        public ArgEventHandle<IntArgs> getIntEvent() {
+            return intEvent.asHandle();
         }
 
         public void testFire(final int intValue) {
@@ -58,7 +58,7 @@ public class ArgEventTest {
         IntEventOwner intEventOwner = new IntEventOwner();
         IntEventHandler intEventHandler = new IntEventHandler();
 
-        intEventOwner.getIntEvent().addListener(intEventHandler);
+        intEventOwner.getIntEvent().addHandler(intEventHandler);
 
         final int ARBITRARY_VALUE = 97531;
         intEventOwner.testFire(ARBITRARY_VALUE);

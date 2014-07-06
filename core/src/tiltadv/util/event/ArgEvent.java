@@ -5,17 +5,20 @@ import java.util.ArrayList;
 /**
  * Like {@link Event} but includes additional {@link EventArgs} when fired.
  */
-public class ArgEvent<T extends EventArgs> implements ArgEventListener<T> {
+public class ArgEvent<T extends EventArgs> {
 
     private final ArrayList<ArgEventHandler<T>> listeners = new ArrayList<ArgEventHandler<T>>();
+    private final ArgEventHandle<T> eventHandle;
 
-    @Override
-    public void addListener(final ArgEventHandler<T> listener) {
+    public ArgEvent() {
+        this.eventHandle = new ArgEventHandle<T>(this);
+    }
+
+    public void addHandler(final ArgEventHandler<T> listener) {
         listeners.add(listener);
     }
 
-    @Override
-    public void removeListener(final ArgEventHandler<T> listener) {
+    public void removeHandler(final ArgEventHandler<T> listener) {
         listeners.remove(listener);
     }
 
@@ -36,5 +39,12 @@ public class ArgEvent<T extends EventArgs> implements ArgEventListener<T> {
      */
     public void clear() {
         listeners.clear();
+    }
+
+    /**
+     * Return a handle to this event which is safe to expose to external classes.
+     */
+    public ArgEventHandle<T> asHandle() {
+        return eventHandle;
     }
 }
