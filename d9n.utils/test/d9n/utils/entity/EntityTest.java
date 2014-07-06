@@ -4,8 +4,10 @@ import org.junit.Test;
 import d9n.utils.entity.Component;
 import d9n.utils.lambda.Action;
 
+import static junit.framework.TestCase.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static d9n.utils.TestUtils.assertException;
 
@@ -38,19 +40,12 @@ public class EntityTest {
     /**
      * This class exists only to be found by a {@link DependentComponent}
      */
-    private class SourceComponent implements Component {
-
-        @Override
-        public void initialize(final Entity owner) { }
-
-        @Override
-        public void dispose() { }
-    }
+    private class SourceComponent extends AbstractComponent {}
 
     /**
-     * This class expects to find a {@link SourceComponent} on the {@link Entity} it's attached to.
+     * This component expects to find a {@link SourceComponent} on the {@link Entity} it's attached to.
      */
-    private class DependentComponent implements Component {
+    private class DependentComponent extends AbstractComponent {
 
         private SourceComponent sourceComponent;
 
@@ -62,12 +57,32 @@ public class EntityTest {
         public void initialize(final Entity owner) {
             sourceComponent = owner.getComponent(SourceComponent.class).value();
         }
-
-        @Override
-        public void dispose() { }
     }
 
-    @Test
+    /**
+     * This component asserts that it is the only one that exists on an entity
+     */
+    private class SingletonComponent implements Component {
+
+        private boolean initialized;
+
+        public boolean isInitialized() {
+            return initialized;
+        }
+
+        @Override
+        public void initialize(final Entity owner) {
+            SingletonComponent singletonComponent = owner.requireSingleInstance(SingletonComponent.class);
+            assertThat(singletonComponent, equalTo(this));
+            initialized = true;
+        }
+
+        @Override
+        public void dispose() {}
+    }
+
+
+        @Test
     public void componentGetsInitializedWithItsOwningEntity() {
         DummyComponent dummyComponent = new DummyComponent();
         assertThat(dummyComponent.getOwner(), nullValue());
@@ -121,4 +136,66 @@ public class EntityTest {
             }
         });
     }
+
+    @Test
+    public void testRequireSingleInstance() {
+        SingletonComponent singletonComponent = new SingletonComponent();
+        Entity entity = new Entity(singletonComponent);
+
+        // Some testing is done in SingletonComponent.initialize(). This quick check here verifies that those tests
+        // completed.
+        assertThat(singletonComponent.isInitialized(), equalTo(true));
+    }
+
+    @Test
+    public void testGetComponents() {
+        DummyComponent component1 = new DummyComponent();
+        DummyComponent component2 = new DummyComponent();
+
+        Entity entity = new Entity(component1, component2);
+
+        assertThat(entity.getComponents(DummyComponent.class), containsInAnyOrder(component1, component2));
+    }
+
+
+    @Test
+    public void requireSingleInstanceThrowsExceptionIfNoInstances() {
+        DummyComponent dummyComponent = new DummyComponent();
+        final Entity entity = new Entity(dummyComponent);
+
+        assertException("requireSingleInstance fails if no instances", IllegalStateException.class, new Action() {
+            @Override
+            public void run() {
+                entity.requireSingleInstance(SingletonComponent.class);
+            }
+        });
+    }
+
+    @Test
+    public void requireSingleInstanceThrowsExceptionIfMultipleInstances() {
+        final SingletonComponent singletonComponent1 = new SingletonComponent();
+        final SingletonComponent singletonComponent2 = new SingletonComponent();
+
+        assertException("requireSingleInstance fails if multiple instances", IllegalStateException.class, new Action() {
+            @Override
+            public void run() {
+                Entity entity = new Entity(singletonComponent1, singletonComponent2);
+                fail("Shouldn't get here - SingletonComponent should have thrown an exception on initialization.");
+            }
+        });
+    }
+
+    @Test
+    public void requireComponentsThrowsExceptionIfNoInstances() {
+        SingletonComponent singletonComponent = new SingletonComponent();
+        final Entity entity = new Entity(singletonComponent);
+
+        assertException("requireSingleInstance fails if no instances", IllegalStateException.class, new Action() {
+            @Override
+            public void run() {
+                entity.requireComponents(DummyComponent.class);
+            }
+        });
+    }
+
 }
