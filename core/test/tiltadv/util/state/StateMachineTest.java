@@ -26,6 +26,20 @@ public class StateMachineTest {
         EVENT_WITH_DATA,
     }
 
+    class DefaultHandler implements StateEventHandler<TestState, TestEvent> {
+
+        private int ranCount;
+
+        @Override
+        public void run(final TestState fromState, final TestEvent withEvent, final Opt eventData) {
+            ranCount++;
+        }
+
+        public int getRanCount() {
+            return ranCount;
+        }
+    }
+
     private class TestMachine extends StateMachine<TestState, TestEvent> {
 
         public TestMachine(final TestState startState) {
@@ -34,6 +48,7 @@ public class StateMachineTest {
     }
 
     private TestMachine fsm;
+    private DefaultHandler defaultHandler = new DefaultHandler();
 
     @Before
     public void setUp() throws Exception {
@@ -73,6 +88,8 @@ public class StateMachineTest {
                 return Opt.of(TestState.A);
             }
         });
+
+        fsm.setDefaultHandler(defaultHandler);
     }
 
     @Test
@@ -102,22 +119,6 @@ public class StateMachineTest {
     @Test
     public void defaultHandlerCatchesUnregisteredEvent() {
 
-        class DefaultHandler implements StateEventHandler<TestState, TestEvent> {
-
-            private int ranCount;
-
-            @Override
-            public void run(final TestState fromState, final TestEvent withEvent, final Opt eventData) {
-                ranCount++;
-            }
-
-            public int getRanCount() {
-                return ranCount;
-            }
-        }
-
-        DefaultHandler defaultHandler = new DefaultHandler();
-        fsm.setDefaultHandler(defaultHandler);
         assertThat(defaultHandler.getRanCount(), equalTo(0));
 
         fsm.handleEvent(TestEvent.A_TO_B);
@@ -134,12 +135,13 @@ public class StateMachineTest {
     @Test
     public void duplicateRegistrationThrowsException() {
 
-        assertException("Duplicate event registration is not allowed", IllegalStateException.class, new Action() {
+        assertException("Duplicate event registration is not allowed", IllegalArgumentException.class, new Action() {
             @Override
             public void run() {
                 fsm.registerEvent(TestState.A, TestEvent.A_TO_B, new StateTransitionHandler<TestState, TestEvent>() {
                     @Override
-                    public Opt<TestState> run(final TestState fromState, final TestEvent withEvent, final Opt eventData) {
+                    public Opt<TestState> run(final TestState fromState, final TestEvent withEvent,
+                        final Opt eventData) {
                         return Opt.of(TestState.B);
                     }
                 });
@@ -154,6 +156,10 @@ public class StateMachineTest {
 
             private boolean ran;
 
+            public boolean wasRan() {
+                return ran;
+            }
+
             @Override
             public Opt<TestState> run(final TestState fromState, final TestEvent withEvent, final Opt eventData) {
                 assertThat(eventData.hasValue(), equalTo(true));
@@ -163,9 +169,6 @@ public class StateMachineTest {
                 return Opt.withNoValue();
             }
 
-            public boolean wasRan() {
-                return ran;
-            }
         }
 
         DummyDataHandler handler = new DummyDataHandler();

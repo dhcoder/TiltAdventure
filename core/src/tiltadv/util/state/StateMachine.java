@@ -5,8 +5,8 @@ import tiltadv.util.opt.Opt;
 import java.util.HashMap;
 import java.util.Map;
 
-import static tiltadv.util.opt.Opt.of;
 import static tiltadv.util.StringUtils.format;
+import static tiltadv.util.opt.Opt.of;
 
 /**
  * Encapsulation of a finite state machine.
@@ -71,25 +71,42 @@ public abstract class StateMachine<S extends Enum, E extends Enum> {
         return currentState;
     }
 
-    public void setDefaultHandler(StateEventHandler<S, E> defaultHandler) {
+    /**
+     * Set a method handler which, if set, will get called any time an event is called on the state machine that isn't
+     * handled.
+     */
+    public void setDefaultHandler(final StateEventHandler<S, E> defaultHandler) {
         defaultHandlerOpt.set(defaultHandler);
     }
 
-    public void registerEvent(final S state, final E event, StateTransitionHandler<S, E> eventHandler) {
+    /**
+     * Register a state/event pair with a handler that will get triggered if the event happens when the state is active.
+     * <p/>
+     * It is an error to register more than one handler for any state/event pair.
+     *
+     * @throws IllegalArgumentException if the state/event pair has previously been registered.
+     */
+    public void registerEvent(final S state, final E event, final StateTransitionHandler<S, E> eventHandler) {
         StateEvent pair = new StateEvent(state, event);
 
         if (eventResponses.containsKey(pair)) {
-            throw new IllegalStateException(
+            throw new IllegalArgumentException(
                 format("Duplicate registration of state+event pair: {0}, {1}.", state, event));
         }
 
         eventResponses.put(pair, eventHandler);
     }
 
+    /**
+     * Tell the state machine to handle the passed in event given the current state.
+     */
     public void handleEvent(final E event) {
         handleEvent(event, Opt.withNoValue());
     }
 
+    /**
+     * Like {@link #handleEvent(Enum)} but with some additional data that is related to the event.
+     */
     public void handleEvent(final E event, final Object eventData) {
         handleEvent(event, of(eventData));
     }
