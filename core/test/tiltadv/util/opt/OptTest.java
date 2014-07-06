@@ -1,7 +1,8 @@
-package tiltadv.util;
+package tiltadv.util.opt;
 
 import org.junit.Test;
 import tiltadv.util.lambda.Action;
+import tiltadv.util.opt.Opt;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;

@@ -1,6 +1,6 @@
 package tiltadv.util.state;
 
-import tiltadv.util.Opt;
+import tiltadv.util.opt.Opt;
 import tiltadv.util.lambda.Action3;
 
 /**

@@ -1,11 +1,11 @@
 package tiltadv.util.state;
 
-import tiltadv.util.Opt;
+import tiltadv.util.opt.Opt;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static tiltadv.util.Opt.opt;
+import static tiltadv.util.opt.Opt.opt;
 import static tiltadv.util.StringUtils.format;
 
 /**

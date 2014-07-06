@@ -1,8 +1,9 @@
-package tiltadv.util;
+package tiltadv.util.state;
 
 import org.junit.Before;
 import org.junit.Test;
 import tiltadv.util.lambda.Action;
+import tiltadv.util.opt.Opt;
 import tiltadv.util.state.StateEventHandler;
 import tiltadv.util.state.StateMachine;
 import tiltadv.util.state.StateTransitionHandler;
@@ -10,8 +11,8 @@ import tiltadv.util.state.StateTransitionHandler;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static tiltadv.TestUtils.assertException;
-import static tiltadv.util.Opt.opt;
-import static tiltadv.util.Opt.optNone;
+import static tiltadv.util.opt.Opt.opt;
+import static tiltadv.util.opt.Opt.optNone;
 
 public class StateMachineTest {
 

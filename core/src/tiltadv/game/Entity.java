@@ -1,7 +1,7 @@
 package tiltadv.game;
 
 import tiltadv.game.components.Component;
-import tiltadv.util.Opt;
+import tiltadv.util.opt.Opt;
 
 import java.util.ArrayList;
 import java.util.List;
