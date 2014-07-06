@@ -5,7 +5,7 @@ import tiltadv.util.opt.Opt;
 import java.util.HashMap;
 import java.util.Map;
 
-import static tiltadv.util.opt.Opt.opt;
+import static tiltadv.util.opt.Opt.of;
 import static tiltadv.util.StringUtils.format;
 
 /**
@@ -60,7 +60,7 @@ public abstract class StateMachine<S extends Enum, E extends Enum> {
 
     private final Map<StateEvent, StateTransitionHandler<S, E>> eventResponses =
         new HashMap<StateEvent, StateTransitionHandler<S, E>>();
-    private final Opt<StateEventHandler<S, E>> defaultHandlerOpt = new Opt<StateEventHandler<S, E>>();
+    private final Opt<StateEventHandler<S, E>> defaultHandlerOpt = Opt.withNoValue();
     private S currentState;
 
     public StateMachine(final S startState) {
@@ -87,11 +87,11 @@ public abstract class StateMachine<S extends Enum, E extends Enum> {
     }
 
     public void handleEvent(final E event) {
-        handleEvent(event, new Opt());
+        handleEvent(event, Opt.withNoValue());
     }
 
     public void handleEvent(final E event, final Object eventData) {
-        handleEvent(event, opt(eventData));
+        handleEvent(event, of(eventData));
     }
 
     private void handleEvent(final E event, final Opt eventData) {

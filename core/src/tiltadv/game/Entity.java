@@ -34,11 +34,11 @@ public class Entity {
     public <T extends Component> Opt<T> getComponent(final Class<T> classType) {
         for (Component component : components) {
             if (classType.isInstance(component)) {
-                return new Opt<T>((T)component);
+                return Opt.of((T)component);
             }
         }
 
-        return new Opt<T>();
+        return Opt.withNoValue();
     }
 
     /**

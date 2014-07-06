@@ -4,15 +4,10 @@ import org.junit.Before;
 import org.junit.Test;
 import tiltadv.util.lambda.Action;
 import tiltadv.util.opt.Opt;
-import tiltadv.util.state.StateEventHandler;
-import tiltadv.util.state.StateMachine;
-import tiltadv.util.state.StateTransitionHandler;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static tiltadv.TestUtils.assertException;
-import static tiltadv.util.opt.Opt.opt;
-import static tiltadv.util.opt.Opt.optNone;
 
 public class StateMachineTest {
 
@@ -47,35 +42,35 @@ public class StateMachineTest {
         fsm.registerEvent(TestState.A, TestEvent.A_TO_B, new StateTransitionHandler<TestState, TestEvent>() {
             @Override
             public Opt<TestState> run(final TestState fromState, final TestEvent withEvent, final Opt eventData) {
-                return opt(TestState.B);
+                return Opt.of(TestState.B);
             }
         });
 
         fsm.registerEvent(TestState.A, TestEvent.A_TO_C, new StateTransitionHandler<TestState, TestEvent>() {
             @Override
             public Opt<TestState> run(final TestState fromState, final TestEvent withEvent, final Opt eventData) {
-                return opt(TestState.C);
+                return Opt.of(TestState.C);
             }
         });
 
         fsm.registerEvent(TestState.B, TestEvent.B_TO_C, new StateTransitionHandler<TestState, TestEvent>() {
             @Override
             public Opt<TestState> run(final TestState fromState, final TestEvent withEvent, final Opt eventData) {
-                return opt(TestState.C);
+                return Opt.of(TestState.C);
             }
         });
 
         fsm.registerEvent(TestState.B, TestEvent.ANY_TO_A, new StateTransitionHandler<TestState, TestEvent>() {
             @Override
             public Opt<TestState> run(final TestState fromState, final TestEvent withEvent, final Opt eventData) {
-                return opt(TestState.A);
+                return Opt.of(TestState.A);
             }
         });
 
         fsm.registerEvent(TestState.C, TestEvent.ANY_TO_A, new StateTransitionHandler<TestState, TestEvent>() {
             @Override
             public Opt<TestState> run(final TestState fromState, final TestEvent withEvent, final Opt eventData) {
-                return opt(TestState.A);
+                return Opt.of(TestState.A);
             }
         });
     }
@@ -145,7 +140,7 @@ public class StateMachineTest {
                 fsm.registerEvent(TestState.A, TestEvent.A_TO_B, new StateTransitionHandler<TestState, TestEvent>() {
                     @Override
                     public Opt<TestState> run(final TestState fromState, final TestEvent withEvent, final Opt eventData) {
-                        return opt(TestState.B);
+                        return Opt.of(TestState.B);
                     }
                 });
             }
@@ -165,7 +160,7 @@ public class StateMachineTest {
                 assertThat(eventData.value(), equalTo(dummyData));
 
                 ran = true;
-                return optNone();
+                return Opt.withNoValue();
             }
 
             public boolean wasRan() {

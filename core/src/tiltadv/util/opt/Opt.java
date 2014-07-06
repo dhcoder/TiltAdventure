@@ -9,45 +9,56 @@ package tiltadv.util.opt;
  * or perhaps take in argument where it makes sense for it to sometime be null, use this class instead. It marks the
  * use-case explicitly and forces good habits in the programmer by having them explicitly check for the existence of
  * a value before using it.
+ * <p/>
+ * You should create optionals via Opt's helper static methods. You cannot construct them directly. This approach is
+ * easier to read and uses less characters than writing {@code new Opt<YourTypeHere>(YourType)} each time.
  */
 public final class Opt<T> {
+
+    /**
+     * Creates an Opt wrapper around a non-null value.
+     *
+     * @throws IllegalArgumentException if value is null.
+     */
+    public static <T> Opt<T> of(final T value) throws IllegalArgumentException {
+        if (value == null) {
+            throw new IllegalArgumentException("Can't call opt with null value - use 'ofNullable' instead.");
+        }
+        return new Opt<T>(value);
+    }
+
+    /**
+     * Creates a new optional type.
+     */
+    public static <T> Opt<T> ofNullable(final T value) {
+        return new Opt<T>(value);
+    }
+
+    /**
+     * Creates an Opt which is initialized to no value.
+     */
+    public static <T> Opt<T> withNoValue() {
+        return new Opt<T>();
+    }
 
     private T value;
 
     /**
-     * Syntax sugar method for creating a new optional type.
-     *
-     * @throws IllegalArgumentException if value is null.
-     */
-    public static <T> Opt<T> opt(T value) throws IllegalArgumentException {
-        if (value == null)
-            throw new IllegalArgumentException("Can't call opt with null value - use Opt constructor instead");
-        return new Opt<T>(value);
-    }
-
-    public static <T> Opt<T> optNone() {
-        return new Opt<T>();
-    }
-
-    /**
      * Create an optional without a value.
+     * <p/>
+     * Use {@link #withNoValue()} instead.
      */
-    public Opt() {
+    private Opt() {
         // Intentionally doing nothing leaves this.value null.
     }
 
     /**
      * Create an optional with an initial value.
+     * <p/>
+     * Use {@link #of(Object)} or {@link #ofNullable(Object)} instead.
      */
-    public Opt(final T value) {
+    private Opt(final T value) {
         set(value);
-    }
-
-    /**
-     * Create an optional from another optional.
-     */
-    public Opt(final Opt<T> rhs) {
-        this.value = rhs.value;
     }
 
     /**
