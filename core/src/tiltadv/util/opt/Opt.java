@@ -10,8 +10,9 @@ package tiltadv.util.opt;
  * use-case explicitly and forces good habits in the programmer by having them explicitly check for the existence of
  * a value before using it.
  * <p/>
- * You should create optionals via Opt's helper static methods. You cannot construct them directly. This approach is
- * easier to read and uses less characters than writing {@code new Opt<YourTypeHere>(YourType)} each time.
+ * You cannot create optionals directly. Instead, you should use Opt's helper static methods to do so. The reason for
+ * this approach is it is easier to read and uses less characters than writing
+ * {@code new Opt<SomeType>(SomeTypeInstance)} out each time.
  */
 public final class Opt<T> {
 
