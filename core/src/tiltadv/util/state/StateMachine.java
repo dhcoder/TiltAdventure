@@ -1,0 +1,114 @@
+package tiltadv.util.state;
+
+import tiltadv.util.Opt;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static tiltadv.util.Opt.opt;
+import static tiltadv.util.StringUtils.format;
+
+/**
+ * Encapsulation of a finite state machine.
+ * <p/>
+ * You instantiate a state machine by registering a list of states and a list of events that it can accept in each
+ * state.
+ *
+ * @param <S> An enumeration type that represents the known states this machine can get into.
+ * @param <E> An enumeration type that represents the known events this machine can accept.
+ */
+public abstract class StateMachine<S extends Enum, E extends Enum> {
+
+    private class StateEvent {
+
+        private final S state;
+        private final E event;
+
+        private StateEvent(final S state, final E event) {
+            this.state = state;
+            this.event = event;
+        }
+
+        public S getState() {
+            return state;
+        }
+
+        public E getEvent() {
+            return event;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = state.hashCode();
+            result = 31 * result + event.hashCode();
+            return result;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) { return true; }
+            if (o == null || getClass() != o.getClass()) { return false; }
+
+            StateEvent that = (StateEvent)o;
+
+            if (!event.equals(that.event)) { return false; }
+            if (!state.equals(that.state)) { return false; }
+
+            return true;
+        }
+    }
+
+    private final Map<StateEvent, StateTransitionHandler<S, E>> eventResponses =
+        new HashMap<StateEvent, StateTransitionHandler<S, E>>();
+    private final Opt<StateEventHandler<S, E>> defaultHandlerOpt = new Opt<StateEventHandler<S, E>>();
+    private S currentState;
+
+    public StateMachine(final S startState) {
+        currentState = startState;
+    }
+
+    public S getCurrentState() {
+        return currentState;
+    }
+
+    public void setDefaultHandler(StateEventHandler<S, E> defaultHandler) {
+        defaultHandlerOpt.set(defaultHandler);
+    }
+
+    public void registerEvent(final S state, final E event, StateTransitionHandler<S, E> eventHandler) {
+        StateEvent pair = new StateEvent(state, event);
+
+        if (eventResponses.containsKey(pair)) {
+            throw new IllegalStateException(
+                format("Duplicate registration of state+event pair: {0}, {1}.", state, event));
+        }
+
+        eventResponses.put(pair, eventHandler);
+    }
+
+    public void handleEvent(final E event) {
+        handleEvent(event, new Opt());
+    }
+
+    public void handleEvent(final E event, final Object eventData) {
+        handleEvent(event, opt(eventData));
+    }
+
+    private void handleEvent(final E event, final Opt eventData) {
+        StateEvent pair = new StateEvent(currentState, event);
+        if (!eventResponses.containsKey(pair)) {
+            if (defaultHandlerOpt.hasValue()) {
+                defaultHandlerOpt.value().run(currentState, event, eventData);
+            }
+            return;
+        }
+
+        StateTransitionHandler<S, E> eventHandler = eventResponses.get(pair);
+        Opt<S> newStateOpt = eventHandler.run(currentState, event, eventData);
+
+        if (newStateOpt.hasValue()) {
+            currentState = newStateOpt.value();
+        }
+    }
+}
+

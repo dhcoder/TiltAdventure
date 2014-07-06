@@ -15,6 +15,21 @@ public final class Opt<T> {
     private T value;
 
     /**
+     * Syntax sugar method for creating a new optional type.
+     *
+     * @throws IllegalArgumentException if value is null.
+     */
+    public static <T> Opt<T> opt(T value) throws IllegalArgumentException {
+        if (value == null)
+            throw new IllegalArgumentException("Can't call opt with null value - use Opt constructor instead");
+        return new Opt<T>(value);
+    }
+
+    public static <T> Opt<T> optNone() {
+        return new Opt<T>();
+    }
+
+    /**
      * Create an optional without a value.
      */
     public Opt() {
