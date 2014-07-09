@@ -26,6 +26,7 @@ android/gen/
 .idea/tasks.xml
 .idea/libraries
 .idea/gradle.xml
+.idea/dictionaries/
 *.iws
 out/
 com_crashlytics_export_strings.xml
