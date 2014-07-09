@@ -5,8 +5,9 @@
       <module fileurl="file://$PROJECT_DIR$/TiltAdventure.iml" filepath="$PROJECT_DIR$/TiltAdventure.iml" />
       <module fileurl="file://$PROJECT_DIR$/android/android.iml" filepath="$PROJECT_DIR$/android/android.iml" />
       <module fileurl="file://$PROJECT_DIR$/core/core.iml" filepath="$PROJECT_DIR$/core/core.iml" />
-      <module fileurl="file://$PROJECT_DIR$/d9n.utils/d9n.utils.iml" filepath="$PROJECT_DIR$/d9n.utils/d9n.utils.iml" />
       <module fileurl="file://$PROJECT_DIR$/desktop/desktop.iml" filepath="$PROJECT_DIR$/desktop/desktop.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dhcoder.support/dhcoder.support.iml" filepath="$PROJECT_DIR$/dhcoder.support/dhcoder.support.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dhcoder.test/dhcoder.test.iml" filepath="$PROJECT_DIR$/dhcoder.test/dhcoder.test.iml" />
     </modules>
   </component>
 </project>

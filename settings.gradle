@@ -1,2 +1,4 @@
-include 'desktop', 'android', 'core', 'd9n.utils'
+include 'desktop', 'android', 'core', 'dhcoder.support'
+
+include 'dhcoder.test'
 

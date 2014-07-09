@@ -1,8 +1,8 @@
 package tiltadv.components.box2d;
 
 import com.badlogic.gdx.physics.box2d.FixtureDef;
-import d9n.utils.entity.Component;
-import d9n.utils.entity.Entity;
+import tiltadv.entity.Component;
+import tiltadv.entity.Entity;
 
 /**
  * A component that wraps a Box2D fixture.

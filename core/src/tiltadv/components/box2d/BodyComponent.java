@@ -3,13 +3,11 @@ package tiltadv.components.box2d;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
-import d9n.utils.entity.Component;
-import d9n.utils.entity.Entity;
+import tiltadv.entity.Component;
+import tiltadv.entity.Entity;
+import tiltadv.components.LocationComponent;
 
 import java.util.List;
-
-import static d9n.utils.ComponentUtils.requireComponents;
-import static d9n.utils.ComponentUtils.requireSingleInstance;
 
 /**
  * A component that wraps a Box2D body.
@@ -29,13 +27,14 @@ public final class BodyComponent implements Component {
     @Override
     public void initialize(final Entity owner) {
 
-        requireSingleInstance(owner, BodyComponent.class);
+        owner.requireSingleInstance(BodyComponent.class);
+        LocationComponent locationComponent = owner.requireSingleInstance(LocationComponent.class);
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         body = world.createBody(bodyDef);
 
-        List<FixtureComponent> fixtureComponents = requireComponents(owner, FixtureComponent.class);
+        List<FixtureComponent> fixtureComponents = owner.requireComponents(FixtureComponent.class);
 
         for (FixtureComponent component : fixtureComponents) {
             body.createFixture(component.getFixtureDef());
