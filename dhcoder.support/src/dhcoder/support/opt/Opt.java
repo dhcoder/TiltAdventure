@@ -1,5 +1,7 @@
 package dhcoder.support.opt;
 
+import static dhcoder.support.utils.StringUtils.format;
+
 /**
  * A class which represents an nullable value - that is, like a reference, it either has a value or not. Unlike a
  * reference, if an Opt doesn't have a value and you try to access it, it will throw an {@link IllegalStateException}.
@@ -109,5 +111,13 @@ public final class Opt<T> {
         Opt rhs = (Opt)o;
         if (value != null ? !value.equals(rhs.value) : rhs.value != null) { return false; }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        if (value == null)
+            return "Opt<?>{}";
+
+        return format("Opt<{0}>{{{1}}}", value.getClass().getSimpleName(), value);
     }
 }
