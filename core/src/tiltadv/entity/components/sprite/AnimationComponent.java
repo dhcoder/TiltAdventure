@@ -1,4 +1,4 @@
-package tiltadv.components.sprite;
+package tiltadv.entity.components.sprite;
 
 import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;

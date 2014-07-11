@@ -1,4 +1,4 @@
-package tiltadv.components.sprite;
+package tiltadv.entity.components.sprite;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import tiltadv.entity.AbstractComponent;
