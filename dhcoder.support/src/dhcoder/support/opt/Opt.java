@@ -93,6 +93,14 @@ public final class Opt<T> {
     }
 
     /**
+     * Set the value of this optional to the value held by another optional (or no value if the target optional is also
+     * valueless).
+     */
+    public void setFrom(final Opt<T> rhs) {
+        this.value = rhs.value;
+    }
+
+    /**
      * Returns true if this optional currently has a value set.
      */
     public boolean hasValue() {
