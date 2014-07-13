@@ -9,6 +9,7 @@ public final class AnimationComponent extends AbstractComponent {
 
     @Override
     public void initialize(final Entity owner) {
-        spriteComponent = owner.requireSingleInstance(SpriteComponent.class);
+        owner.requireSingleInstance(AnimationComponent.class);
+        spriteComponent = owner.requireComponent(SpriteComponent.class);
     }
 }

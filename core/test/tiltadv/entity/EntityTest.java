@@ -12,7 +12,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 public class EntityTest {
 
-    private class DummyComponent implements Component {
+    private class DummyComponent extends AbstractComponent {
 
         private Entity owner;
         private boolean disposed;
@@ -61,7 +61,7 @@ public class EntityTest {
     /**
      * This component asserts that it is the only one that exists on an entity
      */
-    private class SingletonComponent implements Component {
+    private class SingletonComponent extends AbstractComponent {
 
         private boolean initialized;
 

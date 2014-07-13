@@ -1,18 +1,21 @@
 package tiltadv.entity.components.sprite;
 
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;
+import tiltadv.entity.components.SizeComponent;
+import tiltadv.entity.components.TransformComponent;
 
 /**
  * A component that encapsulates the logic of rendering a sprite.
  */
 public class SpriteComponent extends AbstractComponent {
 
-    private Sprite sprite;
+    public Sprite sprite;
 
-    public SpriteComponent() {
-    }
+    private TransformComponent transformComponent;
+    private SizeComponent sizeComponent;
 
     public SpriteComponent(final Sprite sprite) {
         this.sprite = sprite;
@@ -20,14 +23,16 @@ public class SpriteComponent extends AbstractComponent {
 
     @Override
     public void initialize(final Entity owner) {
-        super.initialize(owner);
+        owner.requireSingleInstance(SpriteComponent.class);
+
+        transformComponent = owner.requireComponent(TransformComponent.class);
+        sizeComponent = owner.requireComponent(SizeComponent.class);
     }
 
-    public Sprite getSprite() {
-        return sprite;
-    }
-
-    public void setSprite(final Sprite sprite) {
-        this.sprite = sprite;
+    @Override
+    public void render(final Batch batch) {
+        batch.draw(sprite, transformComponent.translate.x, transformComponent.translate.y, sprite.getWidth() / 2,
+            sprite.getHeight() / 2, sizeComponent.size.x, sizeComponent.size.y, transformComponent.scale.x,
+            transformComponent.scale.y, transformComponent.rotation.getDegrees());
     }
 }

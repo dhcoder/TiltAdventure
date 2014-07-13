@@ -12,21 +12,21 @@ public class TransformComponentTest {
     public void defaultComponentHasExpectedValues() {
         TransformComponent transformComponent = new TransformComponent.Builder().build();
 
-        assertThat(transformComponent.origin, equalTo(new Vector2(0f, 0f)));
+        assertThat(transformComponent.translate, equalTo(new Vector2(0f, 0f)));
         assertThat(transformComponent.scale, equalTo(new Vector2(1f, 1f)));
         assertThat(transformComponent.getRotation(), equalTo(0f));
     }
 
     @Test
     public void componentConsumesInputVectorsDefensively() {
-        Vector2 sneakyOrigin = new Vector2(0f, 0f);
+        Vector2 sneakyTranslate = new Vector2(0f, 0f);
         Vector2 sneakyScale = new Vector2(1f, 1f);
 
         TransformComponent transformComponent =
-            new TransformComponent.Builder().setOrigin(sneakyOrigin).setScale(sneakyScale).build();
+            new TransformComponent.Builder().setTranslate(sneakyTranslate).setScale(sneakyScale).build();
 
-        sneakyOrigin.set(123f, -456f);
-        assertThat(transformComponent.origin, equalTo(new Vector2(0f, 0f)));
+        sneakyTranslate.set(123f, -456f);
+        assertThat(transformComponent.translate, equalTo(new Vector2(0f, 0f)));
 
         sneakyScale.set(123f, -456f);
         assertThat(transformComponent.scale, equalTo(new Vector2(1f, 1f)));
@@ -36,9 +36,9 @@ public class TransformComponentTest {
     public void settingComponentValuesWorks() {
         TransformComponent transformComponent = new TransformComponent.Builder().build();
 
-        Vector2 newOrigin = new Vector2(123f, -456f);
-        transformComponent.origin.set(newOrigin);
-        assertThat(transformComponent.origin, equalTo(newOrigin));
+        Vector2 newTranslate = new Vector2(123f, -456f);
+        transformComponent.translate.set(newTranslate);
+        assertThat(transformComponent.translate, equalTo(newTranslate));
 
         Vector2 newScale = new Vector2(-123f, 456f);
         transformComponent.scale.set(newScale);

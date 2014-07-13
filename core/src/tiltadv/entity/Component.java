@@ -1,5 +1,7 @@
 package tiltadv.entity;
 
+import com.badlogic.gdx.graphics.g2d.Batch;
+
 /**
  * The base class for all components, where a component is simply an isolated unit of logic. An {@link Entity} is
  * defined by what components drive it.
@@ -13,6 +15,16 @@ public interface Component {
      *              component relies on.
      */
     void initialize(Entity owner);
+
+    /**
+     * Updates this component. The passed in time is in seconds.
+     */
+    void update(float elapsedTime);
+
+    /**
+     * Renders this component, via a {@link Batch}.
+     */
+    void render(Batch batch);
 
     /**
      * Clears up any resources used by this component.

@@ -1,5 +1,6 @@
 package tiltadv.entity;
 
+import com.badlogic.gdx.graphics.g2d.Batch;
 import dhcoder.support.opt.Opt;
 
 import java.util.ArrayList;
@@ -62,6 +63,9 @@ public class Entity {
      * is a useful way for a component to assert that it, itself, is a singleton within the entity,
      * when having multiple instances of it would not make sense.
      *
+     * You should consider using {@link #requireComponent(Class)} instead because it often has the same results and is
+     * a bit more lightweight than this method.
+     *
      * @return the singleton component, in case the calling class needs a reference to it.
      * @throws IllegalStateException if there is more than one component that matches the class type parameter.
      */
@@ -81,7 +85,7 @@ public class Entity {
      * Require that there be at least one instance of the specified {@link Component} on this entity. This is a
      * useful way for one component that depends on another to assert that the data it needs is there.
      *
-     * @return the matching components, so that the calling class doesn't have to re-request it.
+     * @return the matching components
      * @throws IllegalStateException if there aren't any components that match the class type parameter.
      */
     public <T extends Component> List<T> requireComponents(final Class<T> classType) throws IllegalStateException {
@@ -96,11 +100,49 @@ public class Entity {
     }
 
     /**
+     * Require that there be at least one instance of the specified {@link Component} on this entity, and we return the
+     * first one. This is extremely similar to {@link #requireSingleInstance(Class)} but is a little bit more
+     * lightweight because it doesn't have to loop through all components to verify there's not more than one.
+     *
+     * @return the first matching component
+     * @throws IllegalStateException if there aren't any components that match the class type parameter.
+     */
+    public <T extends Component> T requireComponent(final Class<T> classType) throws IllegalStateException {
+
+        Opt<T> componentOpt = getComponent(classType);
+
+        if (!componentOpt.hasValue()) {
+            throw new IllegalStateException(
+                format("Entity doesn't have any instances of {0}, should have at least 1", classType));
+        }
+
+        return componentOpt.value();
+    }
+
+    /**
      * Clear up any resources used by this entity.
      */
     public void dispose() {
         for (Component component : components) {
             component.dispose();
+        }
+    }
+
+    /**
+     * Update this entity. The passed in time is in seconds.
+     */
+    public void update(final float elapsedTime) {
+        for (Component component : components) {
+            component.update(elapsedTime);
+        }
+    }
+
+    /**
+     * Render this entity, via a {@link Batch}.
+     */
+    public void render(final Batch batch) {
+        for (Component component : components) {
+            component.render(batch);
         }
     }
 
