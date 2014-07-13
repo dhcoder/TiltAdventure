@@ -1,7 +1,8 @@
-package tiltadv.entity.components;
+package tiltadv.entity.components.data;
 
 import com.badlogic.gdx.math.Vector2;
 import org.junit.Test;
+import tiltadv.entity.components.data.TransformComponent;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -14,7 +15,7 @@ public class TransformComponentTest {
 
         assertThat(transformComponent.translate, equalTo(new Vector2(0f, 0f)));
         assertThat(transformComponent.scale, equalTo(new Vector2(1f, 1f)));
-        assertThat(transformComponent.getRotation(), equalTo(0f));
+        assertThat(transformComponent.rotation.getDegrees(), equalTo(0f));
     }
 
     @Test
@@ -45,8 +46,8 @@ public class TransformComponentTest {
         assertThat(transformComponent.scale, equalTo(newScale));
 
         float newRotation = 30f;
-        transformComponent.setRotation(newRotation);
-        assertThat(transformComponent.getRotation(), equalTo(newRotation));
+        transformComponent.rotation.setDegrees(newRotation);
+        assertThat(transformComponent.rotation.getDegrees(), equalTo(newRotation));
     }
 
 }

@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;
-import tiltadv.entity.components.TransformComponent;
+import tiltadv.entity.components.data.TransformComponent;
 
 import static com.badlogic.gdx.math.MathUtils.atan2;
 

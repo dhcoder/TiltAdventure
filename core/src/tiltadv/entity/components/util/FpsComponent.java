@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;
-import tiltadv.entity.components.TransformComponent;
+import tiltadv.entity.components.data.TransformComponent;
 
 import static dhcoder.support.utils.StringUtils.format;
 

@@ -2,7 +2,7 @@ package tiltadv.entity.components.behavior;
 
 import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;
-import tiltadv.entity.components.TransformComponent;
+import tiltadv.entity.components.data.TransformComponent;
 
 /**
  * HEADER COMMENT HERE.

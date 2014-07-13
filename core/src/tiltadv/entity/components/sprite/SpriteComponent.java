@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;
-import tiltadv.entity.components.SizeComponent;
-import tiltadv.entity.components.TransformComponent;
+import tiltadv.entity.components.data.SizeComponent;
+import tiltadv.entity.components.data.TransformComponent;
 
 /**
  * A component that encapsulates the logic of rendering a sprite.
