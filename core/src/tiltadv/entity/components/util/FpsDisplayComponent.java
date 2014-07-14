@@ -12,12 +12,12 @@ import static dhcoder.support.utils.StringUtils.format;
 /**
  * Simple utility class that shows the current framerate.
  */
-public class FpsComponent extends AbstractComponent {
+public class FpsDisplayComponent extends AbstractComponent {
 
     private final BitmapFont font;
     private TransformComponent transformComponent;
 
-    public FpsComponent(final BitmapFont font) {
+    public FpsDisplayComponent(final BitmapFont font) {
         this.font = font;
     }
 

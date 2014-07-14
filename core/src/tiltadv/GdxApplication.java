@@ -9,12 +9,14 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import tiltadv.entity.Entity;
-import tiltadv.entity.components.data.SizeComponent;
-import tiltadv.entity.components.data.TransformComponent;
 import tiltadv.entity.components.behavior.PlayerBehaviorComponent;
+import tiltadv.entity.components.data.MotionComponent;
+import tiltadv.entity.components.data.SizeComponent;
+import tiltadv.entity.components.data.TiltComponent;
+import tiltadv.entity.components.data.TransformComponent;
 import tiltadv.entity.components.sprite.SpriteComponent;
-import tiltadv.entity.components.util.FpsComponent;
-import tiltadv.entity.components.util.TiltComponent;
+import tiltadv.entity.components.util.FpsDisplayComponent;
+import tiltadv.entity.components.util.TiltDisplayComponent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,35 +87,43 @@ public class GdxApplication extends ApplicationAdapter {
     }
 
     private void AddPlayerEntity() {
+        Sprite playerUp = new Sprite(tiles, 60, 0, 16, 16);
         Sprite playerDown = new Sprite(tiles, 0, 0, 16, 16);
-        SpriteComponent spriteComponent = new SpriteComponent(playerDown);
+        Sprite playerLeft = new Sprite(tiles, 29, 0, 16, 16);
+        Sprite playerRight = new Sprite(tiles, 90, 0, 16, 16);
+        SpriteComponent spriteComponent = new SpriteComponent();
 
         SizeComponent sizeComponent = new SizeComponent(playerDown.getWidth(), playerDown.getHeight());
         TransformComponent transformComponent = new TransformComponent();
-        PlayerBehaviorComponent behaviorComponent = new PlayerBehaviorComponent();
+        MotionComponent motionComponent = new MotionComponent();
+        TiltComponent tiltComponent = new TiltComponent();
+        PlayerBehaviorComponent behaviorComponent =
+            new PlayerBehaviorComponent(playerUp, playerDown, playerLeft, playerRight);
 
-        entities.add(new Entity(transformComponent, sizeComponent, spriteComponent, behaviorComponent));
+        entities.add(new Entity(transformComponent, motionComponent, sizeComponent, tiltComponent, spriteComponent,
+            behaviorComponent));
     }
 
     private void AddFpsEntity() {
         TransformComponent transformComponent = new TransformComponent.Builder()
             .setTranslate(-VIEWPORT_WIDTH / 2, -VIEWPORT_HEIGHT / 2 + font.getLineHeight()).build();
-        FpsComponent fpsComponent = new FpsComponent(font);
-        entities.add(new Entity(transformComponent, fpsComponent));
+        FpsDisplayComponent fpsDisplayComponent = new FpsDisplayComponent(font);
+        entities.add(new Entity(transformComponent, fpsDisplayComponent));
     }
 
     private void AddTiltIndicatorEntity() {
-        Sprite rodUp = new Sprite(tiles, 64, 113, 7, 13);
-        SpriteComponent spriteComponent = new SpriteComponent(rodUp);
-        SizeComponent sizeComponent = new SizeComponent(rodUp.getWidth(), rodUp.getHeight());
-
+        Sprite rodRight = new Sprite(tiles, 98, 126, 13, 4);
         float margin = 5f;
         TransformComponent transformComponent = new TransformComponent.Builder()
-            .setTranslate(VIEWPORT_WIDTH / 2 - rodUp.getWidth() - margin,
-                VIEWPORT_HEIGHT / 2 - rodUp.getHeight() - margin).build();
+            .setTranslate(VIEWPORT_WIDTH / 2 - rodRight.getWidth() - margin,
+                VIEWPORT_HEIGHT / 2 - rodRight.getHeight() - margin).build();
 
+        SpriteComponent spriteComponent = new SpriteComponent();
+        SizeComponent sizeComponent = SizeComponent.fromSprite(rodRight);
         TiltComponent tiltComponent = new TiltComponent();
-        entities.add(new Entity(spriteComponent, sizeComponent, transformComponent, tiltComponent));
+        TiltDisplayComponent tiltDisplayComponent = new TiltDisplayComponent(rodRight);
+        entities
+            .add(new Entity(spriteComponent, sizeComponent, transformComponent, tiltComponent, tiltDisplayComponent));
     }
 
 }

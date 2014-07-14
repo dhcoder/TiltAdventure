@@ -14,6 +14,11 @@ public class Angle {
     public static final float PI = (float)Math.PI;
 
     /**
+     * Convenience constant for π/2
+     */
+    public static final float HALF_PI = PI / 2f;
+
+    /**
      * Multiplying this to a value in degrees converts it to radians.
      */
     public static final float RAD_TO_DEG = 180f / PI;
