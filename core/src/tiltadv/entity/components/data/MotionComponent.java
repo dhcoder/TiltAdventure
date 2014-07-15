@@ -33,7 +33,6 @@ public class MotionComponent extends AbstractComponent {
      */
     private final Opt<Float> dampingTimeOpt = Opt.withNoValue();
     private final Vector2 velocityInitial = new Vector2(); // Copy of initial velocity, used for damping calculations
-    private float dampingTimeStart; // Current time, in seconds
     private float timeElapsedSoFar; // In seconds
     private TransformComponent transformComponent;
 
@@ -59,7 +58,6 @@ public class MotionComponent extends AbstractComponent {
 
     public void setDampingTime(final float dampingTime) {
         dampingTimeOpt.set(dampingTime);
-        dampingTimeStart = millis() / 1000f;
         timeElapsedSoFar = 0;
     }
 
