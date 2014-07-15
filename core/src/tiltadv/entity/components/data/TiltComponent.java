@@ -2,6 +2,7 @@ package tiltadv.entity.components.data;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
+import dhcoder.support.time.Duration;
 import tiltadv.entity.AbstractComponent;
 
 /**
@@ -16,7 +17,7 @@ public class TiltComponent extends AbstractComponent {
     }
 
     @Override
-    public void update(final float elapsedTime) {
+    public void update(final Duration elapsedTime) {
         // Convert portrait accelerometer directions to landscape
         // See https://github.com/libgdx/libgdx/wiki/Accelerometer
         tiltVector.set(Gdx.input.getAccelerometerY(), -Gdx.input.getAccelerometerX());

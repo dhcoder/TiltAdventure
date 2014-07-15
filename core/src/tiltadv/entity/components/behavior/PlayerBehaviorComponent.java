@@ -2,6 +2,7 @@ package tiltadv.entity.components.behavior;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
+import dhcoder.support.time.Duration;
 import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;
 import tiltadv.entity.components.data.MotionComponent;
@@ -46,7 +47,7 @@ public class PlayerBehaviorComponent extends AbstractComponent {
     }
 
     @Override
-    public void update(final float elapsedTime) {
+    public void update(final Duration elapsedTime) {
         Vector2 tiltVector = tiltComponent.getTiltVector();
 
         if (tiltVector.len2() < TILT_THRESHOLD) {

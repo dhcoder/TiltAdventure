@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import dhcoder.support.time.Duration;
 import tiltadv.entity.Entity;
 import tiltadv.entity.components.behavior.PlayerBehaviorComponent;
 import tiltadv.entity.components.data.MotionComponent;
@@ -77,9 +78,9 @@ public class GdxApplication extends ApplicationAdapter {
     }
 
     private void update() {
-        float deltaTime = Math.min(Gdx.graphics.getRawDeltaTime(), MAX_DELTA_TIME_SECS);
+        Duration elapsedTime = Duration.fromSeconds(Math.min(Gdx.graphics.getRawDeltaTime(), MAX_DELTA_TIME_SECS));
         for (Entity entity : entities) {
-            entity.update(deltaTime);
+            entity.update(elapsedTime);
         }
 
         camera.update();
@@ -98,15 +99,15 @@ public class GdxApplication extends ApplicationAdapter {
         MotionComponent motionComponent = new MotionComponent();
         TiltComponent tiltComponent = new TiltComponent();
         PlayerBehaviorComponent behaviorComponent =
-            new PlayerBehaviorComponent(playerUp, playerDown, playerLeft, playerRight);
+                new PlayerBehaviorComponent(playerUp, playerDown, playerLeft, playerRight);
 
         entities.add(new Entity(transformComponent, motionComponent, sizeComponent, tiltComponent, spriteComponent,
-            behaviorComponent));
+                behaviorComponent));
     }
 
     private void AddFpsEntity() {
         TransformComponent transformComponent = new TransformComponent.Builder()
-            .setTranslate(-VIEWPORT_WIDTH / 2, -VIEWPORT_HEIGHT / 2 + font.getLineHeight()).build();
+                .setTranslate(-VIEWPORT_WIDTH / 2, -VIEWPORT_HEIGHT / 2 + font.getLineHeight()).build();
         FpsDisplayComponent fpsDisplayComponent = new FpsDisplayComponent(font);
         entities.add(new Entity(transformComponent, fpsDisplayComponent));
     }
@@ -115,15 +116,15 @@ public class GdxApplication extends ApplicationAdapter {
         Sprite rodRight = new Sprite(tiles, 98, 126, 13, 4);
         float margin = 5f;
         TransformComponent transformComponent = new TransformComponent.Builder()
-            .setTranslate(VIEWPORT_WIDTH / 2 - rodRight.getWidth() - margin,
-                VIEWPORT_HEIGHT / 2 - rodRight.getHeight() - margin).build();
+                .setTranslate(VIEWPORT_WIDTH / 2 - rodRight.getWidth() - margin,
+                        VIEWPORT_HEIGHT / 2 - rodRight.getHeight() - margin).build();
 
         SpriteComponent spriteComponent = new SpriteComponent();
         SizeComponent sizeComponent = SizeComponent.fromSprite(rodRight);
         TiltComponent tiltComponent = new TiltComponent();
         TiltDisplayComponent tiltDisplayComponent = new TiltDisplayComponent(rodRight);
         entities
-            .add(new Entity(spriteComponent, sizeComponent, transformComponent, tiltComponent, tiltDisplayComponent));
+                .add(new Entity(spriteComponent, sizeComponent, transformComponent, tiltComponent, tiltDisplayComponent));
     }
 
 }

@@ -2,6 +2,7 @@ package tiltadv.entity;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import dhcoder.support.opt.Opt;
+import dhcoder.support.time.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -131,7 +132,7 @@ public class Entity {
     /**
      * Update this entity. The passed in time is in seconds.
      */
-    public void update(final float elapsedTime) {
+    public void update(final Duration elapsedTime) {
         for (Component component : components) {
             component.update(elapsedTime);
         }

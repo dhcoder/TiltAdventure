@@ -3,6 +3,7 @@ package tiltadv.entity.components.data;
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.support.math.Angle;
 import dhcoder.support.opt.Opt;
+import dhcoder.support.time.Duration;
 import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;
 
@@ -80,7 +81,9 @@ public class MotionComponent extends AbstractComponent {
     }
 
     @Override
-    public void update(final float elapsedTime) {
+    public void update(final Duration elapsedTime) {
+
+        float elapsedSecs = elapsedTime.inSeconds();
 
         if (dampingTimeOpt.hasValue()) {
             float dampingTime = dampingTimeOpt.value();
@@ -90,7 +93,7 @@ public class MotionComponent extends AbstractComponent {
                 float timeToRadians = Angle.HALF_PI + Angle.HALF_PI * timeElapsedSoFar / dampingTime;
                 velocity.set(velocityInitial);
                 velocity.scl(sin(timeToRadians));
-                timeElapsedSoFar += elapsedTime;
+                timeElapsedSoFar += elapsedSecs;
             }
             else {
                 velocity.setZero();
@@ -99,7 +102,7 @@ public class MotionComponent extends AbstractComponent {
         }
 
         // Adjust current position based on how much velocity was applied over the last time range
-        transformComponent.translate.mulAdd(velocity, elapsedTime);
+        transformComponent.translate.mulAdd(velocity, elapsedSecs);
     }
 
     private void setVelocityInternal(final float vx, final float vy) {
