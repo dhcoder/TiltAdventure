@@ -14,14 +14,10 @@ import tiltadv.entity.components.sprite.SpriteComponent;
  */
 public class TiltDisplayComponent extends AbstractComponent {
 
-    /**
-     * Threshold for tilt strength. If the tilt vector is lower than this value, it means the user isn't tilting enough
-     * and we should ignore the input.
-     */
-    private static final float TILT_THRESHOLD = 1.4f;
     private final Sprite arrowSprite;
     private TransformComponent transformComponent;
     private TiltComponent tiltComponent;
+    private SpriteComponent spriteComponent;
 
     /**
      * Create a tilt indicator by passing in a sprite which represents an arrow facing straight right. This component
@@ -36,13 +32,19 @@ public class TiltDisplayComponent extends AbstractComponent {
         transformComponent = owner.requireComponent(TransformComponent.class);
         tiltComponent = owner.requireComponent(TiltComponent.class);
 
-        SpriteComponent spriteComponent = owner.requireComponent(SpriteComponent.class);
+        spriteComponent = owner.requireComponent(SpriteComponent.class);
         spriteComponent.sprite.set(arrowSprite);
     }
 
     @Override
     public void render(final Batch batch) {
         Vector2 tiltVector = tiltComponent.getTiltVector();
+        if (tiltVector.isZero()) {
+            spriteComponent.hidden = true;
+            return;
+        }
+
+        spriteComponent.hidden = false;
         transformComponent.rotation.setDegrees(tiltVector.angle());
     }
 }

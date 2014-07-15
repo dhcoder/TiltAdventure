@@ -22,6 +22,8 @@ public class SpriteComponent extends AbstractComponent {
      */
     public final Sprite sprite = new Sprite();
 
+    public boolean hidden;
+
     private TransformComponent transformComponent;
     private SizeComponent sizeComponent;
 
@@ -41,6 +43,9 @@ public class SpriteComponent extends AbstractComponent {
 
     @Override
     public void render(final Batch batch) {
+
+        if (hidden)
+            return;
 
         batch.draw(sprite, transformComponent.translate.x, transformComponent.translate.y, sprite.getWidth() / 2,
             sprite.getHeight() / 2, sizeComponent.size.x, sizeComponent.size.y, transformComponent.scale.x,
