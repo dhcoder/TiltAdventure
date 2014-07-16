@@ -163,7 +163,7 @@ public class StateMachineTest {
             @Override
             public Opt<TestState> run(final TestState fromState, final TestEvent withEvent, final Opt eventData) {
                 assertThat(eventData.hasValue(), equalTo(true));
-                assertThat(eventData.value(), equalTo(dummyData));
+                assertThat(eventData.getValue(), equalTo(dummyData));
 
                 ran = true;
                 return Opt.withNoValue();

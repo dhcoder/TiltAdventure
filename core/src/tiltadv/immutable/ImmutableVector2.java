@@ -5,189 +5,188 @@ import com.badlogic.gdx.math.Vector2;
 /**
  * A class that wraps a Vector2, offering read-only access to it.
  */
-public class ImmutableVector2 {
-
-    private final Vector2 innerVector2;
+public class ImmutableVector2 extends Immutable<Vector2> {
 
     public ImmutableVector2(final Vector2 vector2) {
-        this.innerVector2 = vector2;
+        super(vector2);
     }
 
-    public Vector2 toVector2() {
-        return innerVector2.cpy();
+    @Override
+    public Vector2 toMutable() {
+        return wrappedMutable.cpy();
     }
 
     public float getX() {
-        return innerVector2.x;
+        return wrappedMutable.x;
     }
 
     public float getY() {
-        return innerVector2.y;
+        return wrappedMutable.y;
     }
 
     public float getAngle() {
-        return innerVector2.angle();
+        return wrappedMutable.angle();
     }
 
     public float getAngleRad() {
-        return innerVector2.angleRad();
+        return wrappedMutable.angleRad();
     }
 
     public boolean isUnit() {
-        return innerVector2.isUnit();
+        return wrappedMutable.isUnit();
     }
 
     public boolean isUnit(final float margin) {
-        return innerVector2.isUnit(margin);
+        return wrappedMutable.isUnit(margin);
     }
 
     public boolean isZero() {
-        return innerVector2.isZero();
+        return wrappedMutable.isZero();
     }
 
     public boolean isZero(final float margin) {
-        return innerVector2.isZero(margin);
+        return wrappedMutable.isZero(margin);
     }
 
     public boolean isOnLine(final Vector2 other) {
-        return innerVector2.isOnLine(other);
+        return wrappedMutable.isOnLine(other);
     }
 
     public boolean isOnLine(final Vector2 other, final float epsilon) {
-        return innerVector2.isOnLine(other, epsilon);
+        return wrappedMutable.isOnLine(other, epsilon);
     }
 
     public boolean isOnLine(final ImmutableVector2 handle) {
-        return innerVector2.isOnLine(handle.innerVector2);
+        return wrappedMutable.isOnLine(handle.wrappedMutable);
     }
 
     public boolean isOnLine(final ImmutableVector2 handle, final float epsilon) {
-        return innerVector2.isOnLine(handle.innerVector2, epsilon);
+        return wrappedMutable.isOnLine(handle.wrappedMutable, epsilon);
     }
 
     public boolean isCollinear(final Vector2 other) {
-        return innerVector2.isCollinear(other);
+        return wrappedMutable.isCollinear(other);
     }
 
     public boolean isCollinear(final Vector2 other, final float epsilon) {
-        return innerVector2.isCollinear(other, epsilon);
+        return wrappedMutable.isCollinear(other, epsilon);
     }
 
     public boolean isCollinear(final ImmutableVector2 handle) {
-        return innerVector2.isCollinear(handle.innerVector2);
+        return wrappedMutable.isCollinear(handle.wrappedMutable);
     }
 
     public boolean isCollinear(final ImmutableVector2 handle, final float epsilon) {
-        return innerVector2.isCollinear(handle.innerVector2, epsilon);
+        return wrappedMutable.isCollinear(handle.wrappedMutable, epsilon);
     }
 
     public boolean isCollinearOpposite(final Vector2 other) {
-        return innerVector2.isCollinearOpposite(other);
+        return wrappedMutable.isCollinearOpposite(other);
     }
 
     public boolean isCollinearOpposite(final Vector2 other, final float epsilon) {
-        return innerVector2.isCollinearOpposite(other, epsilon);
+        return wrappedMutable.isCollinearOpposite(other, epsilon);
     }
 
     public boolean isCollinearOpposite(final ImmutableVector2 handle) {
-        return innerVector2.isCollinearOpposite(handle.innerVector2);
+        return wrappedMutable.isCollinearOpposite(handle.wrappedMutable);
     }
 
     public boolean isCollinearOpposite(final ImmutableVector2 handle, final float epsilon) {
-        return innerVector2.isCollinearOpposite(handle.innerVector2, epsilon);
+        return wrappedMutable.isCollinearOpposite(handle.wrappedMutable, epsilon);
     }
 
     public boolean isPerpendicular(final Vector2 other) {
-        return innerVector2.isPerpendicular(other);
+        return wrappedMutable.isPerpendicular(other);
     }
 
     public boolean isPerpendicular(final Vector2 other, final float epsilon) {
-        return innerVector2.isPerpendicular(other, epsilon);
+        return wrappedMutable.isPerpendicular(other, epsilon);
     }
 
     public boolean isPerpendicular(final ImmutableVector2 handle) {
-        return innerVector2.isPerpendicular(handle.innerVector2);
+        return wrappedMutable.isPerpendicular(handle.wrappedMutable);
     }
 
     public boolean isPerpendicular(final ImmutableVector2 handle, final float epsilon) {
-        return innerVector2.isPerpendicular(handle.innerVector2, epsilon);
+        return wrappedMutable.isPerpendicular(handle.wrappedMutable, epsilon);
     }
 
     public boolean hasSameDirection(final Vector2 other) {
-        return innerVector2.hasSameDirection(other);
+        return wrappedMutable.hasSameDirection(other);
     }
 
     public boolean hasSameDirection(final ImmutableVector2 handle) {
-        return innerVector2.hasSameDirection(handle.innerVector2);
+        return wrappedMutable.hasSameDirection(handle.wrappedMutable);
     }
 
     public boolean hasOppositeDirection(final Vector2 other) {
-        return innerVector2.hasOppositeDirection(other);
+        return wrappedMutable.hasOppositeDirection(other);
     }
 
     public boolean hasOppositeDirection(final ImmutableVector2 handle) {
-        return innerVector2.hasOppositeDirection(handle.innerVector2);
+        return wrappedMutable.hasOppositeDirection(handle.wrappedMutable);
     }
 
     public float len() {
-        return innerVector2.len();
+        return wrappedMutable.len();
     }
 
     public float len2() {
-        return innerVector2.len2();
+        return wrappedMutable.len2();
     }
 
     public float dst(final float x, final float y) {
-        return innerVector2.dst(x, y);
+        return wrappedMutable.dst(x, y);
     }
 
     public float dst(final Vector2 v) {
-        return innerVector2.dst(v);
+        return wrappedMutable.dst(v);
     }
 
     public float dst(final ImmutableVector2 handle) {
-        return innerVector2.dst(handle.innerVector2);
+        return wrappedMutable.dst(handle.wrappedMutable);
     }
 
     public float dst2(final float x, final float y) {
-        return innerVector2.dst2(x, y);
+        return wrappedMutable.dst2(x, y);
     }
 
     public float dst2(final Vector2 v) {
-        return innerVector2.dst2(v);
+        return wrappedMutable.dst2(v);
     }
 
     public float dst2(final ImmutableVector2 handle) {
-        return innerVector2.dst2(handle.innerVector2);
+        return wrappedMutable.dst2(handle.wrappedMutable);
     }
 
     public float crs(final float x, final float y) {
-        return innerVector2.crs(x, y);
+        return wrappedMutable.crs(x, y);
     }
 
     public float crs(final Vector2 v) {
-        return innerVector2.crs(v);
+        return wrappedMutable.crs(v);
     }
 
     public float crs(final ImmutableVector2 handle) {
-        return innerVector2.crs(handle.innerVector2);
+        return wrappedMutable.crs(handle.wrappedMutable);
     }
 
     public boolean epsilonEquals(final float x, final float y, final float epsilon) {
-        return innerVector2.epsilonEquals(x, y, epsilon);
+        return wrappedMutable.epsilonEquals(x, y, epsilon);
     }
 
     public boolean epsilonEquals(final Vector2 v, final float epsilon) {
-        return innerVector2.epsilonEquals(v, epsilon);
+        return wrappedMutable.epsilonEquals(v, epsilon);
     }
 
     public boolean epsilonEquals(final ImmutableVector2 handle, final float epsilon) {
-        return innerVector2.epsilonEquals(handle.innerVector2, epsilon);
+        return wrappedMutable.epsilonEquals(handle.wrappedMutable, epsilon);
     }
 
     @Override
     public int hashCode() {
-        return innerVector2.hashCode();
+        return wrappedMutable.hashCode();
     }
 
     @Override
@@ -197,13 +196,8 @@ public class ImmutableVector2 {
 
         ImmutableVector2 that = (ImmutableVector2)o;
 
-        if (!innerVector2.equals(that.innerVector2)) { return false; }
+        if (!wrappedMutable.equals(that.wrappedMutable)) { return false; }
 
         return true;
-    }
-
-    @Override
-    public String toString() {
-        return innerVector2.toString();
     }
 }

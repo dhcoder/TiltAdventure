@@ -21,7 +21,7 @@ public final class OptTest {
     public void createOptionalWithValueWorks() {
         Opt<String> stringOpt = Opt.of(DUMMY_VALUE);
         assertThat(stringOpt.hasValue(), equalTo(true));
-        assertThat(stringOpt.value(), equalTo(DUMMY_VALUE));
+        assertThat(stringOpt.getValue(), equalTo(DUMMY_VALUE));
     }
 
     @Test
@@ -38,7 +38,7 @@ public final class OptTest {
 
         stringOpt.set(DUMMY_VALUE);
         assertThat(stringOpt.hasValue(), equalTo(true));
-        assertThat(stringOpt.value(), equalTo(DUMMY_VALUE));
+        assertThat(stringOpt.getValue(), equalTo(DUMMY_VALUE));
 
         stringOpt.set(null);
         assertThat(stringOpt.hasValue(), equalTo(false));
@@ -70,7 +70,7 @@ public final class OptTest {
         assertException("Can't get a value from a valueless optional", IllegalStateException.class, new Action() {
             @Override
             public void run() {
-                String result = emptyStringOpt.value();
+                String result = emptyStringOpt.getValue();
             }
         });
     }

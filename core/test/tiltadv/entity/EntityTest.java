@@ -54,7 +54,7 @@ public class EntityTest {
 
         @Override
         public void initialize(final Entity owner) {
-            sourceComponent = owner.getComponent(SourceComponent.class).value();
+            sourceComponent = owner.getComponent(SourceComponent.class).getValue();
         }
     }
 
@@ -103,8 +103,8 @@ public class EntityTest {
         DummyComponent dummyComponent = new DummyComponent();
         SourceComponent sourceComponent = new SourceComponent();
         Entity entity = new Entity(dummyComponent, sourceComponent);
-        assertThat(entity.getComponent(DummyComponent.class).value(), equalTo(dummyComponent));
-        assertThat(entity.getComponent(SourceComponent.class).value(), equalTo(sourceComponent));
+        assertThat(entity.getComponent(DummyComponent.class).getValue(), equalTo(dummyComponent));
+        assertThat(entity.getComponent(SourceComponent.class).getValue(), equalTo(sourceComponent));
         assertThat(entity.getComponent(DependentComponent.class).hasValue(), equalTo(false));
     }
 

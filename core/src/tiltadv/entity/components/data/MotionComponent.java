@@ -6,8 +6,10 @@ import dhcoder.support.opt.Opt;
 import dhcoder.support.time.Duration;
 import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;
+import tiltadv.immutable.ImmutableVector2;
 
 import static com.badlogic.gdx.math.MathUtils.sin;
+import static dhcoder.support.utils.StringUtils.format;
 
 /**
  * Component that encapsulates the logic of calculating an {@link Entity}'s velocity and acceleration. Expects the
@@ -23,43 +25,39 @@ public class MotionComponent extends AbstractComponent {
      */
     public final Opt<Float> maxVelocityOpt = Opt.withNoValue();
 
-    // The velocity of this entity, in pixels/sec
-    private final Vector2 velocity = new Vector2();
-    // The acceleration of this entity, in pixels/sec²
-    private final Vector2 acceleration = new Vector2();
+    // The velocity of this entity is measured in in pixels/sec
+    private final Vector2 startVelocity = new Vector2();
+    private final Vector2 currentVelocity = new Vector2();
+    private final ImmutableVector2 immutableCurrentVelocity = new ImmutableVector2(currentVelocity);
+    private final Vector2 targetVelocity = new Vector2();
 
-    /**
-     * An optional duration (in seconds), which, if set, represents the amount of time after which, if set, this motion
-     * comes to a complete stop.
-     */
-    private final Opt<Float> dampingTimeOpt = Opt.withNoValue();
-    private final Vector2 velocityCopy = new Vector2(); // Copy of pre-dampened velocity, used for damping calculations
-    private float timeElapsedSoFar; // In seconds
+    // An optional duration, which, if set, represents the amount of time it takes for the current velocity to converge
+    // into the target velocity. If 0, the target velocity is reached immediately.
+    private Duration acclerationTime = Duration.zero();
+    // Time passed since the velocity was last set.
+    private Duration timeElapsedSoFar = Duration.zero();
+
     private TransformComponent transformComponent;
 
-    public void setVelocity(final Vector2 velocity) {
-        setVelocity(velocity.x, velocity.y);
+    public void setTargetVelocity(final Vector2 velocity) {
+        setTargetVelocity(velocity.x, velocity.y);
     }
 
-    public void setVelocity(final float vx, final float vy) {
-        velocity.set(vx, vy);
-        limitVelocity();
-        dampingTimeOpt.clear();
+    public void setTargetVelocity(final float vx, final float vy) {
+        startVelocity.set(currentVelocity);
+        targetVelocity.set(vx, vy);
+        if (maxVelocityOpt.hasValue()) {
+            targetVelocity.limit(maxVelocityOpt.getValue());
+        }
+        timeElapsedSoFar.setZero();
     }
 
-    public void setAcceleration(final Vector2 acceleration) {
-        setAcceleration(acceleration.x, acceleration.y);
+    public ImmutableVector2 getVelocity() {
+        return immutableCurrentVelocity;
     }
 
-    public void setAcceleration(final float ax, final float ay) {
-        acceleration.set(ax, ay);
-    }
-
-    public void setDampingTime(final float dampingTime) {
-        acceleration.set(0f, 0f);
-        velocityCopy.set(velocity);
-        dampingTimeOpt.set(dampingTime);
-        timeElapsedSoFar = 0;
+    public void setAccelerationTime(final Duration accelerationTime) {
+        this.acclerationTime.setFrom(accelerationTime);
     }
 
     @Override
@@ -70,35 +68,24 @@ public class MotionComponent extends AbstractComponent {
     @Override
     public void update(final Duration elapsedTime) {
 
-        float elapsedSecs = elapsedTime.inSeconds();
-
-        if (dampingTimeOpt.hasValue()) {
-            float dampingTime = dampingTimeOpt.value();
-            if (timeElapsedSoFar < dampingTime) {
-                // Sin(π/2) -> Sin(π) => 1 -> 0, but in a way with a smooth decelerating curve.
+        if (!currentVelocity.equals(targetVelocity)) {
+            float secsElapsedSoFar = timeElapsedSoFar.getSeconds();
+            float accelTimeInSecs = acclerationTime.getSeconds();
+            if (secsElapsedSoFar < accelTimeInSecs) {
+                // Sin(π) -> Sin(π/2) => 0 -> 1, but in a way with a smooth decelerating curve.
                 // Map how much time has passed to the appropriate point on the sin curve.
-                float timeToRadians = Angle.HALF_PI + Angle.HALF_PI * timeElapsedSoFar / dampingTime;
-                velocity.set(velocityCopy);
-                velocity.scl(sin(timeToRadians));
-                timeElapsedSoFar += elapsedSecs;
-            } else {
-                velocity.setZero();
-                dampingTimeOpt.clear();
+                float timeToRadians = Angle.PI - Angle.HALF_PI * secsElapsedSoFar / accelTimeInSecs;
+                float percentComplete = sin(timeToRadians);
+                currentVelocity.set(startVelocity.x + (targetVelocity.x - startVelocity.x) * percentComplete,
+                    startVelocity.y + (targetVelocity.y - startVelocity.y) * percentComplete);
+                timeElapsedSoFar.add(elapsedTime);
             }
-        } else if (!acceleration.isZero()) {
-            velocity.mulAdd(acceleration, elapsedSecs);
-            limitVelocity();
+            else {
+                currentVelocity.set(targetVelocity);
+            }
         }
 
         // Adjust current position based on how much velocity was applied over the last time range
-        transformComponent.translate.mulAdd(velocity, elapsedSecs);
-    }
-
-    // Make sure the current velocity is bounded by the current maximum velocity. You must remember to call this any
-    // time velocity is potentially increased.
-    private void limitVelocity() {
-        if (maxVelocityOpt.hasValue()) {
-            velocity.limit(maxVelocityOpt.value());
-        }
+        transformComponent.translate.mulAdd(currentVelocity, elapsedTime.getSeconds());
     }
 }

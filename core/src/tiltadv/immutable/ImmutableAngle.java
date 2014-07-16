@@ -5,30 +5,24 @@ import dhcoder.support.math.Angle;
 /**
  * A class that wraps an Angle, offering read-only access to it.
  */
-public class ImmutableAngle {
-
-    private final Angle innerAngle;
+public class ImmutableAngle extends Immutable<Angle> {
 
     public ImmutableAngle(final Angle angle) {
-        this.innerAngle = angle;
+        super(angle);
     }
 
-    public Angle toAngle() {
+    @Override
+    public Angle toMutable() {
         Angle angleCopy = new Angle();
-        angleCopy.set(innerAngle);
+        angleCopy.setFrom(wrappedMutable);
         return angleCopy;
     }
 
     public float getDegrees() {
-        return innerAngle.getDegrees();
+        return wrappedMutable.getDegrees();
     }
 
     public float getRadians() {
-        return innerAngle.getRadians();
-    }
-
-    @Override
-    public String toString() {
-        return innerAngle.toString();
+        return wrappedMutable.getRadians();
     }
 }

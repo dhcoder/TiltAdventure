@@ -115,7 +115,7 @@ public abstract class StateMachine<S extends Enum, E extends Enum> {
         StateEvent pair = new StateEvent(currentState, event);
         if (!eventResponses.containsKey(pair)) {
             if (defaultHandlerOpt.hasValue()) {
-                defaultHandlerOpt.value().run(currentState, event, eventData);
+                defaultHandlerOpt.getValue().run(currentState, event, eventData);
             }
             return;
         }
@@ -124,7 +124,7 @@ public abstract class StateMachine<S extends Enum, E extends Enum> {
         Opt<S> newStateOpt = eventHandler.run(currentState, event, eventData);
 
         if (newStateOpt.hasValue()) {
-            currentState = newStateOpt.value();
+            currentState = newStateOpt.getValue();
         }
     }
 }

@@ -51,9 +51,9 @@ public class Angle {
 
     public float getDegrees() {
         if (!degreesOpt.hasValue()) {
-            degreesOpt.set(radiansOpt.value() * RAD_TO_DEG);
+            degreesOpt.set(radiansOpt.getValue() * RAD_TO_DEG);
         }
-        return degreesOpt.value();
+        return degreesOpt.getValue();
     }
 
     public void setDegrees(final float degrees) {
@@ -68,9 +68,9 @@ public class Angle {
 
     public float getRadians() {
         if (!radiansOpt.hasValue()) {
-            radiansOpt.set(degreesOpt.value() * DEG_TO_RAD);
+            radiansOpt.set(degreesOpt.getValue() * DEG_TO_RAD);
         }
-        return radiansOpt.value();
+        return radiansOpt.getValue();
     }
 
     public void setRadians(final float radians) {
@@ -83,7 +83,7 @@ public class Angle {
         degreesOpt.clear();
     }
 
-    public void set(final Angle rhs) {
+    public void setFrom(final Angle rhs) {
         degreesOpt.setFrom(rhs.degreesOpt);
         radiansOpt.setFrom(rhs.radiansOpt);
     }

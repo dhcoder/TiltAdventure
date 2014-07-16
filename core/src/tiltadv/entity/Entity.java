@@ -117,7 +117,7 @@ public class Entity {
                 format("Entity doesn't have any instances of {0}, should have at least 1", classType));
         }
 
-        return componentOpt.value();
+        return componentOpt.getValue();
     }
 
     /**

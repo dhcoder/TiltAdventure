@@ -77,7 +77,7 @@ public final class Opt<T> {
      *
      * @throws IllegalStateException if this optional doesn't currently have a value.
      */
-    public T value() {
+    public T getValue() {
         if (value == null) {
             throw new IllegalStateException("Call to value() on a valueless optional.");
         }

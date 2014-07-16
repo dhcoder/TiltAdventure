@@ -55,15 +55,15 @@ public final class TransformComponent extends AbstractComponent {
     private TransformComponent(final Opt<Vector2> translateOpt, final Opt<Vector2> scaleOpt,
         final Opt<Angle> rotationOpt) {
         if (translateOpt.hasValue()) {
-            translate.set(translateOpt.value());
+            translate.set(translateOpt.getValue());
         }
 
         if (scaleOpt.hasValue()) {
-            scale.set(scaleOpt.value());
+            scale.set(scaleOpt.getValue());
         }
 
         if (rotationOpt.hasValue()) {
-            rotation.set(rotationOpt.value());
+            rotation.setFrom(rotationOpt.getValue());
         }
     }
 }

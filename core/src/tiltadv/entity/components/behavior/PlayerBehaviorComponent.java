@@ -1,6 +1,7 @@
 package tiltadv.entity.components.behavior;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Vector2;
 import dhcoder.support.time.Duration;
 import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;
@@ -46,6 +47,7 @@ public class PlayerBehaviorComponent extends AbstractComponent {
         motionComponent = owner.requireComponent(MotionComponent.class);
 
         motionComponent.maxVelocityOpt.set(MAX_VELOCITY);
+        motionComponent.setAccelerationTime(Duration.fromSeconds(1f));
         spriteComponent.sprite.set(playerDown);
     }
 
@@ -56,13 +58,13 @@ public class PlayerBehaviorComponent extends AbstractComponent {
         if (tiltVector.isZero(TILT_THRESHOLD)) {
             if (isMoving) {
                 isMoving = false;
-                motionComponent.setDampingTime(DAMPING_TIME);
+                motionComponent.setTargetVelocity(Vector2.Zero);
             }
 
             return;
         }
 
-        motionComponent.setAcceleration(tiltVector.getX() * TILT_MULTIPLIER, tiltVector.getY() * TILT_MULTIPLIER);
+        motionComponent.setTargetVelocity(tiltVector.getX() * TILT_MULTIPLIER, tiltVector.getY() * TILT_MULTIPLIER);
         float tiltDegrees = tiltVector.getAngle();
 
         if (0f <= tiltDegrees && tiltDegrees < 45f) {
