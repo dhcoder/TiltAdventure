@@ -2,6 +2,8 @@ package dhcoder.support.math;
 
 import dhcoder.support.opt.Opt;
 
+import static dhcoder.support.utils.StringUtils.format;
+
 /**
  * Simple class that represents a 0 -> 360° angle. You can set and get this angle's value in either degreesOpt or
  * radiansOpt.
@@ -55,7 +57,6 @@ public class Angle {
     }
 
     public void setDegrees(final float degrees) {
-
         float boundedDegrees = degrees % FULL_REVOLUTION_DEG;
         while (boundedDegrees < 0f) {
             boundedDegrees += FULL_REVOLUTION_DEG;
@@ -85,5 +86,10 @@ public class Angle {
     public void set(final Angle rhs) {
         degreesOpt.setFrom(rhs.degreesOpt);
         radiansOpt.setFrom(rhs.radiansOpt);
+    }
+
+    @Override
+    public String toString() {
+        return format("{0}°", getDegrees());
     }
 }
