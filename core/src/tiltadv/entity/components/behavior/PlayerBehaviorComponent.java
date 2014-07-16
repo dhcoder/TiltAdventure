@@ -1,13 +1,14 @@
 package tiltadv.entity.components.behavior;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.math.Vector2;
 import dhcoder.support.time.Duration;
 import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;
 import tiltadv.entity.components.data.MotionComponent;
 import tiltadv.entity.components.data.TiltComponent;
 import tiltadv.entity.components.sprite.SpriteComponent;
+import tiltadv.immutable.ImmutableAngle;
+import tiltadv.immutable.ImmutableVector2;
 
 /**
  * Component that maintains the state and logic of the main player's avatar.
@@ -16,7 +17,8 @@ public class PlayerBehaviorComponent extends AbstractComponent {
 
 
     private static final float TILT_THRESHOLD = 4f;
-    private static final float VELOCITY_SCALER = 15f;
+    private static final float TILT_MULTIPLIER = 30f;
+    private static final float MAX_VELOCITY = 60f;
 
     private SpriteComponent spriteComponent;
     private TiltComponent tiltComponent;
@@ -43,14 +45,15 @@ public class PlayerBehaviorComponent extends AbstractComponent {
         tiltComponent = owner.requireComponent(TiltComponent.class);
         motionComponent = owner.requireComponent(MotionComponent.class);
 
+        motionComponent.maxVelocityOpt.set(MAX_VELOCITY);
         spriteComponent.sprite.set(playerDown);
     }
 
     @Override
     public void update(final Duration elapsedTime) {
-        Vector2 tiltVector = tiltComponent.getTiltVector();
+        ImmutableVector2 tiltVector = tiltComponent.getTiltVector();
 
-        if (tiltVector.len2() < TILT_THRESHOLD) {
+        if (tiltVector.isZero(TILT_THRESHOLD)) {
             if (isMoving) {
                 isMoving = false;
                 motionComponent.setDampingTime(DAMPING_TIME);
@@ -59,18 +62,18 @@ public class PlayerBehaviorComponent extends AbstractComponent {
             return;
         }
 
-        motionComponent.setVelocity(tiltVector.scl(VELOCITY_SCALER));
-        float angle = tiltVector.angle();
+        motionComponent.setAcceleration(tiltVector.getX() * TILT_MULTIPLIER, tiltVector.getY() * TILT_MULTIPLIER);
+        float tiltDegrees = tiltVector.getAngle();
 
-        if (0f <= angle && angle < 45f) {
+        if (0f <= tiltDegrees && tiltDegrees < 45f) {
             spriteComponent.sprite.set(playerRight);
-        } else if (45f <= angle && angle < 135f) {
+        } else if (45f <= tiltDegrees && tiltDegrees < 135f) {
             spriteComponent.sprite.set(playerUp);
-        } else if (135f <= angle && angle < 225f) {
+        } else if (135f <= tiltDegrees && tiltDegrees < 225f) {
             spriteComponent.sprite.set(playerLeft);
-        } else if (225f <= angle && angle < 315f) {
+        } else if (225f <= tiltDegrees && tiltDegrees < 315f) {
             spriteComponent.sprite.set(playerDown);
-        } else { // angle >= 315 && angle < 360f
+        } else { // tiltDegrees >= 315 && tiltDegrees < 360f
             spriteComponent.sprite.set(playerRight);
         }
 
