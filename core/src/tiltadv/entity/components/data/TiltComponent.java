@@ -3,11 +3,9 @@ package tiltadv.entity.components.data;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
-import dhcoder.support.math.Angle;
 import dhcoder.support.time.Duration;
 import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;
-import tiltadv.immutable.ImmutableAngle;
 import tiltadv.immutable.ImmutableVector2;
 
 import static com.badlogic.gdx.Input.Keys;
@@ -21,6 +19,10 @@ public class TiltComponent extends AbstractComponent {
     // of √(2*2 + 2*2) -> √8 -> ~2.8. Let's limit to that, then, in case some random device allows much higher tilt
     // values...
     private static final float MAX_TILT_VECTOR_LEN = 2.8f;
+
+    // If the tilt vector is smaller than the following value, we consider the amount of tilt too weak to count, and
+    // instead just treat it as no tilt at all
+    private static final float TILT_THRESHOLD = 1.3f;
 
     private final Vector2 tiltVector = new Vector2();
     private final ImmutableVector2 immutableTiltVector = new ImmutableVector2(tiltVector);
@@ -44,6 +46,9 @@ public class TiltComponent extends AbstractComponent {
             // Convert portrait accelerometer directions to landscape
             // See https://github.com/libgdx/libgdx/wiki/Accelerometer
             tiltVector.set(Gdx.input.getAccelerometerY(), -Gdx.input.getAccelerometerX());
+            if (tiltVector.isZero(TILT_THRESHOLD)) {
+                tiltVector.setZero();
+            }
         }
         else { // useKeyboardOverride
             tiltVector.setZero();
