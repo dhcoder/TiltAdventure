@@ -136,6 +136,18 @@ public class ImmutableVector2 extends Immutable<Vector2> {
         return wrappedMutable.len2();
     }
 
+    public float dot(final float x, final float y) {
+        return wrappedMutable.dot(x, y);
+    }
+
+    public float dot(final Vector2 v) {
+        return wrappedMutable.dot(v);
+    }
+
+    public float dot(final ImmutableVector2 handle) {
+        return wrappedMutable.dot(handle.wrappedMutable);
+    }
+
     public float dst(final float x, final float y) {
         return wrappedMutable.dst(x, y);
     }
