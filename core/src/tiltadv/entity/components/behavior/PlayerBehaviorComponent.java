@@ -1,14 +1,13 @@
 package tiltadv.entity.components.behavior;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.math.Vector2;
+import dhcoder.support.immutable.ImmutableDuration;
 import dhcoder.support.time.Duration;
 import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;
 import tiltadv.entity.components.data.MotionComponent;
 import tiltadv.entity.components.data.TiltComponent;
 import tiltadv.entity.components.sprite.SpriteComponent;
-import tiltadv.immutable.ImmutableAngle;
 import tiltadv.immutable.ImmutableVector2;
 
 /**
@@ -16,18 +15,16 @@ import tiltadv.immutable.ImmutableVector2;
  */
 public class PlayerBehaviorComponent extends AbstractComponent {
 
-
     private static final float TILT_MULTIPLIER = 50f;
-
-    private SpriteComponent spriteComponent;
-    private TiltComponent tiltComponent;
-    private MotionComponent motionComponent;
-
+    private static final float DAMPING_TIME = .5f;
     private final Sprite playerUp;
     private final Sprite playerDown;
     private final Sprite playerLeft;
     private final Sprite playerRight;
-    private static final float DAMPING_TIME = .5f;
+    private SpriteComponent spriteComponent;
+    private TiltComponent tiltComponent;
+    private MotionComponent motionComponent;
+    private boolean isMoving;
 
     public PlayerBehaviorComponent(final Sprite playerUp, final Sprite playerDown, final Sprite playerLeft,
         final Sprite playerRight) {
@@ -46,11 +43,9 @@ public class PlayerBehaviorComponent extends AbstractComponent {
         spriteComponent.sprite.set(playerDown);
     }
 
-    private boolean isMoving;
-
     @Override
-    public void update(final Duration elapsedTime) {
-        ImmutableVector2 tiltVector = tiltComponent.getTiltVector();
+    public void update(final ImmutableDuration elapsedTime) {
+        ImmutableVector2 tiltVector = tiltComponent.getTilt();
 
         if (!tiltVector.isZero()) {
             motionComponent.setVelocity(tiltVector.getX() * TILT_MULTIPLIER, tiltVector.getY() * TILT_MULTIPLIER);
@@ -76,7 +71,7 @@ public class PlayerBehaviorComponent extends AbstractComponent {
         }
         else {
             if (isMoving) {
-                motionComponent.smoothStop(Duration.fromSeconds(.3f));
+                motionComponent.smoothStop(ImmutableDuration.fromSeconds(.3f));
                 isMoving = false;
             }
         }

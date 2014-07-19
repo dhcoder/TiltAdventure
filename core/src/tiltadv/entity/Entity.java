@@ -1,10 +1,12 @@
 package tiltadv.entity;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
-import dhcoder.support.opt.Opt;
-import dhcoder.support.time.Duration;
+import dhcoder.support.immutable.ImmutableDuration;
+import dhcoder.support.immutable.ImmutableList;
+import dhcoder.support.immutable.ImmutableOpt;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static dhcoder.support.utils.StringUtils.format;
@@ -18,8 +20,11 @@ public class Entity {
     private final List<Component> components = new ArrayList<Component>();
 
     public Entity(final Component... components) {
+        this(Arrays.asList(components));
+    }
 
-        if (components.length == 0) {
+    public Entity(final List<Component> components) {
+        if (components.size() == 0) {
             throw new IllegalArgumentException("Attempted to create Entity with no components");
         }
 
@@ -34,21 +39,21 @@ public class Entity {
      * Returns the component that matches the input type, if found.
      */
     @SuppressWarnings("unchecked") // (T) cast is safe because of instanceof check
-    public <T extends Component> Opt<T> getComponent(final Class<T> classType) {
+    public <T extends Component> ImmutableOpt<T> getComponent(final Class<T> classType) {
         for (Component component : components) {
             if (classType.isInstance(component)) {
-                return Opt.of((T)component);
+                return ImmutableOpt.of((T)component);
             }
         }
 
-        return Opt.withNoValue();
+        return ImmutableOpt.withNoValue();
     }
 
     /**
      * Returns the components that match the input type, although this may be an empty list.
      */
     @SuppressWarnings("unchecked") // (T) cast is safe because of instanceof check
-    public <T extends Component> List<T> getComponents(final Class<T> classType) {
+    public <T extends Component> ImmutableList<T> getComponents(final Class<T> classType) {
         List<T> matchingComponents = new ArrayList<T>();
         for (Component component : components) {
             if (classType.isInstance(component)) {
@@ -56,14 +61,14 @@ public class Entity {
             }
         }
 
-        return matchingComponents;
+        return new ImmutableList<T>(matchingComponents);
     }
 
     /**
      * Require that there only be exactly one instance of the specified {@link Component} type on this entity. This
      * is a useful way for a component to assert that it, itself, is a singleton within the entity,
      * when having multiple instances of it would not make sense.
-     *
+     * <p/>
      * You should consider using {@link #requireComponent(Class)} instead because it often has the same results and is
      * a bit more lightweight than this method.
      *
@@ -72,7 +77,7 @@ public class Entity {
      */
     public <T extends Component> T requireSingleInstance(final Class<T> classType) throws IllegalStateException {
 
-        List<T> matchingComponents = getComponents(classType);
+        ImmutableList<T> matchingComponents = getComponents(classType);
         if (matchingComponents.size() != 1) {
             throw new IllegalStateException(
                 format("Entity has {0} instances of component {1}, should only have 1", matchingComponents.size(),
@@ -89,9 +94,10 @@ public class Entity {
      * @return the matching components
      * @throws IllegalStateException if there aren't any components that match the class type parameter.
      */
-    public <T extends Component> List<T> requireComponents(final Class<T> classType) throws IllegalStateException {
+    public <T extends Component> ImmutableList<T> requireComponents(final Class<T> classType)
+        throws IllegalStateException {
 
-        List<T> matchingComponents = getComponents(classType);
+        ImmutableList<T> matchingComponents = getComponents(classType);
         if (matchingComponents.size() == 0) {
             throw new IllegalStateException(
                 format("Entity doesn't have any instances of {0}, should have at least 1", classType));
@@ -101,16 +107,16 @@ public class Entity {
     }
 
     /**
-     * Require that there be at least one instance of the specified {@link Component} on this entity, and we return the
-     * first one. This is extremely similar to {@link #requireSingleInstance(Class)} but is a little bit more
-     * lightweight because it doesn't have to loop through all components to verify there's not more than one.
+     * Require that there be at least one instance of the specified {@link Component} on this entity, and return the
+     * first one. This method is similar to {@link #requireSingleInstance(Class)} but is a little bit more
+     * lightweight because it doesn't have to loop through all components to verify that there's not more than one.
      *
      * @return the first matching component
      * @throws IllegalStateException if there aren't any components that match the class type parameter.
      */
     public <T extends Component> T requireComponent(final Class<T> classType) throws IllegalStateException {
 
-        Opt<T> componentOpt = getComponent(classType);
+        ImmutableOpt<T> componentOpt = getComponent(classType);
 
         if (!componentOpt.hasValue()) {
             throw new IllegalStateException(
@@ -132,7 +138,7 @@ public class Entity {
     /**
      * Update this entity. The passed in time is in seconds.
      */
-    public void update(final Duration elapsedTime) {
+    public void update(final ImmutableDuration elapsedTime) {
         for (Component component : components) {
             component.update(elapsedTime);
         }

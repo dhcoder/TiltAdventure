@@ -1,7 +1,7 @@
 package tiltadv.entity;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
-import dhcoder.support.time.Duration;
+import dhcoder.support.immutable.ImmutableDuration;
 
 /**
  * Abstract {@link Component} which provides default implementations for all methods, so you can only override the ones
@@ -13,7 +13,7 @@ public abstract class AbstractComponent implements Component {
     public void initialize(final Entity owner) {}
 
     @Override
-    public void update(final Duration elapsedTime) {}
+    public void update(final ImmutableDuration elapsedTime) {}
 
     @Override
     public void render(final Batch batch) {}

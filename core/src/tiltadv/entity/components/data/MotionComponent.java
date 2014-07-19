@@ -1,9 +1,10 @@
 package tiltadv.entity.components.data;
 
 import com.badlogic.gdx.math.Vector2;
-import dhcoder.support.time.Duration;
+import dhcoder.support.immutable.ImmutableDuration;
 import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;
+import tiltadv.immutable.ImmutableVector2;
 
 /**
  * Component that encapsulates the logic of calculating an {@link Entity}'s velocity and acceleration. Expects the
@@ -16,20 +17,23 @@ public class MotionComponent extends AbstractComponent {
 
     // The velocity of this entity is measured in pixels/sec
     private final Vector2 velocity = new Vector2();
+    private final ImmutableVector2 immutableVelocity = new ImmutableVector2(velocity);
     // The velocity of this entity is measured in pixels/sec² (after one sec, velocity should be reduced by this much)
     private final Vector2 deceleration = new Vector2();
     private TransformComponent transformComponent;
-
-    public void setVelocity(final Vector2 velocity) {
-        setVelocity(velocity.x, velocity.y);
-    }
 
     public void setVelocity(final float vx, final float vy) {
         velocity.set(vx, vy);
         deceleration.setZero();
     }
 
-    public void smoothStop(final Duration time) {
+    public void setVelocity(final ImmutableVector2 vector) {
+        setVelocity(vector.getX(), vector.getY());
+    }
+
+    public ImmutableVector2 getVelocity() { return immutableVelocity; }
+
+    public void smoothStop(final ImmutableDuration time) {
         float timeSecs = time.getSeconds();
         deceleration.set(-velocity.x / timeSecs, -velocity.y / timeSecs);
     }
@@ -40,7 +44,7 @@ public class MotionComponent extends AbstractComponent {
     }
 
     @Override
-    public void update(final Duration elapsedTime) {
+    public void update(final ImmutableDuration elapsedTime) {
 
         if (!deceleration.isZero()) {
             velocity.mulAdd(deceleration, elapsedTime.getSeconds());

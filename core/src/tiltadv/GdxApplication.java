@@ -1,5 +1,6 @@
 package tiltadv;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -8,16 +9,20 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import dhcoder.support.time.Duration;
+import dhcoder.support.immutable.ImmutableDuration;
+import tiltadv.entity.Component;
 import tiltadv.entity.Entity;
 import tiltadv.entity.components.behavior.PlayerBehaviorComponent;
+import tiltadv.entity.components.controllers.AccelerometerComponent;
+import tiltadv.entity.components.controllers.KeyboardComponent;
 import tiltadv.entity.components.data.MotionComponent;
 import tiltadv.entity.components.data.SizeComponent;
 import tiltadv.entity.components.data.TiltComponent;
 import tiltadv.entity.components.data.TransformComponent;
+import tiltadv.entity.components.display.TiltDisplayComponent;
 import tiltadv.entity.components.sprite.SpriteComponent;
-import tiltadv.entity.components.util.FpsDisplayComponent;
-import tiltadv.entity.components.util.TiltDisplayComponent;
+import tiltadv.entity.components.display.FpsDisplayComponent;
+import tiltadv.immutable.ImmutableSprite;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +42,7 @@ public class GdxApplication extends ApplicationAdapter {
     private Texture tiles;
 
     private List<Entity> entities;
+    private Entity playerEntity;
 
     @Override
     public void create() {
@@ -78,7 +84,9 @@ public class GdxApplication extends ApplicationAdapter {
     }
 
     private void update() {
-        Duration elapsedTime = Duration.fromSeconds(Math.min(Gdx.graphics.getRawDeltaTime(), MAX_DELTA_TIME_SECS));
+        ImmutableDuration elapsedTime =
+            ImmutableDuration.fromSeconds(Math.min(Gdx.graphics.getRawDeltaTime(), MAX_DELTA_TIME_SECS));
+
         for (Entity entity : entities) {
             entity.update(elapsedTime);
         }
@@ -92,22 +100,23 @@ public class GdxApplication extends ApplicationAdapter {
         Sprite playerDown = new Sprite(tiles, 0, 0, 16, 16);
         Sprite playerLeft = new Sprite(tiles, 29, 0, 16, 16);
         Sprite playerRight = new Sprite(tiles, 90, 0, 16, 16);
-        SpriteComponent spriteComponent = new SpriteComponent();
 
-        SizeComponent sizeComponent = new SizeComponent(playerDown.getWidth(), playerDown.getHeight());
-        TransformComponent transformComponent = new TransformComponent();
-        MotionComponent motionComponent = new MotionComponent();
-        TiltComponent tiltComponent = new TiltComponent();
-        PlayerBehaviorComponent behaviorComponent =
-                new PlayerBehaviorComponent(playerUp, playerDown, playerLeft, playerRight);
-
-        entities.add(new Entity(transformComponent, motionComponent, sizeComponent, tiltComponent, spriteComponent,
-                behaviorComponent));
+        List<Component> components = new ArrayList<Component>();
+        components.add(new SpriteComponent());
+        components.add(SizeComponent.fromSprite(new ImmutableSprite(playerDown)));
+        components.add(new TransformComponent());
+        components.add(new MotionComponent());
+        components.add(new TiltComponent());
+        components.add(Gdx.app.getType() == Application.ApplicationType.Android ? new AccelerometerComponent() :
+            new KeyboardComponent());
+        components.add(new PlayerBehaviorComponent(playerUp, playerDown, playerLeft, playerRight));
+        playerEntity = new Entity(components);
+        entities.add(playerEntity);
     }
 
     private void AddFpsEntity() {
         TransformComponent transformComponent = new TransformComponent.Builder()
-                .setTranslate(-VIEWPORT_WIDTH / 2, -VIEWPORT_HEIGHT / 2 + font.getLineHeight()).build();
+            .setTranslate(-VIEWPORT_WIDTH / 2, -VIEWPORT_HEIGHT / 2 + font.getLineHeight()).build();
         FpsDisplayComponent fpsDisplayComponent = new FpsDisplayComponent(font);
         entities.add(new Entity(transformComponent, fpsDisplayComponent));
     }
@@ -116,15 +125,13 @@ public class GdxApplication extends ApplicationAdapter {
         Sprite rodRight = new Sprite(tiles, 98, 126, 13, 4);
         float margin = 5f;
         TransformComponent transformComponent = new TransformComponent.Builder()
-                .setTranslate(VIEWPORT_WIDTH / 2 - rodRight.getWidth() - margin,
-                        VIEWPORT_HEIGHT / 2 - rodRight.getHeight() - margin).build();
+            .setTranslate(VIEWPORT_WIDTH / 2 - rodRight.getWidth() - margin,
+                VIEWPORT_HEIGHT / 2 - rodRight.getHeight() - margin).build();
 
         SpriteComponent spriteComponent = new SpriteComponent();
-        SizeComponent sizeComponent = SizeComponent.fromSprite(rodRight);
-        TiltComponent tiltComponent = new TiltComponent();
-        TiltDisplayComponent tiltDisplayComponent = new TiltDisplayComponent(rodRight);
-        entities
-                .add(new Entity(spriteComponent, sizeComponent, transformComponent, tiltComponent, tiltDisplayComponent));
+        SizeComponent sizeComponent = SizeComponent.fromSprite(new ImmutableSprite(rodRight));
+        TiltDisplayComponent tiltDisplayComponent = new TiltDisplayComponent(rodRight, playerEntity);
+        entities.add(new Entity(spriteComponent, sizeComponent, transformComponent, tiltDisplayComponent));
     }
 
 }

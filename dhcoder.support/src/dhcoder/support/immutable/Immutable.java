@@ -1,10 +1,11 @@
-package tiltadv.immutable;
+package dhcoder.support.immutable;
 
 /**
  * Base class for wrapping a mutable object and offer an immutable interface to it. It is up to the children classes to
  * mimic only the read-only API of the inner class.
  */
 public abstract class Immutable<T> {
+
     protected T wrappedMutable;
 
     protected Immutable(final T mutable) {
@@ -12,6 +13,8 @@ public abstract class Immutable<T> {
     }
 
     public abstract T toMutable();
+
+    public abstract void copyInto(T target);
 
     @Override
     public String toString() {

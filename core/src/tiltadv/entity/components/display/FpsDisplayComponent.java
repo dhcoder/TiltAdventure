@@ -1,4 +1,4 @@
-package tiltadv.entity.components.util;
+package tiltadv.entity.components.display;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;

@@ -1,6 +1,7 @@
 package tiltadv.immutable;
 
 import com.badlogic.gdx.math.Vector2;
+import dhcoder.support.immutable.Immutable;
 
 /**
  * A class that wraps a Vector2, offering read-only access to it.
@@ -14,6 +15,11 @@ public class ImmutableVector2 extends Immutable<Vector2> {
     @Override
     public Vector2 toMutable() {
         return wrappedMutable.cpy();
+    }
+
+    @Override
+    public void copyInto(final Vector2 target) {
+        target.set(wrappedMutable);
     }
 
     public float getX() {

@@ -1,4 +1,4 @@
-package tiltadv.immutable;
+package dhcoder.support.immutable;
 
 import dhcoder.support.math.Angle;
 
@@ -16,6 +16,11 @@ public class ImmutableAngle extends Immutable<Angle> {
         Angle angleCopy = new Angle();
         angleCopy.setFrom(wrappedMutable);
         return angleCopy;
+    }
+
+    @Override
+    public void copyInto(final Angle target) {
+        target.setFrom(wrappedMutable);
     }
 
     public float getDegrees() {
