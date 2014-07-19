@@ -18,7 +18,7 @@ public class TiltDisplayComponent extends AbstractComponent {
     private TransformComponent transformComponent;
     private SpriteComponent spriteComponent;
 
-    private Entity observedEntity;
+    private final Entity observedEntity;
     private TiltComponent tiltComponent;
 
     /**
