@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import dhcoder.support.immutable.ImmutableDuration;
+import dhcoder.support.time.Duration;
 import tiltadv.entity.Component;
 import tiltadv.entity.Entity;
 import tiltadv.entity.components.behavior.PlayerBehaviorComponent;
@@ -19,10 +19,9 @@ import tiltadv.entity.components.data.MotionComponent;
 import tiltadv.entity.components.data.SizeComponent;
 import tiltadv.entity.components.data.TiltComponent;
 import tiltadv.entity.components.data.TransformComponent;
+import tiltadv.entity.components.display.FpsDisplayComponent;
 import tiltadv.entity.components.display.TiltDisplayComponent;
 import tiltadv.entity.components.sprite.SpriteComponent;
-import tiltadv.entity.components.display.FpsDisplayComponent;
-import tiltadv.immutable.ImmutableSprite;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,8 +83,7 @@ public class GdxApplication extends ApplicationAdapter {
     }
 
     private void update() {
-        ImmutableDuration elapsedTime =
-            ImmutableDuration.fromSeconds(Math.min(Gdx.graphics.getRawDeltaTime(), MAX_DELTA_TIME_SECS));
+        Duration elapsedTime = Duration.fromSeconds(Math.min(Gdx.graphics.getRawDeltaTime(), MAX_DELTA_TIME_SECS));
 
         for (Entity entity : entities) {
             entity.update(elapsedTime);
@@ -103,7 +101,7 @@ public class GdxApplication extends ApplicationAdapter {
 
         List<Component> components = new ArrayList<Component>();
         components.add(new SpriteComponent());
-        components.add(SizeComponent.fromSprite(new ImmutableSprite(playerDown)));
+        components.add(SizeComponent.fromSprite(playerDown));
         components.add(new TransformComponent());
         components.add(new MotionComponent());
         components.add(new TiltComponent());
@@ -129,7 +127,7 @@ public class GdxApplication extends ApplicationAdapter {
                 VIEWPORT_HEIGHT / 2 - rodRight.getHeight() - margin).build();
 
         SpriteComponent spriteComponent = new SpriteComponent();
-        SizeComponent sizeComponent = SizeComponent.fromSprite(new ImmutableSprite(rodRight));
+        SizeComponent sizeComponent = SizeComponent.fromSprite(rodRight);
         TiltDisplayComponent tiltDisplayComponent = new TiltDisplayComponent(rodRight, playerEntity);
         entities.add(new Entity(spriteComponent, sizeComponent, transformComponent, tiltDisplayComponent));
     }

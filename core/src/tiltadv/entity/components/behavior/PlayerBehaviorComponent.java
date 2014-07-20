@@ -1,14 +1,13 @@
 package tiltadv.entity.components.behavior;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import dhcoder.support.immutable.ImmutableDuration;
+import com.badlogic.gdx.math.Vector2;
 import dhcoder.support.time.Duration;
 import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;
 import tiltadv.entity.components.data.MotionComponent;
 import tiltadv.entity.components.data.TiltComponent;
 import tiltadv.entity.components.sprite.SpriteComponent;
-import tiltadv.immutable.ImmutableVector2;
 
 /**
  * Component that maintains the state and logic of the main player's avatar.
@@ -44,14 +43,14 @@ public class PlayerBehaviorComponent extends AbstractComponent {
     }
 
     @Override
-    public void update(final ImmutableDuration elapsedTime) {
-        ImmutableVector2 tiltVector = tiltComponent.getTilt();
+    public void update(final Duration elapsedTime) {
+        Vector2 tilt = tiltComponent.getTilt();
 
-        if (!tiltVector.isZero()) {
-            motionComponent.setVelocity(tiltVector.getX() * TILT_MULTIPLIER, tiltVector.getY() * TILT_MULTIPLIER);
+        if (!tilt.isZero()) {
+            motionComponent.setVelocity(tilt.x * TILT_MULTIPLIER, tilt.y * TILT_MULTIPLIER);
             isMoving = true;
 
-            float tiltDegrees = tiltVector.getAngle();
+            float tiltDegrees = tilt.angle();
 
             if (0f <= tiltDegrees && tiltDegrees < 45f) {
                 spriteComponent.sprite.set(playerRight);
@@ -71,7 +70,7 @@ public class PlayerBehaviorComponent extends AbstractComponent {
         }
         else {
             if (isMoving) {
-                motionComponent.smoothStop(ImmutableDuration.fromSeconds(.3f));
+                motionComponent.smoothStop(Duration.fromSeconds(.3f));
                 isMoving = false;
             }
         }

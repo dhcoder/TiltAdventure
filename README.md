@@ -34,10 +34,8 @@ There are some additional rules followed by this codebase...
     in constructors. Having to rely on `super` to do magical things behind your back is a way towards codebase
     fragility.
 * Test everything that can be tested (using JUnit 4)
-* When classes return mutable values that shouldn't be modified, use an Immutable variant instead. However, if a method
-takes in a parameter that should be immutable, just take in the mutable version, and trust the method not to modify it.
-The reason for this is, it's easy enough for a class to allocate an immutable field along with the immutable one, and
-thus it can avoid thrashing the GC, but for callers, they don't often have that luxury.
+* Values returned from getXXX methods should be treated as immutable. Values passed in as parameters should also be
+treated as immutable.
 
 ## On the fence
 
@@ -46,7 +44,3 @@ There are some rules I currently don't follow but may change my mind about some 
 * Using Pools. This would be great to avoid crazy allocations, but then I have to remember to alloc / free everything.
 For now, I'm just going to try to preallocate everything up front and not allocate much during the main game loop.
 Opts and that sort of stuff make this tricky, so I may see if there's a way to use pools in that case...
-
-* Immutables. I may get rid of them entirely, or on the flip side, I may start requiring them for parameters, if I could
-do so without worrying about calling "new Immutable" all the time (maybe pools will help here). It's just so nice and
-clean to have the compiler verify things for you.

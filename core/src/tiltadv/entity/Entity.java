@@ -1,9 +1,8 @@
 package tiltadv.entity;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
-import dhcoder.support.immutable.ImmutableDuration;
-import dhcoder.support.immutable.ImmutableList;
-import dhcoder.support.immutable.ImmutableOpt;
+import dhcoder.support.opt.Opt;
+import dhcoder.support.time.Duration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,21 +38,21 @@ public class Entity {
      * Returns the component that matches the input type, if found.
      */
     @SuppressWarnings("unchecked") // (T) cast is safe because of instanceof check
-    public <T extends Component> ImmutableOpt<T> getComponent(final Class<T> classType) {
+    public <T extends Component> Opt<T> getComponent(final Class<T> classType) {
         for (Component component : components) {
             if (classType.isInstance(component)) {
-                return ImmutableOpt.of((T)component);
+                return Opt.of((T)component);
             }
         }
 
-        return ImmutableOpt.withNoValue();
+        return Opt.withNoValue();
     }
 
     /**
      * Returns the components that match the input type, although this may be an empty list.
      */
     @SuppressWarnings("unchecked") // (T) cast is safe because of instanceof check
-    public <T extends Component> ImmutableList<T> getComponents(final Class<T> classType) {
+    public <T extends Component> List<T> getComponents(final Class<T> classType) {
         List<T> matchingComponents = new ArrayList<T>();
         for (Component component : components) {
             if (classType.isInstance(component)) {
@@ -61,7 +60,7 @@ public class Entity {
             }
         }
 
-        return new ImmutableList<T>(matchingComponents);
+        return matchingComponents;
     }
 
     /**
@@ -77,7 +76,7 @@ public class Entity {
      */
     public <T extends Component> T requireSingleInstance(final Class<T> classType) throws IllegalStateException {
 
-        ImmutableList<T> matchingComponents = getComponents(classType);
+        List<T> matchingComponents = getComponents(classType);
         if (matchingComponents.size() != 1) {
             throw new IllegalStateException(
                 format("Entity has {0} instances of component {1}, should only have 1", matchingComponents.size(),
@@ -94,10 +93,9 @@ public class Entity {
      * @return the matching components
      * @throws IllegalStateException if there aren't any components that match the class type parameter.
      */
-    public <T extends Component> ImmutableList<T> requireComponents(final Class<T> classType)
-        throws IllegalStateException {
+    public <T extends Component> List<T> requireComponents(final Class<T> classType) throws IllegalStateException {
 
-        ImmutableList<T> matchingComponents = getComponents(classType);
+        List<T> matchingComponents = getComponents(classType);
         if (matchingComponents.size() == 0) {
             throw new IllegalStateException(
                 format("Entity doesn't have any instances of {0}, should have at least 1", classType));
@@ -116,7 +114,7 @@ public class Entity {
      */
     public <T extends Component> T requireComponent(final Class<T> classType) throws IllegalStateException {
 
-        ImmutableOpt<T> componentOpt = getComponent(classType);
+        Opt<T> componentOpt = getComponent(classType);
 
         if (!componentOpt.hasValue()) {
             throw new IllegalStateException(
@@ -138,7 +136,7 @@ public class Entity {
     /**
      * Update this entity. The passed in time is in seconds.
      */
-    public void update(final ImmutableDuration elapsedTime) {
+    public void update(final Duration elapsedTime) {
         for (Component component : components) {
             component.update(elapsedTime);
         }

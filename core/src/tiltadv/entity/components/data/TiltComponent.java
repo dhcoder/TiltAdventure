@@ -2,7 +2,6 @@ package tiltadv.entity.components.data;
 
 import com.badlogic.gdx.math.Vector2;
 import tiltadv.entity.AbstractComponent;
-import tiltadv.immutable.ImmutableVector2;
 
 /**
  * Component which exposes a vector that represents the device's tilt orientation (for landscape mode).
@@ -14,13 +13,12 @@ public class TiltComponent extends AbstractComponent {
     // values...
     private static final float MAX_TILT_VECTOR_LEN = 2.8f;
 
-    private final Vector2 tiltVector = new Vector2();
-    private final ImmutableVector2 immutableTiltVector = new ImmutableVector2(tiltVector);
+    private final Vector2 tilt = new Vector2();
 
-    public ImmutableVector2 getTilt() { return immutableTiltVector; }
+    public Vector2 getTilt() { return tilt; }
 
-    public void setTilt(final ImmutableVector2 tiltVector) {
-        this.tiltVector.set(tiltVector.getX(), tiltVector.getY());
-        this.tiltVector.limit(MAX_TILT_VECTOR_LEN);
+    public void setTilt(final Vector2 tilt) {
+        this.tilt.set(tilt.x, tilt.y);
+        this.tilt.limit(MAX_TILT_VECTOR_LEN);
     }
 }

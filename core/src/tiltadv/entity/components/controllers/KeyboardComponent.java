@@ -2,11 +2,10 @@ package tiltadv.entity.components.controllers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
-import dhcoder.support.immutable.ImmutableDuration;
+import dhcoder.support.time.Duration;
 import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;
 import tiltadv.entity.components.data.TiltComponent;
-import tiltadv.immutable.ImmutableVector2;
 
 import static com.badlogic.gdx.Input.Keys;
 
@@ -15,8 +14,7 @@ import static com.badlogic.gdx.Input.Keys;
  */
 public class KeyboardComponent extends AbstractComponent {
 
-    private final Vector2 tiltVector = new Vector2();
-    private final ImmutableVector2 immutableTiltVector = new ImmutableVector2(tiltVector);
+    private final Vector2 tilt = new Vector2();
     private TiltComponent tiltComponent;
 
     @Override
@@ -25,16 +23,16 @@ public class KeyboardComponent extends AbstractComponent {
     }
 
     @Override
-    public void update(final ImmutableDuration elapsedTime) {
+    public void update(final Duration elapsedTime) {
 
-        tiltVector.setZero();
+        tilt.setZero();
 
-        if (Gdx.input.isKeyPressed(Keys.DPAD_LEFT)) { tiltVector.x = -2f; }
-        else if (Gdx.input.isKeyPressed(Keys.DPAD_RIGHT)) { tiltVector.x = 2f; }
+        if (Gdx.input.isKeyPressed(Keys.DPAD_LEFT)) { tilt.x = -2f; }
+        else if (Gdx.input.isKeyPressed(Keys.DPAD_RIGHT)) { tilt.x = 2f; }
 
-        if (Gdx.input.isKeyPressed(Keys.DPAD_DOWN)) { tiltVector.y = -2f; }
-        else if (Gdx.input.isKeyPressed(Keys.DPAD_UP)) { tiltVector.y = 2f; }
+        if (Gdx.input.isKeyPressed(Keys.DPAD_DOWN)) { tilt.y = -2f; }
+        else if (Gdx.input.isKeyPressed(Keys.DPAD_UP)) { tilt.y = 2f; }
 
-        tiltComponent.setTilt(immutableTiltVector);
+        tiltComponent.setTilt(tilt);
     }
 }

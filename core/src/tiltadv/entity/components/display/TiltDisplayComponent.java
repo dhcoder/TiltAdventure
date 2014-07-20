@@ -2,12 +2,12 @@ package tiltadv.entity.components.display;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Vector2;
 import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;
 import tiltadv.entity.components.data.TiltComponent;
 import tiltadv.entity.components.data.TransformComponent;
 import tiltadv.entity.components.sprite.SpriteComponent;
-import tiltadv.immutable.ImmutableVector2;
 
 /**
  * Component which sets the transform of an entity to match the direction of the hardware's tilt.
@@ -15,10 +15,9 @@ import tiltadv.immutable.ImmutableVector2;
 public class TiltDisplayComponent extends AbstractComponent {
 
     private final Sprite arrowSprite;
+    private final Entity observedEntity;
     private TransformComponent transformComponent;
     private SpriteComponent spriteComponent;
-
-    private final Entity observedEntity;
     private TiltComponent tiltComponent;
 
     /**
@@ -41,13 +40,13 @@ public class TiltDisplayComponent extends AbstractComponent {
 
     @Override
     public void render(final Batch batch) {
-        ImmutableVector2 tilt = tiltComponent.getTilt();
+        Vector2 tilt = tiltComponent.getTilt();
         if (tilt.isZero(1f)) {
             spriteComponent.hidden = true;
             return;
         }
 
         spriteComponent.hidden = false;
-        transformComponent.rotation.setDegrees(tilt.getAngle());
+        transformComponent.rotation.setDegrees(tilt.angle());
     }
 }
