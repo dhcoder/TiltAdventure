@@ -33,9 +33,9 @@ There are some additional rules followed by this codebase...
     protected instead of public like they are in an interface, but no matter what, you should never use `super` except
     in constructors. Having to rely on `super` to do magical things behind your back is a way towards codebase
     fragility.
-* Test everything that can be tested (using JUnit 4)
 * Values returned from getXXX methods should be treated as immutable. Values passed in as parameters should also be
 treated as immutable.
+* Fields should never be public. Access them through a getXXX or setXXX method if you need to change this.
 
 ## On the fence
 
@@ -44,3 +44,7 @@ There are some rules I currently don't follow but may change my mind about some 
 * Using Pools. This would be great to avoid crazy allocations, but then I have to remember to alloc / free everything.
 For now, I'm just going to try to preallocate everything up front and not allocate much during the main game loop.
 Opts and that sort of stuff make this tricky, so I may see if there's a way to use pools in that case...
+* Test everything that can be tested (using JUnit 4)
+    * Tests should be FAST
+    * Tests should never write to a file, make a database connection, etc.
+    
