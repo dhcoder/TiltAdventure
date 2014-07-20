@@ -1,16 +1,17 @@
 package tiltadv.entity.components.data;
 
 import com.badlogic.gdx.math.Vector2;
+import dhcoder.support.memory.Pool;
 import dhcoder.support.time.Duration;
 import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;
+import tiltadv.memory.Pools;
 
 /**
  * Component that encapsulates the logic of calculating an {@link Entity}'s velocity and acceleration. Expects the
  * existence of a {@link TransformComponent} to act upon.
  * <p/>
  * TODO: Add tests and documentation, maybe also remove some public methods here.
- * TODO: Do I really like the way we set velocity on this class? How about "setTargetVelocity" so we ramp up as well?
  */
 public class MotionComponent extends AbstractComponent {
 
@@ -18,7 +19,6 @@ public class MotionComponent extends AbstractComponent {
     private final Vector2 velocity = new Vector2();
     // The velocity of this entity is measured in pixels/sec² (after one sec, velocity should be reduced by this much)
     private final Vector2 deceleration = new Vector2();
-    private final Vector2 translate = new Vector2(); // TODO: Replace with pool
 
     private TransformComponent transformComponent;
 
@@ -64,8 +64,13 @@ public class MotionComponent extends AbstractComponent {
         }
 
         // Adjust current position based on how much velocity was applied over the last time range
-        translate.set(transformComponent.getTranslate());
-        translate.mulAdd(velocity, elapsedTime.getSeconds());
-        transformComponent.setTranslate(translate);
+        {
+            Vector2 translate = Pools.vector.grabNew();
+            translate.set(transformComponent.getTranslate());
+            translate.mulAdd(velocity, elapsedTime.getSeconds());
+            transformComponent.setTranslate(translate);
+            Pools.vector.free(translate);
+        }
+
     }
 }

@@ -1,5 +1,7 @@
 package dhcoder.support.utils;
 
+import dhcoder.support.memory.Pool;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +14,32 @@ public final class StringUtils {
         PARSING_INDEX, // We're in between braces, parsing a format index
     }
 
+    private static final Pool<StringBuilder> stringBuilderPool =
+        new Pool<StringBuilder>(new Pool.AllocateMethod<StringBuilder>() {
+            @Override
+            public StringBuilder run() {
+                return new StringBuilder();
+            }
+        }, new Pool.ResetMethod<StringBuilder>() {
+            @Override
+            public void run(final StringBuilder item) {
+                item.setLength(0);
+            }
+        });
+
+    private static final Pool<List<String>> stringListPool =
+        new Pool<List<String>>(new Pool.AllocateMethod<List<String>>() {
+            @Override
+            public List<String> run() {
+                return new ArrayList<String>();
+            }
+        }, new Pool.ResetMethod<List<String>>() {
+            @Override
+            public void run(final List<String> item) {
+                item.clear();
+            }
+        });
+
     /**
      * Format a string using C# style formatting, i.e. using {0} instead of %0$s.
      * <p/>
@@ -23,9 +51,9 @@ public final class StringUtils {
      * @param args  Various args whose string values will be used in the final string.
      */
     public static String format(final String input, final Object... args) {
-        StringBuilder builder = new StringBuilder(); // TODO: Replace with pools
+        StringBuilder builder = stringBuilderPool.grabNew();
 
-        List<String> argStrings = new ArrayList<String>(args.length);  // TODO: Replace with pools
+        List<String> argStrings = stringListPool.grabNew();
         for (Object arg : args) {
             argStrings.add(arg.toString());
         }
@@ -39,9 +67,11 @@ public final class StringUtils {
                 case CONSUME_TEXT:
                     if (c == '{') {
                         state = FormatState.GOT_LEFT_BRACE;
-                    } else if (c == '}') {
+                    }
+                    else if (c == '}') {
                         state = FormatState.GOT_RIGHT_BRACE;
-                    } else {
+                    }
+                    else {
                         builder.append(c);
                     }
                     break;
@@ -49,10 +79,12 @@ public final class StringUtils {
                     if (c == '{') {
                         builder.append('{'); // Two left braces -> '{'
                         state = FormatState.CONSUME_TEXT;
-                    } else if (Character.isDigit(c)) {
+                    }
+                    else if (Character.isDigit(c)) {
                         state = FormatState.PARSING_INDEX;
                         formatIndex = Character.digit(c, 10);
-                    } else {
+                    }
+                    else {
                         throwUnexpectedCharException(input, c);
                     }
                     break;
@@ -60,15 +92,18 @@ public final class StringUtils {
                     if (Character.isDigit(c)) {
                         formatIndex *= 10;
                         formatIndex += Character.digit(c, 10);
-                    } else if (c == '}') {
+                    }
+                    else if (c == '}') {
                         if (formatIndex >= argStrings.size()) {
                             format("Format index {0} out of bounds ({1} arg(s)) in string {2}", formatIndex,
                                 argStrings.size(), input);
-                        } else {
+                        }
+                        else {
                             state = FormatState.CONSUME_TEXT;
                             builder.append(argStrings.get(formatIndex));
                         }
-                    } else {
+                    }
+                    else {
                         throwUnexpectedCharException(input, c);
                     }
                     break;
@@ -76,7 +111,8 @@ public final class StringUtils {
                     if (c == '}') {
                         builder.append('}'); // Two right braces -> '}'
                         state = FormatState.CONSUME_TEXT;
-                    } else {
+                    }
+                    else {
                         throwUnexpectedCharException(input, c);
                     }
                     break;
@@ -89,7 +125,10 @@ public final class StringUtils {
             throw new IllegalArgumentException(format("Unexpected end of format string \"{0}\"", input));
         }
 
-        return builder.toString();
+        String result = builder.toString();
+        stringBuilderPool.free(builder);
+        stringListPool.free(argStrings);
+        return result;
     }
 
     private static void throwUnexpectedCharException(final String input, final char c) {

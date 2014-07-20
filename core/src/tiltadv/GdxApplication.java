@@ -24,6 +24,7 @@ import tiltadv.entity.components.display.FpsDisplayComponent;
 import tiltadv.entity.components.display.PlayerDisplayComponent;
 import tiltadv.entity.components.display.TiltDisplayComponent;
 import tiltadv.entity.components.display.SpriteComponent;
+import tiltadv.memory.Pools;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +45,6 @@ public class GdxApplication extends ApplicationAdapter {
 
     private List<Entity> entities;
     private Entity playerEntity;
-    private Duration elapsedTime = Duration.zero(); // TODO: Replace with pools
 
     @Override
     public void create() {
@@ -86,10 +86,14 @@ public class GdxApplication extends ApplicationAdapter {
     }
 
     private void update() {
-        elapsedTime.setSeconds(Math.min(Gdx.graphics.getRawDeltaTime(), MAX_DELTA_TIME_SECS));
+        {
+            Duration elapsedTime = Pools.duration.grabNew();
+            elapsedTime.setSeconds(Math.min(Gdx.graphics.getRawDeltaTime(), MAX_DELTA_TIME_SECS));
 
-        for (Entity entity : entities) {
-            entity.update(elapsedTime);
+            for (Entity entity : entities) {
+                entity.update(elapsedTime);
+            }
+            Pools.duration.free(elapsedTime);
         }
 
         camera.update();
