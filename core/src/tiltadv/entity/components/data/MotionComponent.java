@@ -18,6 +18,8 @@ public class MotionComponent extends AbstractComponent {
     private final Vector2 velocity = new Vector2();
     // The velocity of this entity is measured in pixels/sec² (after one sec, velocity should be reduced by this much)
     private final Vector2 deceleration = new Vector2();
+    private final Vector2 translate = new Vector2(); // TODO: Replace with pool
+
     private TransformComponent transformComponent;
 
     public void setVelocity(final float vx, final float vy) {
@@ -31,7 +33,15 @@ public class MotionComponent extends AbstractComponent {
         setVelocity(vector.x, vector.y);
     }
 
-    public void smoothStop(final Duration time) {
+    /**
+     * Begin decelerating the entity, such that it takes exactly the specified amount of time to stop.
+     */
+    public void stopSmoothly(final Duration time) {
+        if (time.isZero()) {
+            velocity.setZero();
+            return;
+        }
+
         float timeSecs = time.getSeconds();
         deceleration.set(-velocity.x / timeSecs, -velocity.y / timeSecs);
     }
@@ -54,6 +64,8 @@ public class MotionComponent extends AbstractComponent {
         }
 
         // Adjust current position based on how much velocity was applied over the last time range
-        transformComponent.translate.mulAdd(velocity, elapsedTime.getSeconds());
+        translate.set(transformComponent.getTranslate());
+        translate.mulAdd(velocity, elapsedTime.getSeconds());
+        transformComponent.setTranslate(translate);
     }
 }

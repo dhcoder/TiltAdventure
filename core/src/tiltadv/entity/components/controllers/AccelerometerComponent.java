@@ -16,7 +16,7 @@ public class AccelerometerComponent extends AbstractComponent {
     // instead just treat it as no tilt at all
     private static final float TILT_THRESHOLD = 1.3f;
 
-    private final Vector2 tilt = new Vector2();
+    private final Vector2 tilt = new Vector2(); // TODO: Replace with pool
     private TiltComponent tiltComponent;
 
     @Override

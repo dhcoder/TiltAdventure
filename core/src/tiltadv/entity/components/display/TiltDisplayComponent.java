@@ -33,7 +33,7 @@ public class TiltDisplayComponent extends AbstractComponent {
     public void initialize(final Entity owner) {
         transformComponent = owner.requireComponent(TransformComponent.class);
         spriteComponent = owner.requireComponent(SpriteComponent.class);
-        spriteComponent.sprite.set(arrowSprite);
+        spriteComponent.setSprite(arrowSprite);
 
         tiltComponent = observedEntity.requireComponent(TiltComponent.class);
     }
@@ -42,11 +42,11 @@ public class TiltDisplayComponent extends AbstractComponent {
     public void render(final Batch batch) {
         Vector2 tilt = tiltComponent.getTilt();
         if (tilt.isZero(1f)) {
-            spriteComponent.hidden = true;
+            spriteComponent.setHidden(true);
             return;
         }
 
-        spriteComponent.hidden = false;
-        transformComponent.rotation.setDegrees(tilt.angle());
+        spriteComponent.setHidden(false);
+        transformComponent.setRotation(tilt.angle());
     }
 }

@@ -2,6 +2,8 @@ package tiltadv.entity.components.sprite;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Vector2;
+import dhcoder.support.math.Angle;
 import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;
 import tiltadv.entity.components.data.SizeComponent;
@@ -18,10 +20,8 @@ public class SpriteComponent extends AbstractComponent {
     /**
      * The source sprite used by this component. Use {@link Sprite#set(Sprite)} if you need to change it, later.
      */
-    public final Sprite sprite = new Sprite();
-
-    public boolean hidden;
-
+    private final Sprite sprite = new Sprite();
+    private boolean hidden;
     private TransformComponent transformComponent;
     private SizeComponent sizeComponent;
 
@@ -29,6 +29,22 @@ public class SpriteComponent extends AbstractComponent {
 
     public SpriteComponent(final Sprite sprite) {
         this.sprite.set(sprite);
+    }
+
+    public Sprite getSprite() {
+        return sprite;
+    }
+
+    public void setSprite(final Sprite sprite) {
+        this.sprite.set(sprite);
+    }
+
+    public boolean isHidden() {
+        return hidden;
+    }
+
+    public void setHidden(final boolean hidden) {
+        this.hidden = hidden;
     }
 
     @Override
@@ -44,8 +60,12 @@ public class SpriteComponent extends AbstractComponent {
 
         if (hidden) { return; }
 
-        batch.draw(sprite, transformComponent.translate.x, transformComponent.translate.y, sprite.getWidth() / 2,
-            sprite.getHeight() / 2, sizeComponent.size.x, sizeComponent.size.y, transformComponent.scale.x,
-            transformComponent.scale.y, transformComponent.rotation.getDegrees());
+        Vector2 translate = transformComponent.getTranslate();
+        Vector2 scale = transformComponent.getScale();
+        Angle rotation = transformComponent.getRotation();
+        Vector2 size = sizeComponent.getSize();
+
+        batch.draw(sprite, translate.x, translate.y, sprite.getOriginX(), sprite.getOriginY(), size.x, size.y,
+            scale.x, scale.y, rotation.getDegrees());
     }
 }

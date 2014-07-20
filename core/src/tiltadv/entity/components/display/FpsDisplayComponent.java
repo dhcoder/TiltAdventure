@@ -3,6 +3,7 @@ package tiltadv.entity.components.display;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.math.Vector2;
 import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;
 import tiltadv.entity.components.data.TransformComponent;
@@ -30,6 +31,7 @@ public class FpsDisplayComponent extends AbstractComponent {
     public void render(final Batch batch) {
         int fps = Gdx.graphics.getFramesPerSecond();
         String fpsString = (fps > 0) ? Integer.toString(fps) : "--";
-        font.draw(batch, format("FPS: {0}", fpsString), transformComponent.translate.x, transformComponent.translate.y);
+        Vector2 translate = transformComponent.getTranslate();
+        font.draw(batch, format("FPS: {0}", fpsString), translate.x, translate.y);
     }
 }

@@ -39,7 +39,7 @@ public class PlayerBehaviorComponent extends AbstractComponent {
         tiltComponent = owner.requireComponent(TiltComponent.class);
         motionComponent = owner.requireComponent(MotionComponent.class);
 
-        spriteComponent.sprite.set(playerDown);
+        spriteComponent.setSprite(playerDown);
     }
 
     @Override
@@ -53,24 +53,24 @@ public class PlayerBehaviorComponent extends AbstractComponent {
             float tiltDegrees = tilt.angle();
 
             if (0f <= tiltDegrees && tiltDegrees < 45f) {
-                spriteComponent.sprite.set(playerRight);
+                spriteComponent.setSprite(playerRight);
             }
             else if (45f <= tiltDegrees && tiltDegrees < 135f) {
-                spriteComponent.sprite.set(playerUp);
+                spriteComponent.setSprite(playerUp);
             }
             else if (135f <= tiltDegrees && tiltDegrees < 225f) {
-                spriteComponent.sprite.set(playerLeft);
+                spriteComponent.setSprite(playerLeft);
             }
             else if (225f <= tiltDegrees && tiltDegrees < 315f) {
-                spriteComponent.sprite.set(playerDown);
+                spriteComponent.setSprite(playerDown);
             }
             else { // tiltDegrees >= 315 && tiltDegrees < 360f
-                spriteComponent.sprite.set(playerRight);
+                spriteComponent.setSprite(playerRight);
             }
         }
         else {
             if (isMoving) {
-                motionComponent.smoothStop(Duration.fromSeconds(.3f));
+                motionComponent.stopSmoothly(Duration.fromSeconds(.3f));
                 isMoving = false;
             }
         }

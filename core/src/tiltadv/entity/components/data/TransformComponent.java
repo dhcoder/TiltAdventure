@@ -12,16 +12,16 @@ public final class TransformComponent extends AbstractComponent {
 
     public static class Builder {
 
-        private Opt<Vector2> translateOpt = Opt.withNoValue();
-        private Opt<Vector2> scaleOpt = Opt.withNoValue();
-        private Opt<Angle> rotationOpt = Opt.withNoValue();
+        private final Opt<Vector2> translateOpt = Opt.withNoValue();
+        private final Opt<Vector2> scaleOpt = Opt.withNoValue();
+        private final Opt<Angle> rotationOpt = Opt.withNoValue();
 
         public Builder setTranslate(final Vector2 translate) {
             translateOpt.set(translate);
             return this;
         }
 
-        public Builder setTranslate(float x, float y) {
+        public Builder setTranslate(final float x, final float y) {
             translateOpt.set(new Vector2(x, y));
             return this;
         }
@@ -31,7 +31,7 @@ public final class TransformComponent extends AbstractComponent {
             return this;
         }
 
-        public Builder setScale(float x, float y) {
+        public Builder setScale(final float x, final float y) {
             scaleOpt.set(new Vector2(x, y));
             return this;
         }
@@ -46,9 +46,9 @@ public final class TransformComponent extends AbstractComponent {
         }
     }
 
-    public final Vector2 translate = new Vector2(0f, 0f);
-    public final Vector2 scale = new Vector2(1f, 1f);
-    public final Angle rotation = new Angle();
+    private final Vector2 translate = new Vector2(0f, 0f);
+    private final Vector2 scale = new Vector2(1f, 1f);
+    private final Angle rotation = new Angle();
 
     public TransformComponent() {}
 
@@ -65,5 +65,33 @@ public final class TransformComponent extends AbstractComponent {
         if (rotationOpt.hasValue()) {
             rotation.setFrom(rotationOpt.getValue());
         }
+    }
+
+    public Vector2 getTranslate() {
+        return translate;
+    }
+
+    public void setTranslate(final Vector2 translate) {
+        this.translate.set(translate);
+    }
+
+    public Vector2 getScale() {
+        return scale;
+    }
+
+    public void setScale(final Vector2 scale) {
+        this.scale.set(scale);
+    }
+
+    public Angle getRotation() {
+        return rotation;
+    }
+
+    public void setRotation(final Angle rotation) {
+        this.rotation.setFrom(rotation);
+    }
+
+    public void setRotation(final float degrees) {
+        rotation.setDegrees(degrees);
     }
 }

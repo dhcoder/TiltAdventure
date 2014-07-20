@@ -14,7 +14,7 @@ import static com.badlogic.gdx.Input.Keys;
  */
 public class KeyboardComponent extends AbstractComponent {
 
-    private final Vector2 tilt = new Vector2();
+    private final Vector2 tilt = new Vector2(); // TODO: Replace with pool
     private TiltComponent tiltComponent;
 
     @Override

@@ -16,7 +16,7 @@ public final class SizeComponent extends AbstractComponent {
         return new SizeComponent(sprite.getWidth(), sprite.getHeight());
     }
 
-    public final Vector2 size = new Vector2(0f, 0f);
+    private final Vector2 size = new Vector2(0f, 0f);
 
     public SizeComponent() {}
 
@@ -26,6 +26,14 @@ public final class SizeComponent extends AbstractComponent {
 
     public SizeComponent(final float width, final float height) {
         this.size.set(width, height);
+    }
+
+    public Vector2 getSize() {
+        return size;
+    }
+
+    public void setSize(final Vector2 size) {
+        this.size.set(size);
     }
 
 }

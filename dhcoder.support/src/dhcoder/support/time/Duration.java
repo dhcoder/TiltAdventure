@@ -83,7 +83,7 @@ public class Duration {
         setSeconds(getSeconds() + duration.getSeconds());
     }
 
-    public void setZero() {
-        setSeconds(0f);
-    }
+    public void setZero() { setSeconds(0f); }
+
+    public boolean isZero() { return seconds == 0f; }
 }
