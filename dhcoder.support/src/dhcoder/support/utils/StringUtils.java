@@ -23,9 +23,9 @@ public final class StringUtils {
      * @param args  Various args whose string values will be used in the final string.
      */
     public static String format(final String input, final Object... args) {
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder(); // TODO: Replace with pools
 
-        List<String> argStrings = new ArrayList<String>(args.length);
+        List<String> argStrings = new ArrayList<String>(args.length);  // TODO: Replace with pools
         for (Object arg : args) {
             argStrings.add(arg.toString());
         }

@@ -1,7 +1,8 @@
-package tiltadv.entity.components.sprite;
+package tiltadv.entity.components.display;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.support.math.Angle;
 import tiltadv.entity.AbstractComponent;
@@ -20,15 +21,17 @@ public class SpriteComponent extends AbstractComponent {
     /**
      * The source sprite used by this component. Use {@link Sprite#set(Sprite)} if you need to change it, later.
      */
-    private final Sprite sprite = new Sprite();
+    private Sprite sprite;
     private boolean hidden;
     private TransformComponent transformComponent;
     private SizeComponent sizeComponent;
 
-    public SpriteComponent() {}
+    public SpriteComponent() {
+        sprite = new Sprite();
+    }
 
     public SpriteComponent(final Sprite sprite) {
-        this.sprite.set(sprite);
+        setSprite(sprite);
     }
 
     public Sprite getSprite() {
@@ -36,7 +39,11 @@ public class SpriteComponent extends AbstractComponent {
     }
 
     public void setSprite(final Sprite sprite) {
-        this.sprite.set(sprite);
+        this.sprite = sprite;
+    }
+
+    public void setTextureRegion(final TextureRegion textureRegion) {
+        sprite.setRegion(textureRegion);
     }
 
     public boolean isHidden() {

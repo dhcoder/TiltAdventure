@@ -1,6 +1,7 @@
 package tiltadv.entity.components.data;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import tiltadv.entity.AbstractComponent;
 
@@ -12,8 +13,8 @@ public final class SizeComponent extends AbstractComponent {
     /**
      * Convenience method which generates a new size component from a Sprite's dimensions.
      */
-    public static SizeComponent fromSprite(final Sprite sprite) {
-        return new SizeComponent(sprite.getWidth(), sprite.getHeight());
+    public static SizeComponent from(final TextureRegion textureRegion) {
+        return new SizeComponent(textureRegion.getRegionWidth(), textureRegion.getRegionHeight());
     }
 
     private final Vector2 size = new Vector2(0f, 0f);
