@@ -3,7 +3,10 @@ package dhcoder.support.utils;
 import dhcoder.support.lambda.Action;
 import org.junit.Test;
 
+import java.nio.CharBuffer;
+
 import static dhcoder.support.utils.StringUtils.format;
+import static dhcoder.support.utils.StringUtils.formatInto;
 import static dhcoder.test.TestUtils.assertException;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -105,13 +108,6 @@ public final class StringUtilsTest {
             }
         });
 
-        assertException("Format index cannot contain letters", IllegalArgumentException.class, new Action() {
-            @Override
-            public void run() {
-                format("Numeric qualifiers like {0d} and {1f} aren't necessary and don't work");
-            }
-        });
-
         assertException("Format index cannot be empty", IllegalArgumentException.class, new Action() {
             @Override
             public void run() {
@@ -119,5 +115,36 @@ public final class StringUtilsTest {
             }
         });
     }
+
+    @Test
+    public void testFormatIntoCharBuffer() {
+        CharBuffer charBuffer = CharBuffer.allocate(100);
+        formatInto(charBuffer, "{0}: CharBuffer capacity is {1}.", "TEST", 100);
+
+        assertThat(charBuffer.get(0), equalTo('T'));
+        assertThat(charBuffer.flip().toString(), equalTo("TEST: CharBuffer capacity is 100."));
+    }
+
+    @Test
+    public void formatCorrectlyParsesIntegerParameters() {
+        assertThat(format("{0d}", 0), equalTo("0"));
+        assertThat(format("{0d}", 3), equalTo("3"));
+        assertThat(format("{0d}", -4), equalTo("-4"));
+        assertThat(format("{0d}", 1023405), equalTo("1023405"));
+        assertThat(format("{0d}", -900009), equalTo("-900009"));
+    }
+
+    @Test
+    public void formatIntoThrowsExceptionWhenBufferIsTooSmall() {
+        assertException("Format buffer must be large enough", IllegalArgumentException.class, new Action() {
+            @Override
+            public void run() {
+                CharBuffer charBuffer = CharBuffer.allocate(3);
+                formatInto(charBuffer, "1234");
+            }
+        });
+    }
+
+
 
 }
