@@ -128,8 +128,9 @@ public class Entity {
      * Clear up any resources used by this entity.
      */
     public void dispose() {
-        for (Component component : components) {
-            component.dispose();
+        int numComponents = components.size(); // Old fashioned iterator to avoid Iterator allocation
+        for (int i = 0; i < numComponents; ++i) {
+            components.get(i).dispose();
         }
     }
 
@@ -137,8 +138,9 @@ public class Entity {
      * Update this entity. The passed in time is in seconds.
      */
     public void update(final Duration elapsedTime) {
-        for (Component component : components) {
-            component.update(elapsedTime);
+        int numComponents = components.size(); // Old fashioned iterator to avoid Iterator allocation
+        for (int i = 0; i < numComponents; ++i) {
+            components.get(i).update(elapsedTime);
         }
     }
 
@@ -146,8 +148,9 @@ public class Entity {
      * Render this entity, via a {@link Batch}.
      */
     public void render(final Batch batch) {
-        for (Component component : components) {
-            component.render(batch);
+        int numComponents = components.size(); // Old fashioned iterator to avoid Iterator allocation
+        for (int i = 0; i < numComponents; ++i) {
+            components.get(i).render(batch);
         }
     }
 

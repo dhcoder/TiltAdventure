@@ -1,6 +1,6 @@
 package dhcoder.support.math;
 
-import dhcoder.support.opt.Opt;
+import dhcoder.support.opt.OptFloat;
 
 import static dhcoder.support.utils.StringUtils.format;
 
@@ -46,8 +46,8 @@ public class Angle {
 
     // One or both of these values are guaranteed to be set at any time. When one value is set, the other invalidated,
     // but when a request is made to get an unset value, it will lazily be calculated at that time.
-    private final Opt<Float> degreesOpt = Opt.of(0f);
-    private final Opt<Float> radiansOpt = Opt.of(0f);
+    private final OptFloat degreesOpt = OptFloat.of(0f);
+    private final OptFloat radiansOpt = OptFloat.of(0f);
 
     public float getDegrees() {
         if (!degreesOpt.hasValue()) {

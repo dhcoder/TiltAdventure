@@ -68,8 +68,9 @@ public class GdxApplication extends ApplicationAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         batch.begin();
-        for (Entity entity : entities) {
-            entity.render(batch);
+        int numEntities = entities.size(); // Old fashioned iteration to avoid Iterator allocation
+        for (int i = 0; i < numEntities; ++i) {
+            entities.get(i).render(batch);
         }
         batch.end();
     }
@@ -90,8 +91,9 @@ public class GdxApplication extends ApplicationAdapter {
             Duration elapsedTime = Pools.duration.grabNew();
             elapsedTime.setSeconds(Math.min(Gdx.graphics.getRawDeltaTime(), MAX_DELTA_TIME_SECS));
 
-            for (Entity entity : entities) {
-                entity.update(elapsedTime);
+            int numEntities = entities.size(); // Old fashioned iterator to avoid Iterator allocation
+            for (int i = 0; i < numEntities; ++i) {
+                entities.get(i).update(elapsedTime);
             }
             Pools.duration.free(elapsedTime);
         }

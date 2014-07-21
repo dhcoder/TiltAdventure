@@ -35,15 +35,21 @@ There are some additional rules followed by this codebase...
     fragility.
 * Values returned from getXXX methods should be treated as immutable. Values passed in as parameters should also be
 treated as immutable.
-* Fields should never be public. Access them through a getXXX or setXXX method if you need to change this.
+* Fields should never be public. Access them through a getXXX or setXXX method if you need to change their values.
+    * Following this rule makes it easier to know I acn just modify a single setXXX method and that it will work
+    everywhere.
+    * If this was C#, I would just use properties instead. This of getXXX and setXXX that way.
+* Avoid all allocations that I have any control over while the user can control the player.
+    * This appeases the android GC from chomping on your game performance.
+    * Run Android monitor and track allocations
+    * Use Pools
+    * Avoid `format`, use CharBuffer instead of StringBuilder.
+    * Consider triggering the GC while the game is transitioning, say, from one room to another, etc.
 
 ## On the fence
 
 There are some rules I currently don't follow but may change my mind about some day
 
-* Using Pools. This would be great to avoid crazy allocations, but then I have to remember to alloc / free everything.
-For now, I'm just going to try to preallocate everything up front and not allocate much during the main game loop.
-Opts and that sort of stuff make this tricky, so I may see if there's a way to use pools in that case...
 * Test everything that can be tested (using JUnit 4)
     * Tests should be FAST
     * Tests should never write to a file, make a database connection, etc.
