@@ -7,7 +7,7 @@ import dhcoder.support.time.Duration;
 /**
  * A collection of all memory pools used by our game.
  */
-public class Pools {
+public final class Pools {
 
     public static final Pool<Duration> duration = new Pool<Duration>(new Pool.AllocateMethod<Duration>() {
         @Override

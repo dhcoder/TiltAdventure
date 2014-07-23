@@ -5,7 +5,7 @@ import static dhcoder.support.utils.StringUtils.format;
 /**
  * An class which represents a time duration.
  */
-public class Duration {
+public final class Duration {
 
     public static Duration zero() {
         return new Duration();

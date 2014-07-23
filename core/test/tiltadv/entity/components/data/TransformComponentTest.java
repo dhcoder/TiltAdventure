@@ -7,7 +7,7 @@ import tiltadv.entity.components.data.TransformComponent;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-public class TransformComponentTest {
+public final class TransformComponentTest {
 
     @Test
     public void defaultComponentHasExpectedValues() {

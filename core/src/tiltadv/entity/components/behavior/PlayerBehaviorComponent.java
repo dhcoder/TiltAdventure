@@ -10,7 +10,7 @@ import tiltadv.entity.components.data.TiltComponent;
 /**
  * Component that maintains the state and logic of the main player's avatar.
  */
-public class PlayerBehaviorComponent extends AbstractComponent {
+public final class PlayerBehaviorComponent extends AbstractComponent {
 
     private static final float TILT_MULTIPLIER = 50f;
     private static final Duration STOP_DURATION = Duration.fromSeconds(.3f);

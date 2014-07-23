@@ -8,7 +8,7 @@ import static dhcoder.support.utils.StringUtils.format;
  * Simple class that represents a 0 -> 360° angle. You can set and get this angle's value in either degreesOpt or
  * radiansOpt.
  */
-public class Angle {
+public final class Angle {
 
     /**
      * A float version of java.lang.Math.PI

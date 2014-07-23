@@ -5,7 +5,7 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-public class DurationTest {
+public final class DurationTest {
 
     @Test
     public void testFromSeconds() throws Exception {

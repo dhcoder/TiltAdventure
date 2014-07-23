@@ -10,7 +10,7 @@ import tiltadv.entity.components.data.MotionComponent;
 /**
  * Component that maintains the state and logic of the main player's avatar.
  */
-public class PlayerDisplayComponent extends AbstractComponent {
+public final class PlayerDisplayComponent extends AbstractComponent {
 
     private final Animation animUp;
     private final Animation animDown;

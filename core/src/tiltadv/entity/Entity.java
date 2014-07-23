@@ -13,7 +13,7 @@ import static dhcoder.support.utils.StringUtils.format;
 /**
  * A skeletal game object whose behavior is implemented by {@link Component}s.
  */
-public class Entity {
+public final class Entity {
 
     // Map a component's type to the component itself
     private final List<Component> components = new ArrayList<Component>();

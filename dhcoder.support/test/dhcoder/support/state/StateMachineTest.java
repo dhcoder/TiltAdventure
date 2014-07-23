@@ -9,7 +9,7 @@ import static dhcoder.test.TestUtils.assertException;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-public class StateMachineTest {
+public final class StateMachineTest {
 
     private enum TestState {
         A,

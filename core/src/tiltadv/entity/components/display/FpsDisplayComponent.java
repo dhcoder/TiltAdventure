@@ -14,7 +14,7 @@ import static dhcoder.support.utils.StringUtils.format;
 /**
  * Simple utility class that shows the current framerate.
  */
-public class FpsDisplayComponent extends AbstractComponent {
+public final class FpsDisplayComponent extends AbstractComponent {
 
     private final static String FPS_LABEL_FORMAT = "FPS: {0}";
     private final BitmapFont font;

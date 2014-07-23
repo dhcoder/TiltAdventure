@@ -16,7 +16,7 @@ import tiltadv.entity.components.data.TransformComponent;
  * If a {@link SizeComponent} is available on the owning {@link Entity}, the sprite will render itself using that value.
  * Otherwise, it will render to the size of the current sprite.
  */
-public class SpriteComponent extends AbstractComponent {
+public final class SpriteComponent extends AbstractComponent {
 
     /**
      * The source sprite used by this component. Use {@link Sprite#set(Sprite)} if you need to change it, later.

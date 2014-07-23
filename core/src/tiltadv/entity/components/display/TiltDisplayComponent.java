@@ -12,7 +12,7 @@ import tiltadv.entity.components.data.TransformComponent;
 /**
  * Component which sets the transform of an entity to match the direction of the hardware's tilt.
  */
-public class TiltDisplayComponent extends AbstractComponent {
+public final class TiltDisplayComponent extends AbstractComponent {
 
     private final Sprite arrowSprite;
     private final Entity observedEntity;

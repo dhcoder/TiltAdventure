@@ -29,7 +29,7 @@ import tiltadv.memory.Pools;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GdxApplication extends ApplicationAdapter {
+public final class GdxApplication extends ApplicationAdapter {
 
     private static final int VIEWPORT_HEIGHT = 240;
     private static final int VIEWPORT_WIDTH = 320;

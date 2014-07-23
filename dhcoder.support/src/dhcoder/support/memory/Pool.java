@@ -21,7 +21,7 @@ import static dhcoder.support.utils.StringUtils.format;
  * still holding on to that reference after you release it, that's an error - they will soon find the reference reset
  * underneath them.
  */
-public class Pool<T> {
+public final class Pool<T> {
 
     public interface AllocateMethod<T> extends Func<T> {}
 

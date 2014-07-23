@@ -12,7 +12,7 @@ import static com.badlogic.gdx.Input.Keys;
 /**
  * Component which handles the user using a keyboard to
  */
-public class KeyboardComponent extends AbstractComponent {
+public final class KeyboardComponent extends AbstractComponent {
 
     private final Vector2 tilt = new Vector2(); // TODO: Replace with pool
     private TiltComponent tiltComponent;

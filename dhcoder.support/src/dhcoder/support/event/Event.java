@@ -9,7 +9,7 @@ import java.util.List;
  * <p/>
  * A class should use Event internally but expose it externally via a {@link EventHandle}
  */
-public class Event {
+public final class Event {
 
     private final List<EventHandler> listeners = new ArrayList<EventHandler>();
     private final EventHandle eventHandle;

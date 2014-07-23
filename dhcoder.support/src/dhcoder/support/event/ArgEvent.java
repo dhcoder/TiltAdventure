@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * Like {@link Event} but includes additional {@link EventArgs} when fired.
  */
-public class ArgEvent<T extends EventArgs> {
+public final class ArgEvent<T extends EventArgs> {
 
     private final ArrayList<ArgEventHandler<T>> listeners = new ArrayList<ArgEventHandler<T>>();
     private final ArgEventHandle<T> eventHandle;

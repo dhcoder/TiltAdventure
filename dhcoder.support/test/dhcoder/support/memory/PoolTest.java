@@ -8,7 +8,7 @@ import static dhcoder.test.TestUtils.assertException;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 
-public class PoolTest {
+public final class PoolTest {
 
     private class PooledItem {
 

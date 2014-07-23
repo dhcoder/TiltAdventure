@@ -12,7 +12,7 @@ import tiltadv.memory.Pools;
 /**
  * Component which reads the device's accelerometer and sets the entity's tilt value accordingly.
  */
-public class AccelerometerComponent extends AbstractComponent {
+public final class AccelerometerComponent extends AbstractComponent {
 
     // If the tilt vector is smaller than the following value, we consider the amount of tilt too weak to count, and
     // instead just treat it as no tilt at all

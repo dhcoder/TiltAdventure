@@ -13,7 +13,7 @@ import tiltadv.memory.Pools;
  * <p/>
  * TODO: Add tests and documentation, maybe also remove some public methods here.
  */
-public class MotionComponent extends AbstractComponent {
+public final class MotionComponent extends AbstractComponent {
 
     // The velocity of this entity is measured in pixels/sec
     private final Vector2 velocity = new Vector2();

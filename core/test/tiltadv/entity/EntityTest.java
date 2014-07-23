@@ -10,7 +10,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-public class EntityTest {
+public final class EntityTest {
 
     private class DummyComponent extends AbstractComponent {
 

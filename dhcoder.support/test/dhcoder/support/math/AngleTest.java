@@ -6,7 +6,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.number.IsCloseTo.closeTo;
 
-public class AngleTest {
+public final class AngleTest {
 
     private static final double ALLOWED_ERROR = 0.01; // Converting degrees <-> radians is imprecise
 
