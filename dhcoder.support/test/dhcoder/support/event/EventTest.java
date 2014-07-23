@@ -7,7 +7,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 public final class EventTest {
 
-    private class EventOwner {
+    private final class EventOwner {
 
         private final Event event = new Event();
 
@@ -24,7 +24,7 @@ public final class EventTest {
         }
     }
 
-    private class EventFiredCounter implements EventHandler {
+    private final class EventFiredCounter implements EventHandler {
 
         private Object sender;
         private int eventFiredCount;

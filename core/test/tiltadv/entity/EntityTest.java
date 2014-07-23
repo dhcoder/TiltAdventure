@@ -12,7 +12,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 public final class EntityTest {
 
-    private class DummyComponent extends AbstractComponent {
+    private final class DummyComponent extends AbstractComponent {
 
         private Entity owner;
         private boolean disposed;
@@ -39,12 +39,12 @@ public final class EntityTest {
     /**
      * This class exists only to be found by a {@link DependentComponent}
      */
-    private class SourceComponent extends AbstractComponent {}
+    private final class SourceComponent extends AbstractComponent {}
 
     /**
      * This component expects to find a {@link SourceComponent} on the {@link Entity} it's attached to.
      */
-    private class DependentComponent extends AbstractComponent {
+    private final class DependentComponent extends AbstractComponent {
 
         private SourceComponent sourceComponent;
 
@@ -61,7 +61,7 @@ public final class EntityTest {
     /**
      * This component asserts that it is the only one that exists on an entity
      */
-    private class SingletonComponent extends AbstractComponent {
+    private final class SingletonComponent extends AbstractComponent {
 
         private boolean initialized;
 

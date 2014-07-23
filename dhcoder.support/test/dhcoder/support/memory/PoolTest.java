@@ -10,7 +10,7 @@ import static org.junit.Assert.assertThat;
 
 public final class PoolTest {
 
-    private class PooledItem {
+    private final class PooledItem {
 
         private int releasedCount;
 

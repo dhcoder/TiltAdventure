@@ -40,7 +40,7 @@ public final class StateMachineTest {
         }
     }
 
-    private class TestMachine extends StateMachine<TestState, TestEvent> {
+    private final class TestMachine extends StateMachine<TestState, TestEvent> {
 
         public TestMachine(final TestState startState) {
             super(startState);

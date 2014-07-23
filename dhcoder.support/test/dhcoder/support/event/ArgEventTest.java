@@ -7,7 +7,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 public final class ArgEventTest {
 
-    private class IntArgs implements EventArgs {
+    private final class IntArgs implements EventArgs {
 
         private final int intValue;
 
@@ -20,7 +20,7 @@ public final class ArgEventTest {
         }
     }
 
-    private class IntEventOwner {
+    private final class IntEventOwner {
 
         private final ArgEvent<IntArgs> intEvent = new ArgEvent<IntArgs>();
 
@@ -35,7 +35,7 @@ public final class ArgEventTest {
         public void testClear() { intEvent.clear(); }
     }
 
-    private class IntEventHandler implements ArgEventHandler<IntArgs> {
+    private final class IntEventHandler implements ArgEventHandler<IntArgs> {
 
         private Object sender;
         private IntArgs args;

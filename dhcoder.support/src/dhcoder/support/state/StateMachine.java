@@ -19,7 +19,7 @@ import static dhcoder.support.opt.Opt.of;
  */
 public abstract class StateMachine<S extends Enum, E extends Enum> {
 
-    private class StateEvent {
+    private final class StateEvent {
 
         private final S state;
         private final E event;
