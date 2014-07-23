@@ -1,10 +1,5 @@
 package dhcoder.support.utils;
 
-import dhcoder.support.memory.Pool;
-
-import java.util.ArrayList;
-import java.util.List;
-
 public final class StringUtils {
 
     private enum FormatState {
@@ -13,32 +8,6 @@ public final class StringUtils {
         GOT_RIGHT_BRACE, // Got a right brace, see if we're closing off a format index
         PARSING_INDEX, // We're in between braces, parsing a format index
     }
-
-    private static final Pool<StringBuilder> stringBuilderPool =
-        new Pool<StringBuilder>(new Pool.AllocateMethod<StringBuilder>() {
-            @Override
-            public StringBuilder run() {
-                return new StringBuilder();
-            }
-        }, new Pool.ResetMethod<StringBuilder>() {
-            @Override
-            public void run(final StringBuilder item) {
-                item.setLength(0);
-            }
-        });
-
-    private static final Pool<List<String>> stringListPool =
-        new Pool<List<String>>(new Pool.AllocateMethod<List<String>>() {
-            @Override
-            public List<String> run() {
-                return new ArrayList<String>();
-            }
-        }, new Pool.ResetMethod<List<String>>() {
-            @Override
-            public void run(final List<String> item) {
-                item.clear();
-            }
-        });
 
     /**
      * Format a string using C# style formatting, i.e. using {0} instead of %0$s.
@@ -54,12 +23,7 @@ public final class StringUtils {
      * @param args  Various args whose string values will be used in the final string.
      */
     public static String format(final String input, final Object... args) {
-        StringBuilder builder = stringBuilderPool.grabNew();
-
-        List<String> argStrings = stringListPool.grabNew();
-        for (Object arg : args) {
-            argStrings.add(arg.toString());
-        }
+        StringBuilder builder = new StringBuilder();
 
         FormatState state = FormatState.CONSUME_TEXT;
         int formatIndex = 0;
@@ -97,13 +61,13 @@ public final class StringUtils {
                         formatIndex += Character.digit(c, 10);
                     }
                     else if (c == '}') {
-                        if (formatIndex >= argStrings.size()) {
+                        if (formatIndex >= args.length) {
                             format("Format index {0} out of bounds ({1} arg(s)) in string {2}", formatIndex,
-                                argStrings.size(), input);
+                                args.length, input);
                         }
                         else {
                             state = FormatState.CONSUME_TEXT;
-                            builder.append(argStrings.get(formatIndex));
+                            builder.append(args[formatIndex].toString());
                         }
                     }
                     else {
@@ -128,10 +92,7 @@ public final class StringUtils {
             throw new IllegalArgumentException(format("Unexpected end of format string \"{0}\"", input));
         }
 
-        String result = builder.toString();
-        stringBuilderPool.free(builder);
-        stringListPool.free(argStrings);
-        return result;
+        return builder.toString();
     }
 
     private static void throwUnexpectedCharException(final String input, final char c) {

@@ -32,6 +32,15 @@ public class AngleTest {
     }
 
     @Test
+    public void testSetAngleToOtherAngle() {
+        Angle angle = Angle.fromDegrees(0f);
+        Angle otherAngle = Angle.fromDegrees(45f);
+        assertThat(angle.getDegrees(), equalTo(0f));
+        angle.setFrom(otherAngle);
+        assertThat(angle.getDegrees(), equalTo(45f));
+    }
+
+    @Test
     public void testSetAngleToDegreesThenRadians() {
         Angle angle = Angle.fromDegrees(180f);
         angle.setRadians(Angle.PI / 2f);

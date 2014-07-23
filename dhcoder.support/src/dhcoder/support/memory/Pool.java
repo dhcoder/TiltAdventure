@@ -45,10 +45,17 @@ public class Pool<T> {
         this.allocate = allocate;
         this.reset = reset;
         this.capacity = capacity;
-
     }
 
+    public int getRemainingCount() { return capacity - usedItems.size(); }
+
     public T grabNew() {
+        if (getRemainingCount() == 0) {
+            throw new IllegalStateException(
+                format("Requested too many items from this pool (capacity: {0}) - are you forgetting to free some?",
+                    capacity));
+        }
+
         T newItem;
         if (freeItems.size() > 0) {
             newItem = freeItems.pop();
@@ -58,12 +65,6 @@ public class Pool<T> {
         }
 
         usedItems.add(newItem);
-
-        if (usedItems.size() + freeItems.size() > capacity) {
-            throw new IllegalStateException(
-                format("Requested too many items from this pool (capacity: {0}) - are you forgetting to free some?",
-                    capacity));
-        }
 
         return newItem;
     }
@@ -78,5 +79,4 @@ public class Pool<T> {
         reset.run(item);
         freeItems.push(item);
     }
-
 }

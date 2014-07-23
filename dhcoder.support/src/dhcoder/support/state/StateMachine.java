@@ -29,14 +29,6 @@ public abstract class StateMachine<S extends Enum, E extends Enum> {
             this.event = event;
         }
 
-        public S getState() {
-            return state;
-        }
-
-        public E getEvent() {
-            return event;
-        }
-
         @Override
         public int hashCode() {
             int result = state.hashCode();
