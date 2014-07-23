@@ -68,7 +68,7 @@
       <excludeFolder url="file://$MODULE_DIR$/build/source" />
       <excludeFolder url="file://$MODULE_DIR$/build/symbols" />
     </content>
-    <orderEntry type="jdk" jdkName="Android API 19 Platform" jdkType="Android SDK" />
+    <orderEntry type="jdk" jdkName="TiltAdv ADK" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="gdx-box2d-1.2.0" level="project" />
     <orderEntry type="library" exported="" name="gdx-backend-android-1.2.0" level="project" />
