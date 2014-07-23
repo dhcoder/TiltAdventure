@@ -1,55 +1,59 @@
 package dhcoder.support.memory;
 
 import dhcoder.support.lambda.Action;
-import dhcoder.test.TestUtils;
+import org.junit.Before;
 import org.junit.Test;
-
-import java.util.UUID;
 
 import static dhcoder.test.TestUtils.assertException;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 
 public class PoolTest {
 
     private class PooledItem {
 
-        private UUID uniqueId = UUID.randomUUID();
         private int releasedCount;
 
-        public UUID getUniqueId() {
-            return uniqueId;
+        public PooledItem() {
+            allocationCount++;
         }
 
-        public int getReleasedCount() {
-            return releasedCount;
-        }
+        public int getReleasedCount() { return releasedCount; }
 
-        public void release() {
-            releasedCount++;
-        }
+        public void release() { releasedCount++; }
+    }
+
+    private int allocationCount;
+
+    @Before
+    public void setUp() {
+        allocationCount = 0;
     }
 
     @Test
     public void grabNewAvoidsAllocation() {
+
+        assertThat(allocationCount, equalTo(0));
         Pool<PooledItem> pool = createPool(1);
+        assertThat(allocationCount, equalTo(1));
 
         PooledItem item = pool.grabNew();
-        UUID uniqueId = item.getUniqueId();
+        assertThat(allocationCount, equalTo(1));
         assertThat(item.getReleasedCount(), equalTo(0));
+
         pool.free(item);
+        assertThat(item.getReleasedCount(), equalTo(1));
 
         item = pool.grabNew();
-        // Assert we definitely have the old item, and that it wasn't reallocated
         assertThat(item.getReleasedCount(), equalTo(1));
-        assertThat(item.getUniqueId(), equalTo(uniqueId));
+        assertThat(allocationCount, equalTo(1));
 
-        assertThat(new PooledItem().getUniqueId(), not(equalTo(uniqueId)));
+        PooledItem allocatedItem = new PooledItem();
+        assertThat(allocationCount, equalTo(2));
     }
 
     @Test
-    public void poolRemainingCountsAreCorrect() throws Exception {
+    public void poolRemainingCountsAreCorrect()  {
         Pool<PooledItem> pool = createPool(5);
         assertThat(pool.getRemainingCount(), equalTo(5));
         PooledItem item1 = pool.grabNew();
@@ -106,6 +110,24 @@ public class PoolTest {
                 pool.grabNew();
             }
         });
+    }
+
+    @Test
+    public void invalidCapacityThrowsException() {
+        assertException("Pool can't be instantiated with no capacity", IllegalArgumentException.class, new Action() {
+            @Override
+            public void run() {
+                createPool(0);
+            }
+        });
+
+        assertException("Pool can't be instantiated with negative capacity", IllegalArgumentException.class,
+            new Action() {
+                @Override
+                public void run() {
+                    createPool(-5);
+                }
+            });
     }
 
     private Pool<PooledItem> createPool(int capacity) {

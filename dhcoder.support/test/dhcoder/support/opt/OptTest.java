@@ -34,6 +34,7 @@ public final class OptTest {
     @Test
     public void settingOptionalValueWorks() {
         Opt<String> stringOpt = Opt.withNoValue();
+        Opt<String> emptyStringOpt = Opt.of("");
         assertThat(stringOpt.hasValue(), equalTo(false));
 
         stringOpt.set(DUMMY_VALUE);
@@ -42,6 +43,10 @@ public final class OptTest {
 
         stringOpt.set(null);
         assertThat(stringOpt.hasValue(), equalTo(false));
+
+        stringOpt.setFrom(emptyStringOpt);
+        assertThat(stringOpt.hasValue(), equalTo(true));
+        assertThat(stringOpt.getValue(), equalTo(""));
     }
 
     @Test

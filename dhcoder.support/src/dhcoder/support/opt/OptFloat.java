@@ -29,18 +29,14 @@ public final class OptFloat {
      * <p/>
      * Use {@link #withNoValue()} instead.
      */
-    private OptFloat() {
-        hasValue = false;
-    }
+    private OptFloat() { hasValue = false; }
 
     /**
      * Create an optional with an initial value.
      * <p/>
      * Use {@link #of(float)} instead.
      */
-    private OptFloat(final float value) {
-        set(value);
-    }
+    private OptFloat(final float value) { set(value); }
 
     /**
      * Clears the value of this optional.

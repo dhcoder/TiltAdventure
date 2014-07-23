@@ -60,16 +60,12 @@ public final class Opt<T> {
      * <p/>
      * Use {@link #of(Object)} or {@link #ofNullable(Object)} instead.
      */
-    private Opt(final T value) {
-        set(value);
-    }
+    private Opt(final T value) { set(value); }
 
     /**
      * Clears the value of this optional.
      */
-    public void clear() {
-        set(null);
-    }
+    public void clear() { set(null); }
 
     /**
      * Returns the current value of this optional, or throws an exception otherwise. You may consider checking {@link
@@ -88,29 +84,21 @@ public final class Opt<T> {
      * Sets this optional to a new value. Setting this to null clears the optional, although you are encouraged to use
      * {@link #clear()} if possible, for readability.
      */
-    public void set(final T value) {
-        this.value = value;
-    }
+    public void set(final T value) { this.value = value; }
 
     /**
      * Set the value of this optional to the value held by another optional (or no value if the target optional is also
      * valueless).
      */
-    public void setFrom(final Opt<T> rhs) {
-        this.value = rhs.value;
-    }
+    public void setFrom(final Opt<T> rhs) { this.value = rhs.value; }
 
     /**
      * Returns true if this optional currently has a value set.
      */
-    public boolean hasValue() {
-        return value != null;
-    }
+    public boolean hasValue() { return value != null; }
 
     @Override
-    public int hashCode() {
-        return value != null ? value.hashCode() : 0;
-    }
+    public int hashCode() { return value != null ? value.hashCode() : 0; }
 
     @Override
     public boolean equals(final Object o) {

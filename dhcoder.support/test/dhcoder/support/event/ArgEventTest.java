@@ -31,6 +31,8 @@ public class ArgEventTest {
         public void testFire(final int intValue) {
             intEvent.fire(this, new IntArgs(intValue));
         }
+
+        public void testClear() { intEvent.clear(); }
     }
 
     private class IntEventHandler implements ArgEventHandler<IntArgs> {
@@ -65,5 +67,52 @@ public class ArgEventTest {
 
         assertThat(intEventHandler.getSender(), equalTo((Object)intEventOwner));
         assertThat(intEventHandler.getArgs().getIntValue(), equalTo(ARBITRARY_VALUE));
+    }
+
+    @Test
+    public void firingAnEventTriggersAllEventHandlers() {
+        IntEventOwner intEventOwner = new IntEventOwner();
+
+        IntEventHandler intEventHandler1 = new IntEventHandler();
+        IntEventHandler intEventHandler2 = new IntEventHandler();
+
+        intEventOwner.getIntEvent().addHandler(intEventHandler1);
+        intEventOwner.getIntEvent().addHandler(intEventHandler2);
+
+        final int ARBITRARY_VALUE = 13579;
+        intEventOwner.testFire(ARBITRARY_VALUE);
+
+        assertThat(intEventHandler1.getArgs().getIntValue(), equalTo(ARBITRARY_VALUE));
+        assertThat(intEventHandler2.getArgs().getIntValue(), equalTo(ARBITRARY_VALUE));
+    }
+
+    @Test
+    public void removeListenerStopsEventHandlerFromBeingTriggered() {
+        IntEventOwner intEventOwner = new IntEventOwner();
+
+        IntEventHandler intEventHandler = new IntEventHandler();
+        intEventOwner.getIntEvent().addHandler(intEventHandler);
+
+        intEventOwner.testFire(1);
+        assertThat(intEventHandler.getArgs().getIntValue(), equalTo(1));
+
+        intEventOwner.getIntEvent().removeHandler(intEventHandler);
+        intEventOwner.testFire(2);
+        assertThat(intEventHandler.getArgs().getIntValue(), equalTo(1));
+    }
+
+    @Test
+    public void clearListenersStopsEventHandlerFromBeingTriggered() {
+        IntEventOwner intEventOwner = new IntEventOwner();
+
+        IntEventHandler intEventHandler = new IntEventHandler();
+        intEventOwner.getIntEvent().addHandler(intEventHandler);
+
+        intEventOwner.testFire(1);
+        assertThat(intEventHandler.getArgs().getIntValue(), equalTo(1));
+
+        intEventOwner.testClear();
+        intEventOwner.testFire(2);
+        assertThat(intEventHandler.getArgs().getIntValue(), equalTo(1));
     }
 }

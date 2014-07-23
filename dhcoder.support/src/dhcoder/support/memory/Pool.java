@@ -31,10 +31,9 @@ public class Pool<T> {
     }
 
     private static int DEFAULT_CAPACITY = 10;
-    private final AllocateMethod<T> allocate;
     private final ResetMethod<T> reset;
-    private final Stack<T> freeItems = new Stack<T>();
-    private final List<T> usedItems = new ArrayList<T>();
+    private final Stack<T> freeItems;
+    private final List<T> usedItems;
     private final int capacity;
 
     public Pool(final AllocateMethod<T> allocate, final ResetMethod<T> reset) {
@@ -42,12 +41,24 @@ public class Pool<T> {
     }
 
     public Pool(final AllocateMethod<T> allocate, final ResetMethod<T> reset, final int capacity) {
-        this.allocate = allocate;
+
+        if (capacity <= 0) {
+            throw new IllegalArgumentException(format("Invalid pool capacity: {0}", capacity));
+        }
+
         this.reset = reset;
         this.capacity = capacity;
+
+        freeItems = new Stack<T>();
+        freeItems.ensureCapacity(capacity);
+        usedItems = new ArrayList<T>(capacity);
+
+        for (int i = 0; i < capacity; i++) {
+            freeItems.push(allocate.run());
+        }
     }
 
-    public int getRemainingCount() { return capacity - usedItems.size(); }
+    public int getRemainingCount() { return freeItems.size(); }
 
     public T grabNew() {
         if (getRemainingCount() == 0) {
@@ -56,14 +67,7 @@ public class Pool<T> {
                     capacity));
         }
 
-        T newItem;
-        if (freeItems.size() > 0) {
-            newItem = freeItems.pop();
-        }
-        else {
-            newItem = allocate.run();
-        }
-
+        T newItem = freeItems.pop();
         usedItems.add(newItem);
 
         return newItem;
