@@ -13,9 +13,9 @@ public final class TransformComponentTest {
     public void defaultComponentHasExpectedValues() {
         TransformComponent transformComponent = new TransformComponent.Builder().build();
 
-        assertThat(transformComponent.translate, equalTo(new Vector2(0f, 0f)));
-        assertThat(transformComponent.scale, equalTo(new Vector2(1f, 1f)));
-        assertThat(transformComponent.rotation.getDegrees(), equalTo(0f));
+        assertThat(transformComponent.getTranslate(), equalTo(new Vector2(0f, 0f)));
+        assertThat(transformComponent.getScale(), equalTo(new Vector2(1f, 1f)));
+        assertThat(transformComponent.getRotation().getDegrees(), equalTo(0f));
     }
 
     @Test
@@ -27,10 +27,10 @@ public final class TransformComponentTest {
             new TransformComponent.Builder().setTranslate(sneakyTranslate).setScale(sneakyScale).build();
 
         sneakyTranslate.set(123f, -456f);
-        assertThat(transformComponent.translate, equalTo(new Vector2(0f, 0f)));
+        assertThat(transformComponent.getTranslate(), equalTo(new Vector2(0f, 0f)));
 
         sneakyScale.set(123f, -456f);
-        assertThat(transformComponent.scale, equalTo(new Vector2(1f, 1f)));
+        assertThat(transformComponent.getScale(), equalTo(new Vector2(1f, 1f)));
     }
 
     @Test
@@ -38,16 +38,16 @@ public final class TransformComponentTest {
         TransformComponent transformComponent = new TransformComponent.Builder().build();
 
         Vector2 newTranslate = new Vector2(123f, -456f);
-        transformComponent.translate.set(newTranslate);
-        assertThat(transformComponent.translate, equalTo(newTranslate));
+        transformComponent.setTranslate(newTranslate);
+        assertThat(transformComponent.getTranslate(), equalTo(newTranslate));
 
         Vector2 newScale = new Vector2(-123f, 456f);
-        transformComponent.scale.set(newScale);
-        assertThat(transformComponent.scale, equalTo(newScale));
+        transformComponent.setScale(newScale);
+        assertThat(transformComponent.getScale(), equalTo(newScale));
 
         float newRotation = 30f;
-        transformComponent.rotation.setDegrees(newRotation);
-        assertThat(transformComponent.rotation.getDegrees(), equalTo(newRotation));
+        transformComponent.setRotation(newRotation);
+        assertThat(transformComponent.getRotation().getDegrees(), equalTo(newRotation));
     }
 
 }
