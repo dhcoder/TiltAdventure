@@ -18,6 +18,14 @@ proper format.
 There is also a utility module (dhcoder.support) which the main project depends on and a very small test module
 (dhcoder.test) which provides helper classes for unit testing.
  
+## JDK / ADK
+
+In your project settings, you need to add a JDK named "TiltAdv JDK" that points to JDK 1.6 or later, and "TiltAdv
+ADK" that points to Android API 18 or later.
+
+This extra step allows each contributor to have their own JDK setup (1.6 here, 1.8 there), and those details are
+all abstracted away behind a common, shared name.
+ 
 ## Code Style
 
 This project is meant to be modified using IntelliJ IDEA, as its project settings are set up so that you can use the
