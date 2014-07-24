@@ -4,11 +4,9 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.number.IsCloseTo.closeTo;
+import static dhcoder.test.matchers.IsCloseTo.closeTo;
 
 public final class AngleTest {
-
-    private static final double ALLOWED_ERROR = 0.01; // Converting degrees <-> radians is imprecise
 
     @Test
     public void defaultAngleDefaultsTo0() {
@@ -44,14 +42,14 @@ public final class AngleTest {
     public void testSetAngleToDegreesThenRadians() {
         Angle angle = Angle.fromDegrees(180f);
         angle.setRadians(Angle.PI / 2f);
-        assertClose(angle.getDegrees(), 90f);
+        assertThat(angle.getDegrees(), closeTo(90f));
     }
 
     @Test
     public void testSetAngleToRadiansThenDegrees() {
         Angle angle = Angle.fromRadians(Angle.PI);
         angle.setDegrees(90f);
-        assertClose(angle.getRadians(), Angle.PI / 2);
+        assertThat(angle.getRadians(), closeTo(Angle.PI / 2));
     }
 
     @Test
@@ -76,21 +74,15 @@ public final class AngleTest {
         Angle angle = new Angle();
 
         angle.setRadians(-Angle.PI / 2f);
-        assertClose(angle.getRadians(), 3f * Angle.PI / 2f);
+        assertThat(angle.getRadians(), closeTo(3f * Angle.PI / 2f));
 
         angle.setRadians(-5f * Angle.PI);
-        assertClose(angle.getRadians(), Angle.PI);
+        assertThat(angle.getRadians(), closeTo(Angle.PI));
 
         angle.setRadians(5f * Angle.PI / 2f);
-        assertClose(angle.getRadians(), Angle.PI / 2f);
+        assertThat(angle.getRadians(), closeTo(Angle.PI / 2f));
 
         angle.setRadians(31f * Angle.PI);
-        assertClose(angle.getRadians(), Angle.PI);
+        assertThat(angle.getRadians(), closeTo(Angle.PI));
     }
-
-    // Helper method for the assertThat/closeTo pattern, since closeTo uses doubles and Angle returns floats
-    private void assertClose(float value, float closeToValue) {
-        assertThat((double)value, closeTo((double)closeToValue, ALLOWED_ERROR));
-    }
-
 }
