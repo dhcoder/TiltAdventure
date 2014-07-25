@@ -90,8 +90,4 @@ public final class TransformComponent extends AbstractComponent {
     public void setRotation(final Angle rotation) {
         this.rotation.setFrom(rotation);
     }
-
-    public void setRotation(final float degrees) {
-        rotation.setDegrees(degrees);
-    }
 }

@@ -6,6 +6,7 @@ import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;
 import tiltadv.entity.components.data.MotionComponent;
 import tiltadv.entity.components.data.TiltComponent;
+import tiltadv.memory.Pools;
 
 /**
  * Component that maintains the state and logic of the main player's avatar.
@@ -29,7 +30,12 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
         Vector2 tilt = tiltComponent.getTilt();
 
         if (!tilt.isZero()) {
-            motionComponent.setVelocity(tilt.x * TILT_MULTIPLIER, tilt.y * TILT_MULTIPLIER);
+            {
+                Vector2 velocity = Pools.vector.grabNew();
+                velocity.set(tilt.x * TILT_MULTIPLIER, tilt.y * TILT_MULTIPLIER);
+                motionComponent.setVelocity(velocity);
+                Pools.vector.free(velocity);
+            }
             isMoving = true;
         }
         else {
