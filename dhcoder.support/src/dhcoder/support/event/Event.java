@@ -6,15 +6,10 @@ import java.util.List;
 /**
  * Class which encapsulates the concept of an event, by providing a method to fire the event and notifying a
  * collection of handlers when it is fired.
- * <p/>
- * A class should use Event internally but expose it externally via a {@link EventHandle}
  */
 public final class Event {
 
     private final List<EventHandler> listeners = new ArrayList<EventHandler>();
-    private final EventHandle eventHandle;
-
-    public Event() { eventHandle = new EventHandle(this); }
 
     /**
      * Add a handler to this event, a callback which will get triggered when the event happens.
@@ -43,9 +38,4 @@ public final class Event {
      * event reference alive longer than expected.
      */
     public void clear() { listeners.clear(); }
-
-    /**
-     * Return a handle to this event which is safe to expose to external classes.
-     */
-    public EventHandle asHandle() { return eventHandle; }
 }

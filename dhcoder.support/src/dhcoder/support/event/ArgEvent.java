@@ -8,11 +8,6 @@ import java.util.ArrayList;
 public final class ArgEvent<T extends EventArgs> {
 
     private final ArrayList<ArgEventHandler<T>> listeners = new ArrayList<ArgEventHandler<T>>();
-    private final ArgEventHandle<T> eventHandle;
-
-    public ArgEvent() {
-        this.eventHandle = new ArgEventHandle<T>(this);
-    }
 
     public void addHandler(final ArgEventHandler<T> listener) {
         listeners.add(listener);
@@ -39,12 +34,5 @@ public final class ArgEvent<T extends EventArgs> {
      */
     public void clear() {
         listeners.clear();
-    }
-
-    /**
-     * Return a handle to this event which is safe to expose to external classes.
-     */
-    public ArgEventHandle<T> asHandle() {
-        return eventHandle;
     }
 }

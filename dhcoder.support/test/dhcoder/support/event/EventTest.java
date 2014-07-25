@@ -11,9 +11,7 @@ public final class EventTest {
 
         private final Event event = new Event();
 
-        public EventHandle getEvent() {
-            return event.asHandle();
-        }
+        public Event getEvent() { return event; }
 
         public void testFire() {
             event.fire(this);

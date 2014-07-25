@@ -24,8 +24,8 @@ public final class ArgEventTest {
 
         private final ArgEvent<IntArgs> intEvent = new ArgEvent<IntArgs>();
 
-        public ArgEventHandle<IntArgs> getIntEvent() {
-            return intEvent.asHandle();
+        public ArgEvent<IntArgs> getIntEvent() {
+            return intEvent;
         }
 
         public void testFire(final int intValue) {
