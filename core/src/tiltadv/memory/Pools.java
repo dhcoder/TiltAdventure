@@ -1,6 +1,7 @@
 package tiltadv.memory;
 
 import com.badlogic.gdx.math.Vector2;
+import dhcoder.support.math.Angle;
 import dhcoder.support.memory.Pool;
 import dhcoder.support.time.Duration;
 
@@ -9,6 +10,17 @@ import dhcoder.support.time.Duration;
  */
 public final class Pools {
 
+    public static final Pool<Angle> angle = new Pool<Angle>(new Pool.AllocateMethod<Angle>() {
+        @Override
+        public Angle run() {
+            return Angle.fromDegrees(0f);
+        }
+    }, new Pool.ResetMethod<Angle>() {
+        @Override
+        public void run(final Angle item) {
+            item.setDegrees(0f);
+        }
+    });
     public static final Pool<Duration> duration = new Pool<Duration>(new Pool.AllocateMethod<Duration>() {
         @Override
         public Duration run() {
