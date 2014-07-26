@@ -20,26 +20,28 @@ public final class FpsDisplayComponent extends AbstractComponent {
     private final BitmapFont font;
     private TransformComponent transformComponent;
 
-    private int lastFps;
+    private String[] fpsLabels;
     private String fpsLabel;
 
     public FpsDisplayComponent(final BitmapFont font) {
         this.font = font;
+
+        fpsLabels = new String[61];
+        fpsLabels[0] = format(FPS_LABEL_FORMAT, "--");
+        for (int i = 1; i <= 60; ++i) {
+            fpsLabels[i] = format(FPS_LABEL_FORMAT, i);
+        }
     }
 
     @Override
     public void initialize(final Entity owner) {
         transformComponent = owner.requireComponent(TransformComponent.class);
-        fpsLabel = format(FPS_LABEL_FORMAT, "--");
     }
 
     @Override
     public void update(final Duration elapsedTime) {
-        int fps = Gdx.graphics.getFramesPerSecond();
-        if (fps != lastFps) {
-            fpsLabel = format(FPS_LABEL_FORMAT, fps);
-            lastFps = fps;
-        }
+        int fps = Math.min(Gdx.graphics.getFramesPerSecond(), 60);
+        fpsLabel = fpsLabels[fps];
     }
 
     @Override
