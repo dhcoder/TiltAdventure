@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import dhcoder.support.math.Angle;
 import dhcoder.support.time.Duration;
 import tiltadv.assets.Tiles;
 import tiltadv.entity.Component;
@@ -27,6 +28,9 @@ import tiltadv.memory.Pools;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.badlogic.gdx.math.MathUtils.cos;
+import static com.badlogic.gdx.math.MathUtils.sin;
 
 public final class GdxApplication extends ApplicationAdapter {
 
@@ -51,10 +55,15 @@ public final class GdxApplication extends ApplicationAdapter {
 
         entities = new ArrayList<Entity>();
         Entity playerEntity = AddPlayerEntity();
-        AddRockEntity(-30, -40);
-        AddRockEntity(-60, 70);
-        AddRockEntity(50, -90);
-        AddRockEntity(90, 80);
+
+        int numRocks = 12;
+        for (int i = 0; i < numRocks; ++i) {
+            float circleDistance = (float)i / (float)numRocks * Angle.TWO_PI;
+            float xScale = 120;
+            float yScale = 90;
+            AddRockEntity(xScale * cos(circleDistance), yScale * sin(circleDistance));
+        }
+
         AddTiltIndicatorEntity(playerEntity);
         AddFpsEntity();
     }
