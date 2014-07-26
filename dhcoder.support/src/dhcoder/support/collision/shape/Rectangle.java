@@ -12,6 +12,10 @@ public final class Rectangle implements Shape {
     private float halfWidth;
     private float halfHeight;
 
+    public Rectangle() {
+        reset();
+    }
+
     /**
      * Creates a rectangle by specifying its original x,y point and half-width and heights.
      */
@@ -43,6 +47,11 @@ public final class Rectangle implements Shape {
         float deltaY = y - this.y;
 
         return ((deltaX * deltaX <= halfWidth * halfWidth) && (deltaY * deltaY <= halfHeight * halfHeight));
+    }
+
+    @Override
+    public void reset() {
+        x = y = halfWidth = halfHeight = 0f;
     }
 
     public void setHalfSize(final float halfWidth, final float halfHeight) {

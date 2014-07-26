@@ -7,9 +7,13 @@ import static dhcoder.support.utils.StringUtils.format;
  */
 public final class Circle implements Shape {
 
-    private final float radius;
     private float x;
     private float y;
+    private float radius;
+
+    public Circle() {
+        reset();
+    }
 
     public Circle(final float x, final float y, final float radius) {
 
@@ -45,7 +49,16 @@ public final class Circle implements Shape {
         return (deltaX * deltaX + deltaY * deltaY) <= radius * radius;
     }
 
+    @Override
+    public void reset() {
+        x = y = radius = 0f;
+    }
+
     public float getRadius() {
         return radius;
+    }
+
+    public void setRadius(final float radius) {
+        this.radius = radius;
     }
 }

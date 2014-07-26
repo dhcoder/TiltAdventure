@@ -21,4 +21,9 @@ public interface Shape {
     float getY();
 
     boolean containsPoint(float x, float y);
+
+    /**
+     * Reset this shape to one that's centered at the origin with no size.
+     */
+    void reset();
 }
