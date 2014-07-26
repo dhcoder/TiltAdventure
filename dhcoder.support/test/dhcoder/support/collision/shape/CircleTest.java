@@ -10,7 +10,19 @@ import static org.hamcrest.core.IsEqual.equalTo;
 public final class CircleTest {
 
     @Test
-    public void testCircleContainsPoint() {
+    public void testGetters() {
+        Circle circle = new Circle(1f, 2f, 3f);
+        assertThat(circle.getX(), equalTo(1f));
+        assertThat(circle.getY(), equalTo(2f));
+        assertThat(circle.getRadius(), equalTo(3f));
+
+        circle.setOrigin(-1f, -2f);
+        assertThat(circle.getX(), equalTo(-1f));
+        assertThat(circle.getY(), equalTo(-2f));
+    }
+
+    @Test
+    public void testContainsPoint() {
         Circle circle = new Circle(0f, 0f, 1f);
         assertThat(circle.containsPoint(0f, 0f), equalTo(true));
         assertThat(circle.containsPoint(1f, 0f), equalTo(true));
@@ -26,13 +38,6 @@ public final class CircleTest {
 
     @Test
     public void invalidRadiusThrowsException() {
-        assertException("Can't create a circle with 0 radius", IllegalArgumentException.class, new Action() {
-            @Override
-            public void run() {
-                new Circle(0f, 0f, 0f);
-            }
-        });
-
         assertException("Can't create a circle with negative radius", IllegalArgumentException.class, new Action() {
             @Override
             public void run() {

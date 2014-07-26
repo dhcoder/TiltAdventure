@@ -10,7 +10,23 @@ import static org.hamcrest.core.IsEqual.equalTo;
 public final class RectangleTest {
 
     @Test
-    public void testRectangleContainsPoint() {
+    public void testGetters() {
+        Rectangle rectangle = new Rectangle(1f, 2f, 3f, 4f);
+        assertThat(rectangle.getX(), equalTo(1f));
+        assertThat(rectangle.getY(), equalTo(2f));
+        assertThat(rectangle.getHalfWidth(), equalTo(3f));
+        assertThat(rectangle.getHalfHeight(), equalTo(4f));
+
+        rectangle.setOrigin(-1f, -2f);
+        rectangle.setHalfSize(5f, 6f);
+        assertThat(rectangle.getX(), equalTo(-1f));
+        assertThat(rectangle.getY(), equalTo(-2f));
+        assertThat(rectangle.getHalfWidth(), equalTo(5f));
+        assertThat(rectangle.getHalfHeight(), equalTo(6f));
+    }
+
+    @Test
+    public void testContainsPoint() {
         Rectangle rect = new Rectangle(0f, 0f, 4f, 3f);
 
         assertThat(rect.containsPoint(0f, 0f), equalTo(true));
@@ -27,24 +43,10 @@ public final class RectangleTest {
     @Test
     public void invalidSizeThrowsException() {
 
-        assertException("Can't create a rectangle with 0 width", IllegalArgumentException.class, new Action() {
-            @Override
-            public void run() {
-                new Rectangle(0f, 0f, 0f, 10f);
-            }
-        });
-
         assertException("Can't create a circle with negative width", IllegalArgumentException.class, new Action() {
             @Override
             public void run() {
                 new Rectangle(0f, 0f, -10f, 10f);
-            }
-        });
-
-        assertException("Can't create a rectangle with 0 height", IllegalArgumentException.class, new Action() {
-            @Override
-            public void run() {
-                new Rectangle(0f, 0f, 10f, 0f);
             }
         });
 
