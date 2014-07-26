@@ -25,29 +25,31 @@ public final class Square implements Shape {
         return rectangle;
     }
 
+    @Override
     public void setOrigin(final float x, final float y) {
         rectangle.setOrigin(x, y);
     }
 
+    @Override
     public float getX() {
         return rectangle.getX();
     }
 
+    @Override
     public float getY() {
         return rectangle.getY();
     }
 
-    public void setHalfSize(final float halfSize) {
-        rectangle.setHalfSize(halfSize, halfSize);
+    @Override
+    public boolean containsPoint(final float x, final float y) {
+        return rectangle.containsPoint(x, y);
     }
 
     public float getHalfSize() {
         return rectangle.getHalfWidth();
     }
 
-    @Override
-
-    public boolean containsPoint(final float x, final float y) {
-        return rectangle.containsPoint(x, y);
+    public void setHalfSize(final float halfSize) {
+        rectangle.setHalfSize(halfSize, halfSize);
     }
 }

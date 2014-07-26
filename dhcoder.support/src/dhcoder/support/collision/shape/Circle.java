@@ -22,21 +22,20 @@ public final class Circle implements Shape {
         this.radius = radius;
     }
 
-    public float getX() {
-        return x;
-    }
-
-    public float getY() {
-        return y;
-    }
-
+    @Override
     public void setOrigin(final float x, final float y) {
         this.x = x;
         this.y = y;
     }
 
-    public float getRadius() {
-        return radius;
+    @Override
+    public float getX() {
+        return x;
+    }
+
+    @Override
+    public float getY() {
+        return y;
     }
 
     @Override
@@ -44,5 +43,9 @@ public final class Circle implements Shape {
         float deltaX = x - this.x;
         float deltaY = y - this.y;
         return (deltaX * deltaX + deltaY * deltaY) <= radius * radius;
+    }
+
+    public float getRadius() {
+        return radius;
     }
 }

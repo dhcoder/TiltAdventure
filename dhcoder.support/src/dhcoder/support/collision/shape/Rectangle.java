@@ -21,17 +21,28 @@ public final class Rectangle implements Shape {
         setHalfSize(halfWidth, halfHeight);
     }
 
+    @Override
     public void setOrigin(final float x, final float y) {
         this.x = x;
         this.y = y;
     }
 
+    @Override
     public float getX() {
         return x;
     }
 
+    @Override
     public float getY() {
         return y;
+    }
+
+    @Override
+    public boolean containsPoint(final float x, final float y) {
+        float deltaX = x - this.x;
+        float deltaY = y - this.y;
+
+        return ((deltaX * deltaX <= halfWidth * halfWidth) && (deltaY * deltaY <= halfHeight * halfHeight));
     }
 
     public void setHalfSize(final float halfWidth, final float halfHeight) {
@@ -50,13 +61,5 @@ public final class Rectangle implements Shape {
 
     public float getHalfHeight() {
         return halfHeight;
-    }
-
-    @Override
-    public boolean containsPoint(final float x, final float y) {
-        float deltaX = x - this.x;
-        float deltaY = y - this.y;
-
-        return ((deltaX * deltaX <= halfWidth * halfWidth) && (deltaY * deltaY <= halfHeight * halfHeight));
     }
 }
