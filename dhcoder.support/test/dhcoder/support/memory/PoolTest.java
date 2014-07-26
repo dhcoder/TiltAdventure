@@ -48,31 +48,36 @@ public final class PoolTest {
         assertThat(item.getReleasedCount(), equalTo(1));
         assertThat(allocationCount, equalTo(1));
 
-        PooledItem allocatedItem = new PooledItem();
+        new PooledItem(); // Sanity check that allocating a new pooled item still increases allocationCount.
         assertThat(allocationCount, equalTo(2));
     }
 
     @Test
-    public void poolRemainingCountsAreCorrect()  {
+    public void poolCountsAreCorrect() {
         Pool<PooledItem> pool = createPool(5);
+        assertThat(pool.getUsedCount(), equalTo(0));
         assertThat(pool.getRemainingCount(), equalTo(5));
         PooledItem item1 = pool.grabNew();
 
+        assertThat(pool.getUsedCount(), equalTo(1));
         assertThat(pool.getRemainingCount(), equalTo(4));
         PooledItem item2 = pool.grabNew();
         PooledItem item3 = pool.grabNew();
         PooledItem item4 = pool.grabNew();
         PooledItem item5 = pool.grabNew();
 
+        assertThat(pool.getUsedCount(), equalTo(5));
         assertThat(pool.getRemainingCount(), equalTo(0));
 
         pool.free(item1);
+        assertThat(pool.getUsedCount(), equalTo(4));
         assertThat(pool.getRemainingCount(), equalTo(1));
 
         pool.free(item2);
         pool.free(item3);
         pool.free(item4);
         pool.free(item5);
+        assertThat(pool.getUsedCount(), equalTo(0));
         assertThat(pool.getRemainingCount(), equalTo(5));
 
     }
@@ -131,7 +136,7 @@ public final class PoolTest {
     }
 
     private Pool<PooledItem> createPool(int capacity) {
-        return new Pool<PooledItem>(new Pool.AllocateMethod<PooledItem>() {
+        Pool<PooledItem> pool = new Pool<PooledItem>(new Pool.AllocateMethod<PooledItem>() {
             @Override
             public PooledItem run() {
                 return new PooledItem();
@@ -142,5 +147,9 @@ public final class PoolTest {
                 item.release();
             }
         }, capacity);
+
+        assertThat(pool.getCapacity(), equalTo(capacity));
+
+        return pool;
     }
 }

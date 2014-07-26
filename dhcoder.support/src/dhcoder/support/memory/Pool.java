@@ -58,6 +58,10 @@ public final class Pool<T> {
         }
     }
 
+    public int getCapacity() { return capacity; }
+
+    public int getUsedCount() { return usedItems.size(); }
+
     public int getRemainingCount() { return freeItems.size(); }
 
     public T grabNew() {
@@ -79,7 +83,14 @@ public final class Pool<T> {
             throw new IllegalArgumentException(format("Trying to remove item {0} that's not in the pool", item));
         }
 
-        usedItems.remove(itemIndex);
+        // Swap item to the end before removing (since removing from the end avoids shifting elements)
+        int lastIndex = usedItems.size() - 1;
+        if (lastIndex > 0 && itemIndex != lastIndex) {
+            T temp = usedItems.get(lastIndex);
+            usedItems.set(lastIndex, usedItems.get(itemIndex));
+            usedItems.set(itemIndex, temp);
+        }
+        usedItems.remove(lastIndex);
         reset.run(item);
         freeItems.push(item);
     }
