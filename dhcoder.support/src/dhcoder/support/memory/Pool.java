@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import static dhcoder.support.utils.ListUtils.swapToEndAndRemove;
 import static dhcoder.support.utils.StringUtils.format;
 
 /**
@@ -78,19 +79,7 @@ public final class Pool<T> {
     }
 
     public void free(final T item) {
-        int itemIndex = usedItems.indexOf(item);
-        if (itemIndex < 0) {
-            throw new IllegalArgumentException(format("Trying to remove item {0} that's not in the pool", item));
-        }
-
-        // Swap item to the end before removing (since removing from the end avoids shifting elements)
-        int lastIndex = usedItems.size() - 1;
-        if (lastIndex > 0 && itemIndex != lastIndex) {
-            T temp = usedItems.get(lastIndex);
-            usedItems.set(lastIndex, usedItems.get(itemIndex));
-            usedItems.set(itemIndex, temp);
-        }
-        usedItems.remove(lastIndex);
+        swapToEndAndRemove(usedItems, item);
         reset.run(item);
         freeItems.push(item);
     }
