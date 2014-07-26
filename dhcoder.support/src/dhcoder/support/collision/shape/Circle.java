@@ -5,11 +5,11 @@ import static dhcoder.support.utils.StringUtils.format;
 /**
  * Class that represents a circle
  */
-public class Circle implements Shape {
+public final class Circle implements Shape {
 
-    private float x;
-    private float y;
-    private float radius;
+    private final float x;
+    private final float y;
+    private final float radius;
 
     public Circle(final float x, final float y, final float radius) {
 
@@ -20,18 +20,6 @@ public class Circle implements Shape {
         this.x = x;
         this.y = y;
         this.radius = radius;
-    }
-
-    public float getX() {
-        return x;
-    }
-
-    public float getY() {
-        return y;
-    }
-
-    public float getRadius() {
-        return radius;
     }
 
     @Override

@@ -7,7 +7,7 @@ import static dhcoder.test.TestUtils.assertException;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-public class CircleTest {
+public final class CircleTest {
 
     @Test
     public void testCircleContainsPoint() {

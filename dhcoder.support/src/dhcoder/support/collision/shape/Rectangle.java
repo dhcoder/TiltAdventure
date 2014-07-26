@@ -5,12 +5,12 @@ import static dhcoder.support.utils.StringUtils.format;
 /**
  * Class that represents a circle
  */
-public class Rectangle implements Shape {
+public final class Rectangle implements Shape {
 
-    private float xCenter;
-    private float yCenter;
-    private float halfWidth;
-    private float halfHeight;
+    private final float xCenter;
+    private final float yCenter;
+    private final float halfWidth;
+    private final float halfHeight;
 
     public Rectangle(final float xCenter, final float yCenter, final float halfWidth, final float halfHeight) {
 
