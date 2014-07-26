@@ -5,12 +5,11 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import dhcoder.support.time.Duration;
+import tiltadv.assets.Tiles;
 import tiltadv.entity.Component;
 import tiltadv.entity.Entity;
 import tiltadv.entity.components.behavior.PlayerBehaviorComponent;
@@ -22,8 +21,8 @@ import tiltadv.entity.components.data.TiltComponent;
 import tiltadv.entity.components.data.TransformComponent;
 import tiltadv.entity.components.display.FpsDisplayComponent;
 import tiltadv.entity.components.display.PlayerDisplayComponent;
-import tiltadv.entity.components.display.TiltDisplayComponent;
 import tiltadv.entity.components.display.SpriteComponent;
+import tiltadv.entity.components.display.TiltDisplayComponent;
 import tiltadv.memory.Pools;
 
 import java.util.ArrayList;
@@ -41,22 +40,22 @@ public final class GdxApplication extends ApplicationAdapter {
     private BitmapFont font;
     private OrthographicCamera camera;
     private SpriteBatch batch;
-    private Texture tiles;
 
     private List<Entity> entities;
-    private Entity playerEntity;
 
     @Override
     public void create() {
         camera = new OrthographicCamera(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
         batch = new SpriteBatch();
         font = new BitmapFont();
-        tiles = new Texture("Tiles.png");
 
         entities = new ArrayList<Entity>();
-        AddPlayerEntity();
-
-        AddTiltIndicatorEntity();
+        Entity playerEntity = AddPlayerEntity();
+        AddRockEntity(-30, -40);
+        AddRockEntity(-60, 70);
+        AddRockEntity(50, -90);
+        AddRockEntity(90, 80);
+        AddTiltIndicatorEntity(playerEntity);
         AddFpsEntity();
     }
 
@@ -64,7 +63,7 @@ public final class GdxApplication extends ApplicationAdapter {
     public void render() {
         update();
 
-        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClearColor(1f, .88f, .66f, 1f); // Desert-ish color, for testing!
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         batch.begin();
@@ -83,7 +82,7 @@ public final class GdxApplication extends ApplicationAdapter {
 
         batch.dispose();
         font.dispose();
-        tiles.dispose();
+        Tiles.dispose();
     }
 
     private void update() {
@@ -102,29 +101,20 @@ public final class GdxApplication extends ApplicationAdapter {
         batch.setProjectionMatrix(camera.combined);
     }
 
-    private void AddPlayerEntity() {
-        Sprite playerUp1 = new Sprite(tiles, 60, 0, 16, 16);
-        Sprite playerUp2 = new Sprite(tiles, 60, 30, 16, 16);
-        Sprite playerDown1 = new Sprite(tiles, 0, 0, 16, 16);
-        Sprite playerDown2 = new Sprite(tiles, 0, 30, 16, 16);
-        Sprite playerLeft1 = new Sprite(tiles, 30, 0, 16, 16);
-        Sprite playerLeft2 = new Sprite(tiles, 30, 30, 16, 16);
-        Sprite playerRight1 = new Sprite(tiles, 90, 30, 16, 16);
-        Sprite playerRight2 = new Sprite(tiles, 90, 0, 16, 16);
+    private Entity AddPlayerEntity() {
         Duration animDuration = Duration.fromSeconds(.1f);
-        Animation animUp = new Animation(animDuration.getSeconds(), playerUp1, playerUp2);
+        Animation animUp = new Animation(animDuration.getSeconds(), Tiles.playerUp1, Tiles.playerUp2);
         animUp.setPlayMode(Animation.PlayMode.LOOP);
-        Animation animDown = new Animation(animDuration.getSeconds(), playerDown1, playerDown2);
+        Animation animDown = new Animation(animDuration.getSeconds(), Tiles.playerDown1, Tiles.playerDown2);
         animDown.setPlayMode(Animation.PlayMode.LOOP);
-        Animation animLeft = new Animation(animDuration.getSeconds(), playerLeft1, playerLeft2);
+        Animation animLeft = new Animation(animDuration.getSeconds(), Tiles.playerLeft1, Tiles.playerLeft2);
         animLeft.setPlayMode(Animation.PlayMode.LOOP);
-        Animation animRight = new Animation(animDuration.getSeconds(), playerRight1, playerRight2);
+        Animation animRight = new Animation(animDuration.getSeconds(), Tiles.playerRight1, Tiles.playerRight2);
         animRight.setPlayMode(Animation.PlayMode.LOOP);
-
 
         List<Component> components = new ArrayList<Component>();
         components.add(new SpriteComponent());
-        components.add(SizeComponent.from(playerDown1));
+        components.add(SizeComponent.from(Tiles.playerDown1));
         components.add(new TransformComponent());
         components.add(new MotionComponent());
         components.add(new TiltComponent());
@@ -132,8 +122,19 @@ public final class GdxApplication extends ApplicationAdapter {
             new KeyboardComponent());
         components.add(new PlayerBehaviorComponent());
         components.add(new PlayerDisplayComponent(animUp, animDown, animLeft, animRight));
-        playerEntity = new Entity(components);
+
+        Entity playerEntity = new Entity(components);
         entities.add(playerEntity);
+
+        return playerEntity;
+    }
+
+    private void AddRockEntity(final float x, final float y) {
+        List<Component> components = new ArrayList<Component>();
+        components.add(new SpriteComponent(Tiles.rock));
+        components.add(SizeComponent.from(Tiles.rock));
+        components.add(new TransformComponent.Builder().setTranslate(x, y).build());
+        entities.add(new Entity(components));
     }
 
     private void AddFpsEntity() {
@@ -143,16 +144,15 @@ public final class GdxApplication extends ApplicationAdapter {
         entities.add(new Entity(transformComponent, fpsDisplayComponent));
     }
 
-    private void AddTiltIndicatorEntity() {
-        Sprite rodRight = new Sprite(tiles, 98, 126, 13, 4);
+    private void AddTiltIndicatorEntity(final Entity playerEntity) {
         float margin = 5f;
         TransformComponent transformComponent = new TransformComponent.Builder()
-            .setTranslate(VIEWPORT_WIDTH / 2 - rodRight.getWidth() - margin,
-                VIEWPORT_HEIGHT / 2 - rodRight.getHeight() - margin).build();
+            .setTranslate(VIEWPORT_WIDTH / 2 - Tiles.rodRight.getWidth() - margin,
+                VIEWPORT_HEIGHT / 2 - Tiles.rodRight.getHeight() - margin).build();
 
         SpriteComponent spriteComponent = new SpriteComponent();
-        SizeComponent sizeComponent = SizeComponent.from(rodRight);
-        TiltDisplayComponent tiltDisplayComponent = new TiltDisplayComponent(rodRight, playerEntity);
+        SizeComponent sizeComponent = SizeComponent.from(Tiles.rodRight);
+        TiltDisplayComponent tiltDisplayComponent = new TiltDisplayComponent(Tiles.rodRight, playerEntity);
         entities.add(new Entity(spriteComponent, sizeComponent, transformComponent, tiltDisplayComponent));
     }
 
