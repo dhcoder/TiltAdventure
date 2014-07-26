@@ -6,6 +6,11 @@
         <option name="GRADLE_PROJECT_PATH" value=":core" />
       </configuration>
     </facet>
+    <facet type="java-gradle" name="Java-Gradle">
+      <configuration>
+        <option name="BUILD_FOLDER_PATH" />
+      </configuration>
+    </facet>
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/build/classes/main" />
@@ -22,9 +27,9 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="dhcoder.support" exported="" />
-    <orderEntry type="module" module-name="dhcoder.test" exported="" />
     <orderEntry type="library" exported="" name="gdx-1.2.0" level="project" />
     <orderEntry type="library" exported="" name="gdx-box2d-1.2.0" level="project" />
+    <orderEntry type="module" module-name="dhcoder.test" exported="" />
     <orderEntry type="library" exported="" scope="TEST" name="junit-4.12-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="hamcrest-core-1.3" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="hamcrest-library-1.3" level="project" />
