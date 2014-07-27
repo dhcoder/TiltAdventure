@@ -61,4 +61,24 @@ public final class Circle implements Shape {
     public void setRadius(final float radius) {
         this.radius = radius;
     }
+
+    @Override
+    public float getX0() {
+        return x - radius;
+    }
+
+    @Override
+    public float getY0() {
+        return y - radius;
+    }
+
+    @Override
+    public float getX1() {
+        return x + radius;
+    }
+
+    @Override
+    public float getY1() {
+        return y + radius;
+    }
 }

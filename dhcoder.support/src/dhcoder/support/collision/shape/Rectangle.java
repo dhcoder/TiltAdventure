@@ -71,4 +71,14 @@ public final class Rectangle implements Shape {
     public float getHalfHeight() {
         return halfHeight;
     }
+
+
+    @Override
+    public float getX0() { return x - halfWidth; }
+    @Override
+    public float getY0() { return y - halfHeight; }
+    @Override
+    public float getX1() { return x + halfWidth; }
+    @Override
+    public float getY1() { return y + halfHeight; }
 }
