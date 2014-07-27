@@ -32,7 +32,7 @@ public final class ArgEvent<T extends EventArgs> {
      * This is useful to do when the event is no longer used, as a listener it's holding on to may otherwise keep it
      * alive longer than expected.
      */
-    public void clear() {
+    public void clearListeners() {
         listeners.clear();
     }
 }

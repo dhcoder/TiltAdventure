@@ -18,7 +18,7 @@ public final class EventTest {
         }
 
         public void testClear() {
-            event.clear();
+            event.clearListeners();
         }
     }
 

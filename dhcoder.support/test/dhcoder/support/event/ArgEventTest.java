@@ -32,7 +32,7 @@ public final class ArgEventTest {
             intEvent.fire(this, new IntArgs(intValue));
         }
 
-        public void testClear() { intEvent.clear(); }
+        public void testClear() { intEvent.clearListeners(); }
     }
 
     private final class IntEventHandler implements ArgEventHandler<IntArgs> {

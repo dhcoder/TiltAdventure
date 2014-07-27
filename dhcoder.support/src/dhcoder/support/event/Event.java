@@ -37,5 +37,5 @@ public final class Event {
      * This is useful to do when the event is no longer used, as a listener it's holding on to may otherwise keep this
      * event reference alive longer than expected.
      */
-    public void clear() { listeners.clear(); }
+    public void clearListeners() { listeners.clear(); }
 }
