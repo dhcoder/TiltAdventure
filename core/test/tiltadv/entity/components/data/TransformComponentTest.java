@@ -1,6 +1,7 @@
 package tiltadv.entity.components.data;
 
 import com.badlogic.gdx.math.Vector2;
+import dhcoder.support.math.Angle;
 import org.junit.Test;
 import tiltadv.entity.components.data.TransformComponent;
 
@@ -45,9 +46,8 @@ public final class TransformComponentTest {
         transformComponent.setScale(newScale);
         assertThat(transformComponent.getScale(), equalTo(newScale));
 
-        float newRotation = 30f;
-        transformComponent.setRotation(newRotation);
-        assertThat(transformComponent.getRotation().getDegrees(), equalTo(newRotation));
+        transformComponent.setRotation(Angle.fromDegrees(30f));
+        assertThat(transformComponent.getRotation().getDegrees(), equalTo(30f));
     }
 
 }
