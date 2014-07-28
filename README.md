@@ -26,6 +26,9 @@ ADK" that points to Android API 18 or later.
 This extra step allows each contributor to have their own JDK setup (1.6 here, 1.8 there), and those details are
 all abstracted away behind a common, shared name. The language level should be set to 6, though, because of Android
 limitations.
+
+You may need to additionally create an `ANDROID_HOME` environment variable that points to the location of your
+Android SDK. Do this if Gradle complains about not finding the SDK dir.
  
 ## Code Style
 
