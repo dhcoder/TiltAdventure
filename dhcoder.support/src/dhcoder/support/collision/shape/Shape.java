@@ -20,26 +20,6 @@ public interface Shape {
      */
     float getY();
 
-    /**
-     * Returns the X coordinate of the left boundary of this shape.
-     */
-    float getX0();
-
-    /**
-     * Returns the Y coordinate of the bottom boundary of this shape.
-     */
-    float getY0();
-
-    /**
-     * Returns the X coordinate of the right boundary of this shape.
-     */
-    float getX1();
-
-    /**
-     * Returns the Y coordinate of the top boundary of this shape.
-     */
-    float getY1();
-
     boolean containsPoint(float x, float y);
 
     /**

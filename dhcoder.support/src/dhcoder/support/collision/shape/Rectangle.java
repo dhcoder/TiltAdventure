@@ -20,7 +20,6 @@ public final class Rectangle implements Shape {
      * Creates a rectangle by specifying its original x,y point and half-width and heights.
      */
     public Rectangle(final float x, final float y, final float halfWidth, final float halfHeight) {
-
         setOrigin(x, y);
         setHalfSize(halfWidth, halfHeight);
     }
@@ -72,13 +71,11 @@ public final class Rectangle implements Shape {
         return halfHeight;
     }
 
-
-    @Override
     public float getX0() { return x - halfWidth; }
-    @Override
+
     public float getY0() { return y - halfHeight; }
-    @Override
+
     public float getX1() { return x + halfWidth; }
-    @Override
+
     public float getY1() { return y + halfHeight; }
 }

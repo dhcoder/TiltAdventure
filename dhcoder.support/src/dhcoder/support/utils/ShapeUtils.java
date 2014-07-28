@@ -4,6 +4,7 @@ import dhcoder.support.collision.shape.Circle;
 import dhcoder.support.collision.shape.Rectangle;
 import dhcoder.support.collision.shape.Shape;
 
+import static dhcoder.support.utils.MathUtils.clamp;
 import static dhcoder.support.utils.StringUtils.format;
 
 public final class ShapeUtils {
@@ -14,9 +15,19 @@ public final class ShapeUtils {
         if (shape1 instanceof Circle && shape2 instanceof Circle) {
             return testCircleIntersection((Circle)shape1, (Circle)shape2);
         }
-        else {
-            return testDefaultIntersection(shape1, shape2);
+        else if (shape1 instanceof Rectangle && shape2 instanceof Rectangle) {
+            return testRectangleIntersection((Rectangle)shape1, (Rectangle)shape2);
         }
+        else if (shape1 instanceof Circle && shape2 instanceof Rectangle) {
+            return testCircleRectangleIntersection((Circle)shape1, (Rectangle)shape2);
+        }
+        else if (shape1 instanceof Rectangle && shape2 instanceof Circle) {
+            return testCircleRectangleIntersection((Circle)shape2, (Rectangle)shape1);
+        }
+
+        throw new IllegalArgumentException(
+            format("Unexpected shapes passed in for intersection testing: {0} & {1}", shape1.getClass(),
+                shape2.getClass()));
     }
 
     private static boolean testCircleIntersection(final Circle circle1, final Circle circle2) {
@@ -29,26 +40,24 @@ public final class ShapeUtils {
         return dist2 <= (radiiSum * radiiSum);
     }
 
-    // Fallback intersection is good enough for rect-to-rect and circle-to-rect intersection (this shortcut will break
-    // and have to be revisited if we ever introduce rotations into our collision system)
-    private static boolean testDefaultIntersection(final Shape shape1, final Shape shape2) {
-        float shape1X0 = shape1.getX0();
-        float shape1Y0 = shape1.getY0();
-        float shape1X1 = shape1.getX1();
-        float shape1Y1 = shape1.getY1();
-        float shape2X0 = shape2.getX0();
-        float shape2Y0 = shape2.getY0();
-        float shape2X1 = shape2.getX1();
-        float shape2Y1 = shape2.getY1();
+    private static boolean testRectangleIntersection(final Rectangle rect1, final Rectangle rect2) {
+        // Two rectangles overlap if their corners are bounded by each other.
+        // See also: http://stackoverflow.com/a/306332/1299302
+        return (rect1.getX0() <= rect2.getX1() && rect2.getX0() <= rect1.getX1() &&
+            rect1.getY0() <= rect2.getY1() && rect2.getY0() <= rect1.getY1());
+    }
 
-        return shape1.containsPoint(shape2X0, shape2Y0) ||
-            shape1.containsPoint(shape2X0, shape2Y1) ||
-            shape1.containsPoint(shape2X1, shape2Y0) ||
-            shape1.containsPoint(shape2X1, shape2Y1) ||
-            shape2.containsPoint(shape1X0, shape1Y0) ||
-            shape2.containsPoint(shape1X0, shape1Y1) ||
-            shape2.containsPoint(shape1X1, shape1Y0) ||
-            shape2.containsPoint(shape1X1, shape1Y1);
+    private static boolean testCircleRectangleIntersection(final Circle circle, final Rectangle rect) {
+        // This algorithm finds the point within the rectangle closest to the origin of the circle and compares it to
+        // to origin of the circle. See also: http://stackoverflow.com/a/1879223/1299302
+        float closestX = clamp(circle.getX(), rect.getX0(), rect.getX1());
+        float closestY = clamp(circle.getY(), rect.getY0(), rect.getY1());
+
+        float deltaX = circle.getX() - closestX;
+        float deltaY = circle.getY() - closestY;
+        float radius = circle.getRadius();
+
+        return (deltaX * deltaX + deltaY * deltaY) <= (radius * radius);
     }
 
     private ShapeUtils() {} // Disabled constructor
