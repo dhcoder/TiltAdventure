@@ -1,8 +1,7 @@
-package tiltadv.entity.components.controllers;
+package tiltadv.entity.components.input;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
-import dhcoder.support.memory.Pool;
 import dhcoder.support.time.Duration;
 import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;

@@ -8,14 +8,12 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import dhcoder.support.collision.CollisionManager;
 import dhcoder.support.math.Angle;
 import dhcoder.support.time.Duration;
-import tiltadv.assets.Tiles;
 import tiltadv.entity.Component;
 import tiltadv.entity.Entity;
 import tiltadv.entity.components.behavior.PlayerBehaviorComponent;
-import tiltadv.entity.components.controllers.AccelerometerComponent;
-import tiltadv.entity.components.controllers.KeyboardComponent;
 import tiltadv.entity.components.data.MotionComponent;
 import tiltadv.entity.components.data.SizeComponent;
 import tiltadv.entity.components.data.TiltComponent;
@@ -24,6 +22,10 @@ import tiltadv.entity.components.display.FpsDisplayComponent;
 import tiltadv.entity.components.display.PlayerDisplayComponent;
 import tiltadv.entity.components.display.SpriteComponent;
 import tiltadv.entity.components.display.TiltDisplayComponent;
+import tiltadv.entity.components.input.AccelerometerComponent;
+import tiltadv.entity.components.input.KeyboardComponent;
+import tiltadv.constants.Group;
+import tiltadv.constants.Tiles;
 import tiltadv.memory.Pools;
 
 import java.util.ArrayList;
@@ -46,6 +48,7 @@ public final class GdxApplication extends ApplicationAdapter {
     private SpriteBatch batch;
 
     private List<Entity> entities;
+    private CollisionManager collisionManager;
 
     @Override
     public void create() {
@@ -56,7 +59,9 @@ public final class GdxApplication extends ApplicationAdapter {
         entities = new ArrayList<Entity>();
         Entity playerEntity = AddPlayerEntity();
 
-        int numRocks = 12;
+        initializeServices();
+
+        int numRocks = 800;
         for (int i = 0; i < numRocks; ++i) {
             float circleDistance = (float)i / (float)numRocks * Angle.TWO_PI;
             float xScale = 120;
@@ -94,6 +99,12 @@ public final class GdxApplication extends ApplicationAdapter {
         Tiles.dispose();
     }
 
+    private void initializeServices() {
+        collisionManager = new CollisionManager(200);
+        collisionManager.registerCollidesWith(Group.PLAYER, Group.OBSTACLES);
+        Services.register(CollisionManager.class, collisionManager);
+    }
+
     private void update() {
         {
             Duration elapsedTime = Pools.duration.grabNew();
@@ -105,6 +116,7 @@ public final class GdxApplication extends ApplicationAdapter {
             }
             Pools.duration.free(elapsedTime);
         }
+        collisionManager.triggerCollisions();
 
         camera.update();
         batch.setProjectionMatrix(camera.combined);
@@ -112,18 +124,18 @@ public final class GdxApplication extends ApplicationAdapter {
 
     private Entity AddPlayerEntity() {
         Duration animDuration = Duration.fromSeconds(.1f);
-        Animation animUp = new Animation(animDuration.getSeconds(), Tiles.playerUp1, Tiles.playerUp2);
+        Animation animUp = new Animation(animDuration.getSeconds(), Tiles.PLAYERUP1, Tiles.PLAYERUP2);
         animUp.setPlayMode(Animation.PlayMode.LOOP);
-        Animation animDown = new Animation(animDuration.getSeconds(), Tiles.playerDown1, Tiles.playerDown2);
+        Animation animDown = new Animation(animDuration.getSeconds(), Tiles.PLAYERDOWN1, Tiles.PLAYERDOWN2);
         animDown.setPlayMode(Animation.PlayMode.LOOP);
-        Animation animLeft = new Animation(animDuration.getSeconds(), Tiles.playerLeft1, Tiles.playerLeft2);
+        Animation animLeft = new Animation(animDuration.getSeconds(), Tiles.PLAYERLEFT1, Tiles.PLAYERLEFT2);
         animLeft.setPlayMode(Animation.PlayMode.LOOP);
-        Animation animRight = new Animation(animDuration.getSeconds(), Tiles.playerRight1, Tiles.playerRight2);
+        Animation animRight = new Animation(animDuration.getSeconds(), Tiles.PLAYERRIGHT1, Tiles.PLAYERRIGHT2);
         animRight.setPlayMode(Animation.PlayMode.LOOP);
 
         List<Component> components = new ArrayList<Component>();
         components.add(new SpriteComponent());
-        components.add(SizeComponent.from(Tiles.playerDown1));
+        components.add(SizeComponent.from(Tiles.PLAYERDOWN1));
         components.add(new TransformComponent());
         components.add(new MotionComponent());
         components.add(new TiltComponent());
@@ -140,8 +152,8 @@ public final class GdxApplication extends ApplicationAdapter {
 
     private void AddRockEntity(final float x, final float y) {
         List<Component> components = new ArrayList<Component>();
-        components.add(new SpriteComponent(Tiles.rock));
-        components.add(SizeComponent.from(Tiles.rock));
+        components.add(new SpriteComponent(Tiles.ROCK));
+        components.add(SizeComponent.from(Tiles.ROCK));
         components.add(new TransformComponent.Builder().setTranslate(x, y).build());
         entities.add(new Entity(components));
     }
@@ -156,12 +168,12 @@ public final class GdxApplication extends ApplicationAdapter {
     private void AddTiltIndicatorEntity(final Entity playerEntity) {
         float margin = 5f;
         TransformComponent transformComponent = new TransformComponent.Builder()
-            .setTranslate(VIEWPORT_WIDTH / 2 - Tiles.rodRight.getWidth() - margin,
-                VIEWPORT_HEIGHT / 2 - Tiles.rodRight.getHeight() - margin).build();
+            .setTranslate(VIEWPORT_WIDTH / 2 - Tiles.RODRIGHT.getWidth() - margin,
+                VIEWPORT_HEIGHT / 2 - Tiles.RODRIGHT.getHeight() - margin).build();
 
         SpriteComponent spriteComponent = new SpriteComponent();
-        SizeComponent sizeComponent = SizeComponent.from(Tiles.rodRight);
-        TiltDisplayComponent tiltDisplayComponent = new TiltDisplayComponent(Tiles.rodRight, playerEntity);
+        SizeComponent sizeComponent = SizeComponent.from(Tiles.RODRIGHT);
+        TiltDisplayComponent tiltDisplayComponent = new TiltDisplayComponent(Tiles.RODRIGHT, playerEntity);
         entities.add(new Entity(spriteComponent, sizeComponent, transformComponent, tiltDisplayComponent));
     }
 
