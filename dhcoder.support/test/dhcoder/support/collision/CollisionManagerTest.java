@@ -1,5 +1,7 @@
 package dhcoder.support.collision;
 
+import dhcoder.support.collision.shape.Circle;
+import dhcoder.support.collision.shape.Rectangle;
 import dhcoder.support.event.EventHandler;
 import org.junit.Test;
 
@@ -29,8 +31,8 @@ public final class CollisionManagerTest {
     public void collisionManagerReportsCollisionBetweenCircleAndCircle() {
         CollisionManager collisionManager = new CollisionManager(2);
         collisionManager.registerCollidesWith(GROUP_A, GROUP_B);
-        CollisionHandle handleA = collisionManager.registerCircle(GROUP_A, -5, 0, 4);
-        CollisionHandle handleB = collisionManager.registerCircle(GROUP_B, 5, 0, 4);
+        CollisionHandle handleA = collisionManager.registerShape(GROUP_A, new Circle(-5, 0, 4));
+        CollisionHandle handleB = collisionManager.registerShape(GROUP_B, new Circle(5, 0, 4));
         CollisionHandler handlerA = new CollisionHandler();
         CollisionHandler handlerB = new CollisionHandler();
         handleA.onCollision.addHandler(handlerA);
@@ -50,8 +52,8 @@ public final class CollisionManagerTest {
     public void collisionManagerReportsCollisionBetweenRectangleAndRectangle() {
         CollisionManager collisionManager = new CollisionManager(2);
         collisionManager.registerCollidesWith(GROUP_A, GROUP_B);
-        CollisionHandle handleA = collisionManager.registerRectangle(GROUP_A, -5, 0, 4, 3);
-        CollisionHandle handleB = collisionManager.registerRectangle(GROUP_B, 5, 0, 3, 4);
+        CollisionHandle handleA = collisionManager.registerShape(GROUP_A, new Rectangle(-5, 0, 4, 3));
+        CollisionHandle handleB = collisionManager.registerShape(GROUP_B, new Rectangle(5, 0, 3, 4));
         CollisionHandler handlerA = new CollisionHandler();
         CollisionHandler handlerB = new CollisionHandler();
         handleA.onCollision.addHandler(handlerA);
@@ -72,8 +74,8 @@ public final class CollisionManagerTest {
         CollisionManager collisionManager = new CollisionManager(2);
         collisionManager.registerCollidesWith(GROUP_A, GROUP_B);
         collisionManager.registerCollidesWith(GROUP_B, GROUP_A);
-        CollisionHandle handleA = collisionManager.registerCircle(GROUP_A, -5, 0, 5);
-        CollisionHandle handleB = collisionManager.registerRectangle(GROUP_B, 5, 0, 3, 4);
+        CollisionHandle handleA = collisionManager.registerShape(GROUP_A, new Circle(-5, 0, 5));
+        CollisionHandle handleB = collisionManager.registerShape(GROUP_B, new Rectangle(5, 0, 3, 4));
         CollisionHandler handlerA = new CollisionHandler();
         CollisionHandler handlerB = new CollisionHandler();
         handleA.onCollision.addHandler(handlerA);
@@ -93,8 +95,8 @@ public final class CollisionManagerTest {
     public void collisionManagerReportsCollisionsWithinTheSameGroup() {
         CollisionManager collisionManager = new CollisionManager(2);
         collisionManager.registerCollidesWith(GROUP_A, GROUP_A);
-        CollisionHandle handleA = collisionManager.registerCircle(GROUP_A, -5, 0, 5);
-        CollisionHandle handleB = collisionManager.registerCircle(GROUP_A, -3, 0, 5);
+        CollisionHandle handleA = collisionManager.registerShape(GROUP_A, new Circle(-5, 0, 5));
+        CollisionHandle handleB = collisionManager.registerShape(GROUP_A, new Circle(-3, 0, 5));
         CollisionHandler handlerA = new CollisionHandler();
         CollisionHandler handlerB = new CollisionHandler();
         handleA.onCollision.addHandler(handlerA);

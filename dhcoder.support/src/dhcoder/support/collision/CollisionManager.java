@@ -14,10 +14,10 @@ import static dhcoder.support.utils.StringUtils.format;
 /**
  * Class which manages a collection of shapes and reports back when any of them overlap.
  * <p/>
- * To use this class, first register a bunch of shapes by calling {@link #registerCircle(int, float, float,
- * float)} and {@link #registerRectangle(int, float, float, float, float)}. Each shape is associated with a group ID,
- * which must be a bitmask value (1, 2, 4, 8, etc.). You must also specify which groups can collides with which via
- * {@link #registerCollidesWith(int, int)} after creating it, or else nothing will collide with anything.
+ * To use this class, first register a bunch of shapes by calling {@link #registerShape(int,
+ * Shape)}. Each shape is associated with a group ID, which must be a bitmask value (1, 2, 4, 8,
+ * etc.). You must also specify which groups can collides with which via {@link #registerCollidesWith(int,
+ * int)} after creating it, or else nothing will collide with anything.
  * <p/>
  * Each registration method returns a {@link CollisionHandle} which you use to listen for collisions (by adding a
  * listener to {@link CollisionHandle#onCollision} and to update the position of the shapes.
@@ -30,8 +30,6 @@ public final class CollisionManager {
     private static final int NUM_GROUPS = 32; // One group per integer bit, so 32 bits means 32 groups.
 
     private final Pool<CollisionHandle> handles;
-    private final Pool<Circle> circles;
-    private final Pool<Rectangle> rectangles;
 
     private final int[] collidesWith; // group -> bitmask of groups it collides with
     private final ArrayList<ArrayList<CollisionHandle>> groups;
@@ -45,30 +43,6 @@ public final class CollisionManager {
         }, new Pool.ResetMethod<CollisionHandle>() {
             @Override
             public void run(final CollisionHandle item) {
-                item.reset();
-            }
-        }, maxCapacity);
-
-        circles = new Pool<Circle>(new Pool.AllocateMethod<Circle>() {
-            @Override
-            public Circle run() {
-                return new Circle();
-            }
-        }, new Pool.ResetMethod<Circle>() {
-            @Override
-            public void run(final Circle item) {
-                item.reset();
-            }
-        }, maxCapacity);
-
-        rectangles = new Pool<Rectangle>(new Pool.AllocateMethod<Rectangle>() {
-            @Override
-            public Rectangle run() {
-                return new Rectangle();
-            }
-        }, new Pool.ResetMethod<Rectangle>() {
-            @Override
-            public void run(final Rectangle item) {
                 item.reset();
             }
         }, maxCapacity);
@@ -87,33 +61,13 @@ public final class CollisionManager {
         collidesWith[groupIdToIndex] = collidesWithMask;
     }
 
-    public CollisionHandle registerCircle(final int groupId, final float x, final float y, final float radius) {
+    public CollisionHandle registerShape(final int groupId, final Shape shape) {
         requireValidGroupId(groupId);
 
-        Circle circle = circles.grabNew();
-        circle.setOrigin(x, y);
-        circle.setRadius(radius);
-
         CollisionHandle handle = handles.grabNew();
-        handle.setShape(circle);
+        handle.setShape(shape);
 
         addToGroup(groupId, handle);
-
-        return handle;
-    }
-
-    public CollisionHandle registerRectangle(final int groupId, final float x, final float y, final float halfWidth,
-        final float halfHeight) {
-        requireValidGroupId(groupId);
-
-        Rectangle rectangle = rectangles.grabNew();
-        rectangle.setOrigin(x, y);
-        rectangle.setHalfSize(halfWidth, halfHeight);
-
-        CollisionHandle handle = handles.grabNew();
-        handle.setShape(rectangle);
-        addToGroup(groupId, handle);
-
         return handle;
     }
 
@@ -141,16 +95,6 @@ public final class CollisionManager {
     }
 
     public void release(final CollisionHandle handle) {
-        Shape shape = handle.getShape();
-        if (shape instanceof Circle) {
-            circles.free((Circle)shape);
-        }
-        else if (shape instanceof Rectangle) {
-            rectangles.free((Rectangle)shape);
-        }
-        else {
-            throw new UnsupportedOperationException(format("Unexpected shape: {0}", shape.getClass()));
-        }
         removeFromGroup(handle);
         handles.free(handle);
     }
