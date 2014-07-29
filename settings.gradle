@@ -1,4 +1,1 @@
-include 'desktop', 'android', 'core', 'dhcoder.support'
-
-include 'dhcoder.test'
-
+include 'desktop', 'android', 'core', 'dhcoder.support', 'dhcoder.test'
