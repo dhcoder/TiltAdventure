@@ -61,7 +61,7 @@ public final class GdxApplication extends ApplicationAdapter {
 
         initializeServices();
 
-        int numRocks = 800;
+        int numRocks = 12;
         for (int i = 0; i < numRocks; ++i) {
             float circleDistance = (float)i / (float)numRocks * Angle.TWO_PI;
             float xScale = 120;
