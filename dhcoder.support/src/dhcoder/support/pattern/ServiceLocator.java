@@ -17,7 +17,7 @@ import static dhcoder.support.utils.StringUtils.format;
  *
  * @see <a href="http://gameprogrammingpatterns.com/service-locator.html">Service Locater Pattern</a>
  */
-public final class Services {
+public final class ServiceLocator {
     private Map<Class<?>, Object> services = new HashMap<Class<?>, Object>(); // Map type to instance of type
 
     /**
