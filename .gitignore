@@ -28,6 +28,7 @@ android/gen/
 .idea/gradle.xml
 .idea/dictionaries/
 *.iws
+*.iml
 out/
 com_crashlytics_export_strings.xml
 
