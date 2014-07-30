@@ -1,6 +1,5 @@
 package dhcoder.support.memory;
 
-import dhcoder.support.lambda.Action;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -85,7 +84,7 @@ public final class PoolTest {
     @Test
     public void freeingUnownedObjectThrowsException() {
         final Pool<PooledItem> pool = createPool(1);
-        assertException("Pool can't free what it doesn't own", IllegalArgumentException.class, new Action() {
+        assertException("Pool can't free what it doesn't own", IllegalArgumentException.class, new Runnable() {
             @Override
             public void run() {
                 pool.free(new PooledItem());
@@ -94,7 +93,7 @@ public final class PoolTest {
 
         final PooledItem item = pool.grabNew();
         pool.free(item);
-        assertException("Pool can't free the same item twice in a row", IllegalArgumentException.class, new Action() {
+        assertException("Pool can't free the same item twice in a row", IllegalArgumentException.class, new Runnable() {
             @Override
             public void run() {
                 pool.free(item);
@@ -109,7 +108,7 @@ public final class PoolTest {
         pool.grabNew();
         pool.grabNew();
         pool.grabNew();
-        assertException("Pool is out of capacity", IllegalStateException.class, new Action() {
+        assertException("Pool is out of capacity", IllegalStateException.class, new Runnable() {
             @Override
             public void run() {
                 pool.grabNew();
@@ -119,7 +118,7 @@ public final class PoolTest {
 
     @Test
     public void invalidCapacityThrowsException() {
-        assertException("Pool can't be instantiated with no capacity", IllegalArgumentException.class, new Action() {
+        assertException("Pool can't be instantiated with no capacity", IllegalArgumentException.class, new Runnable() {
             @Override
             public void run() {
                 createPool(0);
@@ -127,7 +126,7 @@ public final class PoolTest {
         });
 
         assertException("Pool can't be instantiated with negative capacity", IllegalArgumentException.class,
-            new Action() {
+            new Runnable() {
                 @Override
                 public void run() {
                     createPool(-5);

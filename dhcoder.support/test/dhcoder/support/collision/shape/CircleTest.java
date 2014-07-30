@@ -1,6 +1,5 @@
 package dhcoder.support.collision.shape;
 
-import dhcoder.support.lambda.Action;
 import org.junit.Test;
 
 import static dhcoder.test.TestUtils.assertException;
@@ -38,7 +37,7 @@ public final class CircleTest {
 
     @Test
     public void invalidRadiusThrowsException() {
-        assertException("Can't create a circle with negative radius", IllegalArgumentException.class, new Action() {
+        assertException("Can't create a circle with negative radius", IllegalArgumentException.class, new Runnable() {
             @Override
             public void run() {
                 new Circle(0f, 0f, -5f);

@@ -1,8 +1,5 @@
 package dhcoder.support.memory;
 
-import dhcoder.support.lambda.Action1;
-import dhcoder.support.lambda.Func;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -24,10 +21,11 @@ import static dhcoder.support.utils.StringUtils.format;
  */
 public final class Pool<T> {
 
-    public interface AllocateMethod<T> extends Func<T> {}
+    public interface AllocateMethod<T> {
+        T run();
+    }
 
-    public interface ResetMethod<T> extends Action1<T> {
-        @Override
+    public interface ResetMethod<T> {
         void run(T item);
     }
 

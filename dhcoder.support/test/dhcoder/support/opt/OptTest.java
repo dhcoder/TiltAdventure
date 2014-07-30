@@ -1,6 +1,5 @@
 package dhcoder.support.opt;
 
-import dhcoder.support.lambda.Action;
 import org.junit.Test;
 
 import static dhcoder.test.TestUtils.assertException;
@@ -72,7 +71,7 @@ public final class OptTest {
     @Test
     public void getValueWithoutValueThrowsException() {
         final Opt<String> emptyStringOpt = Opt.withNoValue();
-        assertException("Can't get a value from a valueless optional", IllegalStateException.class, new Action() {
+        assertException("Can't get a value from a valueless optional", IllegalStateException.class, new Runnable() {
             @Override
             public void run() {
                 String result = emptyStringOpt.getValue();
@@ -83,7 +82,7 @@ public final class OptTest {
     @Test
     public void optOfWithNullValueThrowsException() {
 
-        assertException("Can't pass null into Opt.of", IllegalArgumentException.class, new Action() {
+        assertException("Can't pass null into Opt.of", IllegalArgumentException.class, new Runnable() {
             @Override
             public void run() {
                 String nullValue = null;

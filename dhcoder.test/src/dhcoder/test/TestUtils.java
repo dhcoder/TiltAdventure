@@ -1,6 +1,5 @@
 package dhcoder.test;
 
-import dhcoder.support.lambda.Action;
 import dhcoder.support.utils.StringUtils;
 
 import static junit.framework.TestCase.fail;
@@ -12,15 +11,15 @@ public final class TestUtils {
      *
      * @param reason         A message which explains what should have happened in case the test fails.
      * @param exceptionClass The type of exception which should get thrown.
-     * @param action         A method which should throw an exception as a side-effect of being run.
+     * @param codeUnderTest  A method which should throw an exception as a side-effect of being run.
      */
     public static void assertException(final String reason, final Class<? extends Exception> exceptionClass,
-        final Action action) {
+        final Runnable codeUnderTest) {
 
         Exception exceptionThrown = null;
 
         try {
-            action.run();
+            codeUnderTest.run();
         } catch (Exception e) {
             exceptionThrown = e;
         }

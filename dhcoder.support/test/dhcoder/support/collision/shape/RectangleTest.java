@@ -1,6 +1,5 @@
 package dhcoder.support.collision.shape;
 
-import dhcoder.support.lambda.Action;
 import org.junit.Test;
 
 import static dhcoder.test.TestUtils.assertException;
@@ -43,14 +42,14 @@ public final class RectangleTest {
     @Test
     public void invalidSizeThrowsException() {
 
-        assertException("Can't create a circle with negative width", IllegalArgumentException.class, new Action() {
+        assertException("Can't create a circle with negative width", IllegalArgumentException.class, new Runnable() {
             @Override
             public void run() {
                 new Rectangle(0f, 0f, -10f, 10f);
             }
         });
 
-        assertException("Can't create a circle with negative height", IllegalArgumentException.class, new Action() {
+        assertException("Can't create a circle with negative height", IllegalArgumentException.class, new Runnable() {
             @Override
             public void run() {
                 new Rectangle(0f, 0f, 10f, -10f);

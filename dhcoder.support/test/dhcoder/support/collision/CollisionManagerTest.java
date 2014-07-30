@@ -2,7 +2,7 @@ package dhcoder.support.collision;
 
 import dhcoder.support.collision.shape.Circle;
 import dhcoder.support.collision.shape.Rectangle;
-import dhcoder.support.event.EventHandler;
+import dhcoder.support.event.EventListener;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -10,7 +10,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 public final class CollisionManagerTest {
 
-    private class CollisionHandler implements EventHandler {
+    private class CollisionListener implements EventListener {
 
         private int collisionCount;
 
@@ -33,19 +33,19 @@ public final class CollisionManagerTest {
         collisionManager.registerCollidesWith(GROUP_A, GROUP_B);
         CollisionHandle handleA = collisionManager.registerShape(GROUP_A, new Circle(-5, 0, 4));
         CollisionHandle handleB = collisionManager.registerShape(GROUP_B, new Circle(5, 0, 4));
-        CollisionHandler handlerA = new CollisionHandler();
-        CollisionHandler handlerB = new CollisionHandler();
-        handleA.onCollision.addHandler(handlerA);
-        handleB.onCollision.addHandler(handlerB);
+        CollisionListener listenerA = new CollisionListener();
+        CollisionListener listenerB = new CollisionListener();
+        handleA.onCollision.addListener(listenerA);
+        handleB.onCollision.addListener(listenerB);
 
         collisionManager.triggerCollisions();
-        assertThat(handlerA.getCollisionCount(), equalTo(0));
-        assertThat(handlerB.getCollisionCount(), equalTo(0));
+        assertThat(listenerA.getCollisionCount(), equalTo(0));
+        assertThat(listenerB.getCollisionCount(), equalTo(0));
 
         handleA.updateOrigin(2f, 1f);
         collisionManager.triggerCollisions();
-        assertThat(handlerA.getCollisionCount(), equalTo(1));
-        assertThat(handlerB.getCollisionCount(), equalTo(0)); // Group B doesn't collide with Group A
+        assertThat(listenerA.getCollisionCount(), equalTo(1));
+        assertThat(listenerB.getCollisionCount(), equalTo(0)); // Group B doesn't collide with Group A
     }
 
     @Test
@@ -54,19 +54,19 @@ public final class CollisionManagerTest {
         collisionManager.registerCollidesWith(GROUP_A, GROUP_B);
         CollisionHandle handleA = collisionManager.registerShape(GROUP_A, new Rectangle(-5, 0, 4, 3));
         CollisionHandle handleB = collisionManager.registerShape(GROUP_B, new Rectangle(5, 0, 3, 4));
-        CollisionHandler handlerA = new CollisionHandler();
-        CollisionHandler handlerB = new CollisionHandler();
-        handleA.onCollision.addHandler(handlerA);
-        handleB.onCollision.addHandler(handlerB);
+        CollisionListener listenerA = new CollisionListener();
+        CollisionListener listenerB = new CollisionListener();
+        handleA.onCollision.addListener(listenerA);
+        handleB.onCollision.addListener(listenerB);
 
         collisionManager.triggerCollisions();
-        assertThat(handlerA.getCollisionCount(), equalTo(0));
-        assertThat(handlerB.getCollisionCount(), equalTo(0));
+        assertThat(listenerA.getCollisionCount(), equalTo(0));
+        assertThat(listenerB.getCollisionCount(), equalTo(0));
 
         handleA.updateOrigin(4f, 1f);
         collisionManager.triggerCollisions();
-        assertThat(handlerA.getCollisionCount(), equalTo(1));
-        assertThat(handlerB.getCollisionCount(), equalTo(0)); // Group B doesn't collide with Group A
+        assertThat(listenerA.getCollisionCount(), equalTo(1));
+        assertThat(listenerB.getCollisionCount(), equalTo(0)); // Group B doesn't collide with Group A
     }
 
     @Test
@@ -76,19 +76,19 @@ public final class CollisionManagerTest {
         collisionManager.registerCollidesWith(GROUP_B, GROUP_A);
         CollisionHandle handleA = collisionManager.registerShape(GROUP_A, new Circle(-5, 0, 5));
         CollisionHandle handleB = collisionManager.registerShape(GROUP_B, new Rectangle(5, 0, 3, 4));
-        CollisionHandler handlerA = new CollisionHandler();
-        CollisionHandler handlerB = new CollisionHandler();
-        handleA.onCollision.addHandler(handlerA);
-        handleB.onCollision.addHandler(handlerB);
+        CollisionListener listenerA = new CollisionListener();
+        CollisionListener listenerB = new CollisionListener();
+        handleA.onCollision.addListener(listenerA);
+        handleB.onCollision.addListener(listenerB);
 
         collisionManager.triggerCollisions();
-        assertThat(handlerA.getCollisionCount(), equalTo(0));
-        assertThat(handlerB.getCollisionCount(), equalTo(0));
+        assertThat(listenerA.getCollisionCount(), equalTo(0));
+        assertThat(listenerB.getCollisionCount(), equalTo(0));
 
         handleA.updateOrigin(3f, 1f);
         collisionManager.triggerCollisions();
-        assertThat(handlerA.getCollisionCount(), equalTo(1));
-        assertThat(handlerB.getCollisionCount(), equalTo(1));
+        assertThat(listenerA.getCollisionCount(), equalTo(1));
+        assertThat(listenerB.getCollisionCount(), equalTo(1));
     }
 
     @Test
@@ -97,14 +97,14 @@ public final class CollisionManagerTest {
         collisionManager.registerCollidesWith(GROUP_A, GROUP_A);
         CollisionHandle handleA = collisionManager.registerShape(GROUP_A, new Circle(-5, 0, 5));
         CollisionHandle handleB = collisionManager.registerShape(GROUP_A, new Circle(-3, 0, 5));
-        CollisionHandler handlerA = new CollisionHandler();
-        CollisionHandler handlerB = new CollisionHandler();
-        handleA.onCollision.addHandler(handlerA);
-        handleB.onCollision.addHandler(handlerB);
+        CollisionListener listenerA = new CollisionListener();
+        CollisionListener listenerB = new CollisionListener();
+        handleA.onCollision.addListener(listenerA);
+        handleB.onCollision.addListener(listenerB);
 
         collisionManager.triggerCollisions();
-        assertThat(handlerA.getCollisionCount(), equalTo(1));
-        assertThat(handlerB.getCollisionCount(), equalTo(1));
+        assertThat(listenerA.getCollisionCount(), equalTo(1));
+        assertThat(listenerB.getCollisionCount(), equalTo(1));
     }
 
 }

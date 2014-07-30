@@ -1,6 +1,5 @@
 package dhcoder.support.utils;
 
-import dhcoder.support.lambda.Action;
 import org.junit.Test;
 
 import static dhcoder.support.utils.StringUtils.format;
@@ -57,21 +56,21 @@ public final class StringUtilsTest {
 
     @Test
     public void formatThrowsExceptionWithUnescapedBraces() {
-        assertException("Left bracket must be escaped", IllegalArgumentException.class, new Action() {
+        assertException("Left bracket must be escaped", IllegalArgumentException.class, new Runnable() {
             @Override
             public void run() {
                 format("Unescaped { throws exception");
             }
         });
 
-        assertException("Right bracket must be escaped", IllegalArgumentException.class, new Action() {
+        assertException("Right bracket must be escaped", IllegalArgumentException.class, new Runnable() {
             @Override
             public void run() {
                 format("Unescaped } throws exception");
             }
         });
 
-        assertException("Left bracket must be closed before the end", IllegalArgumentException.class, new Action() {
+        assertException("Left bracket must be closed before the end", IllegalArgumentException.class, new Runnable() {
             @Override
             public void run() {
                 format("Yeah this isn't good: {0");
@@ -81,7 +80,7 @@ public final class StringUtilsTest {
 
     @Test
     public void formatThrowsExceptionWithOutOfBoundsIndex() {
-        assertException("Format indices must be in bounds", IllegalArgumentException.class, new Action() {
+        assertException("Format indices must be in bounds", IllegalArgumentException.class, new Runnable() {
             @Override
             public void run() {
                 format("Shopping list: {0}, {1}, and {2}", "eggs", "cheese");
@@ -91,28 +90,28 @@ public final class StringUtilsTest {
 
     @Test
     public void formatIndicesCanOnlyBeIntegers() {
-        assertException("Format index can't be a name", IllegalArgumentException.class, new Action() {
+        assertException("Format index can't be a name", IllegalArgumentException.class, new Runnable() {
             @Override
             public void run() {
                 format("You can't use {named} format parameters");
             }
         });
 
-        assertException("Format index cannot contain decimals", IllegalArgumentException.class, new Action() {
+        assertException("Format index cannot contain decimals", IllegalArgumentException.class, new Runnable() {
             @Override
             public void run() {
                 format("Floats like {1.3} don't work");
             }
         });
 
-        assertException("Format index cannot contain letters", IllegalArgumentException.class, new Action() {
+        assertException("Format index cannot contain letters", IllegalArgumentException.class, new Runnable() {
             @Override
             public void run() {
                 format("Numeric qualifiers like {0d} and {1f} aren't necessary and don't work");
             }
         });
 
-        assertException("Format index cannot be empty", IllegalArgumentException.class, new Action() {
+        assertException("Format index cannot be empty", IllegalArgumentException.class, new Runnable() {
             @Override
             public void run() {
                 format("Empty braces {} make format cry.");

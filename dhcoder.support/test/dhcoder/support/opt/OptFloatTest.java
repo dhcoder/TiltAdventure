@@ -1,6 +1,5 @@
 package dhcoder.support.opt;
 
-import dhcoder.support.lambda.Action;
 import org.junit.Test;
 
 import static dhcoder.test.TestUtils.assertException;
@@ -10,7 +9,7 @@ import static org.junit.Assert.assertThat;
 public final class OptFloatTest {
 
     private static final float DUMMY_VALUE = -1234.5f;
-    
+
     @Test
     public void createOptionalWithNoValueWorks() {
         OptFloat floatOpt = OptFloat.withNoValue();
@@ -65,7 +64,7 @@ public final class OptFloatTest {
     @Test
     public void getValueWithoutValueThrowsException() {
         final OptFloat emptyfloatOpt = OptFloat.withNoValue();
-        assertException("Can't get a value from a valueless optional", IllegalStateException.class, new Action() {
+        assertException("Can't get a value from a valueless optional", IllegalStateException.class, new Runnable() {
             @Override
             public void run() {
                 emptyfloatOpt.getValue();

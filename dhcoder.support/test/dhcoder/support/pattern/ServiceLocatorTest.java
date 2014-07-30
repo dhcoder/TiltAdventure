@@ -1,6 +1,5 @@
 package dhcoder.support.pattern;
 
-import dhcoder.support.lambda.Action;
 import org.junit.Test;
 
 import static dhcoder.test.TestUtils.assertException;
@@ -36,7 +35,7 @@ public final class ServiceLocatorTest {
 
         serviceLocator.register(TestService.class, dummyService1);
 
-        assertException("Duplicate services are not allowed", IllegalArgumentException.class, new Action() {
+        assertException("Duplicate services are not allowed", IllegalArgumentException.class, new Runnable() {
             @Override
             public void run() {
                 serviceLocator.register(TestService.class, dummyService2);
@@ -50,7 +49,7 @@ public final class ServiceLocatorTest {
         TestService dummyService1 = new DummyService1();
         serviceLocator.register(DummyService1.class, dummyService1);
 
-        assertException("Can't request unregistered service.", IllegalArgumentException.class, new Action() {
+        assertException("Can't request unregistered service.", IllegalArgumentException.class, new Runnable() {
             @Override
             public void run() {
                 serviceLocator.get(DummyService2.class);

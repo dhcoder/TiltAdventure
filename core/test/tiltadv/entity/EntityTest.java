@@ -1,6 +1,5 @@
 package tiltadv.entity;
 
-import dhcoder.support.lambda.Action;
 import org.junit.Test;
 
 import static dhcoder.test.TestUtils.assertException;
@@ -127,7 +126,7 @@ public final class EntityTest {
 
     @Test
     public void emptyEntityThrowsException() {
-        assertException("Empty entities are not allowed", IllegalArgumentException.class, new Action() {
+        assertException("Empty entities are not allowed", IllegalArgumentException.class, new Runnable() {
             @Override
             public void run() {
                 Entity entity = new Entity();
@@ -160,7 +159,7 @@ public final class EntityTest {
         DummyComponent dummyComponent = new DummyComponent();
         final Entity entity = new Entity(dummyComponent);
 
-        assertException("requireSingleInstance fails if no instances", IllegalStateException.class, new Action() {
+        assertException("requireSingleInstance fails if no instances", IllegalStateException.class, new Runnable() {
             @Override
             public void run() {
                 entity.requireSingleInstance(SingletonComponent.class);
@@ -173,13 +172,14 @@ public final class EntityTest {
         final SingletonComponent singletonComponent1 = new SingletonComponent();
         final SingletonComponent singletonComponent2 = new SingletonComponent();
 
-        assertException("requireSingleInstance fails if multiple instances", IllegalStateException.class, new Action() {
-            @Override
-            public void run() {
-                Entity entity = new Entity(singletonComponent1, singletonComponent2);
-                fail("Shouldn't get here - SingletonComponent should have thrown an exception on initialization.");
-            }
-        });
+        assertException("requireSingleInstance fails if multiple instances", IllegalStateException.class,
+            new Runnable() {
+                @Override
+                public void run() {
+                    Entity entity = new Entity(singletonComponent1, singletonComponent2);
+                    fail("Shouldn't get here - SingletonComponent should have thrown an exception on initialization.");
+                }
+            });
     }
 
     @Test
@@ -187,7 +187,7 @@ public final class EntityTest {
         SingletonComponent singletonComponent = new SingletonComponent();
         final Entity entity = new Entity(singletonComponent);
 
-        assertException("requireSingleInstance fails if no instances", IllegalStateException.class, new Action() {
+        assertException("requireSingleInstance fails if no instances", IllegalStateException.class, new Runnable() {
             @Override
             public void run() {
                 entity.requireComponents(DummyComponent.class);

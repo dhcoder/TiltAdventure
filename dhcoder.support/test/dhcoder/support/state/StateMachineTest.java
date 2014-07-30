@@ -1,6 +1,5 @@
 package dhcoder.support.state;
 
-import dhcoder.support.lambda.Action;
 import dhcoder.support.opt.Opt;
 import org.junit.Before;
 import org.junit.Test;
@@ -135,7 +134,7 @@ public final class StateMachineTest {
     @Test
     public void duplicateRegistrationThrowsException() {
 
-        assertException("Duplicate event registration is not allowed", IllegalArgumentException.class, new Action() {
+        assertException("Duplicate event registration is not allowed", IllegalArgumentException.class, new Runnable() {
             @Override
             public void run() {
                 fsm.registerEvent(TestState.A, TestEvent.A_TO_B, new StateTransitionHandler<TestState, TestEvent>() {

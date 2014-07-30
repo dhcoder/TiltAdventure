@@ -22,7 +22,7 @@ public final class EventTest {
         }
     }
 
-    private final class EventFiredCounter implements EventHandler {
+    private final class EventFiredCounter implements EventListener {
 
         private Object sender;
         private int eventFiredCount;
@@ -43,11 +43,11 @@ public final class EventTest {
     }
 
     @Test
-    public void firingAnEventTriggersAnEventHandler() {
+    public void firingAnEventTriggersAnEventListener() {
         EventOwner eventOwner = new EventOwner();
 
         EventFiredCounter eventFiredCounter = new EventFiredCounter();
-        eventOwner.getEvent().addHandler(eventFiredCounter);
+        eventOwner.getEvent().addListener(eventFiredCounter);
 
         assertThat(eventFiredCounter.getCount(), equalTo(0));
 
@@ -56,14 +56,14 @@ public final class EventTest {
     }
 
     @Test
-    public void firingAnEventTriggersAllEventHandlers() {
+    public void firingAnEventTriggersAllEventListener() {
         EventOwner eventOwner = new EventOwner();
 
         EventFiredCounter eventFiredCounter1 = new EventFiredCounter();
         EventFiredCounter eventFiredCounter2 = new EventFiredCounter();
 
-        eventOwner.getEvent().addHandler(eventFiredCounter1);
-        eventOwner.getEvent().addHandler(eventFiredCounter2);
+        eventOwner.getEvent().addListener(eventFiredCounter1);
+        eventOwner.getEvent().addListener(eventFiredCounter2);
 
         eventOwner.testFire();
         assertThat(eventFiredCounter1.getCount(), equalTo(1));
@@ -71,24 +71,24 @@ public final class EventTest {
     }
 
     @Test
-    public void removeListenerStopsEventHandlerFromBeingTriggered() {
+    public void removeListenerStopsEventListenerFromBeingTriggered() {
         EventOwner eventOwner = new EventOwner();
         EventFiredCounter eventFiredCounter = new EventFiredCounter();
-        eventOwner.getEvent().addHandler(eventFiredCounter);
+        eventOwner.getEvent().addListener(eventFiredCounter);
 
         eventOwner.testFire();
         assertThat(eventFiredCounter.getCount(), equalTo(1));
 
-        eventOwner.getEvent().removeHandler(eventFiredCounter);
+        eventOwner.getEvent().removeListener(eventFiredCounter);
         eventOwner.testFire();
         assertThat(eventFiredCounter.getCount(), equalTo(1));
     }
 
     @Test
-    public void clearListenersStopsEventHandlerFromBeingTriggered() {
+    public void clearListenersStopsEventListenerFromBeingTriggered() {
         EventOwner eventOwner = new EventOwner();
         EventFiredCounter eventFiredCounter = new EventFiredCounter();
-        eventOwner.getEvent().addHandler(eventFiredCounter);
+        eventOwner.getEvent().addListener(eventFiredCounter);
 
         eventOwner.testFire();
         assertThat(eventFiredCounter.getCount(), equalTo(1));
