@@ -7,8 +7,6 @@ import static dhcoder.support.utils.StringUtils.format;
  */
 public final class Rectangle implements Shape {
 
-    private float x;
-    private float y;
     private float halfWidth;
     private float halfHeight;
 
@@ -19,38 +17,18 @@ public final class Rectangle implements Shape {
     /**
      * Creates a rectangle by specifying its original x,y point and half-width and heights.
      */
-    public Rectangle(final float x, final float y, final float halfWidth, final float halfHeight) {
-        setOrigin(x, y);
+    public Rectangle(final float halfWidth, final float halfHeight) {
         setHalfSize(halfWidth, halfHeight);
     }
 
     @Override
-    public void setOrigin(final float x, final float y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    @Override
-    public float getX() {
-        return x;
-    }
-
-    @Override
-    public float getY() {
-        return y;
-    }
-
-    @Override
     public boolean containsPoint(final float x, final float y) {
-        float deltaX = x - this.x;
-        float deltaY = y - this.y;
-
-        return ((deltaX * deltaX <= halfWidth * halfWidth) && (deltaY * deltaY <= halfHeight * halfHeight));
+        return Math.abs(x) < halfWidth && Math.abs(y) < halfHeight;
     }
 
     @Override
     public void reset() {
-        x = y = halfWidth = halfHeight = 0f;
+        halfWidth = halfHeight = 0f;
     }
 
     public void setHalfSize(final float halfWidth, final float halfHeight) {
@@ -71,11 +49,11 @@ public final class Rectangle implements Shape {
         return halfHeight;
     }
 
-    public float getX0() { return x - halfWidth; }
+    public float getLeft(final float xOrigin) { return xOrigin - halfWidth; }
 
-    public float getY0() { return y - halfHeight; }
+    public float getBottom(final float yOrigin) { return yOrigin - halfHeight; }
 
-    public float getX1() { return x + halfWidth; }
+    public float getRight(final float xOrigin) { return xOrigin + halfWidth; }
 
-    public float getY1() { return y + halfHeight; }
+    public float getTop(final float yOrigin) { return yOrigin + halfHeight; }
 }

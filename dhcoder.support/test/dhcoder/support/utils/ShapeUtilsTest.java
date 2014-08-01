@@ -8,6 +8,7 @@ import static dhcoder.support.utils.ShapeUtils.testIntersection;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 
+/* Expecting to pull these changes down and merge from another remote CL
 public final class ShapeUtilsTest {
 
     @Test
@@ -65,5 +66,5 @@ public final class ShapeUtilsTest {
     public void testCircleIntersectsWithRectangle() {
         // TODO: Stop being lazy and write these tests
     }
-
 }
+*/

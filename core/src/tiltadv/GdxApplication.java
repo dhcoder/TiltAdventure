@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import dhcoder.support.collision.CollisionManager;
+import dhcoder.support.collision.CollisionSystem;
 import dhcoder.support.math.Angle;
 import dhcoder.support.time.Duration;
 import tiltadv.entity.Component;
@@ -48,7 +48,7 @@ public final class GdxApplication extends ApplicationAdapter {
     private SpriteBatch batch;
 
     private List<Entity> entities;
-    private CollisionManager collisionManager;
+    private CollisionSystem collisionSystem;
 
     @Override
     public void create() {
@@ -100,9 +100,9 @@ public final class GdxApplication extends ApplicationAdapter {
     }
 
     private void initializeServices() {
-        collisionManager = new CollisionManager(200);
-        collisionManager.registerCollidesWith(Group.PLAYER, Group.OBSTACLES);
-        Services.register(CollisionManager.class, collisionManager);
+        collisionSystem = new CollisionSystem(200);
+        collisionSystem.registerCollidesWith(Group.PLAYER, Group.OBSTACLES);
+        Services.register(CollisionSystem.class, collisionSystem);
     }
 
     private void update() {
@@ -116,7 +116,7 @@ public final class GdxApplication extends ApplicationAdapter {
             }
             Pools.duration.free(elapsedTime);
         }
-        collisionManager.triggerCollisions();
+        collisionSystem.triggerCollisions();
 
         camera.update();
         batch.setProjectionMatrix(camera.combined);

@@ -1,7 +1,5 @@
 package dhcoder.support.collision;
 
-import dhcoder.support.collision.shape.Circle;
-import dhcoder.support.collision.shape.Rectangle;
 import dhcoder.support.collision.shape.Shape;
 import dhcoder.support.memory.Pool;
 
@@ -19,38 +17,38 @@ import static dhcoder.support.utils.StringUtils.format;
  * etc.). You must also specify which groups can collides with which via {@link #registerCollidesWith(int,
  * int)} after creating it, or else nothing will collide with anything.
  * <p/>
- * Each registration method returns a {@link CollisionHandle} which you use to listen for collisions (by adding a
- * listener to {@link CollisionHandle#onCollision} and to update the position of the shapes.
+ * Each registration method returns a {@link Collider} which you use to listen for collisions (by adding a
+ * listener to {@link Collider#onCollision} and to update the position of the shapes.
  * <p/>
  * Finally, call {@link #triggerCollisions()} to cause the manager to run through all items and fire the events for
  * any that collided.
  */
-public final class CollisionManager {
+public final class CollisionSystem {
 
     private static final int NUM_GROUPS = 32; // One group per integer bit, so 32 bits means 32 groups.
 
-    private final Pool<CollisionHandle> handles;
+    private final Pool<Collider> colliders;
 
     private final int[] collidesWith; // group -> bitmask of groups it collides with
-    private final ArrayList<ArrayList<CollisionHandle>> groups;
+    private final ArrayList<ArrayList<Collider>> groups;
 
-    public CollisionManager(final int maxCapacity) {
-        handles = new Pool<CollisionHandle>(new Pool.AllocateMethod<CollisionHandle>() {
+    public CollisionSystem(final int maxCapacity) {
+        colliders = new Pool<Collider>(new Pool.AllocateMethod<Collider>() {
             @Override
-            public CollisionHandle run() {
-                return new CollisionHandle();
+            public Collider run() {
+                return new Collider();
             }
-        }, new Pool.ResetMethod<CollisionHandle>() {
+        }, new Pool.ResetMethod<Collider>() {
             @Override
-            public void run(final CollisionHandle item) {
+            public void run(final Collider item) {
                 item.reset();
             }
         }, maxCapacity);
 
         collidesWith = new int[NUM_GROUPS];
-        groups = new ArrayList<ArrayList<CollisionHandle>>(NUM_GROUPS);
+        groups = new ArrayList<ArrayList<Collider>>(NUM_GROUPS);
         for (int i = 0; i < NUM_GROUPS; ++i) {
-            groups.add(new ArrayList<CollisionHandle>(maxCapacity));
+            groups.add(new ArrayList<Collider>(maxCapacity));
         }
     }
 
@@ -61,32 +59,30 @@ public final class CollisionManager {
         collidesWith[groupIdToIndex] = collidesWithMask;
     }
 
-    public CollisionHandle registerShape(final int groupId, final Shape shape) {
+    public Collider registerShape(final int groupId, final Shape shape) {
         requireValidGroupId(groupId);
+        int groupIndex = groupIdToIndex(groupId);
 
-        CollisionHandle handle = handles.grabNew();
-        handle.setShape(shape);
+        Collider collider = colliders.grabNew();
+        collider.initialize(groupIndex, shape);
+        groups.get(groupIndex).add(collider);
 
-        addToGroup(groupId, handle);
-        return handle;
+        return collider;
     }
 
     public void triggerCollisions() {
         for (int groupSourceIndex = 0; groupSourceIndex < NUM_GROUPS; ++groupSourceIndex) {
-            ArrayList<CollisionHandle> groupSource = groups.get(groupSourceIndex);
+            ArrayList<Collider> groupSource = groups.get(groupSourceIndex);
             int groupSourceSize = groupSource.size();
             for (int groupTargetIndex = 0; groupTargetIndex < NUM_GROUPS; ++groupTargetIndex) {
                 if (groupsCanCollide(groupSourceIndex, groupTargetIndex)) {
-                    ArrayList<CollisionHandle> groupTarget = groups.get(groupTargetIndex);
+                    ArrayList<Collider> groupTarget = groups.get(groupTargetIndex);
                     int groupTargetSize = groupTarget.size();
-                    for (int handleSourceIndex = 0; handleSourceIndex < groupSourceSize; ++handleSourceIndex) {
-                        CollisionHandle handleSource = groupSource.get(handleSourceIndex);
-                        for (int handleTargetIndex = 0; handleTargetIndex < groupTargetSize; ++handleTargetIndex) {
-                            CollisionHandle handleTarget = groupTarget.get(handleTargetIndex);
-                            if (handleSource == handleTarget) { continue; }
-                            if (testIntersection(handleSource.getShape(), handleTarget.getShape())) {
-                                handleSource.fireCollision(handleTarget);
-                            }
+                    for (int colliderSourceIndex = 0; colliderSourceIndex < groupSourceSize; ++colliderSourceIndex) {
+                        Collider colliderSource = groupSource.get(colliderSourceIndex);
+                        for (int colliderTargetIndex = 0; colliderTargetIndex < groupTargetSize; ++colliderTargetIndex) {
+                            Collider colliderTarget = groupTarget.get(colliderTargetIndex);
+                            colliderSource.testCollisionWith(colliderTarget);
                         }
                     }
                 }
@@ -94,9 +90,9 @@ public final class CollisionManager {
         }
     }
 
-    public void release(final CollisionHandle handle) {
-        removeFromGroup(handle);
-        handles.free(handle);
+    public void release(final Collider collider) {
+        removeFromGroup(collider);
+        colliders.free(collider);
     }
 
     private void requireValidGroupId(final int group) {
@@ -107,15 +103,9 @@ public final class CollisionManager {
         }
     }
 
-    private void addToGroup(final int groupId, final CollisionHandle handle) {
-        int groupIndex = groupIdToIndex(groupId);
-        handle.setGroupIndex(groupIndex);
-        groups.get(groupIndex).add(handle);
-    }
-
-    private void removeFromGroup(final CollisionHandle handle) {
-        ArrayList<CollisionHandle> group = groups.get(handle.getGroupIndex());
-        swapToEndAndRemove(group, handle);
+    private void removeFromGroup(final Collider collider) {
+        ArrayList<Collider> group = groups.get(collider.getGroupIndex());
+        swapToEndAndRemove(group, collider);
     }
 
     private int groupIdToIndex(final int groupId) {
