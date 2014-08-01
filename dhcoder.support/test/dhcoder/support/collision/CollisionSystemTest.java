@@ -32,6 +32,7 @@ public final class CollisionSystemTest {
     public void defaultCollidersAreInactiveAndWontCollide() {
         CollisionSystem collisionSystem = new CollisionSystem(2);
         collisionSystem.registerCollidesWith(GROUP_A, GROUP_B);
+        collisionSystem.registerCollidesWith(GROUP_B, GROUP_A);
         Collider colliderA = collisionSystem.registerShape(GROUP_A, new Circle(4));
         Collider colliderB = collisionSystem.registerShape(GROUP_B, new Circle(5));
 
@@ -48,10 +49,25 @@ public final class CollisionSystemTest {
         assertThat(colliderB.isActive(), equalTo(false));
         assertThat(listenerA.getCollisionCount(), equalTo(0));
         assertThat(listenerB.getCollisionCount(), equalTo(0));
-
         collisionSystem.triggerCollisions();
         assertThat(listenerA.getCollisionCount(), equalTo(0));
         assertThat(listenerB.getCollisionCount(), equalTo(0));
+
+        // The objects still won't collide if one is active and the other is inactive
+        colliderA.updatePosition(0f, 0f);
+        assertThat(colliderA.isActive(), equalTo(true));
+        assertThat(colliderB.isActive(), equalTo(false));
+        collisionSystem.triggerCollisions();
+        assertThat(listenerA.getCollisionCount(), equalTo(0));
+        assertThat(listenerB.getCollisionCount(), equalTo(0));
+
+        // Sanity check - collisions work as expected when both colliders are active
+        colliderB.updatePosition(0f, 0f);
+        assertThat(colliderA.isActive(), equalTo(true));
+        assertThat(colliderB.isActive(), equalTo(true));
+        collisionSystem.triggerCollisions();
+        assertThat(listenerA.getCollisionCount(), equalTo(1));
+        assertThat(listenerB.getCollisionCount(), equalTo(1));
     }
 
     @Test
