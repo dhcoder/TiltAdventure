@@ -17,6 +17,8 @@ public final class ArgEvent<T extends EventArgs> {
         listeners.remove(listener);
     }
 
+    public boolean hasListeners() { return listeners.size() > 0; }
+
     /**
      * Fire this event, triggering all listeners.
      */

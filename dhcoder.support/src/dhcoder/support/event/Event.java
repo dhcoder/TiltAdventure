@@ -22,6 +22,11 @@ public final class Event {
     public void removeListener(final EventListener eventListener) { listeners.remove(eventListener); }
 
     /**
+     * Returns true if this event has any listeners attached. This may be useful to check before firing the event.
+     */
+    public boolean hasListeners() { return listeners.size() > 0; }
+
+    /**
      * Fire this event, triggering all listeners.
      */
     public void fire(final Object sender) {
