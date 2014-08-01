@@ -1,12 +1,13 @@
 package dhcoder.support.collision;
 
+import dhcoder.support.collection.Key2;
 import dhcoder.support.collision.shape.Shape;
 import dhcoder.support.memory.Pool;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static dhcoder.support.utils.ListUtils.swapToEndAndRemove;
-import static dhcoder.support.utils.ShapeUtils.testIntersection;
 import static dhcoder.support.utils.StringUtils.format;
 
 /**
@@ -27,19 +28,29 @@ public final class CollisionSystem {
 
     private static final int NUM_GROUPS = 32; // One group per integer bit, so 32 bits means 32 groups.
 
-    private final Pool<Collider> colliders;
+    private final Pool<Collider> colliderPool;
+    private final Pool<Collision> collisionPool;
+    private final Key2<Collider, Collider> reusableKey = new Key2<Collider, Collider>();
 
     private final int[] collidesWith; // group -> bitmask of groups it collides with
     private final ArrayList<ArrayList<Collider>> groups;
 
-    public CollisionSystem(final int maxCapacity) {
-        colliders = Pool.of(Collider.class, maxCapacity);
+    private final HashMap<Key2, Collision> collisions;
+
+    public CollisionSystem(final int colliderCapacity) {
+        colliderPool = Pool.of(Collider.class, colliderCapacity);
+        // Given n colliders, there can be up to n² collisionPool. In practice, however, there are much less. Allocate a
+        // subset of n² to save memory but we may adjust this when we see the number of collisionPool in the wild.
+        int collisionCapacity = colliderCapacity * 2;
+        collisionPool = Pool.of(Collision.class, collisionCapacity);
 
         collidesWith = new int[NUM_GROUPS];
         groups = new ArrayList<ArrayList<Collider>>(NUM_GROUPS);
         for (int i = 0; i < NUM_GROUPS; ++i) {
-            groups.add(new ArrayList<Collider>(maxCapacity));
+            groups.add(new ArrayList<Collider>(colliderCapacity));
         }
+
+        collisions = new HashMap<Key2, Collision>(colliderCapacity * 2);
     }
 
     public void registerCollidesWith(final int groupId, final int collidesWithMask) {
@@ -53,7 +64,7 @@ public final class CollisionSystem {
         requireValidGroupId(groupId);
         int groupIndex = groupIdToIndex(groupId);
 
-        Collider collider = colliders.grabNew();
+        Collider collider = colliderPool.grabNew();
         collider.initialize(groupIndex, shape);
         groups.get(groupIndex).add(collider);
 
@@ -72,7 +83,22 @@ public final class CollisionSystem {
                         Collider colliderSource = groupSource.get(colliderSourceIndex);
                         for (int colliderTargetIndex = 0; colliderTargetIndex < groupTargetSize; ++colliderTargetIndex) {
                             Collider colliderTarget = groupTarget.get(colliderTargetIndex);
-                            colliderSource.testCollisionWith(colliderTarget);
+                            reusableKey.set(colliderSource, colliderTarget);
+                            if (colliderSource.collidesWith(colliderTarget)) {
+                                Collision collision;
+                                if (!collisions.containsKey(reusableKey)) {
+                                    collision = collisionPool.grabNew();
+                                    collision.set(colliderSource, colliderTarget);
+                                    collisions.put(collision.getKey(), collision);
+                                } else {
+                                    collision = collisions.get(reusableKey);
+                                }
+                                colliderSource.fireCollision(collision);
+                            } else if (collisions.containsKey(reusableKey)) {
+                                Collision collision = collisions.remove(reusableKey);
+                                collisionPool.free(collision);
+                                // TODO: Add 'fireSeparation' event and test it!
+                            }
                         }
                     }
                 }
@@ -82,7 +108,7 @@ public final class CollisionSystem {
 
     public void release(final Collider collider) {
         removeFromGroup(collider);
-        colliders.free(collider);
+        colliderPool.free(collider);
     }
 
     private void requireValidGroupId(final int group) {

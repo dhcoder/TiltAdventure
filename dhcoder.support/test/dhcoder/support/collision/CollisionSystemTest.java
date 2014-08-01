@@ -2,7 +2,7 @@ package dhcoder.support.collision;
 
 import dhcoder.support.collision.shape.Circle;
 import dhcoder.support.collision.shape.Rectangle;
-import dhcoder.support.event.EventListener;
+import dhcoder.support.event.ArgEventListener;
 import org.junit.Test;
 
 import static dhcoder.support.utils.ShapeUtils.testIntersection;
@@ -11,17 +11,15 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 public final class CollisionSystemTest {
 
-    private class CollisionListener implements EventListener {
+    private class CollisionListener implements ArgEventListener<CollisionEventArgs> {
 
         private int collisionCount;
 
+        @Override
+        public void run(final Object sender, final CollisionEventArgs args) { collisionCount++; }
+
         public int getCollisionCount() {
             return collisionCount;
-        }
-
-        @Override
-        public void run(final Object sender) {
-            collisionCount++;
         }
     }
 
