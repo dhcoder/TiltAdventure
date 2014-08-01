@@ -48,7 +48,7 @@ public final class TransformComponent extends AbstractComponent {
 
     private final Vector2 translate = new Vector2(0f, 0f);
     private final Vector2 scale = new Vector2(1f, 1f);
-    private final Angle rotation = new Angle();
+    private final Angle rotation = Angle.fromDegrees(0f);
 
     public TransformComponent() {}
 

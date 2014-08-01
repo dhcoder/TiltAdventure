@@ -9,13 +9,6 @@ import static dhcoder.test.matchers.IsCloseTo.closeTo;
 public final class AngleTest {
 
     @Test
-    public void defaultAngleDefaultsTo0() {
-        Angle angle = new Angle();
-        assertThat(angle.getDegrees(), equalTo(0f));
-        assertThat(angle.getRadians(), equalTo(0f));
-    }
-
-    @Test
     public void testSetAngleToDegrees() {
         Angle angle = Angle.fromDegrees(45f);
         assertThat(angle.getDegrees(), equalTo(45f));
@@ -54,7 +47,7 @@ public final class AngleTest {
 
     @Test
     public void outOfBoundsDegreesAreBounded() {
-        Angle angle = new Angle();
+        Angle angle = Angle.fromDegrees(0f);
 
         angle.setDegrees(-300f);
         assertThat(angle.getDegrees(), equalTo(60f));
@@ -71,7 +64,7 @@ public final class AngleTest {
 
     @Test
     public void outOfBoundsRadiansAreBounded() {
-        Angle angle = new Angle();
+        Angle angle = Angle.fromRadians(0f);
 
         angle.setRadians(-Angle.PI / 2f);
         assertThat(angle.getRadians(), closeTo(3f * Angle.PI / 2f));

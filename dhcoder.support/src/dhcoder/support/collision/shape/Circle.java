@@ -9,7 +9,7 @@ public final class Circle implements Shape {
 
     private float radius;
 
-    public Circle() {
+    private Circle() {
         reset();
     }
 

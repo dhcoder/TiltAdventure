@@ -1,5 +1,7 @@
 package dhcoder.support.memory;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -21,15 +23,68 @@ import static dhcoder.support.utils.StringUtils.format;
  */
 public final class Pool<T> {
 
-    public interface AllocateMethod<T> {
+    public static interface AllocateMethod<T> {
         T run();
     }
 
-    public interface ResetMethod<T> {
+    public static interface ResetMethod<T> {
         void run(T item);
     }
 
-    private static int DEFAULT_CAPACITY = 10;
+    private static final class PoolableAllocator<P extends Poolable> {
+        private static IllegalArgumentException constructPoolableException(
+            final Class<? extends Poolable> poolableClass) {
+            return new IllegalArgumentException(
+                format("Class type {0} must have an empty constructor and be instantiable", poolableClass));
+        }
+
+        private final Class<P> poolableClass;
+        private final Constructor<P> constructor;
+
+        public PoolableAllocator(final Class<P> poolableClass) {
+            this.poolableClass = poolableClass;
+            try {
+                constructor = (Constructor<P>)poolableClass.getDeclaredConstructor();
+                constructor.setAccessible(true);
+            } catch (NoSuchMethodException e) {
+                throw constructPoolableException(poolableClass);
+            }
+        }
+
+        public P allocate() {
+            try {
+                return constructor.newInstance();
+            } catch (InstantiationException e) {
+                throw constructPoolableException(poolableClass);
+            } catch (IllegalAccessException e) {
+                throw constructPoolableException(poolableClass);
+            } catch (InvocationTargetException e) {
+                throw constructPoolableException(poolableClass);
+            }
+        }
+    }
+
+    private static final int DEFAULT_CAPACITY = 10;
+
+    public static <P extends Poolable> Pool<P> of(final Class<P> poolableClass) {
+        return of(poolableClass, DEFAULT_CAPACITY);
+    }
+
+    public static <P extends Poolable> Pool<P> of(final Class<P> poolableClass, final int capacity) {
+        return new Pool<P>(new AllocateMethod() {
+            PoolableAllocator<P> poolableAllocator = new PoolableAllocator<P>(poolableClass);
+
+            public Object run() {
+                return poolableAllocator.allocate();
+            }
+        }, new ResetMethod() {
+            @Override
+            public void run(final Object item) {
+                ((Poolable)item).reset();
+            }
+        }, capacity);
+    }
+
     private final ResetMethod<T> reset;
     private final Stack<T> freeItems;
     private final List<T> usedItems;

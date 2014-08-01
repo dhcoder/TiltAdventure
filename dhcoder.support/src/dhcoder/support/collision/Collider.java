@@ -2,13 +2,14 @@ package dhcoder.support.collision;
 
 import dhcoder.support.collision.shape.Shape;
 import dhcoder.support.event.Event;
+import dhcoder.support.memory.Poolable;
 
 import static dhcoder.support.utils.ShapeUtils.testIntersection;
 
 /**
  * A simplified representation of some game object used in collision testing.
  */
-public final class Collider {
+public final class Collider implements Poolable {
 
     public final Event onCollision = new Event();
     private boolean isActive;
@@ -44,6 +45,15 @@ public final class Collider {
 
     // Should only be called by CollisionSystem
 
+    // Should only be called by CollisionSystem
+    @Override
+    public void reset() {
+        shape = null;
+        groupIndex = -1;
+        onCollision.clearListeners();
+        isActive = false;
+    }
+
     /**
      * Initialize this collider with its shape. However, the collider won't be active until you call {@link
      * #updatePosition(float, float)} for the first time.
@@ -55,20 +65,8 @@ public final class Collider {
     }
 
     // Should only be called by CollisionSystem
-    void reset() {
-        shape = null;
-        groupIndex = -1;
-        onCollision.clearListeners();
-        isActive = false;
-    }
-
-    // Should only be called by CollisionSystem
     void testCollisionWith(final Collider otherCollider) {
-        if (!isActive) {
-            return;
-        }
-
-        if (otherCollider == this) {
+        if (!isActive || !otherCollider.isActive || otherCollider == this) {
             return;
         }
 

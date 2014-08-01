@@ -1,5 +1,6 @@
 package dhcoder.support.math;
 
+import dhcoder.support.memory.Poolable;
 import dhcoder.support.opt.OptFloat;
 
 import static dhcoder.support.utils.StringUtils.format;
@@ -8,7 +9,7 @@ import static dhcoder.support.utils.StringUtils.format;
  * Simple class that represents a 0 -> 360° angle. You can set and get this angle's value in either degreesOpt or
  * radiansOpt.
  */
-public final class Angle {
+public final class Angle implements Poolable {
 
     /**
      * A float version of java.lang.Math.PI
@@ -54,6 +55,12 @@ public final class Angle {
     private final OptFloat degreesOpt = OptFloat.of(0f);
     private final OptFloat radiansOpt = OptFloat.of(0f);
 
+    /**
+     * Use {@link #fromDegrees(float)} or {@link #fromRadians(float)} instead.
+     */
+    private Angle() {
+    }
+
     public float getDegrees() {
         if (!degreesOpt.hasValue()) {
             degreesOpt.set(radiansOpt.getValue() * RAD_TO_DEG);
@@ -96,5 +103,10 @@ public final class Angle {
     @Override
     public String toString() {
         return format("{0}°", getDegrees());
+    }
+
+    @Override
+    public void reset() {
+        setDegrees(0f);
     }
 }

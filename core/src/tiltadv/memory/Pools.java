@@ -10,28 +10,8 @@ import dhcoder.support.time.Duration;
  */
 public final class Pools {
 
-    public static final Pool<Angle> angle = new Pool<Angle>(new Pool.AllocateMethod<Angle>() {
-        @Override
-        public Angle run() {
-            return Angle.fromDegrees(0f);
-        }
-    }, new Pool.ResetMethod<Angle>() {
-        @Override
-        public void run(final Angle item) {
-            item.setDegrees(0f);
-        }
-    });
-    public static final Pool<Duration> duration = new Pool<Duration>(new Pool.AllocateMethod<Duration>() {
-        @Override
-        public Duration run() {
-            return Duration.zero();
-        }
-    }, new Pool.ResetMethod<Duration>() {
-        @Override
-        public void run(final Duration item) {
-            item.setZero();
-        }
-    });
+    public static final Pool<Angle> angle = Pool.of(Angle.class);
+    public static final Pool<Duration> duration = Pool.of(Duration.class);
     public static final Pool<Vector2> vector = new Pool<Vector2>(new Pool.AllocateMethod<Vector2>() {
         @Override
         public Vector2 run() {

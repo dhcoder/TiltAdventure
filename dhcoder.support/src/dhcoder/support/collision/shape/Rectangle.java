@@ -10,7 +10,7 @@ public final class Rectangle implements Shape {
     private float halfWidth;
     private float halfHeight;
 
-    public Rectangle() {
+    private Rectangle() {
         reset();
     }
 

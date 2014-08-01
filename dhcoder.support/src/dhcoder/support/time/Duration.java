@@ -1,11 +1,13 @@
 package dhcoder.support.time;
 
+import dhcoder.support.memory.Poolable;
+
 import static dhcoder.support.utils.StringUtils.format;
 
 /**
  * An class which represents a time duration.
  */
-public final class Duration {
+public final class Duration implements Poolable {
 
     public static Duration zero() {
         return new Duration();
@@ -86,4 +88,9 @@ public final class Duration {
     public void setZero() { setSeconds(0f); }
 
     public boolean isZero() { return seconds == 0f; }
+
+    @Override
+    public void reset() {
+        setZero();
+    }
 }

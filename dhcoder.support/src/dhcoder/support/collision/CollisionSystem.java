@@ -33,17 +33,7 @@ public final class CollisionSystem {
     private final ArrayList<ArrayList<Collider>> groups;
 
     public CollisionSystem(final int maxCapacity) {
-        colliders = new Pool<Collider>(new Pool.AllocateMethod<Collider>() {
-            @Override
-            public Collider run() {
-                return new Collider();
-            }
-        }, new Pool.ResetMethod<Collider>() {
-            @Override
-            public void run(final Collider item) {
-                item.reset();
-            }
-        }, maxCapacity);
+        colliders = Pool.of(Collider.class, maxCapacity);
 
         collidesWith = new int[NUM_GROUPS];
         groups = new ArrayList<ArrayList<Collider>>(NUM_GROUPS);
