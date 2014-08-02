@@ -1,5 +1,7 @@
 package dhcoder.support.opt;
 
+import dhcoder.support.memory.Poolable;
+
 import static dhcoder.support.utils.StringUtils.format;
 
 /**
@@ -16,7 +18,7 @@ import static dhcoder.support.utils.StringUtils.format;
  * this approach is it is easier to read and uses less characters than writing
  * {@code new Opt<SomeType>(SomeTypeInstance)} out each time.
  */
-public final class Opt<T> {
+public final class Opt<T> implements Poolable {
 
     /**
      * Creates an Opt wrapper around a non-null value.
@@ -111,9 +113,16 @@ public final class Opt<T> {
 
     @Override
     public String toString() {
-        if (value == null)
-            return "Opt<?>{}";
+        if (value == null) { return "Opt<?>{}"; }
 
         return format("Opt<{0}>{{{1}}}", value.getClass().getSimpleName(), value);
+    }
+
+    @Override
+    /**
+     * Overridden from the {@link Poolable} interface, but otherwise use {@link #clear()} instead for readability.
+     */
+    public void reset() {
+        clear();
     }
 }

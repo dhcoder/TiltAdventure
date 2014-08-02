@@ -1,11 +1,14 @@
 package dhcoder.support.opt;
 
+import dhcoder.support.memory.Pool;
+import dhcoder.support.memory.Poolable;
+
 import static dhcoder.support.utils.StringUtils.format;
 
 /**
  * Special-case {@link Opt} for the float primitive type (to avoid the allocation that comes from auto-boxing Floats)
  */
-public final class OptFloat {
+public final class OptFloat implements Poolable {
 
     /**
      * Creates an Opt wrapper around a float value.
@@ -107,5 +110,13 @@ public final class OptFloat {
     @Override
     public int hashCode() {
         return hasValue ? Float.floatToIntBits(value) : 0;
+    }
+
+    @Override
+    /**
+     * Overridden from the {@link Poolable} interface, but otherwise use {@link #clear()} instead for readability.
+     */
+    public void reset() {
+        clear();
     }
 }
