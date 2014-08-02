@@ -8,11 +8,11 @@ import dhcoder.support.memory.Poolable;
  */
 public final class Collision implements Poolable {
 
+    // Implementation detail - CollisionSystem saves the hashmap key for this collision inside itself. It lets us avoid
+    // having to allocate a key every time a new collision occurs.
+    private final Key2<Collider, Collider> key = new Key2<Collider, Collider>();
     private Collider source;
     private Collider target;
-    // Implementation detail - Pool puts the hashmap key for this collision inside the collision, for easy access to
-    // free it up later.
-    private Key2<Collider, Collider> key = new Key2<Collider, Collider>();
 
     public Collider getSource() {
         return source;
@@ -22,17 +22,19 @@ public final class Collision implements Poolable {
         return target;
     }
 
-    Key2<Collider, Collider> getKey() { return key; }
-
-    void set(final Collider source, final Collider target) {
-        this.source = source;
-        this.target = target;
-        key.set(source, target);
-    }
-
     @Override
     public void reset() {
         source = target = null;
         key.reset();
+    }
+
+    // Should only be called by CollisionSystem
+    Key2<Collider, Collider> getKey() { return key; }
+
+    // Should only be called by CollisionSystem
+    void set(final Collider source, final Collider target) {
+        this.source = source;
+        this.target = target;
+        key.set(source, target);
     }
 }

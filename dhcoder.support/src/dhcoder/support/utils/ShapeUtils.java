@@ -3,6 +3,7 @@ package dhcoder.support.utils;
 import dhcoder.support.collision.shape.Circle;
 import dhcoder.support.collision.shape.Rectangle;
 import dhcoder.support.collision.shape.Shape;
+import dhcoder.support.math.Intersection;
 
 import static dhcoder.support.utils.MathUtils.clamp;
 import static dhcoder.support.utils.StringUtils.format;
@@ -29,6 +30,34 @@ public final class ShapeUtils {
         throw new IllegalArgumentException(
             format("Unexpected shapes passed in for intersection testing: {0} & {1}", shape1.getClass(),
                 shape2.getClass()));
+    }
+
+    public static void getIntersection(final Shape shape1, final float fromX1, final float fromY1, final float toX1,
+        final float toY1, final Shape shape2, final float fromX2, final float fromY2, final float toX2,
+        final float toY2, final Intersection outIntersection) {
+        // This code here is ugly - using a map<pair, function> would be better. But this way avoids needing to
+        // allocate a pair each time just to test types.
+        if (shape1 instanceof Circle && shape2 instanceof Circle) {
+            getCircleIntersection((Circle)shape1, fromX1, fromY1, toX1, toY1, (Circle)shape2, fromX2, fromY2, toX2,
+                toY2, outIntersection);
+        }
+        else if (shape1 instanceof Rectangle && shape2 instanceof Rectangle) {
+            getRectangleIntersection((Rectangle)shape1, fromX1, fromY1, toX1, toY1, (Rectangle)shape2, fromX2, fromY2,
+                toX2, toY2, outIntersection);
+        }
+        else if (shape1 instanceof Circle && shape2 instanceof Rectangle) {
+            getCircleRectangleIntersection((Circle)shape1, fromX1, fromY1, toX1, toY1, (Rectangle)shape2, fromX2,
+                fromY2, toX2, toY2, outIntersection);
+        }
+        else if (shape1 instanceof Rectangle && shape2 instanceof Circle) {
+            getCircleRectangleIntersection((Circle)shape2, fromX2, fromY2, toX2, toY2, (Rectangle)shape1, fromX1,
+                fromY1, toX1, toY1, outIntersection);
+        }
+
+        throw new IllegalArgumentException(
+            format("Unexpected shapes passed in for intersection retrieval: {0} & {1}", shape1.getClass(),
+                shape2.getClass()));
+
     }
 
     private static boolean testCircleIntersection(final Circle circle1, final float x1, final float y1,
@@ -62,6 +91,25 @@ public final class ShapeUtils {
         float radius = circle.getRadius();
 
         return (deltaX * deltaX + deltaY * deltaY) < (radius * radius);
+    }
+
+    private static void getCircleIntersection(final Circle circle1, final float fromX1, final float fromY1,
+        final float toX1, final float toY1, final Circle circle2, final float fromX2, final float fromY2,
+        final float toX2, final float toY2, final Intersection outIntersection) {
+
+    }
+
+    private static void getRectangleIntersection(final Rectangle rect1, final float fromX1, final float fromY1,
+        final float toX1, final float toY1, final Rectangle rect2, final float fromX2, final float fromY2,
+        final float toX2, final float toY2, final Intersection outIntersection) {
+
+    }
+
+    private static void getCircleRectangleIntersection(final Circle circle, final float circleFromX,
+        final float circleFromY, final float circleToX, final float circleToY, final Rectangle rect,
+        final float rectFromX, final float rectFromY, final float rectToX, final float rectToY,
+        final Intersection outIntersection) {
+
     }
 
     private ShapeUtils() {} // Disabled constructor
