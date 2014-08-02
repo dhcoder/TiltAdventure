@@ -10,7 +10,7 @@ public final class Collision implements Poolable {
 
     // Implementation detail - CollisionSystem saves the hashmap key for this collision inside itself. It lets us avoid
     // having to allocate a key every time a new collision occurs.
-    private final Key2<Collider, Collider> key = new Key2<Collider, Collider>();
+    private final ColliderKey key = new ColliderKey();
     private Collider source;
     private Collider target;
 
@@ -29,7 +29,7 @@ public final class Collision implements Poolable {
     }
 
     // Should only be called by CollisionSystem
-    Key2<Collider, Collider> getKey() { return key; }
+    ColliderKey getKey() { return key; }
 
     // Should only be called by CollisionSystem
     void set(final Collider source, final Collider target) {
@@ -38,3 +38,4 @@ public final class Collision implements Poolable {
         key.set(source, target);
     }
 }
+

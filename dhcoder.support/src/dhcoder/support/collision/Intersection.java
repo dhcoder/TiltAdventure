@@ -1,4 +1,4 @@
-package dhcoder.support.math;
+package dhcoder.support.collision;
 
 import dhcoder.support.memory.Poolable;
 
@@ -32,7 +32,7 @@ public final class Intersection implements Poolable {
         this.y = y;
     }
 
-    public int set(final float x, final float y) {
+    public void set(final float x, final float y) {
         this.x = x;
         this.y = y;
     }

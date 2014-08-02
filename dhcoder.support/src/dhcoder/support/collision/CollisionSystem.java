@@ -1,6 +1,5 @@
 package dhcoder.support.collision;
 
-import dhcoder.support.collection.Key2;
 import dhcoder.support.collision.shape.Shape;
 import dhcoder.support.memory.Pool;
 
@@ -30,12 +29,12 @@ public final class CollisionSystem {
 
     private final Pool<Collider> colliderPool;
     private final Pool<Collision> collisionPool;
-    private final Key2<Collider, Collider> reusableKey = new Key2<Collider, Collider>();
+    private final ColliderKey reusableKey = new ColliderKey();
 
     private final int[] collidesWith; // group -> bitmask of groups it collides with
     private final ArrayList<ArrayList<Collider>> groups;
 
-    private final HashMap<Key2, Collision> collisions;
+    private final HashMap<ColliderKey, Collision> collisions;
 
     public CollisionSystem(final int colliderCapacity) {
         colliderPool = Pool.of(Collider.class, colliderCapacity);
@@ -50,7 +49,7 @@ public final class CollisionSystem {
             groups.add(new ArrayList<Collider>(colliderCapacity));
         }
 
-        collisions = new HashMap<Key2, Collision>(colliderCapacity * 2);
+        collisions = new HashMap<ColliderKey, Collision>(colliderCapacity * 2);
     }
 
     public void registerCollidesWith(final int groupId, final int collidesWithMask) {
