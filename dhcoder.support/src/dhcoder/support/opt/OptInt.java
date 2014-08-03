@@ -101,14 +101,14 @@ public final class OptInt implements Poolable {
         OptInt optInt = (OptInt) o;
 
         if (hasValue != optInt.hasValue) return false;
-        if (Integer.compare(optInt.value, value) != 0) return false;
+        if (optInt.value != value) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return hasValue ? Integer.hashCode(value) : 0;
+        return value;
     }
 
     @Override
