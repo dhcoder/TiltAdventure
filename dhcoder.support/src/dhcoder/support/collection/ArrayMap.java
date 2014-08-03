@@ -101,7 +101,7 @@ public final class ArrayMap<K, V> {
 
         // Set initial capacity to be at least large enough so we don't resize unless user puts more keys in than they
         // said they would.
-        capacity = (int)(expectedSize / loadFactor);
+        capacity = (int)(expectedSize / loadFactor + 0.5f); // + 0.5f rounds up so we don't truncate our capacity by 1
         capacity = getNextPrimeSize(capacity);
         initializeStructures();
     }
@@ -201,6 +201,7 @@ public final class ArrayMap<K, V> {
         keys = new ArrayList<K>(capacity);
         values = new ArrayList<V>(capacity);
 
+        size = 0;
         for (int i = 0; i < capacity; ++i) {
             keys.add(null);
             values.add(null);

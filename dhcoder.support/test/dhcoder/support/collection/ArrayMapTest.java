@@ -7,6 +7,50 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 public final class ArrayMapTest {
 
+    private final class HashCollisionItem {
+        private final int value;
+
+        public HashCollisionItem(final int value) {
+            this.value = value;
+        }
+
+        @Override
+        public int hashCode() {
+            return 1;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (!(o instanceof HashCollisionItem)) {
+                return false;
+            }
+
+            return value == ((HashCollisionItem)o).value;
+        }
+    }
+
+    private final class NegativeHashItem {
+        private final int value;
+
+        public NegativeHashItem(final int value) {
+            this.value = value;
+        }
+
+        @Override
+        public int hashCode() {
+            return (value > 0) ? -value : value;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (!(o instanceof NegativeHashItem)) {
+                return false;
+            }
+
+            return value == ((NegativeHashItem)o).value;
+        }
+    }
+
     @Test
     public void createMapWithIntegerKeys() {
         ArrayMap<Integer, String> numericStringMap = new ArrayMap<Integer, String>();
@@ -84,4 +128,88 @@ public final class ArrayMapTest {
 
         assertThat(stringNumericMap.getSize(), equalTo(0));
     }
+
+    @Test
+    public void arrayMapHandlesHashCollisions() {
+        ArrayMap<HashCollisionItem, Integer> hashCollisionMap = new ArrayMap<HashCollisionItem, Integer>();
+
+        for (int i = 0; i < 10; ++i) {
+            hashCollisionMap.put(new HashCollisionItem(i), i);
+            assertThat(hashCollisionMap.getSize(), equalTo(i + 1));
+        }
+
+        for (int i = 0; i < 10; ++i) {
+            assertThat(hashCollisionMap.get(new HashCollisionItem(i)), equalTo(i));
+        }
+
+        for (int i = 9; i >= 0; --i) {
+            assertThat(hashCollisionMap.remove(new HashCollisionItem(i)), equalTo(i));
+            assertThat(hashCollisionMap.getSize(), equalTo(i));
+        }
+    }
+
+    @Test
+    public void arrayMapHandlesNegativeHashCodes() {
+        ArrayMap<NegativeHashItem, Integer> negativeHashMap = new ArrayMap<NegativeHashItem, Integer>();
+
+        for (int i = 0; i < 10; ++i) {
+            negativeHashMap.put(new NegativeHashItem(i), i);
+            assertThat(negativeHashMap.getSize(), equalTo(i + 1));
+        }
+
+        for (int i = 0; i < 10; ++i) {
+            assertThat(negativeHashMap.get(new NegativeHashItem(i)), equalTo(i));
+        }
+
+        for (int i = 9; i >= 0; --i) {
+            assertThat(negativeHashMap.remove(new NegativeHashItem(i)), equalTo(i));
+            assertThat(negativeHashMap.getSize(), equalTo(i));
+        }
+    }
+
+    @Test
+    public void arrayMapHandlesGrowingCorrectly() {
+        ArrayMap<Integer, Integer> numericMap = new ArrayMap<Integer, Integer>(1);
+
+        for (int i = 0; i < 10000; ++i) {
+            numericMap.put(i, i);
+            assertThat(numericMap.getSize(), equalTo(i + 1));
+        }
+
+        for (int i = 0; i < 10000; ++i) {
+            assertThat(numericMap.get(i), equalTo(i));
+        }
+    }
+
+    @Test
+    public void removingElementsDoesntBreakProbing() {
+        ArrayMap<HashCollisionItem, Integer> hashCollisionMap = new ArrayMap<HashCollisionItem, Integer>();
+
+        for (int i = 0; i < 10; ++i) {
+            hashCollisionMap.put(new HashCollisionItem(i), i);
+        }
+
+        for (int i = 0; i < 5; ++i) {
+            hashCollisionMap.remove(new HashCollisionItem(i));
+        }
+
+        for (int i = 0; i < 5; ++i) {
+            assertThat(hashCollisionMap.containsKey(new HashCollisionItem(i)), equalTo(false));
+        }
+
+        for (int i = 5; i < 10; ++i) {
+            // We can still find items added later into the map even when earlier items were removed
+            assertThat(hashCollisionMap.get(new HashCollisionItem(i)), equalTo(i));
+        }
+
+        for (int i = 0; i < 5; ++i) {
+            // We can put back the items, and they should reuse existing slots
+            hashCollisionMap.put(new HashCollisionItem(i), i);
+        }
+
+        for (int i = 0; i < 10; ++i) {
+            assertThat(hashCollisionMap.containsKey(new HashCollisionItem(i)), equalTo(true));
+        }
+    }
+
 }
