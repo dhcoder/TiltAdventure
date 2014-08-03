@@ -1,4 +1,4 @@
-package tiltadv.entity.components.data;
+package tiltadv.entity.components.input;
 
 import com.badlogic.gdx.math.Vector2;
 import tiltadv.entity.AbstractComponent;

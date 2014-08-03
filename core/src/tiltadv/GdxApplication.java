@@ -9,23 +9,25 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import dhcoder.support.collision.CollisionSystem;
+import dhcoder.support.collision.shape.Circle;
 import dhcoder.support.math.Angle;
 import dhcoder.support.time.Duration;
+import tiltadv.constants.Tiles;
 import tiltadv.entity.Component;
 import tiltadv.entity.Entity;
 import tiltadv.entity.components.behavior.PlayerBehaviorComponent;
-import tiltadv.entity.components.data.MotionComponent;
-import tiltadv.entity.components.data.SizeComponent;
-import tiltadv.entity.components.data.TiltComponent;
-import tiltadv.entity.components.data.TransformComponent;
+import tiltadv.entity.components.collision.ObstacleCollisionComponent;
+import tiltadv.entity.components.collision.PlayerCollisionComponent;
 import tiltadv.entity.components.display.FpsDisplayComponent;
 import tiltadv.entity.components.display.PlayerDisplayComponent;
 import tiltadv.entity.components.display.SpriteComponent;
 import tiltadv.entity.components.display.TiltDisplayComponent;
 import tiltadv.entity.components.input.AccelerometerComponent;
 import tiltadv.entity.components.input.KeyboardComponent;
-import tiltadv.constants.Group;
-import tiltadv.constants.Tiles;
+import tiltadv.entity.components.input.TiltComponent;
+import tiltadv.entity.components.model.MotionComponent;
+import tiltadv.entity.components.model.SizeComponent;
+import tiltadv.entity.components.model.TransformComponent;
 import tiltadv.memory.Pools;
 
 import java.util.ArrayList;
@@ -40,8 +42,9 @@ public final class GdxApplication extends ApplicationAdapter {
     private static final int VIEWPORT_WIDTH = 320;
 
     // When you hit a breakpoint while debugging an app, this causes the delta time to be huge between the next frame
-    // and this one. Clamping to a reasonable max value works around this issue.
-    private static final float MAX_DELTA_TIME_SECS = .5f;
+    // and this one. Clamping to a reasonable max value works around this issue. A max here also prevents physics update
+    // logic from dealing with time steps that are too large (at which point, objects start going through walls, etc.)
+    private static final float MAX_DELTA_TIME_SECS = 1f / 20f;
 
     private BitmapFont font;
     private OrthographicCamera camera;
@@ -55,22 +58,8 @@ public final class GdxApplication extends ApplicationAdapter {
         camera = new OrthographicCamera(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
         batch = new SpriteBatch();
         font = new BitmapFont();
-
-        entities = new ArrayList<Entity>();
-        Entity playerEntity = AddPlayerEntity();
-
         initializeServices();
-
-        int numRocks = 12;
-        for (int i = 0; i < numRocks; ++i) {
-            float circleDistance = (float)i / (float)numRocks * Angle.TWO_PI;
-            float xScale = 120;
-            float yScale = 90;
-            AddRockEntity(xScale * cos(circleDistance), yScale * sin(circleDistance));
-        }
-
-        AddTiltIndicatorEntity(playerEntity);
-        AddFpsEntity();
+        initializeEntities();
     }
 
     @Override
@@ -101,20 +90,35 @@ public final class GdxApplication extends ApplicationAdapter {
 
     private void initializeServices() {
         collisionSystem = new CollisionSystem(200);
-        collisionSystem.registerCollidesWith(Group.PLAYER, Group.OBSTACLES);
         Services.register(CollisionSystem.class, collisionSystem);
+    }
+
+    private void initializeEntities() {
+        entities = new ArrayList<Entity>();
+        Entity playerEntity = AddPlayerEntity();
+
+        int numRocks = 150;
+        for (int i = 0; i < numRocks; ++i) {
+            float circleDistance = (float)i / (float)numRocks * Angle.TWO_PI;
+            float xScale = 120;
+            float yScale = 90;
+            AddRockEntity(xScale * cos(circleDistance), yScale * sin(circleDistance));
+        }
+
+        AddTiltIndicatorEntity(playerEntity);
+        AddFpsEntity();
     }
 
     private void update() {
         {
-            Duration elapsedTime = Pools.duration.grabNew();
+            Duration elapsedTime = Pools.durations.grabNew();
             elapsedTime.setSeconds(Math.min(Gdx.graphics.getRawDeltaTime(), MAX_DELTA_TIME_SECS));
 
             int numEntities = entities.size(); // Simple iteration to avoid Iterator allocation
             for (int i = 0; i < numEntities; ++i) {
                 entities.get(i).update(elapsedTime);
             }
-            Pools.duration.free(elapsedTime);
+            Pools.durations.free(elapsedTime);
         }
         collisionSystem.triggerCollisions();
 
@@ -143,6 +147,7 @@ public final class GdxApplication extends ApplicationAdapter {
             new KeyboardComponent());
         components.add(new PlayerBehaviorComponent());
         components.add(new PlayerDisplayComponent(animUp, animDown, animLeft, animRight));
+        components.add(new PlayerCollisionComponent(new Circle(Tiles.PLAYERUP1.getWidth() / 2)));
 
         Entity playerEntity = new Entity(components);
         entities.add(playerEntity);
@@ -155,6 +160,7 @@ public final class GdxApplication extends ApplicationAdapter {
         components.add(new SpriteComponent(Tiles.ROCK));
         components.add(SizeComponent.from(Tiles.ROCK));
         components.add(new TransformComponent.Builder().setTranslate(x, y).build());
+        components.add(new ObstacleCollisionComponent(new Circle(Tiles.ROCK.getWidth() / 2)));
         entities.add(new Entity(components));
     }
 

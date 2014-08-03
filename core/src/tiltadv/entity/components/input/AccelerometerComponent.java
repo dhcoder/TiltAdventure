@@ -5,7 +5,6 @@ import com.badlogic.gdx.math.Vector2;
 import dhcoder.support.time.Duration;
 import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;
-import tiltadv.entity.components.data.TiltComponent;
 import tiltadv.memory.Pools;
 
 /**
@@ -30,13 +29,13 @@ public final class AccelerometerComponent extends AbstractComponent {
         // Convert portrait accelerometer directions to landscape
         // See https://github.com/libgdx/libgdx/wiki/Accelerometer
         {
-            Vector2 tilt = Pools.vector.grabNew();
+            Vector2 tilt = Pools.vectors.grabNew();
             tilt.set(Gdx.input.getAccelerometerY(), -Gdx.input.getAccelerometerX());
             if (tilt.isZero(TILT_THRESHOLD)) {
                 tilt.setZero();
             }
             tiltComponent.setTilt(tilt);
-            Pools.vector.free(tilt);
+            Pools.vectors.free(tilt);
         }
     }
 }

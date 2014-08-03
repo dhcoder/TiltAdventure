@@ -1,4 +1,4 @@
-package tiltadv.entity.components.data;
+package tiltadv.entity.components.model;
 
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.support.math.Angle;

@@ -7,8 +7,8 @@ import com.badlogic.gdx.math.Vector2;
 import dhcoder.support.math.Angle;
 import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;
-import tiltadv.entity.components.data.SizeComponent;
-import tiltadv.entity.components.data.TransformComponent;
+import tiltadv.entity.components.model.SizeComponent;
+import tiltadv.entity.components.model.TransformComponent;
 
 /**
  * A component that encapsulates the logic of rendering a sprite.

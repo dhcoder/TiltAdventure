@@ -36,8 +36,8 @@ public final class CollisionSystemTest {
 
         CollisionListener listenerA = new CollisionListener();
         CollisionListener listenerB = new CollisionListener();
-        colliderA.onCollision.addListener(listenerA);
-        colliderB.onCollision.addListener(listenerB);
+        colliderA.onCollided.addListener(listenerA);
+        colliderB.onCollided.addListener(listenerB);
 
         // First, affirm these shapes would obviously collide being at the origin
         assertThat(testIntersection(new Circle(4), 0, 0, new Circle(5), 0, 0), equalTo(true));
@@ -79,8 +79,8 @@ public final class CollisionSystemTest {
 
         CollisionListener listenerA = new CollisionListener();
         CollisionListener listenerB = new CollisionListener();
-        colliderA.onCollision.addListener(listenerA);
-        colliderB.onCollision.addListener(listenerB);
+        colliderA.onCollided.addListener(listenerA);
+        colliderB.onCollided.addListener(listenerB);
 
         collisionSystem.triggerCollisions();
         assertThat(listenerA.getCollisionCount(), equalTo(0));
@@ -103,8 +103,8 @@ public final class CollisionSystemTest {
 
         CollisionListener listenerA = new CollisionListener();
         CollisionListener listenerB = new CollisionListener();
-        colliderA.onCollision.addListener(listenerA);
-        colliderB.onCollision.addListener(listenerB);
+        colliderA.onCollided.addListener(listenerA);
+        colliderB.onCollided.addListener(listenerB);
 
         collisionSystem.triggerCollisions();
         assertThat(listenerA.getCollisionCount(), equalTo(0));
@@ -128,8 +128,8 @@ public final class CollisionSystemTest {
 
         CollisionListener listenerA = new CollisionListener();
         CollisionListener listenerB = new CollisionListener();
-        colliderA.onCollision.addListener(listenerA);
-        colliderB.onCollision.addListener(listenerB);
+        colliderA.onCollided.addListener(listenerA);
+        colliderB.onCollided.addListener(listenerB);
 
         collisionSystem.triggerCollisions();
         assertThat(listenerA.getCollisionCount(), equalTo(0));
@@ -152,8 +152,8 @@ public final class CollisionSystemTest {
 
         CollisionListener listenerA = new CollisionListener();
         CollisionListener listenerB = new CollisionListener();
-        colliderA.onCollision.addListener(listenerA);
-        colliderB.onCollision.addListener(listenerB);
+        colliderA.onCollided.addListener(listenerA);
+        colliderB.onCollided.addListener(listenerB);
 
         collisionSystem.triggerCollisions();
         assertThat(listenerA.getCollisionCount(), equalTo(1));

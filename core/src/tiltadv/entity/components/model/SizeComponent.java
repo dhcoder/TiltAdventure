@@ -1,6 +1,5 @@
-package tiltadv.entity.components.data;
+package tiltadv.entity.components.model;
 
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import tiltadv.entity.AbstractComponent;

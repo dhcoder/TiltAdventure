@@ -1,14 +1,13 @@
 package tiltadv.entity.components.display;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.support.math.Angle;
 import dhcoder.support.time.Duration;
 import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;
-import tiltadv.entity.components.data.TiltComponent;
-import tiltadv.entity.components.data.TransformComponent;
+import tiltadv.entity.components.input.TiltComponent;
+import tiltadv.entity.components.model.TransformComponent;
 import tiltadv.memory.Pools;
 
 /**
@@ -50,10 +49,10 @@ public final class TiltDisplayComponent extends AbstractComponent {
 
         spriteComponent.setHidden(false);
         {
-            Angle angle = Pools.angle.grabNew();
+            Angle angle = Pools.angles.grabNew();
             angle.setDegrees(tilt.angle());
             transformComponent.setRotation(angle);
-            Pools.angle.free(angle);
+            Pools.angles.free(angle);
         }
     }
 }

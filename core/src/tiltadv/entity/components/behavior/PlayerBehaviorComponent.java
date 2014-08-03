@@ -4,8 +4,8 @@ import com.badlogic.gdx.math.Vector2;
 import dhcoder.support.time.Duration;
 import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;
-import tiltadv.entity.components.data.MotionComponent;
-import tiltadv.entity.components.data.TiltComponent;
+import tiltadv.entity.components.model.MotionComponent;
+import tiltadv.entity.components.input.TiltComponent;
 import tiltadv.memory.Pools;
 
 /**
@@ -31,10 +31,10 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
 
         if (!tilt.isZero()) {
             {
-                Vector2 velocity = Pools.vector.grabNew();
+                Vector2 velocity = Pools.vectors.grabNew();
                 velocity.set(tilt.x * TILT_MULTIPLIER, tilt.y * TILT_MULTIPLIER);
                 motionComponent.setVelocity(velocity);
-                Pools.vector.free(velocity);
+                Pools.vectors.free(velocity);
             }
             isMoving = true;
         }

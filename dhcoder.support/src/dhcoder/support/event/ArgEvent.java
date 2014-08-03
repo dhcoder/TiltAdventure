@@ -23,7 +23,9 @@ public final class ArgEvent<T extends EventArgs> {
      * Fire this event, triggering all listeners.
      */
     public void fire(final Object sender, final T args) {
-        for (ArgEventListener<T> listener : listeners) {
+        int numListeners = listeners.size();
+        for (int i = 0; i < numListeners; ++i) {
+            ArgEventListener<T> listener = listeners.get(i);
             listener.run(sender, args);
         }
     }

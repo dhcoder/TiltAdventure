@@ -2,8 +2,6 @@ package dhcoder.support.collision;
 
 import dhcoder.support.collision.shape.Shape;
 import dhcoder.support.event.ArgEvent;
-import dhcoder.support.event.Event;
-import dhcoder.support.event.EventArgs;
 import dhcoder.support.memory.Pool;
 import dhcoder.support.memory.Poolable;
 
@@ -16,7 +14,9 @@ public final class Collider implements Poolable {
 
     private static Pool<CollisionEventArgs> collisionEventArgsPool = Pool.of(CollisionEventArgs.class, 1);
 
-    public final ArgEvent<CollisionEventArgs> onCollision = new ArgEvent<CollisionEventArgs>();
+    public final ArgEvent<CollisionEventArgs> onCollided = new ArgEvent<CollisionEventArgs>();
+    public final ArgEvent<CollisionEventArgs> onSeparated = new ArgEvent<CollisionEventArgs>();
+
     private boolean isActive;
     private float lastX, lastY;
     private float currX, currY;
@@ -55,7 +55,7 @@ public final class Collider implements Poolable {
     public void reset() {
         shape = null;
         groupIndex = -1;
-        onCollision.clearListeners();
+        onCollided.clearListeners();
         isActive = false;
     }
 
@@ -79,12 +79,22 @@ public final class Collider implements Poolable {
     }
 
     void fireCollision(final Collision collision) {
-        if (onCollision.hasListeners()) {
+        if (onCollided.hasListeners()) {
             CollisionEventArgs args = collisionEventArgsPool.grabNew();
             args.setCollision(collision);
-            onCollision.fire(this, args);
+            onCollided.fire(this, args);
             collisionEventArgsPool.free(args);
         }
     }
+
+    void fireSeparation(final Collision collision) {
+        if (onSeparated.hasListeners()) {
+            CollisionEventArgs args = collisionEventArgsPool.grabNew();
+            args.setCollision(collision);
+            onSeparated.fire(this, args);
+            collisionEventArgsPool.free(args);
+        }
+    }
+
 }
 

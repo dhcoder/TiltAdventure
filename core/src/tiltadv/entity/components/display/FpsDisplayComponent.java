@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import dhcoder.support.time.Duration;
 import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;
-import tiltadv.entity.components.data.TransformComponent;
+import tiltadv.entity.components.model.TransformComponent;
 
 import static dhcoder.support.utils.StringUtils.format;
 

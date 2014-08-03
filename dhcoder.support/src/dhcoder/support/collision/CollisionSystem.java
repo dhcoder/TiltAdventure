@@ -1,5 +1,6 @@
 package dhcoder.support.collision;
 
+import dhcoder.support.collection.ArrayMap;
 import dhcoder.support.collision.shape.Shape;
 import dhcoder.support.memory.Pool;
 
@@ -18,7 +19,7 @@ import static dhcoder.support.utils.StringUtils.format;
  * int)} after creating it, or else nothing will collide with anything.
  * <p/>
  * Each registration method returns a {@link Collider} which you use to listen for collisions (by adding a
- * listener to {@link Collider#onCollision} and to update the position of the shapes.
+ * listener to {@link Collider#onCollided} and to update the position of the shapes.
  * <p/>
  * Finally, call {@link #triggerCollisions()} to cause the manager to run through all items and fire the events for
  * any that collided.
@@ -34,7 +35,7 @@ public final class CollisionSystem {
     private final int[] collidesWith; // group -> bitmask of groups it collides with
     private final ArrayList<ArrayList<Collider>> groups;
 
-    private final HashMap<ColliderKey, Collision> collisions;
+    private final ArrayMap<ColliderKey, Collision> collisions;
 
     public CollisionSystem(final int colliderCapacity) {
         colliderPool = Pool.of(Collider.class, colliderCapacity);
@@ -42,14 +43,13 @@ public final class CollisionSystem {
         // subset of n² to save memory but we may adjust this when we see the number of collisionPool in the wild.
         int collisionCapacity = colliderCapacity * 2;
         collisionPool = Pool.of(Collision.class, collisionCapacity);
+        collisions = new ArrayMap<ColliderKey, Collision>(collisionCapacity);
 
         collidesWith = new int[NUM_GROUPS];
         groups = new ArrayList<ArrayList<Collider>>(NUM_GROUPS);
         for (int i = 0; i < NUM_GROUPS; ++i) {
             groups.add(new ArrayList<Collider>(colliderCapacity));
         }
-
-        collisions = new HashMap<ColliderKey, Collision>(colliderCapacity * 2);
     }
 
     public void registerCollidesWith(final int groupId, final int collidesWithMask) {
@@ -89,14 +89,16 @@ public final class CollisionSystem {
                                     collision = collisionPool.grabNew();
                                     collision.set(colliderSource, colliderTarget);
                                     collisions.put(collision.getKey(), collision);
+                                    boolean debugTest = collisions.containsKey(reusableKey);
+                                    colliderSource.fireCollision(collision);
                                 } else {
-                                    collision = collisions.get(reusableKey);
+                                    // collision = collisions.get(reusableKey);
+                                    // Report continued collision?
                                 }
-                                colliderSource.fireCollision(collision);
                             } else if (collisions.containsKey(reusableKey)) {
                                 Collision collision = collisions.remove(reusableKey);
+                                colliderSource.fireSeparation(collision);
                                 collisionPool.free(collision);
-                                // TODO: Add 'fireSeparation' event and test it!
                             }
                         }
                     }

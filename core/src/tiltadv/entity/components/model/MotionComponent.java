@@ -1,7 +1,6 @@
-package tiltadv.entity.components.data;
+package tiltadv.entity.components.model;
 
 import com.badlogic.gdx.math.Vector2;
-import dhcoder.support.memory.Pool;
 import dhcoder.support.time.Duration;
 import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;
@@ -61,11 +60,11 @@ public final class MotionComponent extends AbstractComponent {
 
         // Adjust current position based on how much velocity was applied over the last time range
         {
-            Vector2 translate = Pools.vector.grabNew();
+            Vector2 translate = Pools.vectors.grabNew();
             translate.set(transformComponent.getTranslate());
             translate.mulAdd(velocity, elapsedTime.getSeconds());
             transformComponent.setTranslate(translate);
-            Pools.vector.free(translate);
+            Pools.vectors.free(translate);
         }
 
     }
