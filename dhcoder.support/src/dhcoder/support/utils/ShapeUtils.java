@@ -49,10 +49,6 @@ public final class ShapeUtils {
 
         CollisionAgent agent = getCollisionAgent(shape1, shape2);
         agent.getIntersection(shape1, fromX1, fromY1, toX1, toY1, shape2, fromX2, fromY2, toX2, toY2, outIntersection);
-
-        throw new IllegalArgumentException(
-            format("Unexpected shapes passed in for intersection retrieval: {0} & {1}", shape1.getClass(),
-                shape2.getClass()));
     }
 
     private static CollisionAgent getCollisionAgent(final Shape shape1, final Shape shape2) {
