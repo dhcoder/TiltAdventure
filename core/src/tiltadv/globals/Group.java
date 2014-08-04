@@ -1,4 +1,4 @@
-package tiltadv.constants;
+package tiltadv.globals;
 
 /**
  * Collection of collision groups.

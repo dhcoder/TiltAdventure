@@ -1,4 +1,4 @@
-package tiltadv.constants;
+package tiltadv.globals;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
  */
 public final class Tiles {
 
-    private static Texture texture;
+    private static final Texture texture;
 
     public static final Sprite PLAYERUP1;
     public static final Sprite PLAYERUP2;

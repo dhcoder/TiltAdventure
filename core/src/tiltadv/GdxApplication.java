@@ -12,7 +12,6 @@ import dhcoder.support.collision.CollisionSystem;
 import dhcoder.support.collision.shape.Circle;
 import dhcoder.support.math.Angle;
 import dhcoder.support.time.Duration;
-import tiltadv.constants.Tiles;
 import tiltadv.entity.Component;
 import tiltadv.entity.Entity;
 import tiltadv.entity.components.behavior.PlayerBehaviorComponent;
@@ -28,6 +27,7 @@ import tiltadv.entity.components.input.TiltComponent;
 import tiltadv.entity.components.model.MotionComponent;
 import tiltadv.entity.components.model.SizeComponent;
 import tiltadv.entity.components.model.TransformComponent;
+import tiltadv.globals.Tiles;
 import tiltadv.memory.Pools;
 
 import java.util.ArrayList;
@@ -97,7 +97,7 @@ public final class GdxApplication extends ApplicationAdapter {
         entities = new ArrayList<Entity>();
         Entity playerEntity = AddPlayerEntity();
 
-        int numRocks = 150;
+        int numRocks = 7;
         for (int i = 0; i < numRocks; ++i) {
             float circleDistance = (float)i / (float)numRocks * Angle.TWO_PI;
             float xScale = 120;
