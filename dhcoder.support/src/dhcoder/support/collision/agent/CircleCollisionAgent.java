@@ -13,7 +13,7 @@ import static dhcoder.support.utils.MathUtils.clamp;
  */
 public final class CircleCollisionAgent implements CollisionAgent {
 
-    Pool<Vec2> vecPool = Pool.of(Vec2.class, 4);
+    Pool<Vec2> vecPool = Pool.of(Vec2.class, 3);
 
     @Override
     public boolean testIntersection(final Shape shape1, final float x1, final float y1, final Shape shape2,
@@ -41,8 +41,8 @@ public final class CircleCollisionAgent implements CollisionAgent {
         Circle circle2 = (Circle)shape2;
 
         // The algorithm below calculates what percentage of the circle's motion is spent collided and, by extension,
-        // not collided. From that, we reset the circles to their start point and move them just the percentage of the
-        // way to before collision.
+        // not collided. From that, we reset the circles to their start point and then move them just the percentage
+        // of the way to before collision.
 
         // Simplify the problem by looking at this problem from circle1's frame of reference, so we only have to worry
         // about the motion of a single body.
@@ -53,6 +53,8 @@ public final class CircleCollisionAgent implements CollisionAgent {
         velCircle2.set(toX2 - fromX2, toY2 - fromY2);
         velRelCircle2.set(velCircle2);
         velRelCircle2.sub(velCircle1); // Circle2's speed relative to Circle1
+        vecPool.free(velCircle1);
+        vecPool.free(velCircle2);
 
         // Figure out how far circle2 penetrated circle1 by comparing the actual distance between the two circles vs.
         // their radii.
@@ -66,8 +68,6 @@ public final class CircleCollisionAgent implements CollisionAgent {
         collidedPercentage = clamp(collidedPercentage, 0f, 1f); // Clamp needed because of floating point precision
         float separatedPercentage = 1f - collidedPercentage;
 
-        vecPool.free(velCircle1);
-        vecPool.free(velCircle2);
         vecPool.free(velRelCircle2);
         vecPool.free(circleDistance);
 
