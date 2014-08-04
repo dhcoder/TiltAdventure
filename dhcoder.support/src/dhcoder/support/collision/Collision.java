@@ -1,7 +1,9 @@
 package dhcoder.support.collision;
 
-import dhcoder.support.collection.Key2;
+import dhcoder.support.memory.Pool;
 import dhcoder.support.memory.Poolable;
+
+import static dhcoder.support.utils.ShapeUtils.getIntersection;
 
 /**
  * Information about the point of impact between two {@link Collider}s.

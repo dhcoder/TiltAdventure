@@ -1,5 +1,6 @@
 package tiltadv.entity.components.collision;
 
+import com.badlogic.gdx.math.Vector2;
 import dhcoder.support.collision.Collider;
 import dhcoder.support.collision.Collision;
 import dhcoder.support.collision.CollisionEventArgs;
@@ -11,6 +12,7 @@ import tiltadv.Services;
 import tiltadv.entity.AbstractComponent;
 import tiltadv.entity.Entity;
 import tiltadv.entity.components.model.TransformComponent;
+import tiltadv.memory.Pools;
 
 /**
  * Component that checks if this {@link Entity} collides with any other {@link Entity} that also has a collision
@@ -54,6 +56,23 @@ public abstract class CollisionComponent extends AbstractComponent {
     public final void dispose() {
         CollisionSystem collisionSystem = Services.get(CollisionSystem.class);
         collisionSystem.release(collider);
+    }
+
+    /**
+     * Sync the current entity's location with what the collision system says it should be.
+     * <p/>
+     * Normally, the collision system simply mirrors the location of an entity. But occasionally, it talks back,
+     * saying that an entity shouldn't have moved where it did. In this case, we need to communicate that information
+     * back to the entity.
+     * <p/>
+     * Subclasses should call this method any time our collider has changed in a way that the associated entity should
+     * conform to.
+     */
+    protected final void syncEntityWithCollisionSystem() {
+        Vector2 translate = Pools.vectors.grabNew();
+        translate.set(collider.getCurrX(), collider.getCurrY());
+        transformComponent.setTranslate(translate);
+        Pools.vectors.free(translate);
     }
 
     protected void handleCollided(final Collision collision) {}

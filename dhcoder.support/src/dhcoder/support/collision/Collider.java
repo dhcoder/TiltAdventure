@@ -12,7 +12,7 @@ import static dhcoder.support.utils.ShapeUtils.testIntersection;
  */
 public final class Collider implements Poolable {
 
-    private static Pool<CollisionEventArgs> collisionEventArgsPool = Pool.of(CollisionEventArgs.class, 1);
+    private static final Pool<CollisionEventArgs> collisionEventArgsPool = Pool.of(CollisionEventArgs.class, 1);
 
     public final ArgEvent<CollisionEventArgs> onCollided = new ArgEvent<CollisionEventArgs>();
     public final ArgEvent<CollisionEventArgs> onSeparated = new ArgEvent<CollisionEventArgs>();
@@ -21,7 +21,7 @@ public final class Collider implements Poolable {
     private float lastX, lastY;
     private float currX, currY;
     private Shape shape;
-    private int groupIndex;
+    private int groupId;
 
     public boolean isActive() {
         return isActive;
@@ -31,8 +31,24 @@ public final class Collider implements Poolable {
         return shape;
     }
 
-    public int getGroupIndex() {
-        return groupIndex;
+    public int getGroupId() {
+        return groupId;
+    }
+
+    public float getLastX() {
+        return lastX;
+    }
+
+    public float getLastY() {
+        return lastY;
+    }
+
+    public float getCurrX() {
+        return currX;
+    }
+
+    public float getCurrY() {
+        return currY;
     }
 
     public void updatePosition(final float x, final float y) {
@@ -46,6 +62,7 @@ public final class Collider implements Poolable {
             lastX = x;
             lastY = y;
         }
+
     }
 
     // Should only be called by CollisionSystem
@@ -54,7 +71,7 @@ public final class Collider implements Poolable {
     @Override
     public void reset() {
         shape = null;
-        groupIndex = -1;
+        groupId = -1;
         onCollided.clearListeners();
         isActive = false;
     }
@@ -63,8 +80,8 @@ public final class Collider implements Poolable {
      * Initialize this collider with its shape. However, the collider won't be active until you call {@link
      * #updatePosition(float, float)} for the first time.
      */
-    void initialize(final int groupIndex, final Shape shape) {
-        this.groupIndex = groupIndex;
+    void initialize(final int groupId, final Shape shape) {
+        this.groupId = groupId;
         this.shape = shape;
         isActive = false;
     }
@@ -78,6 +95,7 @@ public final class Collider implements Poolable {
         return testIntersection(shape, currX, currY, otherCollider.shape, otherCollider.currX, otherCollider.currY);
     }
 
+    // Should only be called by CollisionSystem
     void fireCollision(final Collision collision) {
         if (onCollided.hasListeners()) {
             CollisionEventArgs args = collisionEventArgsPool.grabNew();
@@ -87,6 +105,7 @@ public final class Collider implements Poolable {
         }
     }
 
+    // Should only be called by CollisionSystem
     void fireSeparation(final Collision collision) {
         if (onSeparated.hasListeners()) {
             CollisionEventArgs args = collisionEventArgsPool.grabNew();
@@ -94,6 +113,14 @@ public final class Collider implements Poolable {
             onSeparated.fire(this, args);
             collisionEventArgsPool.free(args);
         }
+    }
+
+    // Should only be called by Collision
+    // Used to rewrite history, telling the collider that it didn't really go to where it thought it did...
+    // This is useful, for example, to pop a shape out after it penetrated an object that should be solid.
+    void fixCurrentPosition(final float currX, final float currY) {
+        this.currX = currX;
+        this.currY = currY;
     }
 
 }

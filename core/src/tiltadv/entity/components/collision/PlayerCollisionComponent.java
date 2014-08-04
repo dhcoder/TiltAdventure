@@ -1,6 +1,5 @@
 package tiltadv.entity.components.collision;
 
-import com.badlogic.gdx.Gdx;
 import dhcoder.support.collision.Collision;
 import dhcoder.support.collision.CollisionSystem;
 import dhcoder.support.collision.shape.Shape;
@@ -23,9 +22,10 @@ public final class PlayerCollisionComponent extends CollisionComponent {
 
     @Override
     protected void handleCollided(final Collision collision) {
-    }
-
-    @Override
-    protected void handleSeparated(final Collision collision) {
+        if (collision.getTarget().getGroupId() == Group.OBSTACLES) {
+            CollisionSystem collisionSystem = Services.get(CollisionSystem.class);
+            collisionSystem.separateSourceFromCollision(collision);
+            syncEntityWithCollisionSystem();
+        }
     }
 }

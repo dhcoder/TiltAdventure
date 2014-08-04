@@ -5,9 +5,9 @@ import dhcoder.support.collision.shape.Shape;
 import dhcoder.support.memory.Pool;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import static dhcoder.support.utils.ListUtils.swapToEndAndRemove;
+import static dhcoder.support.utils.ShapeUtils.getIntersection;
 import static dhcoder.support.utils.StringUtils.format;
 
 /**
@@ -30,7 +30,8 @@ public final class CollisionSystem {
 
     private final Pool<Collider> colliderPool;
     private final Pool<Collision> collisionPool;
-    private final ColliderKey reusableKey = new ColliderKey();
+    private final Pool<ColliderKey> colliderKeyPool = Pool.of(ColliderKey.class, 1);
+    private final Pool<Intersection> intersectionPool = Pool.of(Intersection.class, 1);
 
     private final int[] collidesWith; // group -> bitmask of groups it collides with
     private final ArrayList<ArrayList<Collider>> groups;
@@ -64,13 +65,14 @@ public final class CollisionSystem {
         int groupIndex = groupIdToIndex(groupId);
 
         Collider collider = colliderPool.grabNew();
-        collider.initialize(groupIndex, shape);
+        collider.initialize(groupId, shape);
         groups.get(groupIndex).add(collider);
 
         return collider;
     }
 
     public void triggerCollisions() {
+        ColliderKey key = colliderKeyPool.grabNew();
         for (int groupSourceIndex = 0; groupSourceIndex < NUM_GROUPS; ++groupSourceIndex) {
             ArrayList<Collider> groupSource = groups.get(groupSourceIndex);
             int groupSourceSize = groupSource.size();
@@ -82,21 +84,21 @@ public final class CollisionSystem {
                         Collider colliderSource = groupSource.get(colliderSourceIndex);
                         for (int colliderTargetIndex = 0; colliderTargetIndex < groupTargetSize; ++colliderTargetIndex) {
                             Collider colliderTarget = groupTarget.get(colliderTargetIndex);
-                            reusableKey.set(colliderSource, colliderTarget);
+                            key.set(colliderSource, colliderTarget);
                             if (colliderSource.collidesWith(colliderTarget)) {
                                 Collision collision;
-                                if (!collisions.containsKey(reusableKey)) {
+                                if (!collisions.containsKey(key)) {
                                     collision = collisionPool.grabNew();
                                     collision.set(colliderSource, colliderTarget);
                                     collisions.put(collision.getKey(), collision);
-                                    boolean debugTest = collisions.containsKey(reusableKey);
+                                    boolean debugTest = collisions.containsKey(key);
                                     colliderSource.fireCollision(collision);
                                 } else {
-                                    // collision = collisions.get(reusableKey);
+                                    // collision = collisions.get(key);
                                     // Report continued collision?
                                 }
-                            } else if (collisions.containsKey(reusableKey)) {
-                                Collision collision = collisions.remove(reusableKey);
+                            } else if (collisions.containsKey(key)) {
+                                Collision collision = collisions.remove(key);
                                 colliderSource.fireSeparation(collision);
                                 collisionPool.free(collision);
                             }
@@ -105,6 +107,7 @@ public final class CollisionSystem {
                 }
             }
         }
+        colliderKeyPool.free(key);
     }
 
     public void release(final Collider collider) {
@@ -121,7 +124,8 @@ public final class CollisionSystem {
     }
 
     private void removeFromGroup(final Collider collider) {
-        ArrayList<Collider> group = groups.get(collider.getGroupIndex());
+        int groupIndex = groupIdToIndex(collider.getGroupId());
+        ArrayList<Collider> group = groups.get(groupIndex);
         swapToEndAndRemove(group, collider);
     }
 
@@ -140,5 +144,21 @@ public final class CollisionSystem {
         int targetGroupMask = 1 << targetGroupIndex;
 
         return (collidesWithMask & targetGroupMask) != 0;
+    }
+
+    public void separateSourceFromCollision(final Collision collision) {
+
+        Intersection intersection = intersectionPool.grabNew();
+        Collider source = collision.getSource();
+        Collider target = collision.getTarget();
+        getIntersection(source.getShape(), source.getLastX(), source.getLastY(), source.getCurrX(), source.getCurrY(),
+            target.getShape(), target.getLastX(), target.getLastY(), target.getCurrX(), target.getCurrY(),
+            intersection);
+
+        source.fixCurrentPosition(intersection.getX(), intersection.getY());
+        intersectionPool.free(intersection);
+
+        collisions.remove(collision.getKey());
+        collisionPool.free(collision);
     }
 }
