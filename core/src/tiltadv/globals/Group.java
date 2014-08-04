@@ -1,7 +1,9 @@
 package tiltadv.globals;
 
+import dhcoder.support.collision.CollisionSystem;
+
 /**
- * Collection of collision groups.
+ * Collection of collision groups. See also {@link CollisionSystem}.
  */
 public final class Group {
     public static final int OBSTACLES = 1 << 0;
