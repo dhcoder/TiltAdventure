@@ -122,9 +122,8 @@ public final class CollisionSystem {
 
     /**
      * Given a collision, extract the source collider to a position just before it would have collided.
-     * @param collision
      */
-    public void separateSourceFromCollision(final Collision collision) {
+    public void moveSourceToAvoidCollision(final Collision collision) {
 
         Intersection intersection = intersectionPool.grabNew();
         Collider source = collision.getSource();
@@ -134,15 +133,14 @@ public final class CollisionSystem {
             intersection);
 
         Vec2 finalPosition = vecPool.grabNew();
-        finalPosition.set(intersection.getSourceX(), intersection.getSourceY());
-        finalPosition.add(intersection.getNormalX(), intersection.getNormalY());
-
+        finalPosition.set(intersection.getSourcePosition());
+        finalPosition.add(intersection.getNormalForce());
         source.fixCurrentPosition(finalPosition.getX(), finalPosition.getY());
-        //source.fixCurrentPosition(intersection.getSourceX(), intersection.getSourceY());
-
         vecPool.free(finalPosition);
+
         intersectionPool.free(intersection);
 
+        // This collision never happened... remove it quietly...
         collisions.remove(collision.getKey());
         collisionPool.free(collision);
     }

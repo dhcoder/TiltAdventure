@@ -1,5 +1,6 @@
 package dhcoder.support.collision;
 
+import dhcoder.support.math.Vec2;
 import dhcoder.support.memory.Poolable;
 
 /**
@@ -7,52 +8,42 @@ import dhcoder.support.memory.Poolable;
  */
 public final class Intersection implements Poolable {
 
-    // Location of colliding shapes at the time of intersection
-    private float sourceX;
-    private float sourceY;
-    private float targetX;
-    private float targetY;
-    // The unit normal force relative to the source. That is, if the source comes in from the left and the target is
-    // on the right, the normal force will be (-1, 0). The target's normal force is the flip of this, (1, 0).
-    private float normalX;
-    private float normalY;
+    private final Vec2 sourcePosition = new Vec2();
+    private final Vec2 targetPosition = new Vec2();
+    private final Vec2 normalForce = new Vec2();
 
     public Intersection() {}
 
-    public float getSourceX() {
-        return sourceX;
-    }
+    /**
+     * Returns the position of the source collider at the time of collision.
+     */
+    public Vec2 getSourcePosition() { return sourcePosition; }
 
-    public float getSourceY() {
-        return sourceY;
-    }
+    /**
+     * Returns the position of the target collider at the time of collision.
+     */
+    public Vec2 getTargetPosition() { return targetPosition; }
 
-    public float getTargetX() {
-        return targetX;
-    }
-
-    public float getTargetY() {
-        return targetY;
-    }
-
-    public float getNormalX() {
-        return normalX;
-    }
-
-    public float getNormalY() {
-        return normalY;
-    }
+    /**
+     * Returns the normal force of the collision as felt by the source collider.
+     * <p/>
+     * If you add this vector force to the source position, you end up with a new final location that moves the
+     * source collider forward in a way that avoids a collision. Multiplying this by (-1, -1) will return the force
+     * felt by the target collider.
+     */
+    public Vec2 getNormalForce() { return normalForce; }
 
     public void set(final float sourceX, final float sourceY, final float targetX, final float targetY,
         final float normalX, final float normalY) {
-        this.sourceX = sourceX;
-        this.sourceY = sourceY;
-        this.targetX = targetX;
-        this.targetY = targetY;
-        this.normalX = normalX;
-        this.normalY = normalY;
+        sourcePosition.set(sourceX, sourceY);
+        targetPosition.set(targetX, targetY);
+        normalForce.set(normalX, normalY);
     }
 
     @Override
-    public void reset() { set(0f, 0f, 0f, 0f, 0f, 0f); }
+    public void reset() {
+        sourcePosition.reset();
+        targetPosition.reset();
+        normalForce.reset();
+    }
 }

@@ -24,7 +24,7 @@ public final class PlayerCollisionComponent extends CollisionComponent {
     protected void handleCollided(final Collision collision) {
         if (collision.getTarget().getGroupId() == Group.OBSTACLES) {
             CollisionSystem collisionSystem = Services.get(CollisionSystem.class);
-            collisionSystem.separateSourceFromCollision(collision);
+            collisionSystem.moveSourceToAvoidCollision(collision);
             syncEntityWithCollisionSystem();
         }
     }

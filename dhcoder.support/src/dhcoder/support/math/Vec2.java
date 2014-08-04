@@ -77,6 +77,10 @@ public final class Vec2 implements Poolable {
         div(other.x, other.y);
     }
 
+    public void scale(final float value) {
+        mul(value, value);
+    }
+
     public void toUnit() {
         float len = len();
         if (len == 0f) {

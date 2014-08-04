@@ -5,7 +5,6 @@ import dhcoder.support.collision.shape.Circle;
 import dhcoder.support.collision.shape.Shape;
 import dhcoder.support.math.Vec2;
 import dhcoder.support.memory.Pool;
-import dhcoder.support.opt.OptFloat;
 
 import static dhcoder.support.utils.MathUtils.clamp;
 
@@ -41,45 +40,48 @@ public final class CircleCollisionAgent implements CollisionAgent {
         Circle circle1 = (Circle)shape1;
         Circle circle2 = (Circle)shape2;
 
-        // Treat the distance moved by the circles as a velocity. Then, get the velocity relative to the first circle
-        // as if it were standing still. We'll use this later to figure out how much time it took for the two circles
-        // to penetrate each other.
+        // The algorithm below calculates what percentage of the circle's motion is spent collided and, by extension,
+        // not collided. From that, we reset the circles to their start point and move them just the percentage of the
+        // way to before collision.
+
+        // Simplify the problem by looking at this problem from circle1's frame of reference, so we only have to worry
+        // about the motion of a single body.
         Vec2 velCircle1 = vecPool.grabNew();
         Vec2 velCircle2 = vecPool.grabNew();
-        Vec2 velRelCircle2 = vecPool.grabNew(); // Circle2's speed relative to Circle1
+        Vec2 velRelCircle2 = vecPool.grabNew();
         velCircle1.set(toX1 - fromX1, toY1 - fromY1);
         velCircle2.set(toX2 - fromX2, toY2 - fromY2);
         velRelCircle2.set(velCircle2);
-        velRelCircle2.sub(velCircle1);
+        velRelCircle2.sub(velCircle1); // Circle2's speed relative to Circle1
 
-        // Calculate the final distance between the two circles compared to the final distance between the radii
-        // (In other words, the amount of penetration)
-        Vec2 finalDist = vecPool.grabNew();
-        finalDist.set(toX2 - toX1, toY2 - toY1);
+        // Figure out how far circle2 penetrated circle1 by comparing the actual distance between the two circles vs.
+        // their radii.
+        Vec2 circleDistance = vecPool.grabNew();
+        circleDistance.set(toX2 - toX1, toY2 - toY1);
 
-        float rSum = circle1.getRadius() + circle2.getRadius();
-        float penetration = rSum - finalDist.len();
+        float penetration = circle1.getRadius() + circle2.getRadius() - circleDistance.len();
 
-        // Finally, calculate what percentage of circle2's travelling time was spent penetrating circle1.
-
-        float penetrationPercentage = penetration / velRelCircle2.len();
-        penetrationPercentage = clamp(penetrationPercentage, 0f, 1f);
-        float notPenetratedPercentage = 1f - penetrationPercentage;
+        // Finally, calculate what percentage of circle2's travelling time was spent after intersecting.
+        float collidedPercentage = penetration / velRelCircle2.len();
+        collidedPercentage = clamp(collidedPercentage, 0f, 1f); // Clamp needed because of floating point precision
+        float separatedPercentage = 1f - collidedPercentage;
 
         vecPool.free(velCircle1);
         vecPool.free(velCircle2);
         vecPool.free(velRelCircle2);
-        vecPool.free(finalDist);
+        vecPool.free(circleDistance);
 
-        float outSourceX = fromX1 + notPenetratedPercentage * (toX1 - fromX1);
-        float outSourceY = fromY1 + notPenetratedPercentage * (toY1 - fromY1);
-        float outTargetX = fromX2 + notPenetratedPercentage * (toX2 - fromX2);
-        float outTargetY = fromY2 + notPenetratedPercentage * (toY2 - fromY2);
+        float outSourceX = fromX1 + separatedPercentage * (toX1 - fromX1);
+        float outSourceY = fromY1 + separatedPercentage * (toY1 - fromY1);
+        float outTargetX = fromX2 + separatedPercentage * (toX2 - fromX2);
+        float outTargetY = fromY2 + separatedPercentage * (toY2 - fromY2);
 
         Vec2 normalForce = vecPool.grabNew();
         normalForce.set(outSourceX - outTargetX, outSourceY - outTargetY);
         normalForce.toUnit();
-        normalForce.mul(penetration, penetration);
+        // Push back with enough force to cancel the penetration that would have happened
+        normalForce.scale(penetration);
+
         outIntersection.set(outSourceX, outSourceY, outTargetX, outTargetY, normalForce.getX(), normalForce.getY());
         vecPool.free(normalForce);
     }
