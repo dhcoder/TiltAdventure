@@ -5,7 +5,6 @@ import dhcoder.support.opt.OptInt;
 
 import java.util.ArrayList;
 
-import static dhcoder.support.utils.MathUtils.isPowerOfTwo;
 import static dhcoder.support.utils.MathUtils.log2;
 import static dhcoder.support.utils.StringUtils.format;
 
@@ -99,10 +98,15 @@ public final class ArrayMap<K, V> {
 
         this.loadFactor = loadFactor;
 
-        // Set initial capacity to be at least large enough so we don't resize unless user puts more keys in than they
-        // said they would.
-        capacity = (int)(expectedSize / loadFactor + 0.5f); // + 0.5f rounds up so we don't truncate our capacity by 1
-        capacity = getNextPrimeSize(capacity);
+        capacity = getNextPrimeSize(expectedSize);
+
+        // Ensure initial capacity to be at least large enough so we don't resize unless user puts more keys in than
+        // they said they would. Note: adding 0.5f rounds up so we don't accidentally truncate our needed capacity by 1
+        int enoughInitialCapacity = (int)(expectedSize / loadFactor + 0.5f);
+        while (capacity < enoughInitialCapacity) {
+            capacity = getNextPrimeSize(capacity + 1);
+        }
+
         initializeStructures();
     }
 
