@@ -121,9 +121,10 @@ public final class CollisionSystem {
     }
 
     /**
-     * Given a collision, extract the source collider to a position just before it would have collided.
+     * Given a collision we want to revert, change the location of the source collider to a new destination that avoids
+     * the target collider (by sliding alongside it)
      */
-    public void moveSourceToAvoidCollision(final Collision collision) {
+    public void redirectSourceToAvoidCollision(final Collision collision) {
 
         Intersection intersection = intersectionPool.grabNew();
         Collider source = collision.getSource();
