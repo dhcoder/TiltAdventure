@@ -56,4 +56,9 @@ public final class Rectangle implements Shape {
     public float getRight(final float xOrigin) { return xOrigin + halfWidth; }
 
     public float getTop(final float yOrigin) { return yOrigin + halfHeight; }
+
+    @Override
+    public String toString() {
+        return format("w/2={0},h/2={1}", halfWidth, halfHeight);
+    }
 }

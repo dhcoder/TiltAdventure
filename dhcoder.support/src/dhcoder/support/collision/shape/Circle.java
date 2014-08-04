@@ -28,6 +28,11 @@ public final class Circle implements Shape {
     }
 
     @Override
+    public String toString() {
+        return format("r={0}", radius);
+    }
+
+    @Override
     public void reset() {
         setRadius(0f);
     }
