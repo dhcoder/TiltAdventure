@@ -4,7 +4,7 @@ import dhcoder.support.collision.Collision;
 import dhcoder.support.collision.CollisionSystem;
 import dhcoder.support.collision.shape.Shape;
 import tiltadv.Services;
-import tiltadv.constants.Group;
+import tiltadv.globals.Group;
 
 /**
  * Component that maintains the collision logic for the main player's avatar.

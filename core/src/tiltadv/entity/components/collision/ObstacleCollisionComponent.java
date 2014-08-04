@@ -1,8 +1,7 @@
 package tiltadv.entity.components.collision;
 
-import dhcoder.support.collision.Collision;
 import dhcoder.support.collision.shape.Shape;
-import tiltadv.constants.Group;
+import tiltadv.globals.Group;
 
 /**
  * Component that maintains the collision logic for all obstacles.

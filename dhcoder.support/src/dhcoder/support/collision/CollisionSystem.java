@@ -2,6 +2,7 @@ package dhcoder.support.collision;
 
 import dhcoder.support.collection.ArrayMap;
 import dhcoder.support.collision.shape.Shape;
+import dhcoder.support.math.Vec2;
 import dhcoder.support.memory.Pool;
 
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ public final class CollisionSystem {
     private final Pool<Collision> collisionPool;
     private final Pool<ColliderKey> colliderKeyPool = Pool.of(ColliderKey.class, 1);
     private final Pool<Intersection> intersectionPool = Pool.of(Intersection.class, 1);
+    private final Pool<Vec2> vecPool = Pool.of(Vec2.class, 1);
 
     private final int[] collidesWith; // group -> bitmask of groups it collides with
     private final ArrayList<ArrayList<Collider>> groups;
@@ -82,7 +84,8 @@ public final class CollisionSystem {
                     int groupTargetSize = groupTarget.size();
                     for (int colliderSourceIndex = 0; colliderSourceIndex < groupSourceSize; ++colliderSourceIndex) {
                         Collider colliderSource = groupSource.get(colliderSourceIndex);
-                        for (int colliderTargetIndex = 0; colliderTargetIndex < groupTargetSize; ++colliderTargetIndex) {
+                        for (int colliderTargetIndex = 0; colliderTargetIndex < groupTargetSize;
+                             ++colliderTargetIndex) {
                             Collider colliderTarget = groupTarget.get(colliderTargetIndex);
                             key.set(colliderSource, colliderTarget);
                             if (colliderSource.collidesWith(colliderTarget)) {
@@ -93,11 +96,13 @@ public final class CollisionSystem {
                                     collisions.put(collision.getKey(), collision);
                                     boolean debugTest = collisions.containsKey(key);
                                     colliderSource.fireCollision(collision);
-                                } else {
+                                }
+                                else {
                                     // collision = collisions.get(key);
                                     // Report continued collision?
                                 }
-                            } else if (collisions.containsKey(key)) {
+                            }
+                            else if (collisions.containsKey(key)) {
                                 Collision collision = collisions.remove(key);
                                 colliderSource.fireSeparation(collision);
                                 collisionPool.free(collision);
@@ -113,6 +118,33 @@ public final class CollisionSystem {
     public void release(final Collider collider) {
         removeFromGroup(collider);
         colliderPool.free(collider);
+    }
+
+    /**
+     * Given a collision, extract the source collider to a position just before it would have collided.
+     * @param collision
+     */
+    public void separateSourceFromCollision(final Collision collision) {
+
+        Intersection intersection = intersectionPool.grabNew();
+        Collider source = collision.getSource();
+        Collider target = collision.getTarget();
+        getIntersection(source.getShape(), source.getLastX(), source.getLastY(), source.getCurrX(), source.getCurrY(),
+            target.getShape(), target.getLastX(), target.getLastY(), target.getCurrX(), target.getCurrY(),
+            intersection);
+
+        Vec2 finalPosition = vecPool.grabNew();
+        finalPosition.set(intersection.getSourceX(), intersection.getSourceY());
+        finalPosition.add(intersection.getNormalX(), intersection.getNormalY());
+
+        source.fixCurrentPosition(finalPosition.getX(), finalPosition.getY());
+        //source.fixCurrentPosition(intersection.getSourceX(), intersection.getSourceY());
+
+        vecPool.free(finalPosition);
+        intersectionPool.free(intersection);
+
+        collisions.remove(collision.getKey());
+        collisionPool.free(collision);
     }
 
     private void requireValidGroupId(final int group) {
@@ -144,21 +176,5 @@ public final class CollisionSystem {
         int targetGroupMask = 1 << targetGroupIndex;
 
         return (collidesWithMask & targetGroupMask) != 0;
-    }
-
-    public void separateSourceFromCollision(final Collision collision) {
-
-        Intersection intersection = intersectionPool.grabNew();
-        Collider source = collision.getSource();
-        Collider target = collision.getTarget();
-        getIntersection(source.getShape(), source.getLastX(), source.getLastY(), source.getCurrX(), source.getCurrY(),
-            target.getShape(), target.getLastX(), target.getLastY(), target.getCurrX(), target.getCurrY(),
-            intersection);
-
-        source.fixCurrentPosition(intersection.getX(), intersection.getY());
-        intersectionPool.free(intersection);
-
-        collisions.remove(collision.getKey());
-        collisionPool.free(collision);
     }
 }
