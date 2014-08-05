@@ -2,9 +2,9 @@ package dhcoder.support.math;
 
 import org.junit.Test;
 
+import static dhcoder.test.matchers.IsCloseTo.closeTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static dhcoder.test.matchers.IsCloseTo.closeTo;
 
 public final class AngleTest {
 
