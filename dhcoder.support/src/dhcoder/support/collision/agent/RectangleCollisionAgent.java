@@ -12,7 +12,7 @@ import dhcoder.support.opt.OptFloat;
  */
 public final class RectangleCollisionAgent implements CollisionAgent {
 
-    Pool<OptFloat> optFloatPool = Pool.of(OptFloat.class, 4);
+    Pool<OptFloat> optFloatPool = Pool.of(OptFloat.class, 1);
     Pool<Vec2> vecPool = Pool.of(Vec2.class, 3);
 
     @Override
@@ -35,11 +35,6 @@ public final class RectangleCollisionAgent implements CollisionAgent {
 
         Rectangle rect1 = (Rectangle)shape1;
         Rectangle rect2 = (Rectangle)shape2;
-
-        OptFloat timeCollidedLeftOpt = optFloatPool.grabNew();
-        OptFloat timeCollidedRightOpt = optFloatPool.grabNew();
-        OptFloat timeCollidedTopOpt = optFloatPool.grabNew();
-        OptFloat timeCollidedBottomOpt = optFloatPool.grabNew();
 
         // We do this test from rect2's frame of reference, as if he were located at the origin, not moving, the whole
         // time.
@@ -76,32 +71,36 @@ public final class RectangleCollisionAgent implements CollisionAgent {
         float rect2top = rect2.getTop(0f);
         float rect2bottom = rect2.getBottom(0f);
 
+        OptFloat percentWhenCollidedOpt = optFloatPool.grabNew();
         if (rect1StartRight < rect2left && rect1EndRight >= rect2left) {
-            timeCollidedLeftOpt.set((rect2left - rect1StartRight) / (rect1EndRight - rect1StartRight));
+            float percentCollidedLeft = (rect2left - rect1StartRight) / (rect1EndRight - rect1StartRight);
+            percentWhenCollidedOpt.set(percentCollidedLeft);
         }
         else if (rect1StartLeft > rect2right && rect1EndLeft <= rect2right) {
-            timeCollidedRightOpt.set((rect1StartLeft - rect2right) / (rect1StartLeft - rect1EndLeft));
+            float percentCollidedRight = (rect1StartLeft - rect2right) / (rect1StartLeft - rect1EndLeft);
+            percentWhenCollidedOpt.set(percentCollidedRight);
         }
 
         if (rect1StartTop < rect2bottom && rect1EndTop >= rect2bottom) {
-            timeCollidedBottomOpt.set((rect2bottom - rect1StartTop) / (rect1EndTop - rect1StartTop));
+            float percentCollidedBottom = (rect2bottom - rect1StartTop) / (rect1EndTop - rect1StartTop);
+            if (percentWhenCollidedOpt.getValueOr(1f) > percentCollidedBottom) {
+                percentWhenCollidedOpt.set(percentCollidedBottom);
+            }
         }
         else if (rect1StartBottom > rect2top && rect1EndBottom <= rect2top) {
-            timeCollidedTopOpt.set((rect1StartBottom - rect2top) / (rect1StartBottom - rect1EndBottom));
+            float percentCollidedTop = (rect1StartBottom - rect2top) / (rect1StartBottom - rect1EndBottom);
+            if (percentWhenCollidedOpt.getValueOr(1f) > percentCollidedTop) {
+                percentWhenCollidedOpt.set(percentCollidedTop);
+            }
         }
 
-        float percent = Math.min(timeCollidedLeftOpt.getValueOr(1f), Math.min(timeCollidedRightOpt.getValueOr(1f),
-                Math.min(timeCollidedTopOpt.getValueOr(1f), timeCollidedBottomOpt.getValueOr(1f))));
+        float percentWhenCollided = percentWhenCollidedOpt.getValueOr(0f);
+        optFloatPool.free(percentWhenCollidedOpt);
 
-        optFloatPool.free(timeCollidedLeftOpt);
-        optFloatPool.free(timeCollidedRightOpt);
-        optFloatPool.free(timeCollidedTopOpt);
-        optFloatPool.free(timeCollidedBottomOpt);
-
-        float outSourceX = fromX1 + percent * (toX1 - fromX1);
-        float outSourceY = fromY1 + percent * (toY1 - fromY1);
-        float outTargetX = fromX2 + percent * (toX2 - fromX2);
-        float outTargetY = fromY2 + percent * (toY2 - fromY2);
+        float outSourceX = fromX1 + percentWhenCollided * (toX1 - fromX1);
+        float outSourceY = fromY1 + percentWhenCollided * (toY1 - fromY1);
+        float outTargetX = fromX2 + percentWhenCollided * (toX2 - fromX2);
+        float outTargetY = fromY2 + percentWhenCollided * (toY2 - fromY2);
 
         outIntersection.set(outSourceX, outSourceY, outTargetX, outTargetY, 0f, 0f);
     }
