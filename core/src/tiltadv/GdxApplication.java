@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import dhcoder.support.collision.CollisionSystem;
 import dhcoder.support.collision.shape.Circle;
+import dhcoder.support.collision.shape.Rectangle;
 import dhcoder.support.math.Angle;
 import dhcoder.support.time.Duration;
 import tiltadv.entity.Component;
@@ -147,7 +148,7 @@ public final class GdxApplication extends ApplicationAdapter {
             new KeyboardComponent());
         components.add(new PlayerBehaviorComponent());
         components.add(new PlayerDisplayComponent(animUp, animDown, animLeft, animRight));
-        components.add(new PlayerCollisionComponent(new Circle(Tiles.PLAYERUP1.getWidth() / 2)));
+        components.add(new PlayerCollisionComponent(new Rectangle(Tiles.PLAYERUP1.getWidth() / 2, Tiles.PLAYERUP1.getHeight() / 2)));
 
         Entity playerEntity = new Entity(components);
         entities.add(playerEntity);
@@ -160,7 +161,7 @@ public final class GdxApplication extends ApplicationAdapter {
         components.add(new SpriteComponent(Tiles.ROCK));
         components.add(SizeComponent.from(Tiles.ROCK));
         components.add(new TransformComponent.Builder().setTranslate(x, y).build());
-        components.add(new ObstacleCollisionComponent(new Circle(Tiles.ROCK.getWidth() / 2)));
+        components.add(new ObstacleCollisionComponent(new Rectangle(Tiles.ROCK.getWidth() / 2, Tiles.ROCK.getHeight() / 2)));
         entities.add(new Entity(components));
     }
 
