@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-import static dhcoder.support.utils.ListUtils.swapToEndAndRemove;
-import static dhcoder.support.utils.StringUtils.format;
+import static dhcoder.support.collection.ListUtils.swapToEndAndRemove;
+import static dhcoder.support.text.StringUtils.format;
 
 /**
  * A class which manages a pool of pre-allocated objects so you can avoid thrashing Android's garbage collector when you

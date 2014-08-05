@@ -8,26 +8,25 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import dhcoder.support.collision.CollisionSystem;
-import dhcoder.support.collision.shape.Circle;
-import dhcoder.support.collision.shape.Rectangle;
+import dhcoder.libgdx.collision.CollisionSystem;
+import dhcoder.libgdx.collision.shape.Rectangle;
+import dhcoder.libgdx.entity.Component;
+import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.math.Angle;
 import dhcoder.support.time.Duration;
-import tiltadv.entity.Component;
-import tiltadv.entity.Entity;
-import tiltadv.entity.components.behavior.PlayerBehaviorComponent;
-import tiltadv.entity.components.collision.ObstacleCollisionComponent;
-import tiltadv.entity.components.collision.PlayerCollisionComponent;
-import tiltadv.entity.components.display.FpsDisplayComponent;
-import tiltadv.entity.components.display.PlayerDisplayComponent;
-import tiltadv.entity.components.display.SpriteComponent;
-import tiltadv.entity.components.display.TiltDisplayComponent;
-import tiltadv.entity.components.input.AccelerometerComponent;
-import tiltadv.entity.components.input.KeyboardComponent;
-import tiltadv.entity.components.input.TiltComponent;
-import tiltadv.entity.components.model.MotionComponent;
-import tiltadv.entity.components.model.SizeComponent;
-import tiltadv.entity.components.model.TransformComponent;
+import tiltadv.components.behavior.PlayerBehaviorComponent;
+import tiltadv.components.collision.ObstacleCollisionComponent;
+import tiltadv.components.collision.PlayerCollisionComponent;
+import tiltadv.components.display.FpsDisplayComponent;
+import tiltadv.components.display.PlayerDisplayComponent;
+import tiltadv.components.display.SpriteComponent;
+import tiltadv.components.display.TiltDisplayComponent;
+import tiltadv.components.input.AccelerometerComponent;
+import tiltadv.components.input.KeyboardComponent;
+import tiltadv.components.input.TiltComponent;
+import tiltadv.components.model.MotionComponent;
+import tiltadv.components.model.SizeComponent;
+import tiltadv.components.model.TransformComponent;
 import tiltadv.globals.Tiles;
 import tiltadv.memory.Pools;
 
@@ -148,7 +147,8 @@ public final class GdxApplication extends ApplicationAdapter {
             new KeyboardComponent());
         components.add(new PlayerBehaviorComponent());
         components.add(new PlayerDisplayComponent(animUp, animDown, animLeft, animRight));
-        components.add(new PlayerCollisionComponent(new Rectangle(Tiles.PLAYERUP1.getWidth() / 2, Tiles.PLAYERUP1.getHeight() / 2)));
+        components.add(new PlayerCollisionComponent(
+            new Rectangle(Tiles.PLAYERUP1.getWidth() / 2, Tiles.PLAYERUP1.getHeight() / 2)));
 
         Entity playerEntity = new Entity(components);
         entities.add(playerEntity);
@@ -161,7 +161,8 @@ public final class GdxApplication extends ApplicationAdapter {
         components.add(new SpriteComponent(Tiles.ROCK));
         components.add(SizeComponent.from(Tiles.ROCK));
         components.add(new TransformComponent.Builder().setTranslate(x, y).build());
-        components.add(new ObstacleCollisionComponent(new Rectangle(Tiles.ROCK.getWidth() / 2, Tiles.ROCK.getHeight() / 2)));
+        components
+            .add(new ObstacleCollisionComponent(new Rectangle(Tiles.ROCK.getWidth() / 2, Tiles.ROCK.getHeight() / 2)));
         entities.add(new Entity(components));
     }
 

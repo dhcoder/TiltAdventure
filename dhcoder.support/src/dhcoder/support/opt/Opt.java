@@ -2,7 +2,7 @@ package dhcoder.support.opt;
 
 import dhcoder.support.memory.Poolable;
 
-import static dhcoder.support.utils.StringUtils.format;
+import static dhcoder.support.text.StringUtils.format;
 
 /**
  * A class which represents an nullable value - that is, like a reference, it either has a value or not. Unlike a

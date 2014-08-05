@@ -3,7 +3,7 @@ package dhcoder.support.math;
 import dhcoder.support.memory.Poolable;
 import dhcoder.support.opt.OptFloat;
 
-import static dhcoder.support.utils.StringUtils.format;
+import static dhcoder.support.text.StringUtils.format;
 
 /**
  * Simple class that represents a 0 -> 360° angle. You can set and get this angle's value in either degreesOpt or

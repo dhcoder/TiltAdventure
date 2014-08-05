@@ -2,7 +2,7 @@ package dhcoder.support.time;
 
 import dhcoder.support.memory.Poolable;
 
-import static dhcoder.support.utils.StringUtils.format;
+import static dhcoder.support.text.StringUtils.format;
 
 /**
  * An class which represents a time duration.

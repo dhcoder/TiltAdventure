@@ -31,7 +31,6 @@ dependencies {
     natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86"
 }
 
-
 // needed to add JNI shared libraries to APK when compiling on CLI
 tasks.withType(com.android.build.gradle.tasks.PackageApplication) { pkgTask ->
     pkgTask.jniFolders = new HashSet<File>()
@@ -41,17 +40,17 @@ tasks.withType(com.android.build.gradle.tasks.PackageApplication) { pkgTask ->
 // called every time gradle gets executed, takes the native dependencies of
 // the natives configuration, and extracts them to the proper libs/ folders
 // so they get packed with the APK.
-task copyAndroidNatives() { 
+task copyAndroidNatives() {
     file("libs/armeabi/").mkdirs();
     file("libs/armeabi-v7a/").mkdirs();
     file("libs/x86/").mkdirs();
 
     configurations.natives.files.each { jar ->
         def outputDir = null
-        if(jar.name.endsWith("natives-armeabi-v7a.jar")) outputDir = file("libs/armeabi-v7a")
-        if(jar.name.endsWith("natives-armeabi.jar")) outputDir = file("libs/armeabi")
-        if(jar.name.endsWith("natives-x86.jar")) outputDir = file("libs/x86")
-        if(outputDir != null) {
+        if (jar.name.endsWith("natives-armeabi-v7a.jar")) outputDir = file("libs/armeabi-v7a")
+        if (jar.name.endsWith("natives-armeabi.jar")) outputDir = file("libs/armeabi")
+        if (jar.name.endsWith("natives-x86.jar")) outputDir = file("libs/x86")
+        if (outputDir != null) {
             copy {
                 from zipTree(jar)
                 into outputDir
@@ -70,7 +69,7 @@ task run(type: Exec) {
 idea {
     module {
         sourceDirs += file("src");
-        scopes = [ COMPILE: [plus:[project.configurations.compile]]]        
+        scopes = [COMPILE: [plus: [project.configurations.compile]]]
 
         iml {
             withXml {
@@ -80,7 +79,7 @@ idea {
                 builder.component(name: "FacetManager") {
                     facet(type: "android", name: "Android") {
                         configuration {
-                            option(name: "UPDATE_PROPERTY_FILES", value:"true")
+                            option(name: "UPDATE_PROPERTY_FILES", value: "true")
                         }
                     }
                 }

@@ -1,9 +1,8 @@
 package dhcoder.support.opt;
 
-import dhcoder.support.memory.Pool;
 import dhcoder.support.memory.Poolable;
 
-import static dhcoder.support.utils.StringUtils.format;
+import static dhcoder.support.text.StringUtils.format;
 
 /**
  * Special-case {@link Opt} for the float primitive type (to avoid the allocation that comes from auto-boxing Floats)
@@ -94,29 +93,28 @@ public final class OptFloat implements Poolable {
     }
 
     @Override
-    public String toString() {
-        if (!hasValue)
-            return "OptFloat{}";
-
-        return format("OptFloat{{{0}}}", value);
+    public int hashCode() {
+        return hasValue ? Float.floatToIntBits(value) : 0;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
 
-        OptFloat optFloat = (OptFloat) o;
+        OptFloat optFloat = (OptFloat)o;
 
-        if (hasValue != optFloat.hasValue) return false;
-        if (Float.compare(optFloat.value, value) != 0) return false;
+        if (hasValue != optFloat.hasValue) { return false; }
+        if (Float.compare(optFloat.value, value) != 0) { return false; }
 
         return true;
     }
 
     @Override
-    public int hashCode() {
-        return hasValue ? Float.floatToIntBits(value) : 0;
+    public String toString() {
+        if (!hasValue) { return "OptFloat{}"; }
+
+        return format("OptFloat{{{0}}}", value);
     }
 
     @Override

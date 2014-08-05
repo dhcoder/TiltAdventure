@@ -1,6 +1,6 @@
 package tiltadv.globals;
 
-import dhcoder.support.collision.CollisionSystem;
+import dhcoder.libgdx.collision.CollisionSystem;
 
 /**
  * Collection of collision groups. See also {@link CollisionSystem}.

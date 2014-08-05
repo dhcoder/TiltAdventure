@@ -3,7 +3,7 @@ package dhcoder.support.pattern;
 import java.util.HashMap;
 import java.util.Map;
 
-import static dhcoder.support.utils.StringUtils.format;
+import static dhcoder.support.text.StringUtils.format;
 
 /**
  * Class which implements the service pattern - namely, it provides a way to register and, later, retrieve classes

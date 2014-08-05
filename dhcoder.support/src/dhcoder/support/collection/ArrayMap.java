@@ -5,8 +5,8 @@ import dhcoder.support.opt.OptInt;
 
 import java.util.ArrayList;
 
-import static dhcoder.support.utils.MathUtils.log2;
-import static dhcoder.support.utils.StringUtils.format;
+import static dhcoder.support.math.MathUtils.log2;
+import static dhcoder.support.text.StringUtils.format;
 
 /**
  * A map implementation that uses {@link ArrayList}s under the hood, allowing it to preallocate all memory ahead of

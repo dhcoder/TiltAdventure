@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static dhcoder.support.opt.Opt.of;
-import static dhcoder.support.utils.StringUtils.format;
+import static dhcoder.support.text.StringUtils.format;
 
 /**
  * Encapsulation of a finite state machine.

@@ -1,6 +1,6 @@
 package dhcoder.test;
 
-import dhcoder.support.utils.StringUtils;
+import dhcoder.support.text.StringUtils;
 
 import static junit.framework.TestCase.fail;
 

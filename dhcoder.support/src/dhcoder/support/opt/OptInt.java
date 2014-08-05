@@ -2,7 +2,7 @@ package dhcoder.support.opt;
 
 import dhcoder.support.memory.Poolable;
 
-import static dhcoder.support.utils.StringUtils.format;
+import static dhcoder.support.text.StringUtils.format;
 
 /**
  * Special-case {@link Opt} for the int primitive type (to avoid the allocation that comes from auto-boxing Ints)
@@ -86,29 +86,28 @@ public final class OptInt implements Poolable {
     }
 
     @Override
-    public String toString() {
-        if (!hasValue)
-            return "OptInt{}";
-
-        return format("OptInt{{{0}}}", value);
+    public int hashCode() {
+        return value;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
 
-        OptInt optInt = (OptInt) o;
+        OptInt optInt = (OptInt)o;
 
-        if (hasValue != optInt.hasValue) return false;
-        if (optInt.value != value) return false;
+        if (hasValue != optInt.hasValue) { return false; }
+        if (optInt.value != value) { return false; }
 
         return true;
     }
 
     @Override
-    public int hashCode() {
-        return value;
+    public String toString() {
+        if (!hasValue) { return "OptInt{}"; }
+
+        return format("OptInt{{{0}}}", value);
     }
 
     @Override
