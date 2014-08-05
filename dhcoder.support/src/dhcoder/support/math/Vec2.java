@@ -24,71 +24,77 @@ public final class Vec2 implements Poolable {
         return x;
     }
 
-    public void setX(final float x) {
+    public Vec2 setX(final float x) {
         this.x = x;
+        return this;
     }
 
     public float getY() {
         return y;
     }
 
-    public void setY(final float y) {
+    public Vec2 setY(final float y) {
         this.y = y;
+        return this;
     }
 
-    public void set(final float x, final float y) {
+    public Vec2 set(final float x, final float y) {
         this.x = x;
         this.y = y;
+
+        return this;
     }
 
-    public void set(final Vec2 other) {
-        set(other.x, other.y);
+    public Vec2 set(final Vec2 other) {
+        return set(other.x, other.y);
     }
 
-    public void add(final float x, final float y) {
-        set(this.x + x, this.y + y);
+    public Vec2 add(final float x, final float y) {
+        return set(this.x + x, this.y + y);
     }
 
-    public void sub(final float x, final float y) {
-        set(this.x - x, this.y - y);
+    public Vec2 sub(final float x, final float y) {
+        return set(this.x - x, this.y - y);
     }
 
-    public void mul(final float x, final float y) {
-        set(this.x * x, this.y * y);
+    public Vec2 mul(final float x, final float y) {
+        return set(this.x * x, this.y * y);
     }
 
-    public void div(final float x, final float y) {
-        set(this.x / x, this.y / y);
+    public Vec2 div(final float x, final float y) {
+        return set(this.x / x, this.y / y);
     }
 
-    public void add(final Vec2 other) {
-        add(other.x, other.y);
+    public Vec2 add(final Vec2 other) {
+        return add(other.x, other.y);
     }
 
-    public void sub(final Vec2 other) {
-        sub(other.x, other.y);
+    public Vec2 sub(final Vec2 other) {
+        return sub(other.x, other.y);
     }
 
-    public void mul(final Vec2 other) {
-        mul(other.x, other.y);
+    public Vec2 mul(final Vec2 other) {
+        return mul(other.x, other.y);
     }
 
-    public void div(final Vec2 other) {
-        div(other.x, other.y);
+    public Vec2 div(final Vec2 other) {
+        return div(other.x, other.y);
     }
 
-    public void scale(final float value) {
-        mul(value, value);
+    public Vec2 scale(final float value) {
+        return mul(value, value);
     }
 
-    public void toUnit() {
+    public Vec2 toUnit() {
         float len = len();
         if (len == 0f) {
-            return;
+            return this;
         }
 
         x /= len;
         y /= len;
+
+        return this;
     }
 
 
