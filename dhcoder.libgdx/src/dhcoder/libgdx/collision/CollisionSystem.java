@@ -10,6 +10,7 @@ import dhcoder.support.memory.Pool;
 import java.util.ArrayList;
 
 import static com.badlogic.gdx.math.MathUtils.atan2;
+import static com.badlogic.gdx.math.MathUtils.cos;
 import static dhcoder.libgdx.collision.shape.ShapeUtils.getIntersection;
 import static dhcoder.support.collection.ListUtils.swapToEndAndRemove;
 import static dhcoder.support.text.StringUtils.format;
@@ -37,7 +38,7 @@ public final class CollisionSystem {
     private final Pool<ColliderKey> colliderKeyPool = Pool.of(ColliderKey.class, 1);
     private final Pool<Intersection> intersectionPool = Pool.of(Intersection.class, 1);
     private final Pool<Angle> anglePool = Pool.of(Angle.class, 1);
-    private final Pool<Vector2> vectorPool = VectorPoolBuilder.build(4);
+    private final Pool<Vector2> vectorPool = VectorPoolBuilder.build(3);
 
     private final int[] collidesWith; // group -> bitmask of groups it collides with
     private final ArrayList<ArrayList<Collider>> groups;
@@ -142,36 +143,27 @@ public final class CollisionSystem {
 
         final Vector2 normal = intersection.getNormal();
 
-        Vector2 originalCourse = vectorPool.grabNew();
-        originalCourse.set(source.getCurrPosition()).sub(source.getLastPosition());
+        // Project the post-collision vector onto the tangent of the point of collision. This basically means we
+        // eliminate any part of the vector that goes into the object we are colliding with.
+        Vector2 postCollision = vectorPool.grabNew();
+        postCollision.set(source.getCurrPosition()).sub(intersection.getSourcePosition());
 
-        Angle angleToNormal = anglePool.grabNew();
-        angleToNormal
-            .setRadians(atan2(originalCourse.crs(normal), originalCourse.dot(normal)));
+        Vector2 tangent = vectorPool.grabNew();
+        tangent.set(normal).rotate90(1); // Rotation direction doesn't matter
 
-        // If we're pushing straight against the normal force, kill all motion. Otherwise, do some calculations to
-        // determine how to slide perpendicular to the normal.
-        if (angleToNormal.getDegrees() != 180f) {
-            // Given the normal force vector returned by getIntersection, we want to move perpendicular to it, with the same
-            // momentum that we were originally heading in before when we collided.
-            Vector2 postCollision = vectorPool.grabNew();
-            postCollision.set(source.getCurrPosition()).sub(intersection.getSourcePosition());
+        Angle angleToTanget = anglePool.grabNew();
+        angleToTanget.setRadians(atan2(postCollision.crs(tangent), postCollision.dot(tangent)));
 
-            Vector2 perpendicular = vectorPool.grabNew();
-            perpendicular.set(normal);
-            perpendicular.rotate90(angleToNormal.getRadians() > 180f ? -1 : 1);
+        // See http://en.wikipedia.org/wiki/Vector_projection
+        float scalarProjection = postCollision.len() * cos(angleToTanget.getRadians());
+        tangent.scl(scalarProjection);
 
-            perpendicular.scl(postCollision.len());
-            finalPosition.add(perpendicular);
-
-            vectorPool.free(perpendicular);
-            vectorPool.free(postCollision);
-        }
-
+        finalPosition.add(tangent);
         source.setCurrPosition(finalPosition);
 
-        anglePool.free(angleToNormal);
-        vectorPool.free(originalCourse);
+        anglePool.free(angleToTanget);
+        vectorPool.free(postCollision);
+        vectorPool.free(tangent);
         vectorPool.free(finalPosition);
         intersectionPool.free(intersection);
 
