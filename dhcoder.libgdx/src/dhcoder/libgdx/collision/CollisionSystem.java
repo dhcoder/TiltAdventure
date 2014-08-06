@@ -4,10 +4,12 @@ import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.collision.shape.Shape;
 import dhcoder.libgdx.pool.VectorPoolBuilder;
 import dhcoder.support.collection.ArrayMap;
+import dhcoder.support.math.Angle;
 import dhcoder.support.memory.Pool;
 
 import java.util.ArrayList;
 
+import static com.badlogic.gdx.math.MathUtils.atan2;
 import static dhcoder.libgdx.collision.shape.ShapeUtils.getIntersection;
 import static dhcoder.support.collection.ListUtils.swapToEndAndRemove;
 import static dhcoder.support.text.StringUtils.format;
@@ -34,6 +36,7 @@ public final class CollisionSystem {
     private final Pool<Collision> collisionPool;
     private final Pool<ColliderKey> colliderKeyPool = Pool.of(ColliderKey.class, 1);
     private final Pool<Intersection> intersectionPool = Pool.of(Intersection.class, 1);
+    private final Pool<Angle> anglePool = Pool.of(Angle.class, 1);
     private final Pool<Vector2> vectorPool = VectorPoolBuilder.build(4);
 
     private final int[] collidesWith; // group -> bitmask of groups it collides with
@@ -127,19 +130,49 @@ public final class CollisionSystem {
      */
     public void redirectSourceToAvoidCollision(final Collision collision) {
 
-        Intersection intersection = intersectionPool.grabNew();
         Collider source = collision.getSource();
         Collider target = collision.getTarget();
-        getIntersection(source.getShape(), source.getLastX(), source.getLastY(), source.getCurrX(), source.getCurrY(),
-            target.getShape(), target.getLastX(), target.getLastY(), target.getCurrX(), target.getCurrY(),
-            intersection);
+        Intersection intersection = intersectionPool.grabNew();
+        getIntersection(source.getShape(), source.getLastPosition().x, source.getLastPosition().y,
+            source.getCurrPosition().x, source.getCurrPosition().y, target.getShape(), target.getLastPosition().x,
+            target.getLastPosition().y, target.getCurrPosition().x, target.getCurrPosition().y, intersection);
 
         Vector2 finalPosition = vectorPool.grabNew();
         finalPosition.set(intersection.getSourcePosition());
-        finalPosition.add(intersection.getNormalForce());
-        source.fixCurrentPosition(finalPosition.x, finalPosition.y);
-        vectorPool.free(finalPosition);
 
+        final Vector2 normal = intersection.getNormal();
+
+        Vector2 originalCourse = vectorPool.grabNew();
+        originalCourse.set(source.getCurrPosition()).sub(source.getLastPosition());
+
+        Angle angleToNormal = anglePool.grabNew();
+        angleToNormal
+            .setRadians(atan2(originalCourse.crs(normal), originalCourse.dot(normal)));
+
+        // If we're pushing straight against the normal force, kill all motion. Otherwise, do some calculations to
+        // determine how to slide perpendicular to the normal.
+        if (angleToNormal.getDegrees() != 180f) {
+            // Given the normal force vector returned by getIntersection, we want to move perpendicular to it, with the same
+            // momentum that we were originally heading in before when we collided.
+            Vector2 postCollision = vectorPool.grabNew();
+            postCollision.set(source.getCurrPosition()).sub(intersection.getSourcePosition());
+
+            Vector2 perpendicular = vectorPool.grabNew();
+            perpendicular.set(normal);
+            perpendicular.rotate90(angleToNormal.getRadians() > 180f ? -1 : 1);
+
+            perpendicular.scl(postCollision.len());
+            finalPosition.add(perpendicular);
+
+            vectorPool.free(perpendicular);
+            vectorPool.free(postCollision);
+        }
+
+        source.setCurrPosition(finalPosition);
+
+        anglePool.free(angleToNormal);
+        vectorPool.free(originalCourse);
+        vectorPool.free(finalPosition);
         intersectionPool.free(intersection);
 
         // This collision never happened... remove it quietly...

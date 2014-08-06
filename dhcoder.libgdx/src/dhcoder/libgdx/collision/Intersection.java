@@ -31,7 +31,7 @@ public final class Intersection implements Poolable {
      * source collider forward in a way that avoids a collision. Multiplying this by (-1, -1) will return the force
      * felt by the target collider.
      */
-    public Vector2 getNormalForce() { return normalForce; }
+    public Vector2 getNormal() { return normalForce; }
 
     public void set(final float sourceX, final float sourceY, final float targetX, final float targetY,
         final float normalX, final float normalY) {

@@ -73,25 +73,30 @@ public final class RectangleCollisionAgent implements CollisionAgent {
         float rect2bottom = rect2.getBottom(0f);
 
         OptFloat percentWhenCollidedOpt = optFloatPool.grabNew();
-        if (rect1StartRight < rect2left && rect1EndRight >= rect2left) {
+        Vector2 normal = vectorPool.grabNew();
+        if (rect1StartRight <= rect2left && rect1EndRight >= rect2left) {
             float percentCollidedLeft = (rect2left - rect1StartRight) / (rect1EndRight - rect1StartRight);
             percentWhenCollidedOpt.set(percentCollidedLeft);
+            normal.set(-1f, 0f);
         }
-        else if (rect1StartLeft > rect2right && rect1EndLeft <= rect2right) {
+        else if (rect1StartLeft >= rect2right && rect1EndLeft <= rect2right) {
             float percentCollidedRight = (rect1StartLeft - rect2right) / (rect1StartLeft - rect1EndLeft);
             percentWhenCollidedOpt.set(percentCollidedRight);
+            normal.set(1f, 0f);
         }
 
-        if (rect1StartTop < rect2bottom && rect1EndTop >= rect2bottom) {
+        if (rect1StartTop <= rect2bottom && rect1EndTop >= rect2bottom) {
             float percentCollidedBottom = (rect2bottom - rect1StartTop) / (rect1EndTop - rect1StartTop);
             if (percentWhenCollidedOpt.getValueOr(1f) > percentCollidedBottom) {
                 percentWhenCollidedOpt.set(percentCollidedBottom);
+                normal.set(0f, -1f);
             }
         }
-        else if (rect1StartBottom > rect2top && rect1EndBottom <= rect2top) {
+        else if (rect1StartBottom >= rect2top && rect1EndBottom <= rect2top) {
             float percentCollidedTop = (rect1StartBottom - rect2top) / (rect1StartBottom - rect1EndBottom);
             if (percentWhenCollidedOpt.getValueOr(1f) > percentCollidedTop) {
                 percentWhenCollidedOpt.set(percentCollidedTop);
+                normal.set(1f, 0f);
             }
         }
 
@@ -103,6 +108,7 @@ public final class RectangleCollisionAgent implements CollisionAgent {
         float outTargetX = fromX2 + percentWhenCollided * (toX2 - fromX2);
         float outTargetY = fromY2 + percentWhenCollided * (toY2 - fromY2);
 
-        outIntersection.set(outSourceX, outSourceY, outTargetX, outTargetY, 0f, 0f);
+        outIntersection.set(outSourceX, outSourceY, outTargetX, outTargetY, normal.x, normal.y);
+        vectorPool.free(normal);
     }
 }
