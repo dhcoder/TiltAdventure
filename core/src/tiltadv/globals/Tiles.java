@@ -18,6 +18,8 @@ public final class Tiles {
     public static final Sprite PLAYERRIGHT2;
     public static final Sprite RODRIGHT;
     public static final Sprite ROCK;
+    private static final Texture texture;
+
     static {
         texture = new Texture("Tiles.png");
 
@@ -32,7 +34,6 @@ public final class Tiles {
         RODRIGHT = new Sprite(texture, 98, 126, 13, 4);
         ROCK = new Sprite(texture, 120, 0, 16, 16);
     }
-    private static final Texture texture;
 
     public static void dispose() {
         texture.dispose();
