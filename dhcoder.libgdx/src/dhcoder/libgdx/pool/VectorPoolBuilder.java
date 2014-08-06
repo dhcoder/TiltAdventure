@@ -22,5 +22,9 @@ public final class VectorPoolBuilder {
         }, capacity);
     }
 
+    public static Pool<Vector2> build() {
+        return build(Pool.DEFAULT_CAPACITY);
+    }
+
     private VectorPoolBuilder() {}
 }
