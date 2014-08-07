@@ -37,8 +37,8 @@ public final class RectangleCollisionAgent implements CollisionAgent {
         Rectangle rect1 = (Rectangle)shape1;
         Rectangle rect2 = (Rectangle)shape2;
 
-        // We do this test from rect2's frame of reference, as if he were located at the origin, not moving, the whole
-        // time.
+        // We do this test from rect2's frame of reference, as if it were located at the origin and not moving. This
+        // simplifies a bunch of math, later.
         Vector2 velRect1 = vectorPool.grabNew();
         Vector2 velRect2 = vectorPool.grabNew();
         Vector2 relVelRect1 = vectorPool.grabNew();
@@ -72,6 +72,9 @@ public final class RectangleCollisionAgent implements CollisionAgent {
         float rect2top = rect2.getTop(0f);
         float rect2bottom = rect2.getBottom(0f);
 
+        // Now that we're in a new frame of reference (where rect2 stands still and rect1 is moving), calculate the
+        // times when rect1 first passes over rect2, as well as the side crossed over. If the shape crossed over two
+        // sides at the same time (say, top and left), calculate which side was crossed over first.
         OptFloat percentWhenCollidedOpt = optFloatPool.grabNew();
         Vector2 normal = vectorPool.grabNew();
         if (rect1StartRight <= rect2left && rect1EndRight >= rect2left) {
@@ -79,7 +82,7 @@ public final class RectangleCollisionAgent implements CollisionAgent {
             percentWhenCollidedOpt.set(percentCollidedLeft);
             normal.set(-1f, 0f);
         }
-        else if (rect1StartLeft >= rect2right && rect1EndLeft <= rect2right) {
+        if (rect1StartLeft >= rect2right && rect1EndLeft <= rect2right) {
             float percentCollidedRight = (rect1StartLeft - rect2right) / (rect1StartLeft - rect1EndLeft);
             percentWhenCollidedOpt.set(percentCollidedRight);
             normal.set(1f, 0f);
@@ -92,7 +95,7 @@ public final class RectangleCollisionAgent implements CollisionAgent {
                 normal.set(0f, -1f);
             }
         }
-        else if (rect1StartBottom >= rect2top && rect1EndBottom <= rect2top) {
+        if (rect1StartBottom >= rect2top && rect1EndBottom <= rect2top) {
             float percentCollidedTop = (rect1StartBottom - rect2top) / (rect1StartBottom - rect1EndBottom);
             if (percentWhenCollidedOpt.getValueOr(1f) > percentCollidedTop) {
                 percentWhenCollidedOpt.set(percentCollidedTop);
