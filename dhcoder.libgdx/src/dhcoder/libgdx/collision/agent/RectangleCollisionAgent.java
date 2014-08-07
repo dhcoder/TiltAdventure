@@ -96,7 +96,7 @@ public final class RectangleCollisionAgent implements CollisionAgent {
             float percentCollidedTop = (rect1StartBottom - rect2top) / (rect1StartBottom - rect1EndBottom);
             if (percentWhenCollidedOpt.getValueOr(1f) > percentCollidedTop) {
                 percentWhenCollidedOpt.set(percentCollidedTop);
-                normal.set(1f, 0f);
+                normal.set(0f, 1f);
             }
         }
 
