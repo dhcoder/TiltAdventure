@@ -62,6 +62,13 @@ public final class OptInt implements Poolable {
     }
 
     /**
+     * Returns the current value of this optional or the specified default value if this optional has no value.
+     */
+    public int getValueOr(final int defaultValue) {
+        return (hasValue ? value : defaultValue);
+    }
+
+    /**
      * Sets this optional to a new value.
      */
     public void set(final int value) {
