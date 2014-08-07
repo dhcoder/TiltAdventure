@@ -138,9 +138,6 @@ public final class CollisionSystem {
             source.getCurrPosition().x, source.getCurrPosition().y, target.getShape(), target.getLastPosition().x,
             target.getLastPosition().y, target.getCurrPosition().x, target.getCurrPosition().y, intersection);
 
-        Vector2 finalPosition = vectorPool.grabNew();
-        finalPosition.set(intersection.getSourcePosition());
-
         final Vector2 normal = intersection.getNormal();
 
         // Project the post-collision vector onto the tangent of the point of collision. This basically means we
@@ -149,19 +146,22 @@ public final class CollisionSystem {
         postCollision.set(source.getCurrPosition()).sub(intersection.getSourcePosition());
 
         Vector2 tangent = vectorPool.grabNew();
-        tangent.set(normal).rotate90(1); // Rotation direction doesn't matter
+        // Rotation direction doesn't matter - we just want the line that's perpendicular to the point of contact.
+        tangent.set(normal).rotate90(1);
 
-        Angle angleToTanget = anglePool.grabNew();
-        angleToTanget.setRadians(atan2(postCollision.crs(tangent), postCollision.dot(tangent)));
+        Angle angleToTangent = anglePool.grabNew();
+        angleToTangent.setRadians(atan2(postCollision.crs(tangent), postCollision.dot(tangent)));
 
         // See http://en.wikipedia.org/wiki/Vector_projection
-        float scalarProjection = postCollision.len() * cos(angleToTanget.getRadians());
+        float scalarProjection = postCollision.len() * cos(angleToTangent.getRadians());
         tangent.scl(scalarProjection);
 
+        Vector2 finalPosition = vectorPool.grabNew();
+        finalPosition.set(intersection.getSourcePosition());
         finalPosition.add(tangent);
         source.setCurrPosition(finalPosition);
 
-        anglePool.free(angleToTanget);
+        anglePool.free(angleToTangent);
         vectorPool.free(postCollision);
         vectorPool.free(tangent);
         vectorPool.free(finalPosition);
