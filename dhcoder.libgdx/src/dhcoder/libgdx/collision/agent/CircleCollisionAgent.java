@@ -7,7 +7,7 @@ import dhcoder.libgdx.pool.VectorPoolBuilder;
 import dhcoder.support.memory.Pool;
 
 /**
- * Interface that provides various collision operations between two shapes.
+ * Class that provides various collision operations between two circles.
  */
 public final class CircleCollisionAgent implements CollisionAgent {
 

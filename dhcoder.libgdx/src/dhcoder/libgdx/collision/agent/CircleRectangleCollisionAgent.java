@@ -11,7 +11,7 @@ import dhcoder.support.opt.OptFloat;
 import static dhcoder.support.math.MathUtils.clamp;
 
 /**
- * Interface that provides various collision operations between two shapes.
+ * Class that provides various collision operations between a circle and a rectangle.
  */
 public final class CircleRectangleCollisionAgent implements CollisionAgent {
 

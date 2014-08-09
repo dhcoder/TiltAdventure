@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.collision.shape.Shape;
 
 /**
- * A collision agent which wraps another and reverses the input parameters being tested. So for example, reversing a
+ * A collision agent which wraps another agent, reversing the input parameters being tested. So for example, reversing a
  * CircleRectangleAgent gives you a RectangleCircleAgent.
  */
 public final class ReverseCollisionAgent implements CollisionAgent {

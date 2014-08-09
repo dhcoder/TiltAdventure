@@ -8,7 +8,7 @@ import dhcoder.support.memory.Pool;
 import dhcoder.support.opt.OptFloat;
 
 /**
- * Interface that provides various collision operations between two shapes.
+ * Class that provides various collision operations between two rectangles.
  */
 public final class RectangleCollisionAgent implements CollisionAgent {
 
