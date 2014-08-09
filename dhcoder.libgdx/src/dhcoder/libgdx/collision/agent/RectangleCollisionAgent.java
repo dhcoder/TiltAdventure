@@ -45,7 +45,7 @@ public final class RectangleCollisionAgent implements CollisionAgent {
         velRect1.set(toX1 - fromX1, toY1 - fromY1);
         velRect2.set(toX2 - fromX2, toY2 - fromY2);
         relVelRect1.set(velRect1);
-        relVelRect1.add(velRect2);
+        relVelRect1.sub(velRect2);
 
         vectorPool.free(velRect1);
         vectorPool.free(velRect2);
