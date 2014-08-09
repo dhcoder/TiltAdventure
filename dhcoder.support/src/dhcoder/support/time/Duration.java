@@ -85,6 +85,22 @@ public final class Duration implements Poolable {
         setSeconds(getSeconds() + duration.getSeconds());
     }
 
+    public void subtractSeconds(final float secs) {
+        setSeconds(getSeconds() - secs);
+    }
+
+    public void subtractMinutes(final float minutes) {
+        setMinutes(getMinutes() - minutes);
+    }
+
+    public void subtractMilliseconds(final float milliseconds) {
+        setMilliseconds(getMilliseconds() - milliseconds);
+    }
+
+    public void subtract(final Duration duration) {
+        setSeconds(getSeconds() - duration.getSeconds());
+    }
+
     public void setZero() { setSeconds(0f); }
 
     public boolean isZero() { return seconds == 0f; }
