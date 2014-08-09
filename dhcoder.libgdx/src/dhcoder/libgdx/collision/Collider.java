@@ -9,7 +9,7 @@ import dhcoder.support.memory.Poolable;
 import static dhcoder.libgdx.collision.shape.ShapeUtils.testIntersection;
 
 /**
- * A simplified representation of some game object used in collision testing.
+ * A class that encapsulates a shape and position used for collision testing.
  */
 public final class Collider implements Poolable {
 
@@ -32,16 +32,19 @@ public final class Collider implements Poolable {
         return shape;
     }
 
+    /**
+     * Returns the ID of the group this collider belongs in.
+     */
     public int getGroupId() {
         return groupId;
     }
 
-    public Vector2 getLastPosition() {
-        return lastPosition;
-    }
-
     public Vector2 getCurrPosition() {
         return currPosition;
+    }
+
+    public Vector2 getLastPosition() {
+        return lastPosition;
     }
 
     // Should only be called by Collision
@@ -56,7 +59,7 @@ public final class Collider implements Poolable {
         currPosition.set(x, y);
 
         if (!isActive) {
-            isActive = true;
+            isActive = true; // If just activated, currPosition wasn't valid until just now
             lastPosition.set(currPosition);
         }
     }

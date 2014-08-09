@@ -1,9 +1,12 @@
 package dhcoder.libgdx.collision.agent;
 
-import dhcoder.libgdx.collision.Intersection;
+import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.collision.shape.Circle;
 import dhcoder.libgdx.collision.shape.Rectangle;
 import dhcoder.libgdx.collision.shape.Shape;
+import dhcoder.libgdx.pool.VectorPoolBuilder;
+import dhcoder.support.memory.Pool;
+import dhcoder.support.opt.OptFloat;
 
 import static dhcoder.support.math.MathUtils.clamp;
 
@@ -11,6 +14,8 @@ import static dhcoder.support.math.MathUtils.clamp;
  * Interface that provides various collision operations between two shapes.
  */
 public final class CircleRectangleCollisionAgent implements CollisionAgent {
+
+    Pool<Vector2> vectorPool = VectorPoolBuilder.build(1);
 
     public static CollisionAgent reverse() {
         return new ReverseCollisionAgent(new CircleRectangleCollisionAgent());
@@ -36,10 +41,23 @@ public final class CircleRectangleCollisionAgent implements CollisionAgent {
     }
 
     @Override
-    public void getIntersection(final Shape shape1, final float fromX1, final float fromY1, final float toX1,
+    public void getRepulsion(final Shape shape1, final float fromX1, final float fromY1, final float toX1,
         final float toY1, final Shape shape2, final float fromX2, final float fromY2, final float toX2,
-        final float toY2, final Intersection outIntersection) {
-        outIntersection.set(fromX1, fromY1, fromX2, fromY2, 0f, 0f);
+        final float toY2, final Vector2 outRepulsion) {
+
+        Circle circle = (Circle)shape1;
+        Rectangle rect = (Rectangle)shape2;
+
+        float closestX = clamp(toX1, rect.getLeft(toX2), rect.getRight(toX2));
+        float closestY = clamp(toY1, rect.getBottom(toY2), rect.getTop(toY2));
+
+        Vector2 circleToPointDistance = vectorPool.grabNew();
+        circleToPointDistance.set(toX1 - closestX, toY1 - closestY); // Vector points from closest point to circle1
+
+        float penetration = circle.getRadius() - circleToPointDistance.len();
+        outRepulsion.set(circleToPointDistance).nor().scl(penetration);
+
+        vectorPool.free(circleToPointDistance);
     }
 }
 

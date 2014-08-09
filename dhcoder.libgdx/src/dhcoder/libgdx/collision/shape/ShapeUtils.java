@@ -1,6 +1,6 @@
 package dhcoder.libgdx.collision.shape;
 
-import dhcoder.libgdx.collision.Intersection;
+import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.collision.agent.CircleCollisionAgent;
 import dhcoder.libgdx.collision.agent.CircleRectangleCollisionAgent;
 import dhcoder.libgdx.collision.agent.CollisionAgent;
@@ -40,12 +40,12 @@ public final class ShapeUtils {
         return agent.testIntersection(shape1, x1, y1, shape2, x2, y2);
     }
 
-    public static void getIntersection(final Shape shape1, final float fromX1, final float fromY1, final float toX1,
+    public static void getRepulsion(final Shape shape1, final float fromX1, final float fromY1, final float toX1,
         final float toY1, final Shape shape2, final float fromX2, final float fromY2, final float toX2,
-        final float toY2, final Intersection outIntersection) {
+        final float toY2, final Vector2 outRepulsion) {
 
         CollisionAgent agent = getCollisionAgent(shape1, shape2);
-        agent.getIntersection(shape1, fromX1, fromY1, toX1, toY1, shape2, fromX2, fromY2, toX2, toY2, outIntersection);
+        agent.getRepulsion(shape1, fromX1, fromY1, toX1, toY1, shape2, fromX2, fromY2, toX2, toY2, outRepulsion);
     }
 
     private static CollisionAgent getCollisionAgent(final Shape shape1, final Shape shape2) {

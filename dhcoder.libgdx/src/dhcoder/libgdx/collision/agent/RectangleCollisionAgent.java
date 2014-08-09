@@ -1,7 +1,6 @@
 package dhcoder.libgdx.collision.agent;
 
 import com.badlogic.gdx.math.Vector2;
-import dhcoder.libgdx.collision.Intersection;
 import dhcoder.libgdx.collision.shape.Rectangle;
 import dhcoder.libgdx.collision.shape.Shape;
 import dhcoder.libgdx.pool.VectorPoolBuilder;
@@ -30,9 +29,9 @@ public final class RectangleCollisionAgent implements CollisionAgent {
     }
 
     @Override
-    public void getIntersection(final Shape shape1, final float fromX1, final float fromY1, final float toX1,
+    public void getRepulsion(final Shape shape1, final float fromX1, final float fromY1, final float toX1,
         final float toY1, final Shape shape2, final float fromX2, final float fromY2, final float toX2,
-        final float toY2, final Intersection outIntersection) {
+        final float toY2, final Vector2 outRepulsion) {
 
         Rectangle rect1 = (Rectangle)shape1;
         Rectangle rect2 = (Rectangle)shape2;
@@ -76,46 +75,40 @@ public final class RectangleCollisionAgent implements CollisionAgent {
         // times when rect1 first passes over rect2, as well as the side crossed over. If the shape crossed over two
         // sides at the same time (say, top and left), calculate which side was crossed over first.
         OptFloat percentWhenCollidedOpt = optFloatPool.grabNew();
-        Vector2 normal = vectorPool.grabNew();
+
+        // Set to 1.1 instead of 1, to guarantee our repulsion pushes the colliding shape OUT enough. Otherwise, because
+        // of float precision, we might only push the colliding shape just too little so it's still inside of us.
+        final float REPULSION_SCALAR = 1.1f;
         if (rect1StartRight <= rect2left && rect1EndRight >= rect2left) {
+            // Rect1 collided over Rect2 left->right
             float percentCollidedLeft = (rect2left - rect1StartRight) / (rect1EndRight - rect1StartRight);
             percentWhenCollidedOpt.set(percentCollidedLeft);
-            normal.set(-1f, 0f);
+            outRepulsion.set(-REPULSION_SCALAR, 0f).scl(rect1EndRight - rect2left);
         }
-        if (rect1StartLeft >= rect2right && rect1EndLeft <= rect2right) {
+        else if (rect1StartLeft >= rect2right && rect1EndLeft <= rect2right) {
+            // Rect1 collided over Rect2 right->left
             float percentCollidedRight = (rect1StartLeft - rect2right) / (rect1StartLeft - rect1EndLeft);
             percentWhenCollidedOpt.set(percentCollidedRight);
-            normal.set(1f, 0f);
+            outRepulsion.set(REPULSION_SCALAR, 0f).scl(rect2right - rect1EndLeft);
         }
 
         if (rect1StartTop <= rect2bottom && rect1EndTop >= rect2bottom) {
+            // Rect1 collided over Rect2 bottom->top
             float percentCollidedBottom = (rect2bottom - rect1StartTop) / (rect1EndTop - rect1StartTop);
-            if (percentWhenCollidedOpt.getValueOr(1f) > percentCollidedBottom) {
+            if (percentCollidedBottom <= percentWhenCollidedOpt.getValueOr(1f)) {
                 percentWhenCollidedOpt.set(percentCollidedBottom);
-                normal.set(0f, -1f);
+                outRepulsion.set(0f, -REPULSION_SCALAR).scl(rect1EndTop - rect2bottom);
             }
         }
-        if (rect1StartBottom >= rect2top && rect1EndBottom <= rect2top) {
+        else if (rect1StartBottom >= rect2top && rect1EndBottom <= rect2top) {
+            // Rect1 collided over Rect2 top->bottom
             float percentCollidedTop = (rect1StartBottom - rect2top) / (rect1StartBottom - rect1EndBottom);
-            if (percentWhenCollidedOpt.getValueOr(1f) > percentCollidedTop) {
+            if (percentCollidedTop <= percentWhenCollidedOpt.getValueOr(1f)) {
                 percentWhenCollidedOpt.set(percentCollidedTop);
-                normal.set(0f, 1f);
+                outRepulsion.set(0f, REPULSION_SCALAR).scl(rect2top - rect1EndBottom);
             }
         }
 
-        if (!percentWhenCollidedOpt.hasValue()) {
-            throw new IllegalArgumentException("Requested invalid rect/rect intersection.");
-        }
-
-        float percentWhenCollided = percentWhenCollidedOpt.getValue();
         optFloatPool.free(percentWhenCollidedOpt);
-
-        float outSourceX = fromX1 + percentWhenCollided * (toX1 - fromX1);
-        float outSourceY = fromY1 + percentWhenCollided * (toY1 - fromY1);
-        float outTargetX = fromX2 + percentWhenCollided * (toX2 - fromX2);
-        float outTargetY = fromY2 + percentWhenCollided * (toY2 - fromY2);
-
-        outIntersection.set(outSourceX, outSourceY, outTargetX, outTargetY, normal.x, normal.y);
-        vectorPool.free(normal);
     }
 }

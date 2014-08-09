@@ -9,9 +9,7 @@ import dhcoder.support.memory.Pool;
 
 import java.util.ArrayList;
 
-import static com.badlogic.gdx.math.MathUtils.atan2;
-import static com.badlogic.gdx.math.MathUtils.cos;
-import static dhcoder.libgdx.collision.shape.ShapeUtils.getIntersection;
+import static dhcoder.libgdx.collision.shape.ShapeUtils.getRepulsion;
 import static dhcoder.support.collection.ListUtils.swapToEndAndRemove;
 import static dhcoder.support.text.StringUtils.format;
 
@@ -36,7 +34,6 @@ public final class CollisionSystem {
     private final Pool<Collider> colliderPool;
     private final Pool<Collision> collisionPool;
     private final Pool<ColliderKey> colliderKeyPool = Pool.of(ColliderKey.class, 1);
-    private final Pool<Intersection> intersectionPool = Pool.of(Intersection.class, 1);
     private final Pool<Angle> anglePool = Pool.of(Angle.class, 1);
     private final Pool<Vector2> vectorPool = VectorPoolBuilder.build(3);
 
@@ -133,39 +130,20 @@ public final class CollisionSystem {
 
         Collider source = collision.getSource();
         Collider target = collision.getTarget();
-        Intersection intersection = intersectionPool.grabNew();
-        getIntersection(source.getShape(), source.getLastPosition().x, source.getLastPosition().y,
-            source.getCurrPosition().x, source.getCurrPosition().y, target.getShape(), target.getLastPosition().x,
-            target.getLastPosition().y, target.getCurrPosition().x, target.getCurrPosition().y, intersection);
-
-        final Vector2 normal = intersection.getNormal();
-
-        // Project the post-collision vector onto the tangent of the point of collision. This basically means we
-        // eliminate any part of the vector that goes into the object we are colliding with.
-        Vector2 postCollision = vectorPool.grabNew();
-        postCollision.set(source.getCurrPosition()).sub(intersection.getSourcePosition());
-
-        Vector2 tangent = vectorPool.grabNew();
-        // Rotation direction doesn't matter - we just want the line that's perpendicular to the point of contact.
-        tangent.set(normal).rotate90(1);
-
-        Angle angleToTangent = anglePool.grabNew();
-        angleToTangent.setRadians(atan2(postCollision.crs(tangent), postCollision.dot(tangent)));
-
-        // See http://en.wikipedia.org/wiki/Vector_projection
-        float scalarProjection = postCollision.len() * cos(angleToTangent.getRadians());
-        tangent.scl(scalarProjection);
+        Vector2 sourceCurrPos = source.getCurrPosition();
+        Vector2 sourceLastPos = source.getLastPosition();
+        Vector2 targetCurrPos = target.getCurrPosition();
+        Vector2 targetLastPos = target.getLastPosition();
+        Vector2 repulsion = vectorPool.grabNew();
+        getRepulsion(source.getShape(), sourceLastPos.x, sourceLastPos.y, sourceCurrPos.x, sourceCurrPos.y,
+            target.getShape(), targetLastPos.x, targetLastPos.y, targetCurrPos.x, targetCurrPos.y, repulsion);
 
         Vector2 finalPosition = vectorPool.grabNew();
-        finalPosition.set(intersection.getSourcePosition());
-        finalPosition.add(tangent);
+        finalPosition.set(sourceCurrPos).add(repulsion);
         source.setCurrPosition(finalPosition);
 
-        anglePool.free(angleToTangent);
-        vectorPool.free(postCollision);
-        vectorPool.free(tangent);
         vectorPool.free(finalPosition);
-        intersectionPool.free(intersection);
+        vectorPool.free(repulsion);
 
         // This collision never happened... remove it quietly...
         collisions.remove(collision.getKey());
