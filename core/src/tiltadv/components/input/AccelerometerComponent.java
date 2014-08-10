@@ -11,8 +11,6 @@ import dhcoder.support.time.Duration;
 import tiltadv.globals.Events;
 import tiltadv.memory.Pools;
 
-import static dhcoder.support.text.StringUtils.format;
-
 /**
  * Component which reads the device's accelerometer and sets the entity's tilt value accordingly.
  */
@@ -20,11 +18,12 @@ public final class AccelerometerComponent extends AbstractComponent {
 
     // If the tilt vector is smaller than the following value, we consider the amount of tilt too weak to count, and
     // instead just treat it as no tilt at all
-    private static final float TILT_THRESHOLD = 0.2f;
-    private final Quaternion relativeRotation = new Quaternion();
-    private boolean isTouchDown;
+    private static final float TILT_THRESHOLD = 0.1f;
+    private static final float ANGLE_TO_TILT = -0.07f;
+    private final Vector3 referenceVector = new Vector3();
+    private boolean isTiltActivated;
+
     private TiltComponent tiltComponent;
-    private Duration printDuration = Duration.zero();
 
     @Override
     public void initialize(final Entity owner) {
@@ -32,51 +31,54 @@ public final class AccelerometerComponent extends AbstractComponent {
         Events.onScreenTouchDown.addListener(new EventListener() {
             @Override
             public void run(final Object sender) {
-                accelerometerSnapshot
-                    .set(Gdx.input.getAccelerometerX(), Gdx.input.getAccelerometerY(), Gdx.input.getAccelerometerZ());
-                isTouchDown = true;
+                readAccelerometerValuesInto(referenceVector);
+                referenceVector.nor();
+                isTiltActivated = true;
             }
         });
         Events.onScreenTouchUp.addListener(new EventListener() {
             @Override
             public void run(final Object sender) {
-                isTouchDown = false;
+                isTiltActivated = false;
             }
         });
     }
 
+    @Override
     public void update(final Duration elapsedTime) {
-
-        boolean showMessage = false;
-        printDuration.add(elapsedTime);
-        if (printDuration.getSeconds() > 1f) {
-            showMessage = true;
-            printDuration.setZero();
-        }
 
         Vector2 tilt = Pools.vector2s.grabNew();
 
-        if (isTouchDown) {
-            Vector3 screenUpVector = Pools.vector3s.grabNew().set(0f, 0f, 1f);
-            Vector3 accelerometerDiff = Pools.vector3s.grabNew();
-            accelerometerDiff
-                .set(Gdx.input.getAccelerometerX(), Gdx.input.getAccelerometerY(), Gdx.input.getAccelerometerZ())
-                .sub(accelerometerSnapshot);
+        if (isTiltActivated) {
+            Vector3 accelerometerCurr = Pools.vector3s.grabNew();
+            Vector3 accelerometerCurrNormalized = Pools.vector3s.grabNew();
+            Quaternion rotationBetweenVectors = Pools.quaternions.grabNew();
+            readAccelerometerValuesInto(accelerometerCurr);
+            accelerometerCurrNormalized.set(accelerometerCurr).nor();
 
-            if (showMessage) {
-                Gdx.app.log("ACCEL", format("{0}x{1}x{2}", Gdx.input.getAccelerometerX(), Gdx.input.getAccelerometerY(),
-                    Gdx.input.getAccelerometerZ()));
-            }
-            // Convert portrait accelerometer directions to landscape
-            // See https://github.com/libgdx/libgdx/wiki/Accelerometer
-            tilt.set(accelerometerDiff.y, -accelerometerDiff.x);
-            Pools.vector3s.free(accelerometerDiff);
+            rotationBetweenVectors.setFromCross(referenceVector, accelerometerCurrNormalized);
+
+            tilt.set(angleToTilt(rotationBetweenVectors.getPitch()), angleToTilt(rotationBetweenVectors.getYaw()));
 
             if (tilt.isZero(TILT_THRESHOLD)) {
                 tilt.setZero();
             }
+
+            Pools.quaternions.free(rotationBetweenVectors);
+            Pools.vector3s.free(accelerometerCurrNormalized);
+            Pools.vector3s.free(accelerometerCurr);
+
         }
         tiltComponent.setTilt(tilt);
         Pools.vector2s.free(tilt);
+    }
+
+    // Given an input angle between 0 and 180, return
+    private float angleToTilt(final float angleDeg) {
+        return angleDeg * ANGLE_TO_TILT;
+    }
+
+    private void readAccelerometerValuesInto(final Vector3 outVector) {
+        outVector.set(Gdx.input.getAccelerometerX(), Gdx.input.getAccelerometerY(), Gdx.input.getAccelerometerZ());
     }
 }
