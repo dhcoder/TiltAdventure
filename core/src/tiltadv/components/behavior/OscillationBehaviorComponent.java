@@ -4,12 +4,9 @@ import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
-import dhcoder.support.math.Angle;
 import dhcoder.support.time.Duration;
 import tiltadv.components.model.TransformComponent;
 import tiltadv.memory.Pools;
-
-import static com.badlogic.gdx.math.MathUtils.sin;
 
 /**
  * Class that oscillates an entity between two locations, both easing out of and into each location.
@@ -55,13 +52,13 @@ public final class OscillationBehaviorComponent extends AbstractComponent {
         float xEnd = onReturnTrip ? xTo : xFrom;
         float yEnd = onReturnTrip ? yTo : yFrom;
 
-        Vector2 currPos = Pools.vectors.grabNew();
-        Vector2 destPos = Pools.vectors.grabNew();
+        Vector2 currPos = Pools.vector2s.grabNew();
+        Vector2 destPos = Pools.vector2s.grabNew();
         currPos.set(xStart, yStart);
         destPos.set(xEnd, yEnd);
         currPos.interpolate(destPos, percent, Interpolation.sine);
         transformComponent.setTranslate(currPos);
-        Pools.vectors.free(destPos);
-        Pools.vectors.free(currPos);
+        Pools.vector2s.free(destPos);
+        Pools.vector2s.free(currPos);
     }
 }

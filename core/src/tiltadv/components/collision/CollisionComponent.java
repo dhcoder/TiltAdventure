@@ -69,10 +69,10 @@ public abstract class CollisionComponent extends AbstractComponent {
      * conform to.
      */
     protected final void syncEntityWithCollisionSystem() {
-        Vector2 translate = Pools.vectors.grabNew();
+        Vector2 translate = Pools.vector2s.grabNew();
         translate.set(collider.getCurrPosition().x, collider.getCurrPosition().y);
         transformComponent.setTranslate(translate);
-        Pools.vectors.free(translate);
+        Pools.vector2s.free(translate);
     }
 
     protected void handleCollided(final Collision collision) {}

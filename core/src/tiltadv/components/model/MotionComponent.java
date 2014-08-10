@@ -60,11 +60,11 @@ public final class MotionComponent extends AbstractComponent {
 
         // Adjust current position based on how much velocity was applied over the last time range
         {
-            Vector2 translate = Pools.vectors.grabNew();
+            Vector2 translate = Pools.vector2s.grabNew();
             translate.set(transformComponent.getTranslate());
             translate.mulAdd(velocity, elapsedTime.getSeconds());
             transformComponent.setTranslate(translate);
-            Pools.vectors.free(translate);
+            Pools.vector2s.free(translate);
         }
 
     }

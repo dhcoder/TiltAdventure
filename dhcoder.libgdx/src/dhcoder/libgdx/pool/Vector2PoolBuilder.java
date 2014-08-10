@@ -6,7 +6,7 @@ import dhcoder.support.memory.Pool;
 /**
  * Convenience class that builds a pool of Vector2's.
  */
-public final class VectorPoolBuilder {
+public final class Vector2PoolBuilder {
 
     public static Pool<Vector2> build(final int capacity) {
         return new Pool<Vector2>(new Pool.AllocateMethod<Vector2>() {
@@ -26,5 +26,5 @@ public final class VectorPoolBuilder {
         return build(Pool.DEFAULT_CAPACITY);
     }
 
-    private VectorPoolBuilder() {}
+    private Vector2PoolBuilder() {}
 }

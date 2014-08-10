@@ -3,6 +3,7 @@ package tiltadv;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -29,6 +30,7 @@ import tiltadv.components.input.TiltComponent;
 import tiltadv.components.model.MotionComponent;
 import tiltadv.components.model.SizeComponent;
 import tiltadv.components.model.TransformComponent;
+import tiltadv.globals.Events;
 import tiltadv.globals.Tiles;
 import tiltadv.memory.Pools;
 
@@ -43,10 +45,10 @@ public final class GdxApplication extends ApplicationAdapter {
     private static final int VIEWPORT_HEIGHT = 240;
     private static final int VIEWPORT_WIDTH = 320;
 
-    // When you hit a breakpoint while debugging an app, this causes the delta time to be huge between the next frame
-    // and this one. Clamping to a reasonable max value works around this issue. A max here also prevents physics update
+    // When you hit a breakpoint while debugging an app, or if the phone you're using is just simply being slow, the
+    // delta times between frames can be HUGE. Let's clamp to a reasonable max here. This also prevents physics update
     // logic from dealing with time steps that are too large (at which point, objects start going through walls, etc.)
-    private static final float MAX_DELTA_TIME_SECS = 1f / 20f;
+    private static final float MAX_DELTA_TIME_SECS = 1f / 30f;
 
     private BitmapFont font;
     private OrthographicCamera camera;
@@ -62,6 +64,28 @@ public final class GdxApplication extends ApplicationAdapter {
         font = new BitmapFont();
         initializeServices();
         initializeEntities();
+
+        Gdx.input.setInputProcessor(new InputAdapter() {
+            private int numFingersDown;
+
+            @Override
+            public boolean touchDown(final int screenX, final int screenY, final int pointer, final int button) {
+                if (numFingersDown == 0) {
+                    Events.onScreenTouchDown.fire(Gdx.input);
+                }
+                ++numFingersDown;
+                return false;
+            }
+
+            @Override
+            public boolean touchUp(final int screenX, final int screenY, final int pointer, final int button) {
+                --numFingersDown;
+                if (numFingersDown == 0) {
+                    Events.onScreenTouchUp.fire(Gdx.input);
+                }
+                return false;
+            }
+        });
     }
 
     @Override
@@ -77,6 +101,7 @@ public final class GdxApplication extends ApplicationAdapter {
             entities.get(i).render(batch);
         }
         batch.end();
+
     }
 
     @Override

@@ -4,9 +4,8 @@ import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.collision.shape.Circle;
 import dhcoder.libgdx.collision.shape.Rectangle;
 import dhcoder.libgdx.collision.shape.Shape;
-import dhcoder.libgdx.pool.VectorPoolBuilder;
+import dhcoder.libgdx.pool.Vector2PoolBuilder;
 import dhcoder.support.memory.Pool;
-import dhcoder.support.opt.OptFloat;
 
 import static dhcoder.support.math.MathUtils.clamp;
 
@@ -15,7 +14,7 @@ import static dhcoder.support.math.MathUtils.clamp;
  */
 public final class CircleRectangleCollisionAgent implements CollisionAgent {
 
-    Pool<Vector2> vectorPool = VectorPoolBuilder.build(1);
+    Pool<Vector2> vectorPool = Vector2PoolBuilder.build(1);
 
     public static CollisionAgent reverse() {
         return new ReverseCollisionAgent(new CircleRectangleCollisionAgent());

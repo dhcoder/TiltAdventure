@@ -13,7 +13,7 @@ import tiltadv.memory.Pools;
  */
 public final class PlayerBehaviorComponent extends AbstractComponent {
 
-    private static final float TILT_MULTIPLIER = 50f;
+    private static final float TILT_MULTIPLIER = 70f;
     private static final Duration STOP_DURATION = Duration.fromSeconds(.3f);
     private TiltComponent tiltComponent;
     private MotionComponent motionComponent;
@@ -31,10 +31,10 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
 
         if (!tilt.isZero()) {
             {
-                Vector2 velocity = Pools.vectors.grabNew();
+                Vector2 velocity = Pools.vector2s.grabNew();
                 velocity.set(tilt.x * TILT_MULTIPLIER, tilt.y * TILT_MULTIPLIER);
                 motionComponent.setVelocity(velocity);
-                Pools.vectors.free(velocity);
+                Pools.vector2s.free(velocity);
             }
             isMoving = true;
         }

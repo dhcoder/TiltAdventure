@@ -3,7 +3,7 @@ package dhcoder.libgdx.collision.agent;
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.collision.shape.Rectangle;
 import dhcoder.libgdx.collision.shape.Shape;
-import dhcoder.libgdx.pool.VectorPoolBuilder;
+import dhcoder.libgdx.pool.Vector2PoolBuilder;
 import dhcoder.support.memory.Pool;
 import dhcoder.support.opt.OptFloat;
 
@@ -13,7 +13,7 @@ import dhcoder.support.opt.OptFloat;
 public final class RectangleCollisionAgent implements CollisionAgent {
 
     Pool<OptFloat> optFloatPool = Pool.of(OptFloat.class, 1);
-    Pool<Vector2> vectorPool = VectorPoolBuilder.build(3);
+    Pool<Vector2> vectorPool = Vector2PoolBuilder.build(3);
 
     @Override
     public boolean testIntersection(final Shape shape1, final float x1, final float y1, final Shape shape2,

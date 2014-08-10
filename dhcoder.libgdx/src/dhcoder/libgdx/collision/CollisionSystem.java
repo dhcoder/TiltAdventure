@@ -2,7 +2,7 @@ package dhcoder.libgdx.collision;
 
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.collision.shape.Shape;
-import dhcoder.libgdx.pool.VectorPoolBuilder;
+import dhcoder.libgdx.pool.Vector2PoolBuilder;
 import dhcoder.support.collection.ArrayMap;
 import dhcoder.support.math.Angle;
 import dhcoder.support.memory.Pool;
@@ -35,7 +35,7 @@ public final class CollisionSystem {
     private final Pool<Collision> collisionPool;
     private final Pool<ColliderKey> colliderKeyPool = Pool.of(ColliderKey.class, 1);
     private final Pool<Angle> anglePool = Pool.of(Angle.class, 1);
-    private final Pool<Vector2> vectorPool = VectorPoolBuilder.build(3);
+    private final Pool<Vector2> vectorPool = Vector2PoolBuilder.build(3);
 
     private final int[] collidesWith; // group -> bitmask of groups it collides with
     private final ArrayList<ArrayList<Collider>> groups;
