@@ -9,11 +9,13 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import dhcoder.libgdx.collision.CollisionSystem;
+import dhcoder.libgdx.collision.shape.Circle;
 import dhcoder.libgdx.collision.shape.Rectangle;
 import dhcoder.libgdx.entity.Component;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.math.Angle;
 import dhcoder.support.time.Duration;
+import tiltadv.components.behavior.OscillationBehaviorComponent;
 import tiltadv.components.behavior.PlayerBehaviorComponent;
 import tiltadv.components.collision.ObstacleCollisionComponent;
 import tiltadv.components.collision.PlayerCollisionComponent;
@@ -95,18 +97,26 @@ public final class GdxApplication extends ApplicationAdapter {
 
     private void initializeEntities() {
         entities = new ArrayList<Entity>();
-        Entity playerEntity = AddPlayerEntity();
+        Entity playerEntity = addPlayerEntity();
 
-        int numRocks = 7;
+        addMovingRockEntities();
+        addTiltIndicatorEntity(playerEntity);
+        addFpsEntity();
+    }
+
+    private void addMovingRockEntities() {
+        final int numRocks = 100;
+        final float scaleX = 120;
+        final float scaleY = 90;
+        final float percent = .2f;
         for (int i = 0; i < numRocks; ++i) {
             float circleDistance = (float)i / (float)numRocks * Angle.TWO_PI;
-            float xScale = 120;
-            float yScale = 90;
-            AddRockEntity(xScale * cos(circleDistance), yScale * sin(circleDistance));
+            float xTo = scaleX * cos(circleDistance);
+            float yTo = scaleY * sin(circleDistance);
+            float xFrom = xTo * percent;
+            float yFrom = yTo * percent;
+            AddMovingRockEntity(xTo, yTo, xFrom, yFrom);
         }
-
-        AddTiltIndicatorEntity(playerEntity);
-        AddFpsEntity();
     }
 
     private void update() {
@@ -126,7 +136,7 @@ public final class GdxApplication extends ApplicationAdapter {
         batch.setProjectionMatrix(camera.combined);
     }
 
-    private Entity AddPlayerEntity() {
+    private Entity addPlayerEntity() {
         Duration animDuration = Duration.fromSeconds(.1f);
         Animation animUp = new Animation(animDuration.getSeconds(), Tiles.PLAYERUP1, Tiles.PLAYERUP2);
         animUp.setPlayMode(Animation.PlayMode.LOOP);
@@ -147,8 +157,7 @@ public final class GdxApplication extends ApplicationAdapter {
             new KeyboardComponent());
         components.add(new PlayerBehaviorComponent());
         components.add(new PlayerDisplayComponent(animUp, animDown, animLeft, animRight));
-        components.add(new PlayerCollisionComponent(
-            new Rectangle(Tiles.PLAYERUP1.getWidth() / 2, Tiles.PLAYERUP1.getHeight() / 2)));
+        components.add(new PlayerCollisionComponent(new Circle(Tiles.PLAYERUP1.getWidth() / 2)));
 
         Entity playerEntity = new Entity(components);
         entities.add(playerEntity);
@@ -156,24 +165,27 @@ public final class GdxApplication extends ApplicationAdapter {
         return playerEntity;
     }
 
-    private void AddRockEntity(final float x, final float y) {
+    private void AddMovingRockEntity(final float xFrom, final float yFrom, final float xTo, final float yTo) {
         List<Component> components = new ArrayList<Component>();
         components.add(new SpriteComponent(Tiles.ROCK));
         components.add(SizeComponent.from(Tiles.ROCK));
-        components.add(new TransformComponent.Builder().setTranslate(x, y).build());
+        components.add(new TransformComponent());
+        components.add(new OscillationBehaviorComponent(xFrom, yFrom, xTo, yTo, Duration.fromSeconds(2f)));
         components
             .add(new ObstacleCollisionComponent(new Rectangle(Tiles.ROCK.getWidth() / 2, Tiles.ROCK.getHeight() / 2)));
-        entities.add(new Entity(components));
+
+        final Entity rockEntity = new Entity(components);
+        entities.add(rockEntity);
     }
 
-    private void AddFpsEntity() {
+    private void addFpsEntity() {
         TransformComponent transformComponent = new TransformComponent.Builder()
             .setTranslate(-VIEWPORT_WIDTH / 2, -VIEWPORT_HEIGHT / 2 + font.getLineHeight()).build();
         FpsDisplayComponent fpsDisplayComponent = new FpsDisplayComponent(font);
         entities.add(new Entity(transformComponent, fpsDisplayComponent));
     }
 
-    private void AddTiltIndicatorEntity(final Entity playerEntity) {
+    private void addTiltIndicatorEntity(final Entity playerEntity) {
         float margin = 5f;
         TransformComponent transformComponent = new TransformComponent.Builder()
             .setTranslate(VIEWPORT_WIDTH / 2 - Tiles.RODRIGHT.getWidth() - margin,
