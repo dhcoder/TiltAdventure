@@ -1,6 +1,7 @@
 package tiltadv.components.input;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import dhcoder.libgdx.entity.AbstractComponent;
@@ -20,7 +21,7 @@ public final class AccelerometerComponent extends AbstractComponent {
     // If the tilt vector is smaller than the following value, we consider the amount of tilt too weak to count, and
     // instead just treat it as no tilt at all
     private static final float TILT_THRESHOLD = 0.2f;
-    private final Vector3 accelerometerSnapshot = new Vector3();
+    private final Quaternion relativeRotation = new Quaternion();
     private boolean isTouchDown;
     private TiltComponent tiltComponent;
     private Duration printDuration = Duration.zero();
@@ -56,6 +57,7 @@ public final class AccelerometerComponent extends AbstractComponent {
         Vector2 tilt = Pools.vector2s.grabNew();
 
         if (isTouchDown) {
+            Vector3 screenUpVector = Pools.vector3s.grabNew().set(0f, 0f, 1f);
             Vector3 accelerometerDiff = Pools.vector3s.grabNew();
             accelerometerDiff
                 .set(Gdx.input.getAccelerometerX(), Gdx.input.getAccelerometerY(), Gdx.input.getAccelerometerZ())
