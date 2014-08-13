@@ -5,8 +5,15 @@
 An old school zelda-inspired game which uses tilt controls (and other inputs that take advantage of the average
 smart phone) for navigation and interaction with the world (battles and puzzles).
 
+## Building for the first time
+
+This is a Gradle project. The first time you open the code on your machine, you should do it by choosing
+`File -> Import Project...` and selected the `build.gradle` file located in the root directory. If you ever sync and get
+strange project errors, you may first want to try opening up the Gradle toolbar and clicking on the "Sync" button.
+
 ## Organization
-This project is based on [libdgx](http://libgdx.badlogicgames.com/) and, as such, is divided into various sections:
+
+This project is based on [libdgx](http://libgdx.badlogicgames.com/) and, as such, is divided into platforms:
 
 * android/
 * desktop/
@@ -15,9 +22,16 @@ This project is based on [libdgx](http://libgdx.badlogicgames.com/) and, as such
 Most of the game logic is under core/, whereas the target-specific folders exist only to publish the game to their
 proper format.
 
-There is also a utility module (dhcoder.support) which the main project depends on and a very small test module
-(dhcoder.test) which provides helper classes for unit testing.
- 
+There are also some utility modules:
+
+* dhcoder.support/
+* dhcoder.libgdx/
+* dhcoder.test/
+
+dhcoder.test is a small set of utility classes that help me out in my unit tests. dhcoder.support is a growing set of
+general utility classes that I could, in theory, port over to any other Java application. dhcoder.libgdx, in contrast,
+is a set of utility classes that build on top of libgdx itself.
+
 ## JDK / ADK
 
 In your project settings, you need to add a JDK named "TiltAdv JDK" that points to JDK 1.6 or later, and "TiltAdv
@@ -53,12 +67,13 @@ treated as immutable.
     * Following this rule makes it easier to know I can just modify a single setXXX method and that it will work
     everywhere.
 * Avoid all allocations that I have any control over while the user can control the player.
-    * This appeases the android GC from chomping on your game performance.
-    * Run Android monitor and track allocations
+    * This appeases the android GC from nibbling away at your game performance.
+    * **Run Android monitor and track allocations**
     * Use Pools
-    * Avoid `format` in code paths that get called a lot.
+    * Avoid `StringUtils.format` in code paths that get called a lot (this does a couple of minor allocations under the
+      hood.
     * Consider triggering the GC while the game is transitioning, say, from one room to another, etc., where a drop in
-    frame rate is less noticeable.
+      frame rate is less noticeable.
 
 ## On the fence
 
