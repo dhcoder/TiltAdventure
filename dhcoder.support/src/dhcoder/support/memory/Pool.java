@@ -87,7 +87,7 @@ public final class Pool<T> {
 
     private final ResetMethod<T> reset;
     private final Stack<T> freeItems;
-    private final List<T> usedItems;
+    private final List<T> itemsInUse;
     private final int capacity;
 
     public Pool(final AllocateMethod<T> allocate, final ResetMethod<T> reset) {
@@ -105,7 +105,7 @@ public final class Pool<T> {
 
         freeItems = new Stack<T>();
         freeItems.ensureCapacity(capacity);
-        usedItems = new ArrayList<T>(capacity);
+        itemsInUse = new ArrayList<T>(capacity);
 
         for (int i = 0; i < capacity; i++) {
             freeItems.push(allocate.run());
@@ -114,7 +114,9 @@ public final class Pool<T> {
 
     public int getCapacity() { return capacity; }
 
-    public int getUsedCount() { return usedItems.size(); }
+    public List<T> getItemsInUse() {
+        return itemsInUse;
+    }
 
     public int getRemainingCount() { return freeItems.size(); }
 
@@ -126,13 +128,13 @@ public final class Pool<T> {
         }
 
         T newItem = freeItems.pop();
-        usedItems.add(newItem);
+        itemsInUse.add(newItem);
 
         return newItem;
     }
 
     public void free(final T item) {
-        swapToEndAndRemove(usedItems, item);
+        swapToEndAndRemove(itemsInUse, item);
         reset.run(item);
         freeItems.push(item);
     }

@@ -54,29 +54,29 @@ public final class PoolTest {
     @Test
     public void poolCountsAreCorrect() {
         Pool<PooledItem> pool = createPool(5);
-        assertThat(pool.getUsedCount(), equalTo(0));
+        assertThat(pool.getItemsInUse().size(), equalTo(0));
         assertThat(pool.getRemainingCount(), equalTo(5));
         PooledItem item1 = pool.grabNew();
 
-        assertThat(pool.getUsedCount(), equalTo(1));
+        assertThat(pool.getItemsInUse().size(), equalTo(1));
         assertThat(pool.getRemainingCount(), equalTo(4));
         PooledItem item2 = pool.grabNew();
         PooledItem item3 = pool.grabNew();
         PooledItem item4 = pool.grabNew();
         PooledItem item5 = pool.grabNew();
 
-        assertThat(pool.getUsedCount(), equalTo(5));
+        assertThat(pool.getItemsInUse().size(), equalTo(5));
         assertThat(pool.getRemainingCount(), equalTo(0));
 
         pool.free(item1);
-        assertThat(pool.getUsedCount(), equalTo(4));
+        assertThat(pool.getItemsInUse().size(), equalTo(4));
         assertThat(pool.getRemainingCount(), equalTo(1));
 
         pool.free(item2);
         pool.free(item3);
         pool.free(item4);
         pool.free(item5);
-        assertThat(pool.getUsedCount(), equalTo(0));
+        assertThat(pool.getItemsInUse().size(), equalTo(0));
         assertThat(pool.getRemainingCount(), equalTo(5));
 
     }
