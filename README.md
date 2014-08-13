@@ -7,9 +7,10 @@ smart phone) for navigation and interaction with the world (battles and puzzles)
 
 ## Building for the first time
 
-This is a Gradle project. The first time you open the code on your machine, you should do it by choosing
-`File -> Import Project...` and selected the `build.gradle` file located in the root directory. If you ever sync and get
-strange project errors, you may first want to try opening up the Gradle toolbar and clicking on the "Sync" button.
+This is a Gradle project. The first time you open the project on your machine, you should do it by choosing
+`File -> Import Project...` and selected the `build.gradle` file located in the root directory. If you ever pull down
+from GitHub and get strange project errors, you may first want to try opening up the Gradle toolbar and clicking on the
+"Sync" button to see if that fixes things.
 
 ## Organization
 
