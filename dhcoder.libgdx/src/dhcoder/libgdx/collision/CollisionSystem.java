@@ -126,7 +126,7 @@ public final class CollisionSystem {
      * Given a collision we want to revert, change the location of the source collider to a new destination that avoids
      * the target collider (by sliding alongside it)
      */
-    public void redirectSourceToAvoidCollision(final Collision collision) {
+    public void revertCollision(final Collision collision) {
 
         Collider source = collision.getSource();
         Collider target = collision.getTarget();
