@@ -1,5 +1,7 @@
 package dhcoder.libgdx.collision.shape;
 
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+
 import static dhcoder.support.text.StringUtils.format;
 
 /**
@@ -24,6 +26,11 @@ public final class Rectangle implements Shape {
     @Override
     public boolean containsPoint(final float x, final float y) {
         return Math.abs(x) < halfWidth && Math.abs(y) < halfHeight;
+    }
+
+    @Override
+    public void render(final ShapeRenderer renderer, final float x, final float y) {
+        renderer.rect(x, y, halfWidth * 2, halfHeight * 2);
     }
 
     @Override

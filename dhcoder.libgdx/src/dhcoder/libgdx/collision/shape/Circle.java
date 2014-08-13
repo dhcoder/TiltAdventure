@@ -1,5 +1,7 @@
 package dhcoder.libgdx.collision.shape;
 
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+
 import static dhcoder.support.text.StringUtils.format;
 
 /**
@@ -25,6 +27,11 @@ public final class Circle implements Shape {
     @Override
     public boolean containsPoint(final float x, final float y) {
         return (x * x + y * y) <= radius * radius;
+    }
+
+    @Override
+    public void render(final ShapeRenderer renderer, final float x, final float y) {
+        renderer.circle(x + radius, y + radius, radius);
     }
 
     @Override

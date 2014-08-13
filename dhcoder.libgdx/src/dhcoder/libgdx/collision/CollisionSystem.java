@@ -1,5 +1,6 @@
 package dhcoder.libgdx.collision;
 
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.collision.shape.Shape;
 import dhcoder.libgdx.pool.Vector2PoolBuilder;
@@ -8,6 +9,7 @@ import dhcoder.support.math.Angle;
 import dhcoder.support.memory.Pool;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static dhcoder.libgdx.collision.shape.ShapeUtils.getRepulsion;
 import static dhcoder.support.collection.ListUtils.swapToEndAndRemove;
@@ -34,7 +36,6 @@ public final class CollisionSystem {
     private final Pool<Collider> colliderPool;
     private final Pool<Collision> collisionPool;
     private final Pool<ColliderKey> colliderKeyPool = Pool.of(ColliderKey.class, 1);
-    private final Pool<Angle> anglePool = Pool.of(Angle.class, 1);
     private final Pool<Vector2> vectorPool = Vector2PoolBuilder.build(3);
 
     private final int[] collidesWith; // group -> bitmask of groups it collides with
@@ -148,6 +149,16 @@ public final class CollisionSystem {
         // This collision never happened... remove it quietly...
         collisions.remove(collision.getKey());
         collisionPool.free(collision);
+    }
+
+    public void render(final ShapeRenderer renderer) {
+        List<Collider> colliders = colliderPool.getItemsInUse();
+        int numColliders = colliders.size();
+        for (int i = 0; i < numColliders; i++) {
+            Collider collider = colliders.get(i);
+            Vector2 pos = collider.getCurrPosition();
+            collider.getShape().render(renderer, pos.x, pos.y);
+        }
     }
 
     private void requireValidGroupId(final int group) {

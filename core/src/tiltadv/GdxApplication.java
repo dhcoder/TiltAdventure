@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import dhcoder.libgdx.collision.CollisionSystem;
 import dhcoder.libgdx.collision.shape.Circle;
 import dhcoder.libgdx.collision.shape.Rectangle;
@@ -30,7 +31,9 @@ import tiltadv.components.input.TiltComponent;
 import tiltadv.components.model.MotionComponent;
 import tiltadv.components.model.SizeComponent;
 import tiltadv.components.model.TransformComponent;
+import tiltadv.globals.DevSettings;
 import tiltadv.globals.Events;
+import tiltadv.globals.Settings;
 import tiltadv.globals.Tiles;
 import tiltadv.memory.Pools;
 
@@ -53,6 +56,7 @@ public final class GdxApplication extends ApplicationAdapter {
     private BitmapFont font;
     private OrthographicCamera camera;
     private SpriteBatch batch;
+    private ShapeRenderer shapeRenderer;
 
     private List<Entity> entities;
     private CollisionSystem collisionSystem;
@@ -61,6 +65,9 @@ public final class GdxApplication extends ApplicationAdapter {
     public void create() {
         camera = new OrthographicCamera(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
         batch = new SpriteBatch();
+        if (Settings.IN_DEV_MODE) {
+            shapeRenderer = new ShapeRenderer();
+        }
         font = new BitmapFont();
         initializeServices();
         initializeEntities();
@@ -102,6 +109,11 @@ public final class GdxApplication extends ApplicationAdapter {
         }
         batch.end();
 
+        if (Settings.IN_DEV_MODE && DevSettings.SHOW_COLLISION_SHAPES) {
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+            collisionSystem.render(shapeRenderer);
+            shapeRenderer.end();
+        }
     }
 
     @Override
@@ -113,6 +125,10 @@ public final class GdxApplication extends ApplicationAdapter {
         batch.dispose();
         font.dispose();
         Tiles.dispose();
+
+        if (Settings.IN_DEV_MODE) {
+            shapeRenderer.dispose();
+        }
     }
 
     private void initializeServices() {
@@ -159,6 +175,9 @@ public final class GdxApplication extends ApplicationAdapter {
 
         camera.update();
         batch.setProjectionMatrix(camera.combined);
+        if (Settings.IN_DEV_MODE) {
+            shapeRenderer.setProjectionMatrix(camera.combined);
+        }
     }
 
     private Entity addPlayerEntity() {
