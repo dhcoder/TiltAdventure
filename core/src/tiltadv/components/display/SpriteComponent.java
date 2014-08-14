@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.math.Angle;
+import dhcoder.support.time.Duration;
 import tiltadv.components.model.SizeComponent;
 import tiltadv.components.model.TransformComponent;
 
@@ -21,7 +22,7 @@ public final class SpriteComponent extends AbstractComponent {
     /**
      * The source sprite used by this component. Use {@link Sprite#set(Sprite)} if you need to change it, later.
      */
-    private Sprite sprite;
+    private final Sprite sprite;
     private boolean hidden;
     private TransformComponent transformComponent;
     private SizeComponent sizeComponent;
@@ -30,24 +31,17 @@ public final class SpriteComponent extends AbstractComponent {
         sprite = new Sprite();
     }
 
-    public SpriteComponent(final Sprite sprite) {
-        setSprite(sprite);
+    public SpriteComponent(final TextureRegion textureRegion) {
+        this();
+        setTextureRegion(textureRegion);
     }
 
     public Sprite getSprite() {
         return sprite;
     }
 
-    public void setSprite(final Sprite sprite) {
-        this.sprite = sprite;
-    }
-
     public void setTextureRegion(final TextureRegion textureRegion) {
         sprite.setRegion(textureRegion);
-    }
-
-    public boolean isHidden() {
-        return hidden;
     }
 
     public void setHidden(final boolean hidden) {
@@ -63,16 +57,21 @@ public final class SpriteComponent extends AbstractComponent {
     }
 
     @Override
-    public void render(final Batch batch) {
-
-        if (hidden) { return; }
-
+    public void update(final Duration elapsedTime) {
         Vector2 translate = transformComponent.getTranslate();
         Vector2 scale = transformComponent.getScale();
         Angle rotation = transformComponent.getRotation();
         Vector2 size = sizeComponent.getSize();
 
-        batch.draw(sprite, translate.x, translate.y, sprite.getOriginX(), sprite.getOriginY(), size.x, size.y, scale.x,
-            scale.y, rotation.getDegrees());
+        sprite.setPosition(translate.x - (size.x / 2f), translate.y - (size.y / 2f));
+        sprite.setSize(size.x, size.y);
+        sprite.setScale(scale.x, scale.y);
+        sprite.setRotation(rotation.getDegrees());
+    }
+
+    @Override
+    public void render(final Batch batch) {
+        if (hidden) { return; }
+        sprite.draw(batch);
     }
 }

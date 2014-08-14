@@ -31,7 +31,7 @@ public final class Circle implements Shape {
 
     @Override
     public void render(final ShapeRenderer renderer, final float x, final float y) {
-        renderer.circle(x + radius, y + radius, radius);
+        renderer.circle(x, y, radius);
     }
 
     @Override

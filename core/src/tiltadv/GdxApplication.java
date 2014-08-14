@@ -143,10 +143,31 @@ public final class GdxApplication extends ApplicationAdapter {
         addMovingRockEntities();
         addTiltIndicatorEntity(playerEntity);
         addFpsEntity();
+        addBoundaryWalls();
+    }
+
+    private void addBoundaryWalls() {
+        float screenW = VIEWPORT_WIDTH;
+        float screenH = VIEWPORT_HEIGHT;
+        float halfScreenW = screenW / 2f;
+        float halfScreenH = screenH / 2f;
+        float top = halfScreenH;
+        float bottom = -halfScreenH;
+        float left = -halfScreenW;
+        float right = halfScreenW;
+        float wallSize = 5f;
+        entities.add(new Entity(new TransformComponent.Builder().setTranslate(left, 0f).build(),
+            new ObstacleCollisionComponent(new Rectangle(wallSize, screenH))));
+        entities.add(new Entity(new TransformComponent.Builder().setTranslate(right, 0f).build(),
+            new ObstacleCollisionComponent(new Rectangle(wallSize, screenH))));
+        entities.add(new Entity(new TransformComponent.Builder().setTranslate(0f, bottom).build(),
+            new ObstacleCollisionComponent(new Rectangle(screenW, wallSize))));
+        entities.add(new Entity(new TransformComponent.Builder().setTranslate(0f, top).build(),
+            new ObstacleCollisionComponent(new Rectangle(screenW, wallSize))));
     }
 
     private void addMovingRockEntities() {
-        final int numRocks = 100;
+        final int numRocks = 4;
         final float scaleX = 120;
         final float scaleY = 90;
         final float percent = .2f;
@@ -201,7 +222,36 @@ public final class GdxApplication extends ApplicationAdapter {
             new KeyboardComponent());
         components.add(new PlayerBehaviorComponent());
         components.add(new PlayerDisplayComponent(animUp, animDown, animLeft, animRight));
-        components.add(new PlayerCollisionComponent(new Circle(Tiles.PLAYERUP1.getWidth() / 2)));
+        components.add(new PlayerCollisionComponent(new Circle(Tiles.PLAYERUP1.getRegionWidth() / 2)));
+
+        Entity playerEntity = new Entity(components);
+        entities.add(playerEntity);
+
+        return playerEntity;
+    }
+
+    private Entity addOctoEnemy() {
+        Duration animDuration = Duration.fromSeconds(.1f);
+        Animation animUp = new Animation(animDuration.getSeconds(), Tiles.OCTOUP1, Tiles.OCTOUP2);
+        animUp.setPlayMode(Animation.PlayMode.LOOP);
+        Animation animDown = new Animation(animDuration.getSeconds(), Tiles.OCTODOWN1, Tiles.OCTODOWN2);
+        animDown.setPlayMode(Animation.PlayMode.LOOP);
+        Animation animLeft = new Animation(animDuration.getSeconds(), Tiles.OCTOLEFT1, Tiles.OCTOLEFT2);
+        animLeft.setPlayMode(Animation.PlayMode.LOOP);
+        Animation animRight = new Animation(animDuration.getSeconds(), Tiles.OCTORIGHT1, Tiles.OCTORIGHT2);
+        animRight.setPlayMode(Animation.PlayMode.LOOP);
+
+        List<Component> components = new ArrayList<Component>();
+        components.add(new SpriteComponent());
+        components.add(SizeComponent.from(Tiles.OCTODOWN1));
+        components.add(new TransformComponent());
+        components.add(new MotionComponent());
+        components.add(new TiltComponent());
+        components.add(Gdx.app.getType() == Application.ApplicationType.Android ? new AccelerometerComponent() :
+            new KeyboardComponent());
+        components.add(new PlayerBehaviorComponent());
+        components.add(new PlayerDisplayComponent(animUp, animDown, animLeft, animRight));
+        components.add(new PlayerCollisionComponent(new Circle(Tiles.OCTOUP1.getRegionWidth() / 2)));
 
         Entity playerEntity = new Entity(components);
         entities.add(playerEntity);
@@ -215,8 +265,8 @@ public final class GdxApplication extends ApplicationAdapter {
         components.add(SizeComponent.from(Tiles.ROCK));
         components.add(new TransformComponent());
         components.add(new OscillationBehaviorComponent(xFrom, yFrom, xTo, yTo, Duration.fromSeconds(2f)));
-        components
-            .add(new ObstacleCollisionComponent(new Rectangle(Tiles.ROCK.getWidth() / 2, Tiles.ROCK.getHeight() / 2)));
+        components.add(new ObstacleCollisionComponent(
+            new Rectangle(Tiles.ROCK.getRegionWidth() / 2, Tiles.ROCK.getRegionHeight() / 2)));
 
         final Entity rockEntity = new Entity(components);
         entities.add(rockEntity);
@@ -232,8 +282,8 @@ public final class GdxApplication extends ApplicationAdapter {
     private void addTiltIndicatorEntity(final Entity playerEntity) {
         float margin = 5f;
         TransformComponent transformComponent = new TransformComponent.Builder()
-            .setTranslate(VIEWPORT_WIDTH / 2 - Tiles.RODRIGHT.getWidth() - margin,
-                VIEWPORT_HEIGHT / 2 - Tiles.RODRIGHT.getHeight() - margin).build();
+            .setTranslate(VIEWPORT_WIDTH / 2 - Tiles.RODRIGHT.getRegionWidth() - margin,
+                VIEWPORT_HEIGHT / 2 - Tiles.RODRIGHT.getRegionHeight() - margin).build();
 
         SpriteComponent spriteComponent = new SpriteComponent();
         SizeComponent sizeComponent = SizeComponent.from(Tiles.RODRIGHT);

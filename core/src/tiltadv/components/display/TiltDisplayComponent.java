@@ -1,6 +1,6 @@
 package tiltadv.components.display;
 
-import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
@@ -15,7 +15,7 @@ import tiltadv.memory.Pools;
  */
 public final class TiltDisplayComponent extends AbstractComponent {
 
-    private final Sprite arrowSprite;
+    private final TextureRegion arrowSprite;
     private final Entity observedEntity;
     private TransformComponent transformComponent;
     private SpriteComponent spriteComponent;
@@ -25,8 +25,8 @@ public final class TiltDisplayComponent extends AbstractComponent {
      * Create a tilt indicator by passing in a sprite which represents an arrow facing straight right. This component
      * will rotate and render the arrow appropriately.
      */
-    public TiltDisplayComponent(final Sprite arrowSprite, final Entity observedEntity) {
-        this.arrowSprite = arrowSprite;
+    public TiltDisplayComponent(final TextureRegion arrowTexture, final Entity observedEntity) {
+        this.arrowSprite = arrowTexture;
         this.observedEntity = observedEntity;
     }
 
@@ -34,7 +34,7 @@ public final class TiltDisplayComponent extends AbstractComponent {
     public void initialize(final Entity owner) {
         transformComponent = owner.requireComponent(TransformComponent.class);
         spriteComponent = owner.requireComponent(SpriteComponent.class);
-        spriteComponent.setSprite(arrowSprite);
+        spriteComponent.setTextureRegion(arrowSprite);
 
         tiltComponent = observedEntity.requireComponent(TiltComponent.class);
     }

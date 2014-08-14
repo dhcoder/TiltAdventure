@@ -30,7 +30,7 @@ public final class Rectangle implements Shape {
 
     @Override
     public void render(final ShapeRenderer renderer, final float x, final float y) {
-        renderer.rect(x, y, halfWidth * 2, halfHeight * 2);
+        renderer.rect(x - halfWidth, y - halfHeight, halfWidth * 2, halfHeight * 2);
     }
 
     @Override
