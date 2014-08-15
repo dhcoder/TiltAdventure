@@ -10,7 +10,7 @@ import tiltadv.components.model.MotionComponent;
 /**
  * Component that renders the main player's avatar depending on its state.
  */
-public final class PlayerDisplayComponent extends AbstractComponent {
+public final class MovingUnitDisplayComponent extends AbstractComponent {
 
     private final Animation animUp;
     private final Animation animDown;
@@ -21,7 +21,7 @@ public final class PlayerDisplayComponent extends AbstractComponent {
     private float elapsedSoFar;
     private Animation activeAnim;
 
-    public PlayerDisplayComponent(final Animation animUp, final Animation animDown, final Animation animLeft,
+    public MovingUnitDisplayComponent(final Animation animUp, final Animation animDown, final Animation animLeft,
         final Animation animRight) {
         this.animUp = animUp;
         this.animDown = animDown;

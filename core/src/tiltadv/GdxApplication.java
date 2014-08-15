@@ -17,12 +17,14 @@ import dhcoder.libgdx.entity.Component;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.math.Angle;
 import dhcoder.support.time.Duration;
+import tiltadv.components.behavior.OctoBehaviorComponent;
 import tiltadv.components.behavior.OscillationBehaviorComponent;
 import tiltadv.components.behavior.PlayerBehaviorComponent;
+import tiltadv.components.collision.EnemyCollisionComponent;
 import tiltadv.components.collision.ObstacleCollisionComponent;
 import tiltadv.components.collision.PlayerCollisionComponent;
 import tiltadv.components.display.FpsDisplayComponent;
-import tiltadv.components.display.PlayerDisplayComponent;
+import tiltadv.components.display.MovingUnitDisplayComponent;
 import tiltadv.components.display.SpriteComponent;
 import tiltadv.components.display.TiltDisplayComponent;
 import tiltadv.components.input.AccelerometerComponent;
@@ -140,10 +142,30 @@ public final class GdxApplication extends ApplicationAdapter {
         entities = new ArrayList<Entity>();
         Entity playerEntity = addPlayerEntity();
 
+        addOctoEnemies();
         addMovingRockEntities();
         addTiltIndicatorEntity(playerEntity);
         addFpsEntity();
         addBoundaryWalls();
+    }
+
+    private void addOctoEnemies() {
+        addOctoEnemy(-80, 20);
+        addOctoEnemy(-30, 20);
+        addOctoEnemy(-80, 80);
+        addOctoEnemy(-30, 80);
+        addOctoEnemy(80, 20);
+        addOctoEnemy(30, 20);
+        addOctoEnemy(30, 80);
+        addOctoEnemy(80, 80);
+        addOctoEnemy(-80, -20);
+        addOctoEnemy(-30, -20);
+        addOctoEnemy(-80, -80);
+        addOctoEnemy(-30, -80);
+        addOctoEnemy(30, -80);
+        addOctoEnemy(80, -80);
+        addOctoEnemy(30, -20);
+        addOctoEnemy(80, -20);
     }
 
     private void addBoundaryWalls() {
@@ -182,16 +204,14 @@ public final class GdxApplication extends ApplicationAdapter {
     }
 
     private void update() {
-        {
-            Duration elapsedTime = Pools.durations.grabNew();
-            elapsedTime.setSeconds(Math.min(Gdx.graphics.getRawDeltaTime(), MAX_DELTA_TIME_SECS));
-
-            int numEntities = entities.size(); // Simple iteration to avoid Iterator allocation
-            for (int i = 0; i < numEntities; ++i) {
-                entities.get(i).update(elapsedTime);
-            }
-            Pools.durations.free(elapsedTime);
+        Duration elapsedTime = Pools.durations.grabNew();
+        elapsedTime.setSeconds(Math.min(Gdx.graphics.getRawDeltaTime(), MAX_DELTA_TIME_SECS));
+        int numEntities = entities.size(); // Simple iteration to avoid Iterator allocation
+        for (int i = 0; i < numEntities; ++i) {
+            entities.get(i).update(elapsedTime);
         }
+        Pools.durations.free(elapsedTime);
+
         collisionSystem.triggerCollisions();
 
         camera.update();
@@ -221,7 +241,7 @@ public final class GdxApplication extends ApplicationAdapter {
         components.add(Gdx.app.getType() == Application.ApplicationType.Android ? new AccelerometerComponent() :
             new KeyboardComponent());
         components.add(new PlayerBehaviorComponent());
-        components.add(new PlayerDisplayComponent(animUp, animDown, animLeft, animRight));
+        components.add(new MovingUnitDisplayComponent(animUp, animDown, animLeft, animRight));
         components.add(new PlayerCollisionComponent(new Circle(Tiles.PLAYERUP1.getRegionWidth() / 2)));
 
         Entity playerEntity = new Entity(components);
@@ -230,7 +250,7 @@ public final class GdxApplication extends ApplicationAdapter {
         return playerEntity;
     }
 
-    private Entity addOctoEnemy() {
+    private void addOctoEnemy(final float x, final float y) {
         Duration animDuration = Duration.fromSeconds(.1f);
         Animation animUp = new Animation(animDuration.getSeconds(), Tiles.OCTOUP1, Tiles.OCTOUP2);
         animUp.setPlayMode(Animation.PlayMode.LOOP);
@@ -244,19 +264,13 @@ public final class GdxApplication extends ApplicationAdapter {
         List<Component> components = new ArrayList<Component>();
         components.add(new SpriteComponent());
         components.add(SizeComponent.from(Tiles.OCTODOWN1));
-        components.add(new TransformComponent());
+        components.add(new TransformComponent.Builder().setTranslate(x, y).build());
         components.add(new MotionComponent());
-        components.add(new TiltComponent());
-        components.add(Gdx.app.getType() == Application.ApplicationType.Android ? new AccelerometerComponent() :
-            new KeyboardComponent());
-        components.add(new PlayerBehaviorComponent());
-        components.add(new PlayerDisplayComponent(animUp, animDown, animLeft, animRight));
-        components.add(new PlayerCollisionComponent(new Circle(Tiles.OCTOUP1.getRegionWidth() / 2)));
+        components.add(new OctoBehaviorComponent());
+        components.add(new MovingUnitDisplayComponent(animUp, animDown, animLeft, animRight));
+        components.add(new EnemyCollisionComponent(new Circle(Tiles.OCTOUP1.getRegionWidth() / 2)));
 
-        Entity playerEntity = new Entity(components);
-        entities.add(playerEntity);
-
-        return playerEntity;
+        entities.add(new Entity(components));
     }
 
     private void AddMovingRockEntity(final float xFrom, final float yFrom, final float xTo, final float yTo) {

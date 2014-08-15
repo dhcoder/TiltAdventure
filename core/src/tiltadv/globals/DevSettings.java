@@ -9,7 +9,7 @@ public final class DevSettings {
     /**
      * If true and in dev mode, we should render shape overlays over all entities set up for collision.
      */
-    public static boolean SHOW_COLLISION_SHAPES = true;
+    public static boolean SHOW_COLLISION_SHAPES = false;
 
     private DevSettings() {}
 

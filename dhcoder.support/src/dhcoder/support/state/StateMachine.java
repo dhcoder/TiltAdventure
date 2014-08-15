@@ -17,7 +17,7 @@ import static dhcoder.support.text.StringUtils.format;
  * @param <S> An enumeration type that represents the known states this machine can get into.
  * @param <E> An enumeration type that represents the known events this machine can accept.
  */
-public abstract class StateMachine<S extends Enum, E extends Enum> {
+public class StateMachine<S extends Enum, E extends Enum> {
 
     private final class StateEvent {
 
@@ -59,7 +59,7 @@ public abstract class StateMachine<S extends Enum, E extends Enum> {
         currentState = startState;
     }
 
-    public S getCurrentState() {
+    public final S getCurrentState() {
         return currentState;
     }
 
@@ -67,7 +67,7 @@ public abstract class StateMachine<S extends Enum, E extends Enum> {
      * Set a method handler which, if set, will get called any time an event is called on the state machine that isn't
      * handled.
      */
-    public void setDefaultHandler(final StateEventHandler<S, E> defaultHandler) {
+    public final void setDefaultHandler(final StateEventHandler<S, E> defaultHandler) {
         defaultHandlerOpt.set(defaultHandler);
     }
 
@@ -78,7 +78,7 @@ public abstract class StateMachine<S extends Enum, E extends Enum> {
      *
      * @throws IllegalArgumentException if the state/event pair has previously been registered.
      */
-    public void registerEvent(final S state, final E event, final StateTransitionHandler<S, E> eventHandler) {
+    public final void registerEvent(final S state, final E event, final StateTransitionHandler<S, E> eventHandler) {
         StateEvent pair = new StateEvent(state, event);
 
         if (eventResponses.containsKey(pair)) {
@@ -92,14 +92,14 @@ public abstract class StateMachine<S extends Enum, E extends Enum> {
     /**
      * Tell the state machine to handle the passed in event given the current state.
      */
-    public void handleEvent(final E event) {
+    public final void handleEvent(final E event) {
         handleEvent(event, Opt.withNoValue());
     }
 
     /**
      * Like {@link #handleEvent(Enum)} but with some additional data that is related to the event.
      */
-    public void handleEvent(final E event, final Object eventData) {
+    public final void handleEvent(final E event, final Object eventData) {
         handleEvent(event, of(eventData));
     }
 
@@ -113,11 +113,7 @@ public abstract class StateMachine<S extends Enum, E extends Enum> {
         }
 
         StateTransitionHandler<S, E> eventHandler = eventResponses.get(pair);
-        Opt<S> newStateOpt = eventHandler.run(currentState, event, eventData);
-
-        if (newStateOpt.hasValue()) {
-            currentState = newStateOpt.getValue();
-        }
+        currentState = eventHandler.run(currentState, event, eventData);
     }
 }
 

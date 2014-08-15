@@ -9,5 +9,5 @@ import dhcoder.support.opt.Opt;
  * @param <E> An enumeration type that represents the known events this machine can accept.
  */
 public interface StateTransitionHandler<S extends Enum, E extends Enum> {
-    Opt<S> run(S fromState, E withEvent, Opt eventData);
+    S run(S fromState, E withEvent, Opt eventData);
 }
