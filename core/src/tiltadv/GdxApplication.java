@@ -177,7 +177,7 @@ public final class GdxApplication extends ApplicationAdapter {
         float bottom = -halfScreenH;
         float left = -halfScreenW;
         float right = halfScreenW;
-        float wallSize = 5f;
+        float wallSize = .5f;
         entities.add(new Entity(new TransformComponent.Builder().setTranslate(left, 0f).build(),
             new ObstacleCollisionComponent(new Rectangle(wallSize, screenH))));
         entities.add(new Entity(new TransformComponent.Builder().setTranslate(right, 0f).build(),
