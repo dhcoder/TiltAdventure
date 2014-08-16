@@ -1,11 +1,12 @@
 package dhcoder.support.state;
 
+import dhcoder.support.collection.Key2;
+import dhcoder.support.memory.Pool;
 import dhcoder.support.opt.Opt;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static dhcoder.support.opt.Opt.of;
 import static dhcoder.support.text.StringUtils.format;
 
 /**
@@ -19,40 +20,11 @@ import static dhcoder.support.text.StringUtils.format;
  */
 public class StateMachine<S extends Enum, E extends Enum> {
 
-    private final class StateEvent {
-
-        private final S state;
-        private final E event;
-
-        private StateEvent(final S state, final E event) {
-            this.state = state;
-            this.event = event;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = state.hashCode();
-            result = 31 * result + event.hashCode();
-            return result;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-            if (this == o) { return true; }
-            if (o == null || getClass() != o.getClass()) { return false; }
-
-            StateEvent that = (StateEvent)o;
-
-            if (!event.equals(that.event)) { return false; }
-            if (!state.equals(that.state)) { return false; }
-
-            return true;
-        }
-    }
-
-    private final Map<StateEvent, StateTransitionHandler<S, E>> eventResponses =
-        new HashMap<StateEvent, StateTransitionHandler<S, E>>();
+    private final Map<Key2<S, E>, StateTransitionHandler<S, E>> eventResponses =
+        new HashMap<Key2<S, E>, StateTransitionHandler<S, E>>();
     private final Opt<StateEventHandler<S, E>> defaultHandlerOpt = Opt.withNoValue();
+    private final Pool<Key2> keyPool = Pool.of(Key2.class, 1);
+    private final Pool<Opt> optPool = Pool.of(Opt.class, 1);
     private S currentState;
 
     public StateMachine(final S startState) {
@@ -79,40 +51,48 @@ public class StateMachine<S extends Enum, E extends Enum> {
      * @throws IllegalArgumentException if the state/event pair has previously been registered.
      */
     public final void registerEvent(final S state, final E event, final StateTransitionHandler<S, E> eventHandler) {
-        StateEvent pair = new StateEvent(state, event);
-
-        if (eventResponses.containsKey(pair)) {
+        Key2<S, E> key = new Key2<S, E>(state, event);
+        if (eventResponses.containsKey(key)) {
             throw new IllegalArgumentException(
                 format("Duplicate registration of state+event pair: {0}, {1}.", state, event));
         }
 
-        eventResponses.put(pair, eventHandler);
+        eventResponses.put(key, eventHandler);
     }
 
     /**
      * Tell the state machine to handle the passed in event given the current state.
      */
     public final void handleEvent(final E event) {
-        handleEvent(event, Opt.withNoValue());
+        Opt emptyOpt = optPool.grabNew();
+        handleEvent(event, emptyOpt);
+        optPool.free(emptyOpt);
     }
 
     /**
      * Like {@link #handleEvent(Enum)} but with some additional data that is related to the event.
      */
     public final void handleEvent(final E event, final Object eventData) {
-        handleEvent(event, of(eventData));
+        Opt dataOpt = optPool.grabNew();
+        dataOpt.set(eventData);
+        handleEvent(event, dataOpt);
+        optPool.free(dataOpt);
     }
 
     private void handleEvent(final E event, final Opt eventData) {
-        StateEvent pair = new StateEvent(currentState, event);
-        if (!eventResponses.containsKey(pair)) {
+        Key2 key = keyPool.grabNew();
+        key.set(currentState, event);
+        if (!eventResponses.containsKey(key)) {
+            keyPool.free(key);
             if (defaultHandlerOpt.hasValue()) {
                 defaultHandlerOpt.getValue().run(currentState, event, eventData);
             }
             return;
         }
 
-        StateTransitionHandler<S, E> eventHandler = eventResponses.get(pair);
+        StateTransitionHandler<S, E> eventHandler = eventResponses.get(key);
+        keyPool.free(key);
+
         currentState = eventHandler.run(currentState, event, eventData);
     }
 }

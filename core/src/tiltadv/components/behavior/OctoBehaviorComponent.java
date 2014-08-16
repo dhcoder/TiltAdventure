@@ -32,7 +32,13 @@ public final class OctoBehaviorComponent extends AbstractComponent {
         NORTH,
         SOUTH,
         EAST,
-        WEST
+        WEST;
+
+        private static final Direction[] CACHED = values();
+
+        public static Direction getRandom() {
+            return CACHED[random.nextInt(CACHED.length)];
+        }
     }
 
     private static final float SPEED = 30.0f;
@@ -68,8 +74,7 @@ public final class OctoBehaviorComponent extends AbstractComponent {
             public S run(final S fromState, final E withEvent, final Opt eventData) {
 
                 Vector2 velocity = Pools.vector2s.grabNew();
-                Direction randomDir = Direction.values()[random.nextInt(4)];
-                switch (randomDir) {
+                switch (Direction.getRandom()) {
                     case NORTH:
                         velocity.set(0f, SPEED);
                         break;
