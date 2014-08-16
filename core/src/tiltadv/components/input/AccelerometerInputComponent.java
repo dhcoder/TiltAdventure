@@ -8,13 +8,14 @@ import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.event.EventListener;
 import dhcoder.support.time.Duration;
+import tiltadv.components.model.TiltComponent;
 import tiltadv.globals.Events;
 import tiltadv.memory.Pools;
 
 /**
  * Component which reads the device's accelerometer and sets the entity's tilt value accordingly.
  */
-public final class AccelerometerComponent extends AbstractComponent {
+public final class AccelerometerInputComponent extends AbstractComponent {
 
     // If the tilt vector is smaller than the following value, we consider the amount of tilt too weak to count, and
     // instead just treat it as no tilt at all

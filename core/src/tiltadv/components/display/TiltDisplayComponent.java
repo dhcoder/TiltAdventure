@@ -6,7 +6,7 @@ import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.math.Angle;
 import dhcoder.support.time.Duration;
-import tiltadv.components.input.TiltComponent;
+import tiltadv.components.model.TiltComponent;
 import tiltadv.components.model.TransformComponent;
 import tiltadv.memory.Pools;
 

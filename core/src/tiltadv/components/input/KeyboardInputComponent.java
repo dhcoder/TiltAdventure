@@ -5,13 +5,14 @@ import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.time.Duration;
+import tiltadv.components.model.TiltComponent;
 
 import static com.badlogic.gdx.Input.Keys;
 
 /**
  * Component which handles the user using a keyboard to
  */
-public final class KeyboardComponent extends AbstractComponent {
+public final class KeyboardInputComponent extends AbstractComponent {
 
     private final Vector2 tilt = new Vector2(); // TODO: Replace with pool
     private TiltComponent tiltComponent;
