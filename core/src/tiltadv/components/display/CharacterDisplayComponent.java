@@ -8,7 +8,7 @@ import dhcoder.support.time.Duration;
 import tiltadv.components.model.MotionComponent;
 
 /**
- * Component that renders the main player's avatar depending on its state.
+ * Component that renders a character which can move in any of the cardinal directions.
  */
 public final class CharacterDisplayComponent extends AbstractComponent {
 
