@@ -24,7 +24,7 @@ import tiltadv.components.collision.EnemyCollisionComponent;
 import tiltadv.components.collision.ObstacleCollisionComponent;
 import tiltadv.components.collision.PlayerCollisionComponent;
 import tiltadv.components.display.FpsDisplayComponent;
-import tiltadv.components.display.MovingUnitDisplayComponent;
+import tiltadv.components.display.CharacterDisplayComponent;
 import tiltadv.components.display.SpriteComponent;
 import tiltadv.components.display.TiltDisplayComponent;
 import tiltadv.components.input.AccelerometerInputComponent;
@@ -241,7 +241,7 @@ public final class GdxApplication extends ApplicationAdapter {
         components.add(Gdx.app.getType() == Application.ApplicationType.Android ? new AccelerometerInputComponent() :
             new KeyboardInputComponent());
         components.add(new PlayerBehaviorComponent());
-        components.add(new MovingUnitDisplayComponent(animUp, animDown, animLeft, animRight));
+        components.add(new CharacterDisplayComponent(animUp, animDown, animLeft, animRight));
         components.add(new PlayerCollisionComponent(new Circle(Tiles.PLAYERUP1.getRegionWidth() / 2)));
 
         Entity playerEntity = new Entity(components);
@@ -267,7 +267,7 @@ public final class GdxApplication extends ApplicationAdapter {
         components.add(new TransformComponent.Builder().setTranslate(x, y).build());
         components.add(new MotionComponent());
         components.add(new OctoBehaviorComponent());
-        components.add(new MovingUnitDisplayComponent(animUp, animDown, animLeft, animRight));
+        components.add(new CharacterDisplayComponent(animUp, animDown, animLeft, animRight));
         components.add(new EnemyCollisionComponent(new Circle(Tiles.OCTOUP1.getRegionWidth() / 2)));
 
         entities.add(new Entity(components));
