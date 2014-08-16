@@ -21,7 +21,9 @@ public final class AccelerometerInputComponent extends AbstractComponent {
     // instead just treat it as no tilt at all
     private static final float TILT_THRESHOLD = 0.1f;
     private static final float ANGLE_TO_TILT = -0.07f;
-    private final Vector3 referenceVector = new Vector3();
+    // Default screen position is slightly tilted toward the player, about 10° from flat
+    // TODO: Allow multiple configuration, maybe? (Flat, upside-down, configurable?)
+    private final Vector3 referenceVector = new Vector3(.4f, 0f, 1f).nor();
     private boolean isTiltActivated;
 
     private TiltComponent tiltComponent;
@@ -32,8 +34,6 @@ public final class AccelerometerInputComponent extends AbstractComponent {
         Events.onScreenTouchDown.addListener(new EventListener() {
             @Override
             public void run(final Object sender) {
-                readAccelerometerValuesInto(referenceVector);
-                referenceVector.nor();
                 isTiltActivated = true;
             }
         });
@@ -47,16 +47,15 @@ public final class AccelerometerInputComponent extends AbstractComponent {
 
     @Override
     public void update(final Duration elapsedTime) {
-
         Vector2 tilt = Pools.vector2s.grabNew();
 
         if (isTiltActivated) {
             Vector3 accelerometerCurr = Pools.vector3s.grabNew();
             Vector3 accelerometerCurrNormalized = Pools.vector3s.grabNew();
             Quaternion rotationBetweenVectors = Pools.quaternions.grabNew();
+
             readAccelerometerValuesInto(accelerometerCurr);
             accelerometerCurrNormalized.set(accelerometerCurr).nor();
-
             rotationBetweenVectors.setFromCross(referenceVector, accelerometerCurrNormalized);
 
             tilt.set(angleToTilt(rotationBetweenVectors.getPitch()), angleToTilt(rotationBetweenVectors.getYaw()));
@@ -68,8 +67,8 @@ public final class AccelerometerInputComponent extends AbstractComponent {
             Pools.quaternions.free(rotationBetweenVectors);
             Pools.vector3s.free(accelerometerCurrNormalized);
             Pools.vector3s.free(accelerometerCurr);
-
         }
+
         tiltComponent.setTilt(tilt);
         Pools.vector2s.free(tilt);
     }
