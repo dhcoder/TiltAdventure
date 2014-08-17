@@ -14,11 +14,11 @@ import static dhcoder.support.math.MathUtils.clamp;
  */
 public final class CircleRectangleCollisionAgent implements CollisionAgent {
 
-    Pool<Vector2> vectorPool = Vector2PoolBuilder.build(1);
-
     public static CollisionAgent reverse() {
         return new ReverseCollisionAgent(new CircleRectangleCollisionAgent());
     }
+
+    Pool<Vector2> vectorPool = Vector2PoolBuilder.build(1);
 
     @Override
     public boolean testIntersection(final Shape shape1, final float x1, final float y1, final Shape shape2,

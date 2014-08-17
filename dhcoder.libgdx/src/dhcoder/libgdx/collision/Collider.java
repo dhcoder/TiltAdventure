@@ -43,15 +43,15 @@ public final class Collider implements Poolable {
         return currPosition;
     }
 
-    public Vector2 getLastPosition() {
-        return lastPosition;
-    }
-
     // Should only be called by Collision
     // Used to rewrite history, telling the collider that it didn't really go to where it thought it did...
     // This is useful, for example, to pop a shape out after it penetrated an object that should be solid.
     void setCurrPosition(final Vector2 currPosition) {
         this.currPosition.set(currPosition);
+    }
+
+    public Vector2 getLastPosition() {
+        return lastPosition;
     }
 
     public void updatePosition(final float x, final float y) {

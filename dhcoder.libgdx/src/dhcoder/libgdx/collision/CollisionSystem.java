@@ -5,7 +5,6 @@ import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.collision.shape.Shape;
 import dhcoder.libgdx.pool.Vector2PoolBuilder;
 import dhcoder.support.collection.ArrayMap;
-import dhcoder.support.math.Angle;
 import dhcoder.support.memory.Pool;
 
 import java.util.ArrayList;

@@ -1,6 +1,5 @@
 package dhcoder.libgdx.pool;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import dhcoder.support.memory.Pool;
 
