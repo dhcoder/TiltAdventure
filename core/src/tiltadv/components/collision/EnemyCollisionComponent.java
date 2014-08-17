@@ -3,7 +3,7 @@ package tiltadv.components.collision;
 import dhcoder.libgdx.collision.Collision;
 import dhcoder.libgdx.collision.CollisionSystem;
 import dhcoder.libgdx.collision.shape.Shape;
-import tiltadv.Services;
+import tiltadv.globals.Services;
 import tiltadv.globals.Group;
 
 /**

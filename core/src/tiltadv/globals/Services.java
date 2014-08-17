@@ -1,4 +1,4 @@
-package tiltadv;
+package tiltadv.globals;
 
 import dhcoder.support.pattern.ServiceLocator;
 

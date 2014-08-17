@@ -10,7 +10,7 @@ import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.event.ArgEventListener;
 import dhcoder.support.time.Duration;
-import tiltadv.Services;
+import tiltadv.globals.Services;
 import tiltadv.components.model.TransformComponent;
 import tiltadv.memory.Pools;
 

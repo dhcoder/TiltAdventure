@@ -33,10 +33,7 @@ import tiltadv.components.model.MotionComponent;
 import tiltadv.components.model.SizeComponent;
 import tiltadv.components.model.TiltComponent;
 import tiltadv.components.model.TransformComponent;
-import tiltadv.globals.DevSettings;
-import tiltadv.globals.Events;
-import tiltadv.globals.Settings;
-import tiltadv.globals.Tiles;
+import tiltadv.globals.*;
 import tiltadv.memory.Pools;
 
 import java.util.ArrayList;
