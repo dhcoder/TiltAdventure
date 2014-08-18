@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 /**
- * Static class which acts as a location to hold all tiles used by our game.
+ * Static class which holds all tiles used by our game.
  */
 public final class Tiles {
 

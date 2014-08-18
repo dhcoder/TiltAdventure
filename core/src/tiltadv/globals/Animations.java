@@ -3,7 +3,7 @@ package tiltadv.globals;
 import com.badlogic.gdx.graphics.g2d.Animation;
 
 /**
- * Static class which acts as a location to hold all tiles used by our game.
+ * Static class which holds all animations used by our game.
  */
 public final class Animations {
 
