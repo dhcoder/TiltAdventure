@@ -13,8 +13,8 @@ import dhcoder.libgdx.collision.CollisionSystem;
 import dhcoder.libgdx.collision.shape.Circle;
 import dhcoder.libgdx.collision.shape.Rectangle;
 import dhcoder.libgdx.entity.Entity;
+import dhcoder.libgdx.entity.EntityManager;
 import dhcoder.support.math.Angle;
-import dhcoder.support.memory.Pool;
 import dhcoder.support.time.Duration;
 import tiltadv.components.behavior.OctoBehaviorComponent;
 import tiltadv.components.behavior.OscillationBehaviorComponent;
@@ -34,8 +34,6 @@ import tiltadv.components.model.TiltComponent;
 import tiltadv.components.model.TransformComponent;
 import tiltadv.globals.*;
 import tiltadv.memory.Pools;
-
-import java.util.List;
 
 import static com.badlogic.gdx.math.MathUtils.cos;
 import static com.badlogic.gdx.math.MathUtils.sin;
@@ -57,7 +55,7 @@ public final class GdxApplication extends ApplicationAdapter {
 
     private CollisionSystem collisionSystem;
 
-    private Pool<Entity> entityPool;
+    private EntityManager entities;
 
     @Override
     public void create() {
@@ -100,13 +98,8 @@ public final class GdxApplication extends ApplicationAdapter {
         Gdx.gl.glClearColor(1f, .88f, .66f, 1f); // Desert-ish color, for testing!
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        List<Entity> entities = entityPool.getItemsInUse();
-        int numEntities = entities.size(); // Simple iteration to avoid Iterator allocation
-
         batch.begin();
-        for (int i = 0; i < numEntities; ++i) {
-            entities.get(i).render(batch);
-        }
+        entities.render(batch);
         batch.end();
 
         if (Settings.IN_DEV_MODE && DevSettings.SHOW_COLLISION_SHAPES) {
@@ -118,11 +111,6 @@ public final class GdxApplication extends ApplicationAdapter {
 
     @Override
     public void dispose() {
-        List<Entity> entities = entityPool.getItemsInUse();
-        for (Entity entity : entities) {
-            entity.dispose();
-        }
-
         batch.dispose();
         font.dispose();
         Tiles.dispose();
@@ -138,7 +126,7 @@ public final class GdxApplication extends ApplicationAdapter {
     }
 
     private void initializeEntities() {
-        entityPool = Pool.of(Entity.class, 300);
+        entities = new EntityManager(200);
         Entity playerEntity = addPlayerEntity();
 
         addOctoEnemies();
@@ -178,10 +166,10 @@ public final class GdxApplication extends ApplicationAdapter {
         float right = halfScreenW;
         float wallSize = .5f;
 
-        Entity wallLeft = entityPool.grabNew();
-        Entity wallRight = entityPool.grabNew();
-        Entity wallBottom = entityPool.grabNew();
-        Entity wallTop = entityPool.grabNew();
+        Entity wallLeft = entities.newEntity();
+        Entity wallRight = entities.newEntity();
+        Entity wallBottom = entities.newEntity();
+        Entity wallTop = entities.newEntity();
 
         wallLeft.addComponent(new TransformComponent.Builder().setTranslate(left, 0f).build());
         wallLeft.addComponent(new ObstacleCollisionComponent(new Rectangle(wallSize, screenH)));
@@ -212,14 +200,10 @@ public final class GdxApplication extends ApplicationAdapter {
     }
 
     private void update() {
-        List<Entity> entities = entityPool.getItemsInUse();
-        int numEntities = entities.size(); // Simple iteration to avoid Iterator allocation
 
         Duration elapsedTime = Pools.durations.grabNew();
         elapsedTime.setSeconds(Math.min(Gdx.graphics.getRawDeltaTime(), MAX_DELTA_TIME_SECS));
-        for (int i = 0; i < numEntities; ++i) {
-            entities.get(i).update(elapsedTime);
-        }
+        entities.update(elapsedTime);
         Pools.durations.free(elapsedTime);
 
         collisionSystem.triggerCollisions();
@@ -232,7 +216,7 @@ public final class GdxApplication extends ApplicationAdapter {
     }
 
     private Entity addPlayerEntity() {
-        Entity playerEntity = entityPool.grabNew();
+        Entity playerEntity = entities.newEntity();
         playerEntity.addComponent(new SpriteComponent());
         playerEntity.addComponent(SizeComponent.from(Tiles.PLAYERDOWN1));
         playerEntity.addComponent(new TransformComponent());
@@ -251,7 +235,7 @@ public final class GdxApplication extends ApplicationAdapter {
     }
 
     private void addOctoEnemy(final float x, final float y) {
-        Entity octoEnemy = entityPool.grabNew();
+        Entity octoEnemy = entities.newEntity();
 
         octoEnemy.addComponent(new SpriteComponent());
         octoEnemy.addComponent(SizeComponent.from(Tiles.OCTODOWN1));
@@ -266,7 +250,7 @@ public final class GdxApplication extends ApplicationAdapter {
 
     private void AddMovingRockEntity(final float xFrom, final float yFrom, final float xTo, final float yTo) {
 
-        Entity rockEntity = entityPool.grabNew();
+        Entity rockEntity = entities.newEntity();
         rockEntity.addComponent(new SpriteComponent(Tiles.ROCK));
         rockEntity.addComponent(SizeComponent.from(Tiles.ROCK));
         rockEntity.addComponent(new TransformComponent());
@@ -276,14 +260,14 @@ public final class GdxApplication extends ApplicationAdapter {
     }
 
     private void addFpsEntity() {
-        Entity fpsEntity = entityPool.grabNew();
+        Entity fpsEntity = entities.newEntity();
         fpsEntity.addComponent(new TransformComponent.Builder()
             .setTranslate(-VIEWPORT_WIDTH / 2, -VIEWPORT_HEIGHT / 2 + font.getLineHeight()).build());
         fpsEntity.addComponent(new FpsDisplayComponent(font));
     }
 
     private void addTiltIndicatorEntity(final Entity playerEntity) {
-        Entity tiltIndicatorEntity = entityPool.grabNew();
+        Entity tiltIndicatorEntity = entities.newEntity();
 
         final float MARGIN = 5f;
         tiltIndicatorEntity.addComponent(new TransformComponent.Builder()

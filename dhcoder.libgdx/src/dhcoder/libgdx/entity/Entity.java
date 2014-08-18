@@ -15,17 +15,21 @@ import static dhcoder.support.text.StringUtils.format;
  */
 public final class Entity implements Poolable {
 
-    private boolean initialized;
-
     // Map a component's type to the component itself
     private final List<Component> components = new ArrayList<Component>();
+    private boolean initialized;
+
+    /**
+     * Restricted access - use {@link EntityManager#newEntity} instead.
+     */
+    private Entity() {}
 
     /**
      * Add a component to the entity. You can safely add components after you've created an entity but before you call
      * {@link #update(Duration)} for the very first time.
      *
      * @throws IllegalStateException if you try to add a component to an entity that's already in use (that is, has
-     * been updated at least once).
+     *                               been updated at least once).
      */
     public void addComponent(final Component component) {
         if (initialized) {
@@ -128,7 +132,7 @@ public final class Entity implements Poolable {
     /**
      * Clear up any resources used by this entity.
      */
-    public void dispose() {
+    void dispose() {
         int numComponents = components.size(); // Simple iteration to avoid Iterator allocation
         for (int i = 0; i < numComponents; ++i) {
             components.get(i).dispose();
@@ -161,6 +165,7 @@ public final class Entity implements Poolable {
 
     @Override
     public void reset() {
+        dispose();
         components.clear();
         initialized = false;
     }
