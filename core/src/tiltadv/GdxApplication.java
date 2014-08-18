@@ -6,16 +6,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import dhcoder.libgdx.collision.CollisionSystem;
 import dhcoder.libgdx.collision.shape.Circle;
 import dhcoder.libgdx.collision.shape.Rectangle;
-import dhcoder.libgdx.entity.Component;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.math.Angle;
+import dhcoder.support.memory.Pool;
 import dhcoder.support.time.Duration;
 import tiltadv.components.behavior.OctoBehaviorComponent;
 import tiltadv.components.behavior.OscillationBehaviorComponent;
@@ -36,7 +35,6 @@ import tiltadv.components.model.TransformComponent;
 import tiltadv.globals.*;
 import tiltadv.memory.Pools;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.badlogic.gdx.math.MathUtils.cos;
@@ -57,8 +55,9 @@ public final class GdxApplication extends ApplicationAdapter {
     private SpriteBatch batch;
     private ShapeRenderer shapeRenderer;
 
-    private List<Entity> entities;
     private CollisionSystem collisionSystem;
+
+    private Pool<Entity> entityPool;
 
     @Override
     public void create() {
@@ -101,8 +100,10 @@ public final class GdxApplication extends ApplicationAdapter {
         Gdx.gl.glClearColor(1f, .88f, .66f, 1f); // Desert-ish color, for testing!
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        batch.begin();
+        List<Entity> entities = entityPool.getItemsInUse();
         int numEntities = entities.size(); // Simple iteration to avoid Iterator allocation
+
+        batch.begin();
         for (int i = 0; i < numEntities; ++i) {
             entities.get(i).render(batch);
         }
@@ -117,6 +118,7 @@ public final class GdxApplication extends ApplicationAdapter {
 
     @Override
     public void dispose() {
+        List<Entity> entities = entityPool.getItemsInUse();
         for (Entity entity : entities) {
             entity.dispose();
         }
@@ -136,7 +138,7 @@ public final class GdxApplication extends ApplicationAdapter {
     }
 
     private void initializeEntities() {
-        entities = new ArrayList<Entity>();
+        entityPool = Pool.of(Entity.class, 300);
         Entity playerEntity = addPlayerEntity();
 
         addOctoEnemies();
@@ -175,14 +177,23 @@ public final class GdxApplication extends ApplicationAdapter {
         float left = -halfScreenW;
         float right = halfScreenW;
         float wallSize = .5f;
-        entities.add(new Entity(new TransformComponent.Builder().setTranslate(left, 0f).build(),
-            new ObstacleCollisionComponent(new Rectangle(wallSize, screenH))));
-        entities.add(new Entity(new TransformComponent.Builder().setTranslate(right, 0f).build(),
-            new ObstacleCollisionComponent(new Rectangle(wallSize, screenH))));
-        entities.add(new Entity(new TransformComponent.Builder().setTranslate(0f, bottom).build(),
-            new ObstacleCollisionComponent(new Rectangle(screenW, wallSize))));
-        entities.add(new Entity(new TransformComponent.Builder().setTranslate(0f, top).build(),
-            new ObstacleCollisionComponent(new Rectangle(screenW, wallSize))));
+
+        Entity wallLeft = entityPool.grabNew();
+        Entity wallRight = entityPool.grabNew();
+        Entity wallBottom = entityPool.grabNew();
+        Entity wallTop = entityPool.grabNew();
+
+        wallLeft.addComponent(new TransformComponent.Builder().setTranslate(left, 0f).build());
+        wallLeft.addComponent(new ObstacleCollisionComponent(new Rectangle(wallSize, screenH)));
+
+        wallRight.addComponent(new TransformComponent.Builder().setTranslate(right, 0f).build());
+        wallRight.addComponent(new ObstacleCollisionComponent(new Rectangle(wallSize, screenH)));
+
+        wallBottom.addComponent(new TransformComponent.Builder().setTranslate(0f, bottom).build());
+        wallBottom.addComponent(new ObstacleCollisionComponent(new Rectangle(screenW, wallSize)));
+
+        wallTop.addComponent(new TransformComponent.Builder().setTranslate(0f, top).build());
+        wallTop.addComponent(new ObstacleCollisionComponent(new Rectangle(screenW, wallSize)));
     }
 
     private void addMovingRockEntities() {
@@ -201,9 +212,11 @@ public final class GdxApplication extends ApplicationAdapter {
     }
 
     private void update() {
+        List<Entity> entities = entityPool.getItemsInUse();
+        int numEntities = entities.size(); // Simple iteration to avoid Iterator allocation
+
         Duration elapsedTime = Pools.durations.grabNew();
         elapsedTime.setSeconds(Math.min(Gdx.graphics.getRawDeltaTime(), MAX_DELTA_TIME_SECS));
-        int numEntities = entities.size(); // Simple iteration to avoid Iterator allocation
         for (int i = 0; i < numEntities; ++i) {
             entities.get(i).update(elapsedTime);
         }
@@ -219,87 +232,65 @@ public final class GdxApplication extends ApplicationAdapter {
     }
 
     private Entity addPlayerEntity() {
-        Duration animDuration = Duration.fromSeconds(.1f);
-        Animation animUp = new Animation(animDuration.getSeconds(), Tiles.PLAYERUP1, Tiles.PLAYERUP2);
-        animUp.setPlayMode(Animation.PlayMode.LOOP);
-        Animation animDown = new Animation(animDuration.getSeconds(), Tiles.PLAYERDOWN1, Tiles.PLAYERDOWN2);
-        animDown.setPlayMode(Animation.PlayMode.LOOP);
-        Animation animLeft = new Animation(animDuration.getSeconds(), Tiles.PLAYERLEFT1, Tiles.PLAYERLEFT2);
-        animLeft.setPlayMode(Animation.PlayMode.LOOP);
-        Animation animRight = new Animation(animDuration.getSeconds(), Tiles.PLAYERRIGHT1, Tiles.PLAYERRIGHT2);
-        animRight.setPlayMode(Animation.PlayMode.LOOP);
-
-        List<Component> components = new ArrayList<Component>();
-        components.add(new SpriteComponent());
-        components.add(SizeComponent.from(Tiles.PLAYERDOWN1));
-        components.add(new TransformComponent());
-        components.add(new MotionComponent());
-        components.add(new TiltComponent());
-        components.add(Gdx.app.getType() == Application.ApplicationType.Android ? new AccelerometerInputComponent() :
-            new KeyboardInputComponent());
-        components.add(new PlayerBehaviorComponent());
-        components.add(new CharacterDisplayComponent(animUp, animDown, animLeft, animRight));
-        components.add(new PlayerCollisionComponent(new Circle(Tiles.PLAYERUP1.getRegionWidth() / 2)));
-
-        Entity playerEntity = new Entity(components);
-        entities.add(playerEntity);
+        Entity playerEntity = entityPool.grabNew();
+        playerEntity.addComponent(new SpriteComponent());
+        playerEntity.addComponent(SizeComponent.from(Tiles.PLAYERDOWN1));
+        playerEntity.addComponent(new TransformComponent());
+        playerEntity.addComponent(new MotionComponent());
+        playerEntity.addComponent(new TiltComponent());
+        playerEntity.addComponent(
+            Gdx.app.getType() == Application.ApplicationType.Android ? new AccelerometerInputComponent() :
+                new KeyboardInputComponent());
+        playerEntity.addComponent(new PlayerBehaviorComponent());
+        playerEntity.addComponent(
+            new CharacterDisplayComponent(Animations.PLAYERUP, Animations.PLAYERDOWN, Animations.PLAYERLEFT,
+                Animations.PLAYERRIGHT));
+        playerEntity.addComponent(new PlayerCollisionComponent(new Circle(Tiles.PLAYERUP1.getRegionWidth() / 2)));
 
         return playerEntity;
     }
 
     private void addOctoEnemy(final float x, final float y) {
-        Duration animDuration = Duration.fromSeconds(.1f);
-        Animation animUp = new Animation(animDuration.getSeconds(), Tiles.OCTOUP1, Tiles.OCTOUP2);
-        animUp.setPlayMode(Animation.PlayMode.LOOP);
-        Animation animDown = new Animation(animDuration.getSeconds(), Tiles.OCTODOWN1, Tiles.OCTODOWN2);
-        animDown.setPlayMode(Animation.PlayMode.LOOP);
-        Animation animLeft = new Animation(animDuration.getSeconds(), Tiles.OCTOLEFT1, Tiles.OCTOLEFT2);
-        animLeft.setPlayMode(Animation.PlayMode.LOOP);
-        Animation animRight = new Animation(animDuration.getSeconds(), Tiles.OCTORIGHT1, Tiles.OCTORIGHT2);
-        animRight.setPlayMode(Animation.PlayMode.LOOP);
+        Entity octoEnemy = entityPool.grabNew();
 
-        List<Component> components = new ArrayList<Component>();
-        components.add(new SpriteComponent());
-        components.add(SizeComponent.from(Tiles.OCTODOWN1));
-        components.add(new TransformComponent.Builder().setTranslate(x, y).build());
-        components.add(new MotionComponent());
-        components.add(new OctoBehaviorComponent());
-        components.add(new CharacterDisplayComponent(animUp, animDown, animLeft, animRight));
-        components.add(new EnemyCollisionComponent(new Circle(Tiles.OCTOUP1.getRegionWidth() / 2)));
-
-        entities.add(new Entity(components));
+        octoEnemy.addComponent(new SpriteComponent());
+        octoEnemy.addComponent(SizeComponent.from(Tiles.OCTODOWN1));
+        octoEnemy.addComponent(new TransformComponent.Builder().setTranslate(x, y).build());
+        octoEnemy.addComponent(new MotionComponent());
+        octoEnemy.addComponent(new OctoBehaviorComponent());
+        octoEnemy.addComponent(
+            new CharacterDisplayComponent(Animations.OCTOUP, Animations.OCTODOWN, Animations.OCTOLEFT,
+                Animations.OCTORIGHT));
+        octoEnemy.addComponent(new EnemyCollisionComponent(new Circle(Tiles.OCTOUP1.getRegionWidth() / 2)));
     }
 
     private void AddMovingRockEntity(final float xFrom, final float yFrom, final float xTo, final float yTo) {
-        List<Component> components = new ArrayList<Component>();
-        components.add(new SpriteComponent(Tiles.ROCK));
-        components.add(SizeComponent.from(Tiles.ROCK));
-        components.add(new TransformComponent());
-        components.add(new OscillationBehaviorComponent(xFrom, yFrom, xTo, yTo, Duration.fromSeconds(2f)));
-        components.add(new ObstacleCollisionComponent(
-            new Rectangle(Tiles.ROCK.getRegionWidth() / 2, Tiles.ROCK.getRegionHeight() / 2)));
 
-        final Entity rockEntity = new Entity(components);
-        entities.add(rockEntity);
+        Entity rockEntity = entityPool.grabNew();
+        rockEntity.addComponent(new SpriteComponent(Tiles.ROCK));
+        rockEntity.addComponent(SizeComponent.from(Tiles.ROCK));
+        rockEntity.addComponent(new TransformComponent());
+        rockEntity.addComponent(new OscillationBehaviorComponent(xFrom, yFrom, xTo, yTo, Duration.fromSeconds(2f)));
+        rockEntity.addComponent(new ObstacleCollisionComponent(
+            new Rectangle(Tiles.ROCK.getRegionWidth() / 2, Tiles.ROCK.getRegionHeight() / 2)));
     }
 
     private void addFpsEntity() {
-        TransformComponent transformComponent = new TransformComponent.Builder()
-            .setTranslate(-VIEWPORT_WIDTH / 2, -VIEWPORT_HEIGHT / 2 + font.getLineHeight()).build();
-        FpsDisplayComponent fpsDisplayComponent = new FpsDisplayComponent(font);
-        entities.add(new Entity(transformComponent, fpsDisplayComponent));
+        Entity fpsEntity = entityPool.grabNew();
+        fpsEntity.addComponent(new TransformComponent.Builder()
+            .setTranslate(-VIEWPORT_WIDTH / 2, -VIEWPORT_HEIGHT / 2 + font.getLineHeight()).build());
+        fpsEntity.addComponent(new FpsDisplayComponent(font));
     }
 
     private void addTiltIndicatorEntity(final Entity playerEntity) {
-        float margin = 5f;
-        TransformComponent transformComponent = new TransformComponent.Builder()
-            .setTranslate(VIEWPORT_WIDTH / 2 - Tiles.RODRIGHT.getRegionWidth() - margin,
-                VIEWPORT_HEIGHT / 2 - Tiles.RODRIGHT.getRegionHeight() - margin).build();
+        Entity tiltIndicatorEntity = entityPool.grabNew();
 
-        SpriteComponent spriteComponent = new SpriteComponent();
-        SizeComponent sizeComponent = SizeComponent.from(Tiles.RODRIGHT);
-        TiltDisplayComponent tiltDisplayComponent = new TiltDisplayComponent(Tiles.RODRIGHT, playerEntity);
-        entities.add(new Entity(spriteComponent, sizeComponent, transformComponent, tiltDisplayComponent));
+        final float MARGIN = 5f;
+        tiltIndicatorEntity.addComponent(new TransformComponent.Builder()
+            .setTranslate(VIEWPORT_WIDTH / 2 - Tiles.RODRIGHT.getRegionWidth() - MARGIN,
+                VIEWPORT_HEIGHT / 2 - Tiles.RODRIGHT.getRegionHeight() - MARGIN).build());
+        tiltIndicatorEntity.addComponent(new SpriteComponent());
+        tiltIndicatorEntity.addComponent(SizeComponent.from(Tiles.RODRIGHT));
+        tiltIndicatorEntity.addComponent(new TiltDisplayComponent(Tiles.RODRIGHT, playerEntity));
     }
-
 }

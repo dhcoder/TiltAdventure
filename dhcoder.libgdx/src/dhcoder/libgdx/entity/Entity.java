@@ -1,11 +1,11 @@
 package dhcoder.libgdx.entity;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import dhcoder.support.memory.Poolable;
 import dhcoder.support.opt.Opt;
 import dhcoder.support.time.Duration;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static dhcoder.support.text.StringUtils.format;
@@ -13,25 +13,26 @@ import static dhcoder.support.text.StringUtils.format;
 /**
  * A skeletal game object whose behavior is implemented by {@link Component}s.
  */
-public final class Entity {
+public final class Entity implements Poolable {
+
+    private boolean initialized;
 
     // Map a component's type to the component itself
     private final List<Component> components = new ArrayList<Component>();
 
-    public Entity(final Component... components) {
-        this(Arrays.asList(components));
-    }
-
-    public Entity(final List<Component> components) {
-        if (components.size() == 0) {
-            throw new IllegalArgumentException("Attempted to create Entity with no components");
+    /**
+     * Add a component to the entity. You can safely add components after you've created an entity but before you call
+     * {@link #update(Duration)} for the very first time.
+     *
+     * @throws IllegalStateException if you try to add a component to an entity that's already in use (that is, has
+     * been updated at least once).
+     */
+    public void addComponent(final Component component) {
+        if (initialized) {
+            throw new IllegalStateException("Can't add a component to an Entity that's already in use.");
         }
 
-        for (Component component : components) {
-            this.components.add(component);
-        }
-
-        initialize();
+        this.components.add(component);
     }
 
     /**
@@ -138,6 +139,10 @@ public final class Entity {
      * Update this entity. The passed in time is in seconds.
      */
     public void update(final Duration elapsedTime) {
+        if (!initialized) {
+            initialize();
+        }
+
         int numComponents = components.size(); // Simple iteration to avoid Iterator allocation
         for (int i = 0; i < numComponents; ++i) {
             components.get(i).update(elapsedTime);
@@ -154,9 +159,19 @@ public final class Entity {
         }
     }
 
+    @Override
+    public void reset() {
+        components.clear();
+        initialized = false;
+    }
+
     private void initialize() {
+
+        assert !initialized;
+
         for (Component component : components) {
             component.initialize(this);
         }
+        initialized = true;
     }
 }
