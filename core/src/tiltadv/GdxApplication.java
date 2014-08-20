@@ -47,6 +47,7 @@ public final class GdxApplication extends ApplicationAdapter {
     // delta times between frames can be HUGE. Let's clamp to a reasonable max here. This also prevents physics update
     // logic from dealing with time steps that are too large (at which point, objects start going through walls, etc.)
     private static final float MAX_DELTA_TIME_SECS = 1f / 30f;
+    public static final int ENTITY_COUNT = 200;
 
     private BitmapFont font;
     private OrthographicCamera camera;
@@ -121,12 +122,17 @@ public final class GdxApplication extends ApplicationAdapter {
     }
 
     private void initializeServices() {
-        collisionSystem = new CollisionSystem(200);
+        collisionSystem = new CollisionSystem(ENTITY_COUNT);
         Services.register(CollisionSystem.class, collisionSystem);
     }
 
     private void initializeEntities() {
-        entities = new EntityManager(200);
+        entities = new EntityManager(ENTITY_COUNT);
+        entities.preallocateComponents(TransformComponent.class, ENTITY_COUNT);
+        entities.preallocateComponents(MotionComponent.class, ENTITY_COUNT);
+        entities.preallocateComponents(SizeComponent.class, ENTITY_COUNT);
+        entities.preallocateComponents(SpriteComponent.class, ENTITY_COUNT);
+
         Entity playerEntity = addPlayerEntity();
 
         addOctoEnemies();

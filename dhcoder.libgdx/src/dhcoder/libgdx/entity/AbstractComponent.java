@@ -20,4 +20,7 @@ public abstract class AbstractComponent implements Component {
 
     @Override
     public void dispose() {}
+
+    @Override
+    public abstract void reset();
 }

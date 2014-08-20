@@ -67,10 +67,20 @@ public final class Pool<T> {
     public static final int DEFAULT_CAPACITY = 10;
 
     public static <P extends Poolable> Pool<P> of(final Class<P> poolableClass) {
-        return of(poolableClass, DEFAULT_CAPACITY);
+        return of(poolableClass, DEFAULT_CAPACITY, false);
+    }
+
+    public static <P extends Poolable> Pool<P> of(final Class<P> poolableClass, final boolean resizable) {
+        return of(poolableClass, DEFAULT_CAPACITY, resizable);
     }
 
     public static <P extends Poolable> Pool<P> of(final Class<P> poolableClass, final int capacity) {
+        return of(poolableClass, capacity, false);
+    }
+
+    public static <P extends Poolable> Pool<P> of(final Class<P> poolableClass, final int capacity,
+        final boolean resizable) {
+
         return new Pool<P>(new AllocateMethod() {
             PoolableAllocator<P> poolableAllocator = new PoolableAllocator<P>(poolableClass);
 
@@ -85,23 +95,35 @@ public final class Pool<T> {
         }, capacity);
     }
 
+    private final AllocateMethod<T> allocate;
     private final ResetMethod<T> reset;
     private final Stack<T> freeItems;
-    private final List<T> itemsInUse;
-    private final int capacity;
+    private final ArrayList<T> itemsInUse;
+    private final boolean resizable;
+    private int capacity;
 
     public Pool(final AllocateMethod<T> allocate, final ResetMethod<T> reset) {
-        this(allocate, reset, DEFAULT_CAPACITY);
+        this(allocate, reset, DEFAULT_CAPACITY, false);
+    }
+
+    public Pool(final AllocateMethod<T> allocate, final ResetMethod<T> reset, final boolean resizable) {
+        this(allocate, reset, DEFAULT_CAPACITY, resizable);
     }
 
     public Pool(final AllocateMethod<T> allocate, final ResetMethod<T> reset, final int capacity) {
+        this(allocate, reset, capacity, false);
+    }
 
+    public Pool(final AllocateMethod<T> allocate, final ResetMethod<T> reset, final int capacity,
+        final boolean resizable) {
         if (capacity <= 0) {
             throw new IllegalArgumentException(format("Invalid pool capacity: {0}", capacity));
         }
 
+        this.allocate = allocate;
         this.reset = reset;
         this.capacity = capacity;
+        this.resizable = resizable;
 
         freeItems = new Stack<T>();
         freeItems.ensureCapacity(capacity);
@@ -122,9 +144,21 @@ public final class Pool<T> {
 
     public T grabNew() {
         if (getRemainingCount() == 0) {
-            throw new IllegalStateException(
-                format("Requested too many items from this pool (capacity: {0}) - are you forgetting to free some?",
-                    capacity));
+
+            if (!resizable) {
+                throw new IllegalStateException(
+                    format("Requested too many items from this pool (capacity: {0}) - are you forgetting to free some?",
+                        capacity));
+            }
+
+            int oldCapacity = capacity;
+            capacity *= 2;
+            freeItems.ensureCapacity(capacity);
+            itemsInUse.ensureCapacity(capacity);
+
+            for (int i = oldCapacity; i < capacity; i++) {
+                freeItems.push(allocate.run());
+            }
         }
 
         T newItem = freeItems.pop();
