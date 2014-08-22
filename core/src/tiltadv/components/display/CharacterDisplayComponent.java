@@ -12,23 +12,38 @@ import tiltadv.components.model.MotionComponent;
  */
 public final class CharacterDisplayComponent extends AbstractComponent {
 
-    private final Animation animUp;
-    private final Animation animDown;
-    private final Animation animLeft;
-    private final Animation animRight;
+    private final Animation animS;
+    private final Animation animSE;
+    private final Animation animE;
+    private final Animation animNE;
+    private final Animation animN;
+    private final Animation animNW;
+    private final Animation animW;
+    private final Animation animSW;
+
     private MotionComponent motionComponent;
     private SpriteComponent spriteComponent;
     private float elapsedSoFar;
     private Animation activeAnim;
 
-    public CharacterDisplayComponent(final Animation animUp, final Animation animDown, final Animation animLeft,
-        final Animation animRight) {
-        this.animUp = animUp;
-        this.animDown = animDown;
-        this.animLeft = animLeft;
-        this.animRight = animRight;
+    public CharacterDisplayComponent(final Animation animS, final Animation animE, final Animation animN,
+        final Animation animW) {
+        this(animS, animS, animE, animE, animN, animN, animW, animW);
+    }
 
-        activeAnim = animDown;
+    public CharacterDisplayComponent(final Animation animS, final Animation animSE, final Animation animE,
+        final Animation animNE, final Animation animN, final Animation animNW, final Animation animW,
+        final Animation animSW) {
+        this.animS = animS;
+        this.animSE = animSE;
+        this.animE = animE;
+        this.animNE = animNE;
+        this.animN = animN;
+        this.animNW = animNW;
+        this.animW = animW;
+        this.animSW = animSW;
+
+        activeAnim = animS;
     }
 
     @Override
@@ -36,7 +51,7 @@ public final class CharacterDisplayComponent extends AbstractComponent {
         spriteComponent = owner.requireComponent(SpriteComponent.class);
         motionComponent = owner.requireComponent(MotionComponent.class);
 
-        spriteComponent.setTextureRegion(animDown.getKeyFrame(0));
+        spriteComponent.setTextureRegion(animS.getKeyFrame(0));
     }
 
     @Override
@@ -48,17 +63,32 @@ public final class CharacterDisplayComponent extends AbstractComponent {
 
             float motionAngle = velocity.angle();
 
-            if (45f <= motionAngle && motionAngle < 135f) {
-                activeAnim = animUp;
+            if (0 <= motionAngle && motionAngle < 22.5f) {
+                activeAnim = animE;
             }
-            else if (135f <= motionAngle && motionAngle < 225f) {
-                activeAnim = animLeft;
+            else if (motionAngle < 67.5f) {
+                activeAnim = animNE;
             }
-            else if (225f <= motionAngle && motionAngle < 315f) {
-                activeAnim = animDown;
+            else if (motionAngle < 112.5f) {
+                activeAnim = animN;
+            }
+            else if (motionAngle < 157.5f) {
+                activeAnim = animNW;
+            }
+            else if (motionAngle < 202.5f) {
+                activeAnim = animW;
+            }
+            else if (motionAngle < 247.5f) {
+                activeAnim = animSW;
+            }
+            else if (motionAngle < 292.5f) {
+                activeAnim = animS;
+            }
+            else if (motionAngle < 337.5f) {
+                activeAnim = animSE;
             }
             else { // tiltDegrees >= 315 && tiltDegrees < 45f
-                activeAnim = animRight;
+                activeAnim = animE;
             }
 
             spriteComponent.setTextureRegion(activeAnim.getKeyFrame(elapsedSoFar));

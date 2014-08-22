@@ -1,6 +1,6 @@
 package tiltadv;
 
-import com.badlogic.gdx.Application;
+import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
@@ -127,9 +127,9 @@ public final class GdxApplication extends ApplicationAdapter {
 
     private void initializeEntities() {
         entities = new EntityManager(200);
-        Entity playerEntity = addPlayerEntity();
-
         addOctoEnemies();
+
+        Entity playerEntity = addPlayerEntity();
         addMovingRockEntities();
         addTiltIndicatorEntity(playerEntity);
         addFpsEntity();
@@ -188,7 +188,7 @@ public final class GdxApplication extends ApplicationAdapter {
         final int numRocks = 4;
         final float scaleX = 120;
         final float scaleY = 90;
-        final float percent = .2f;
+        final float percent = .4f;
         for (int i = 0; i < numRocks; ++i) {
             float circleDistance = (float)i / (float)numRocks * Angle.TWO_PI;
             float xTo = scaleX * cos(circleDistance);
@@ -218,18 +218,20 @@ public final class GdxApplication extends ApplicationAdapter {
     private Entity addPlayerEntity() {
         Entity playerEntity = entities.newEntity();
         playerEntity.addComponent(new SpriteComponent());
-        playerEntity.addComponent(SizeComponent.from(Tiles.PLAYERDOWN1));
+        SizeComponent sizeComponent = SizeComponent.from(Tiles.PLAYER_S);
+        playerEntity.addComponent(sizeComponent);
         playerEntity.addComponent(new TransformComponent());
         playerEntity.addComponent(new MotionComponent());
         playerEntity.addComponent(new TiltComponent());
         playerEntity.addComponent(
-            Gdx.app.getType() == Application.ApplicationType.Android ? new AccelerometerInputComponent() :
+            Gdx.app.getType() == ApplicationType.Android ? new AccelerometerInputComponent() :
                 new KeyboardInputComponent());
         playerEntity.addComponent(new PlayerBehaviorComponent());
         playerEntity.addComponent(
-            new CharacterDisplayComponent(Animations.PLAYERUP, Animations.PLAYERDOWN, Animations.PLAYERLEFT,
-                Animations.PLAYERRIGHT));
-        playerEntity.addComponent(new PlayerCollisionComponent(new Circle(Tiles.PLAYERUP1.getRegionWidth() / 2)));
+            new CharacterDisplayComponent(Animations.PLAYER_S, Animations.PLAYER_SE, Animations.PLAYER_E,
+                Animations.PLAYER_NE, Animations.PLAYER_N, Animations.PLAYER_NW, Animations.PLAYER_W,
+                Animations.PLAYER_SW));
+        playerEntity.addComponent(new PlayerCollisionComponent(new Circle(sizeComponent.getSize().x / 2)));
 
         return playerEntity;
     }
@@ -243,8 +245,8 @@ public final class GdxApplication extends ApplicationAdapter {
         octoEnemy.addComponent(new MotionComponent());
         octoEnemy.addComponent(new OctoBehaviorComponent());
         octoEnemy.addComponent(
-            new CharacterDisplayComponent(Animations.OCTOUP, Animations.OCTODOWN, Animations.OCTOLEFT,
-                Animations.OCTORIGHT));
+            new CharacterDisplayComponent(Animations.OCTODOWN, Animations.OCTORIGHT, Animations.OCTOUP,
+                Animations.OCTOLEFT));
         octoEnemy.addComponent(new EnemyCollisionComponent(new Circle(Tiles.OCTOUP1.getRegionWidth() / 2)));
     }
 
