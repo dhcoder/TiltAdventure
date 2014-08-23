@@ -218,7 +218,7 @@ public final class GdxApplication extends ApplicationAdapter {
     private Entity addPlayerEntity() {
         Entity playerEntity = entities.newEntity();
         playerEntity.addComponent(new SpriteComponent());
-        SizeComponent sizeComponent = new SizeComponent(16, 16);
+        SizeComponent sizeComponent = SizeComponent.from(Tiles.LINKDOWN1);
         playerEntity.addComponent(sizeComponent);
         playerEntity.addComponent(new TransformComponent());
         playerEntity.addComponent(new MotionComponent());

@@ -21,21 +21,21 @@ public final class Animations {
     public static final Animation OCTORIGHT;
 
     static {
-        PLAYER_S = new Animation(0.1f, Tiles.PLAYER_S, Tiles.PLAYER_S);
+        PLAYER_S = new Animation(0.1f, Tiles.LINKDOWN1, Tiles.LINKDOWN2);
         PLAYER_S.setPlayMode(Animation.PlayMode.LOOP);
-        PLAYER_SE = new Animation(0.1f, Tiles.PLAYER_SE, Tiles.PLAYER_SE);
+        PLAYER_SE = new Animation(0.1f, Tiles.LINKDOWN1, Tiles.LINKDOWN2);
         PLAYER_SE.setPlayMode(Animation.PlayMode.LOOP);
-        PLAYER_E = new Animation(0.1f, Tiles.PLAYER_E, Tiles.PLAYER_E);
+        PLAYER_E = new Animation(0.1f, Tiles.LINKRIGHT1, Tiles.LINKRIGHT2);
         PLAYER_E.setPlayMode(Animation.PlayMode.LOOP);
-        PLAYER_NE = new Animation(0.1f, Tiles.PLAYER_NE, Tiles.PLAYER_NE);
+        PLAYER_NE = new Animation(0.1f, Tiles.LINKRIGHT1, Tiles.LINKRIGHT2);
         PLAYER_NE.setPlayMode(Animation.PlayMode.LOOP);
-        PLAYER_N = new Animation(0.1f, Tiles.PLAYER_N, Tiles.PLAYER_N);
+        PLAYER_N = new Animation(0.1f, Tiles.LINKUP1, Tiles.LINKUP2);
         PLAYER_N.setPlayMode(Animation.PlayMode.LOOP);
-        PLAYER_NW = new Animation(0.1f, Tiles.PLAYER_NW, Tiles.PLAYER_NW);
+        PLAYER_NW = new Animation(0.1f, Tiles.LINKUP1, Tiles.LINKUP2);
         PLAYER_NW.setPlayMode(Animation.PlayMode.LOOP);
-        PLAYER_W = new Animation(0.1f, Tiles.PLAYER_W, Tiles.PLAYER_W);
+        PLAYER_W = new Animation(0.1f, Tiles.LINKLEFT1, Tiles.LINKLEFT2);
         PLAYER_W.setPlayMode(Animation.PlayMode.LOOP);
-        PLAYER_SW = new Animation(0.1f, Tiles.PLAYER_SW, Tiles.PLAYER_SW);
+        PLAYER_SW = new Animation(0.1f, Tiles.LINKLEFT1, Tiles.LINKLEFT2);
         PLAYER_SW.setPlayMode(Animation.PlayMode.LOOP);
         OCTOUP  = new Animation(0.1f, Tiles.OCTOUP1, Tiles.OCTOUP2);
         OCTOUP.setPlayMode(Animation.PlayMode.LOOP);
