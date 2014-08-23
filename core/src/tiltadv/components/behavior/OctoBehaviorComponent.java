@@ -33,14 +33,18 @@ public final class OctoBehaviorComponent extends AbstractComponent {
     private static final Duration STOPPING_DURATION = Duration.fromSeconds(0.3f);
     private static final Random random = new Random();
     private final Duration remainingDuration = Duration.zero();
-    private StateMachine<State, Evt> octoState;
+    private final StateMachine<State, Evt> octoState;
+    private Evt followupEvent;
     private MotionComponent motionComponent;
-    private Evt followupEvent = Evt.MOVE;
+
+    public OctoBehaviorComponent() {
+        octoState = createStateMachine();
+        reset();
+    }
 
     @Override
     public void initialize(final Entity owner) {
         motionComponent = owner.requireComponent(MotionComponent.class);
-        octoState = createStateMachine();
     }
 
     @Override
@@ -101,5 +105,12 @@ public final class OctoBehaviorComponent extends AbstractComponent {
         });
 
         return fsm;
+    }
+
+    @Override
+    public void reset() {
+        octoState.reset();
+        followupEvent = Evt.MOVE;
+        remainingDuration.setZero();
     }
 }

@@ -48,10 +48,11 @@ public final class MotionComponent extends AbstractComponent {
 
     @Override
     public void update(final Duration elapsedTime) {
-
         if (!deceleration.isZero()) {
             velocity.mulAdd(deceleration, elapsedTime.getSeconds());
 
+            // If velocity and deceleration are going in the same direction on either axis, we've gone too far (and
+            // this would probably be due to a precision error), so treat this condition as stopping.
             if (velocity.x * deceleration.x > 0 || velocity.y * deceleration.y > 0) {
                 velocity.setZero();
                 deceleration.setZero();
@@ -66,6 +67,11 @@ public final class MotionComponent extends AbstractComponent {
             transformComponent.setTranslate(translate);
             Pools.vector2s.free(translate);
         }
+    }
 
+    @Override
+    public void reset() {
+        velocity.setZero();
+        deceleration.setZero();
     }
 }

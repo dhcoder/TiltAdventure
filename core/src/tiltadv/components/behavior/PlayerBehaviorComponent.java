@@ -19,6 +19,10 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
     private MotionComponent motionComponent;
     private boolean isMoving;
 
+    public PlayerBehaviorComponent() {
+        reset();
+    }
+
     @Override
     public void initialize(final Entity owner) {
         tiltComponent = owner.requireComponent(TiltComponent.class);
@@ -44,5 +48,10 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
                 isMoving = false;
             }
         }
+    }
+
+    @Override
+    public void reset() {
+        isMoving = false;
     }
 }

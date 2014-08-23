@@ -12,13 +12,21 @@ public final class TiltComponent extends AbstractComponent {
     // of √(2*2 + 2*2) -> √8 -> ~2.8. Let's limit to that, then, in case some random device allows much higher tilt
     // values...
     private static final float MAX_TILT_VECTOR_LEN = 2.8f;
-
     private final Vector2 tilt = new Vector2();
+
+    public TiltComponent() {
+        reset();
+    }
 
     public Vector2 getTilt() { return tilt; }
 
     public void setTilt(final Vector2 tilt) {
         this.tilt.set(tilt.x, tilt.y);
         this.tilt.limit(MAX_TILT_VECTOR_LEN);
+    }
+
+    @Override
+    public void reset() {
+        tilt.setZero();
     }
 }

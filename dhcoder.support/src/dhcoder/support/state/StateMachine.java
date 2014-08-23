@@ -25,14 +25,22 @@ public class StateMachine<S extends Enum, E extends Enum> {
     private final Opt<StateEventHandler<S, E>> defaultHandlerOpt = Opt.withNoValue();
     private final Pool<Key2> keyPool = Pool.of(Key2.class, 1);
     private final Pool<Opt> optPool = Pool.of(Opt.class, 1);
+    private S startState;
     private S currentState;
 
     public StateMachine(final S startState) {
-        currentState = startState;
+        this.startState = currentState = startState;
     }
 
     public final S getCurrentState() {
         return currentState;
+    }
+
+    /**
+     * Reset this state machine back to its initial state.
+     */
+    public void reset() {
+        currentState = startState;
     }
 
     /**

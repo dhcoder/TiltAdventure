@@ -14,6 +14,7 @@ import dhcoder.libgdx.collision.shape.Circle;
 import dhcoder.libgdx.collision.shape.Rectangle;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.libgdx.entity.EntityManager;
+import dhcoder.libgdx.pool.Vector2PoolBuilder;
 import dhcoder.support.math.Angle;
 import dhcoder.support.time.Duration;
 import tiltadv.components.behavior.OctoBehaviorComponent;

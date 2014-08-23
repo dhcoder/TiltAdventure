@@ -13,23 +13,21 @@ import tiltadv.memory.Pools;
  */
 public final class OscillationBehaviorComponent extends AbstractComponent {
 
-    private final float xFrom;
-    private final float yFrom;
-    private final float xTo;
-    private final float yTo;
-    private final Duration duration;
+    private final Vector2 from = new Vector2();
+    private final Vector2 to = new Vector2();
+    private final Duration duration = Duration.zero();
     private final Duration accumulated = Duration.zero();
     private boolean onReturnTrip;
     private TransformComponent transformComponent;
 
-    public OscillationBehaviorComponent(final float xFrom, final float yFrom, final float xTo, final float yTo,
-        final Duration duration) {
+    public OscillationBehaviorComponent() {
+        reset();
+    }
 
-        this.xFrom = xFrom;
-        this.yFrom = yFrom;
-        this.xTo = xTo;
-        this.yTo = yTo;
-        this.duration = duration;
+    public void set(final Vector2 from, final Vector2 to, final Duration duration) {
+        this.from.set(from);
+        this.to.set(to);
+        this.duration.setFrom(duration);
     }
 
     @Override
@@ -47,18 +45,22 @@ public final class OscillationBehaviorComponent extends AbstractComponent {
 
         float percent = accumulated.getSeconds() / duration.getSeconds();
 
-        float xStart = onReturnTrip ? xFrom : xTo;
-        float yStart = onReturnTrip ? yFrom : yTo;
-        float xEnd = onReturnTrip ? xTo : xFrom;
-        float yEnd = onReturnTrip ? yTo : yFrom;
+        Vector2 start = onReturnTrip ? to : from;
+        Vector2 end = onReturnTrip ? from : to;
 
         Vector2 currPos = Pools.vector2s.grabNew();
-        Vector2 destPos = Pools.vector2s.grabNew();
-        currPos.set(xStart, yStart);
-        destPos.set(xEnd, yEnd);
-        currPos.interpolate(destPos, percent, Interpolation.sine);
+        currPos.set(start);
+        currPos.interpolate(end, percent, Interpolation.sine);
         transformComponent.setTranslate(currPos);
-        Pools.vector2s.free(destPos);
         Pools.vector2s.free(currPos);
+    }
+
+    @Override
+    public void reset() {
+        from.setZero();
+        to.setZero();
+        duration.setZero();
+        accumulated.setZero();
+        onReturnTrip = false;
     }
 }
