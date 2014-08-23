@@ -10,8 +10,8 @@ import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.event.ArgEventListener;
 import dhcoder.support.time.Duration;
-import tiltadv.globals.Services;
 import tiltadv.components.model.TransformComponent;
+import tiltadv.globals.Services;
 import tiltadv.memory.Pools;
 
 /**
@@ -22,11 +22,17 @@ import tiltadv.memory.Pools;
  */
 public abstract class CollisionComponent extends AbstractComponent {
 
-    private final Collider collider;
+    private final int groupId;
+    private Collider collider;
     private TransformComponent transformComponent;
 
-    public CollisionComponent(final int groupId, final Shape shape) {
+    public CollisionComponent(final int groupId) {
+        this.groupId = groupId;
+    }
+
+    public final CollisionComponent setShape(final Shape shape) {
         CollisionSystem collisionSystem = Services.get(CollisionSystem.class);
+
         collider = collisionSystem.registerShape(groupId, shape);
         collider.onCollided.addListener(new ArgEventListener<CollisionEventArgs>() {
             @Override
@@ -40,6 +46,8 @@ public abstract class CollisionComponent extends AbstractComponent {
                 handleSeparated(args.getCollision());
             }
         });
+
+        return this;
     }
 
     @Override
@@ -49,14 +57,20 @@ public abstract class CollisionComponent extends AbstractComponent {
 
     @Override
     public final void update(final Duration elapsedTime) {
+        if (collider == null) {
+            return;
+        }
+
         collider.updatePosition(transformComponent.getTranslate().x, transformComponent.getTranslate().y);
     }
 
     @Override
-    public final void dispose() {
+    public final void reset() {
         CollisionSystem collisionSystem = Services.get(CollisionSystem.class);
         collisionSystem.release(collider);
+        collider = null;
     }
+
 
     /**
      * Sync the current entity's location with what the collision system says it should be.

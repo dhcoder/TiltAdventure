@@ -49,4 +49,9 @@ public final class FpsDisplayComponent extends AbstractComponent {
         Vector2 translate = transformComponent.getTranslate();
         font.draw(batch, fpsLabel, translate.x, translate.y);
     }
+
+    @Override
+    public void reset() {
+        // TODO: reset
+    }
 }

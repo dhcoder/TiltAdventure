@@ -31,35 +31,34 @@ public final class Pool<T> {
         void run(T item);
     }
 
-    private static final class PoolableAllocator<P extends Poolable> {
-        private static IllegalArgumentException constructPoolableException(
-            final Class<? extends Poolable> poolableClass) {
+    private static final class ReflectionAllocator<T> {
+        private static IllegalArgumentException newConstructionException(final Class<?> targetClass) {
             return new IllegalArgumentException(
-                format("Class type {0} must have an empty constructor and be instantiable", poolableClass));
+                format("Class type {0} must have an empty constructor and be instantiable", targetClass));
         }
 
-        private final Class<P> poolableClass;
-        private final Constructor<P> constructor;
+        private final Class<T> targetClass;
+        private final Constructor<T> constructor;
 
-        public PoolableAllocator(final Class<P> poolableClass) {
-            this.poolableClass = poolableClass;
+        public ReflectionAllocator(final Class<T> targetClass) {
+            this.targetClass = targetClass;
             try {
-                constructor = (Constructor<P>)poolableClass.getDeclaredConstructor();
+                constructor = targetClass.getDeclaredConstructor();
                 constructor.setAccessible(true);
             } catch (NoSuchMethodException e) {
-                throw constructPoolableException(poolableClass);
+                throw newConstructionException(targetClass);
             }
         }
 
-        public P allocate() {
+        public T allocate() {
             try {
                 return constructor.newInstance();
             } catch (InstantiationException e) {
-                throw constructPoolableException(poolableClass);
+                throw newConstructionException(targetClass);
             } catch (IllegalAccessException e) {
-                throw constructPoolableException(poolableClass);
+                throw newConstructionException(targetClass);
             } catch (InvocationTargetException e) {
-                throw constructPoolableException(poolableClass);
+                throw newConstructionException(targetClass);
             }
         }
     }
@@ -67,25 +66,15 @@ public final class Pool<T> {
     public static final int DEFAULT_CAPACITY = 10;
 
     public static <P extends Poolable> Pool<P> of(final Class<P> poolableClass) {
-        return of(poolableClass, DEFAULT_CAPACITY, false);
-    }
-
-    public static <P extends Poolable> Pool<P> of(final Class<P> poolableClass, final boolean resizable) {
-        return of(poolableClass, DEFAULT_CAPACITY, resizable);
+        return of(poolableClass, DEFAULT_CAPACITY);
     }
 
     public static <P extends Poolable> Pool<P> of(final Class<P> poolableClass, final int capacity) {
-        return of(poolableClass, capacity, false);
-    }
-
-    public static <P extends Poolable> Pool<P> of(final Class<P> poolableClass, final int capacity,
-        final boolean resizable) {
-
         return new Pool<P>(new AllocateMethod() {
-            PoolableAllocator<P> poolableAllocator = new PoolableAllocator<P>(poolableClass);
+            ReflectionAllocator<P> reflectionAllocator = new ReflectionAllocator<P>(poolableClass);
 
             public Object run() {
-                return poolableAllocator.allocate();
+                return reflectionAllocator.allocate();
             }
         }, new ResetMethod() {
             @Override
@@ -99,23 +88,14 @@ public final class Pool<T> {
     private final ResetMethod<T> reset;
     private final Stack<T> freeItems;
     private final ArrayList<T> itemsInUse;
-    private final boolean resizable;
+    private boolean resizable;
     private int capacity;
 
     public Pool(final AllocateMethod<T> allocate, final ResetMethod<T> reset) {
-        this(allocate, reset, DEFAULT_CAPACITY, false);
-    }
-
-    public Pool(final AllocateMethod<T> allocate, final ResetMethod<T> reset, final boolean resizable) {
-        this(allocate, reset, DEFAULT_CAPACITY, resizable);
+        this(allocate, reset, DEFAULT_CAPACITY);
     }
 
     public Pool(final AllocateMethod<T> allocate, final ResetMethod<T> reset, final int capacity) {
-        this(allocate, reset, capacity, false);
-    }
-
-    public Pool(final AllocateMethod<T> allocate, final ResetMethod<T> reset, final int capacity,
-        final boolean resizable) {
         if (capacity <= 0) {
             throw new IllegalArgumentException(format("Invalid pool capacity: {0}", capacity));
         }
@@ -123,7 +103,6 @@ public final class Pool<T> {
         this.allocate = allocate;
         this.reset = reset;
         this.capacity = capacity;
-        this.resizable = resizable;
 
         freeItems = new Stack<T>();
         freeItems.ensureCapacity(capacity);
@@ -132,6 +111,13 @@ public final class Pool<T> {
         for (int i = 0; i < capacity; i++) {
             freeItems.push(allocate.run());
         }
+
+        this.resizable = false; // TODO: This should default to true for production builds
+    }
+
+    public Pool setResizable(final boolean resizable) {
+        this.resizable = resizable;
+        return this;
     }
 
     public int getCapacity() { return capacity; }

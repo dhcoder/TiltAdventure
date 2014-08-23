@@ -9,12 +9,12 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.collision.CollisionSystem;
 import dhcoder.libgdx.collision.shape.Circle;
 import dhcoder.libgdx.collision.shape.Rectangle;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.libgdx.entity.EntityManager;
-import dhcoder.libgdx.pool.Vector2PoolBuilder;
 import dhcoder.support.math.Angle;
 import dhcoder.support.time.Duration;
 import tiltadv.components.behavior.OctoBehaviorComponent;
@@ -41,15 +41,13 @@ import static com.badlogic.gdx.math.MathUtils.sin;
 
 public final class GdxApplication extends ApplicationAdapter {
 
+    public static final int ENTITY_COUNT = 200;
     private static final int VIEWPORT_HEIGHT = 240;
     private static final int VIEWPORT_WIDTH = 320;
-
     // When you hit a breakpoint while debugging an app, or if the phone you're using is just simply being slow, the
     // delta times between frames can be HUGE. Let's clamp to a reasonable max here. This also prevents physics update
     // logic from dealing with time steps that are too large (at which point, objects start going through walls, etc.)
     private static final float MAX_DELTA_TIME_SECS = 1f / 30f;
-    public static final int ENTITY_COUNT = 200;
-
     private BitmapFont font;
     private OrthographicCamera camera;
     private SpriteBatch batch;
@@ -178,17 +176,25 @@ public final class GdxApplication extends ApplicationAdapter {
         Entity wallBottom = entities.newEntity();
         Entity wallTop = entities.newEntity();
 
-        wallLeft.addComponent(new TransformComponent.Builder().setTranslate(left, 0f).build());
-        wallLeft.addComponent(new ObstacleCollisionComponent(new Rectangle(wallSize, screenH)));
+        Vector2 wallPos = Pools.vector2s.grabNew();
 
-        wallRight.addComponent(new TransformComponent.Builder().setTranslate(right, 0f).build());
-        wallRight.addComponent(new ObstacleCollisionComponent(new Rectangle(wallSize, screenH)));
+        wallPos.set(left, 0f);
+        wallLeft.addComponent(new TransformComponent().setTranslate(wallPos));
+        wallLeft.addComponent(new ObstacleCollisionComponent().setShape(new Rectangle(wallSize, screenH)));
 
-        wallBottom.addComponent(new TransformComponent.Builder().setTranslate(0f, bottom).build());
-        wallBottom.addComponent(new ObstacleCollisionComponent(new Rectangle(screenW, wallSize)));
+        wallPos.set(right, 0f);
+        wallRight.addComponent(new TransformComponent().setTranslate(wallPos));
+        wallRight.addComponent(new ObstacleCollisionComponent().setShape(new Rectangle(wallSize, screenH)));
 
-        wallTop.addComponent(new TransformComponent.Builder().setTranslate(0f, top).build());
-        wallTop.addComponent(new ObstacleCollisionComponent(new Rectangle(screenW, wallSize)));
+        wallPos.set(0f, bottom);
+        wallBottom.addComponent(new TransformComponent().setTranslate(wallPos));
+        wallBottom.addComponent(new ObstacleCollisionComponent().setShape(new Rectangle(screenW, wallSize)));
+
+        wallPos.set(0f, top);
+        wallTop.addComponent(new TransformComponent().setTranslate(wallPos));
+        wallTop.addComponent(new ObstacleCollisionComponent().setShape(new Rectangle(screenW, wallSize)));
+
+        Pools.vector2s.free(wallPos);
     }
 
     private void addMovingRockEntities() {
@@ -230,15 +236,14 @@ public final class GdxApplication extends ApplicationAdapter {
         playerEntity.addComponent(new TransformComponent());
         playerEntity.addComponent(new MotionComponent());
         playerEntity.addComponent(new TiltComponent());
-        playerEntity.addComponent(
-            Gdx.app.getType() == ApplicationType.Android ? new AccelerometerInputComponent() :
-                new KeyboardInputComponent());
+        playerEntity.addComponent(Gdx.app.getType() == ApplicationType.Android ? new AccelerometerInputComponent() :
+            new KeyboardInputComponent());
         playerEntity.addComponent(new PlayerBehaviorComponent());
         playerEntity.addComponent(
             new CharacterDisplayComponent(Animations.PLAYER_S, Animations.PLAYER_SE, Animations.PLAYER_E,
                 Animations.PLAYER_NE, Animations.PLAYER_N, Animations.PLAYER_NW, Animations.PLAYER_W,
                 Animations.PLAYER_SW));
-        playerEntity.addComponent(new PlayerCollisionComponent(new Circle(sizeComponent.getSize().x / 2)));
+        playerEntity.addComponent(new PlayerCollisionComponent().setShape(new Circle(sizeComponent.getSize().x / 2)));
 
         return playerEntity;
     }
@@ -246,15 +251,19 @@ public final class GdxApplication extends ApplicationAdapter {
     private void addOctoEnemy(final float x, final float y) {
         Entity octoEnemy = entities.newEntity();
 
+        Vector2 position = Pools.vector2s.grabNew().set(x, y);
+
         octoEnemy.addComponent(new SpriteComponent());
         octoEnemy.addComponent(SizeComponent.from(Tiles.OCTODOWN1));
-        octoEnemy.addComponent(new TransformComponent.Builder().setTranslate(x, y).build());
+        octoEnemy.addComponent(new TransformComponent().setTranslate(position));
         octoEnemy.addComponent(new MotionComponent());
         octoEnemy.addComponent(new OctoBehaviorComponent());
         octoEnemy.addComponent(
             new CharacterDisplayComponent(Animations.OCTODOWN, Animations.OCTORIGHT, Animations.OCTOUP,
                 Animations.OCTOLEFT));
-        octoEnemy.addComponent(new EnemyCollisionComponent(new Circle(Tiles.OCTOUP1.getRegionWidth() / 2)));
+        octoEnemy.addComponent(new EnemyCollisionComponent().setShape(new Circle(Tiles.OCTOUP1.getRegionWidth() / 2)));
+
+        Pools.vector2s.free(position);
     }
 
     private void AddMovingRockEntity(final float xFrom, final float yFrom, final float xTo, final float yTo) {
@@ -263,15 +272,16 @@ public final class GdxApplication extends ApplicationAdapter {
         rockEntity.addComponent(new SpriteComponent(Tiles.ROCK));
         rockEntity.addComponent(SizeComponent.from(Tiles.ROCK));
         rockEntity.addComponent(new TransformComponent());
-        rockEntity.addComponent(new OscillationBehaviorComponent(xFrom, yFrom, xTo, yTo, Duration.fromSeconds(2f)));
-        rockEntity.addComponent(new ObstacleCollisionComponent(
+        rockEntity.addComponent(new OscillationBehaviorComponent()
+            .set(new Vector2(xFrom, yFrom), new Vector2(xTo, yTo), Duration.fromSeconds(2f)));
+        rockEntity.addComponent(new ObstacleCollisionComponent().setShape(
             new Rectangle(Tiles.ROCK.getRegionWidth() / 2, Tiles.ROCK.getRegionHeight() / 2)));
     }
 
     private void addFpsEntity() {
         Entity fpsEntity = entities.newEntity();
-        fpsEntity.addComponent(new TransformComponent.Builder()
-            .setTranslate(-VIEWPORT_WIDTH / 2, -VIEWPORT_HEIGHT / 2 + font.getLineHeight()).build());
+        fpsEntity.addComponent(new TransformComponent()
+            .setTranslate(new Vector2(-VIEWPORT_WIDTH / 2, -VIEWPORT_HEIGHT / 2 + font.getLineHeight())));
         fpsEntity.addComponent(new FpsDisplayComponent(font));
     }
 
@@ -279,9 +289,9 @@ public final class GdxApplication extends ApplicationAdapter {
         Entity tiltIndicatorEntity = entities.newEntity();
 
         final float MARGIN = 5f;
-        tiltIndicatorEntity.addComponent(new TransformComponent.Builder()
-            .setTranslate(VIEWPORT_WIDTH / 2 - Tiles.RODRIGHT.getRegionWidth() - MARGIN,
-                VIEWPORT_HEIGHT / 2 - Tiles.RODRIGHT.getRegionHeight() - MARGIN).build());
+        tiltIndicatorEntity.addComponent(new TransformComponent().setTranslate(
+            new Vector2(VIEWPORT_WIDTH / 2 - Tiles.RODRIGHT.getRegionWidth() - MARGIN,
+                VIEWPORT_HEIGHT / 2 - Tiles.RODRIGHT.getRegionHeight() - MARGIN)));
         tiltIndicatorEntity.addComponent(new SpriteComponent());
         tiltIndicatorEntity.addComponent(SizeComponent.from(Tiles.RODRIGHT));
         tiltIndicatorEntity.addComponent(new TiltDisplayComponent(Tiles.RODRIGHT, playerEntity));

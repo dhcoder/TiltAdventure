@@ -35,4 +35,10 @@ public final class KeyboardInputComponent extends AbstractComponent {
 
         tiltComponent.setTilt(tilt);
     }
+
+    @Override
+    public void reset() {
+        tilt.setZero();
+    }
+
 }

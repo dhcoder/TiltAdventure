@@ -155,19 +155,8 @@ public final class Entity implements Poolable {
 
     @Override
     public void reset() {
-        dispose();
         components.clear();
         initialized = false;
-    }
-
-    /**
-     * Clear up any resources used by this entity.
-     */
-    public void dispose() {
-        int numComponents = components.size(); // Simple iteration to avoid Iterator allocation
-        for (int i = 0; i < numComponents; ++i) {
-            components.get(i).dispose();
-        }
     }
 
     void freeComponents(final EntityManager entityManager) {

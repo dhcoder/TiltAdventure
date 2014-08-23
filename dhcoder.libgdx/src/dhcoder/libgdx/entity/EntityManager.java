@@ -37,7 +37,7 @@ public final class EntityManager {
                 format("Duplicate request to preallocate component type {0}", componentClass));
         }
 
-        componentPools.put(componentClass, Pool.of(componentClass, maxCount, false));
+        componentPools.put(componentClass, Pool.of(componentClass, maxCount));
     }
 
     public Entity newEntity() {
@@ -46,7 +46,7 @@ public final class EntityManager {
 
     public <C extends Component> C newComponent(final Class<C> componentClass) {
         if (!componentPools.containsKey(componentClass)) {
-            componentPools.put(componentClass, Pool.of(componentClass, Pool.DEFAULT_CAPACITY, true));
+            componentPools.put(componentClass, Pool.of(componentClass, Pool.DEFAULT_CAPACITY).setResizable(true));
         }
 
         return (C)componentPools.get(componentClass).grabNew();

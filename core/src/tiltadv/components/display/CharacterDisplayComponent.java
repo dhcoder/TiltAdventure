@@ -83,6 +83,11 @@ public final class CharacterDisplayComponent extends AbstractComponent {
         }
     }
 
+    @Override
+    public void reset() {
+        // TODO: Reset
+    }
+
     private Animation getAnimationForDirection(final Direction direction) {
         switch (direction) {
             case E:

@@ -24,10 +24,11 @@ public final class OscillationBehaviorComponent extends AbstractComponent {
         reset();
     }
 
-    public void set(final Vector2 from, final Vector2 to, final Duration duration) {
+    public OscillationBehaviorComponent set(final Vector2 from, final Vector2 to, final Duration duration) {
         this.from.set(from);
         this.to.set(to);
         this.duration.setFrom(duration);
+        return this;
     }
 
     @Override

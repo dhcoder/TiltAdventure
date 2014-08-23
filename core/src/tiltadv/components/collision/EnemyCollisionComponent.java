@@ -2,9 +2,8 @@ package tiltadv.components.collision;
 
 import dhcoder.libgdx.collision.Collision;
 import dhcoder.libgdx.collision.CollisionSystem;
-import dhcoder.libgdx.collision.shape.Shape;
-import tiltadv.globals.Services;
 import tiltadv.globals.Group;
+import tiltadv.globals.Services;
 
 /**
  * Component that maintains the collision logic for the main player's avatar.
@@ -16,8 +15,8 @@ public final class EnemyCollisionComponent extends CollisionComponent {
         collisionSystem.registerCollidesWith(Group.ENEMY, Group.OBSTACLES);
     }
 
-    public EnemyCollisionComponent(final Shape shape) {
-        super(Group.ENEMY, shape);
+    public EnemyCollisionComponent() {
+        super(Group.ENEMY);
     }
 
     @Override

@@ -1,6 +1,5 @@
 package tiltadv.components.collision;
 
-import dhcoder.libgdx.collision.shape.Shape;
 import tiltadv.globals.Group;
 
 /**
@@ -8,7 +7,7 @@ import tiltadv.globals.Group;
  */
 public final class ObstacleCollisionComponent extends CollisionComponent {
 
-    public ObstacleCollisionComponent(final Shape shape) {
-        super(Group.OBSTACLES, shape);
+    public ObstacleCollisionComponent() {
+        super(Group.OBSTACLES);
     }
 }

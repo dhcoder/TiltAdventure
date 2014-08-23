@@ -74,4 +74,9 @@ public final class SpriteComponent extends AbstractComponent {
         if (hidden) { return; }
         sprite.draw(batch);
     }
+
+    @Override
+    public void reset() {
+        // TODO: reset
+    }
 }

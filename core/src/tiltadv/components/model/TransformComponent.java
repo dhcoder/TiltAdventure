@@ -13,30 +13,33 @@ public final class TransformComponent extends AbstractComponent {
     private final Vector2 scale = new Vector2();
     private final Angle rotation = Angle.fromDegrees(0f);
 
-    private TransformComponent() { reset(); }
+    public TransformComponent() { reset(); }
 
     public Vector2 getTranslate() {
         return translate;
     }
 
-    public void setTranslate(final Vector2 translate) {
+    public TransformComponent setTranslate(final Vector2 translate) {
         this.translate.set(translate);
+        return this;
     }
 
     public Vector2 getScale() {
         return scale;
     }
 
-    public void setScale(final Vector2 scale) {
+    public TransformComponent setScale(final Vector2 scale) {
         this.scale.set(scale);
+        return this;
     }
 
     public Angle getRotation() {
         return rotation;
     }
 
-    public void setRotation(final Angle rotation) {
+    public TransformComponent setRotation(final Angle rotation) {
         this.rotation.setFrom(rotation);
+        return this;
     }
 
     @Override

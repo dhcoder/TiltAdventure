@@ -26,9 +26,4 @@ public interface Component extends Poolable {
      * Renders this component, via a {@link Batch}.
      */
     void render(Batch batch);
-
-    /**
-     * Clears up any resources used by this component.
-     */
-    void dispose();
 }

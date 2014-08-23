@@ -73,6 +73,11 @@ public final class AccelerometerInputComponent extends AbstractComponent {
         Pools.vector2s.free(tilt);
     }
 
+    @Override
+    public void reset() {
+        // TODO: Reset
+    }
+
     // Given an input angle between 0 and 180, return
     private float angleToTilt(final float angleDeg) {
         return angleDeg * ANGLE_TO_TILT;
@@ -81,4 +86,5 @@ public final class AccelerometerInputComponent extends AbstractComponent {
     private void readAccelerometerValuesInto(final Vector3 outVector) {
         outVector.set(Gdx.input.getAccelerometerX(), Gdx.input.getAccelerometerY(), Gdx.input.getAccelerometerZ());
     }
+
 }
