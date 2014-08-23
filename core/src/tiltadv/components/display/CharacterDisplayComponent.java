@@ -4,8 +4,11 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
+import dhcoder.support.math.Angle;
+import dhcoder.support.math.Direction;
 import dhcoder.support.time.Duration;
 import tiltadv.components.model.MotionComponent;
+import tiltadv.memory.Pools;
 
 /**
  * Component that renders a character which can move in any of the cardinal directions.
@@ -24,6 +27,7 @@ public final class CharacterDisplayComponent extends AbstractComponent {
     private MotionComponent motionComponent;
     private SpriteComponent spriteComponent;
     private float elapsedSoFar;
+    private Direction activeDirection;
     private Animation activeAnim;
 
     public CharacterDisplayComponent(final Animation animS, final Animation animE, final Animation animN,
@@ -43,7 +47,8 @@ public final class CharacterDisplayComponent extends AbstractComponent {
         this.animW = animW;
         this.animSW = animSW;
 
-        activeAnim = animS;
+        activeDirection = Direction.S;
+        activeAnim = getAnimationForDirection(activeDirection);
     }
 
     @Override
@@ -51,7 +56,7 @@ public final class CharacterDisplayComponent extends AbstractComponent {
         spriteComponent = owner.requireComponent(SpriteComponent.class);
         motionComponent = owner.requireComponent(MotionComponent.class);
 
-        spriteComponent.setTextureRegion(animS.getKeyFrame(0));
+        spriteComponent.setTextureRegion(activeAnim.getKeyFrame(0));
     }
 
     @Override
@@ -61,41 +66,43 @@ public final class CharacterDisplayComponent extends AbstractComponent {
         if (!velocity.isZero()) {
             elapsedSoFar += elapsedTime.getSeconds();
 
-            float motionAngle = velocity.angle();
+            final Angle angle = Pools.angles.grabNew();
+            angle.setDegrees(velocity.angle());
+            if (!activeDirection.isFacing(angle)) {
+                activeDirection = Direction.getForAngle(angle);
+                activeAnim = getAnimationForDirection(activeDirection);
+            }
 
-            if (0 <= motionAngle && motionAngle < 22.5f) {
-                activeAnim = animE;
-            }
-            else if (motionAngle < 67.5f) {
-                activeAnim = animNE;
-            }
-            else if (motionAngle < 112.5f) {
-                activeAnim = animN;
-            }
-            else if (motionAngle < 157.5f) {
-                activeAnim = animNW;
-            }
-            else if (motionAngle < 202.5f) {
-                activeAnim = animW;
-            }
-            else if (motionAngle < 247.5f) {
-                activeAnim = animSW;
-            }
-            else if (motionAngle < 292.5f) {
-                activeAnim = animS;
-            }
-            else if (motionAngle < 337.5f) {
-                activeAnim = animSE;
-            }
-            else { // tiltDegrees >= 315 && tiltDegrees < 45f
-                activeAnim = animE;
-            }
+            Pools.angles.free(angle);
 
             spriteComponent.setTextureRegion(activeAnim.getKeyFrame(elapsedSoFar));
         }
         else {
             elapsedSoFar = 0f;
             spriteComponent.setTextureRegion(activeAnim.getKeyFrame(0));
+        }
+    }
+
+    private Animation getAnimationForDirection(final Direction direction) {
+        switch (direction) {
+            case E:
+                return animE;
+            case NE:
+                return animNE;
+            case N:
+                return animN;
+            case NW:
+                return animNW;
+            case W:
+                return animW;
+            case SW:
+                return animSW;
+            case S:
+                return animS;
+            case SE:
+                return animSE;
+            default:
+                return animS;
         }
     }
 }
