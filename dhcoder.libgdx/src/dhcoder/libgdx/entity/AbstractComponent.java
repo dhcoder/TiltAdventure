@@ -22,5 +22,5 @@ public abstract class AbstractComponent implements Component {
     public void dispose() {}
 
     @Override
-    public abstract void reset();
+    public void reset() {}
 }

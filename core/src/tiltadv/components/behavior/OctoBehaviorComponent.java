@@ -3,6 +3,7 @@ package tiltadv.components.behavior;
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
+import dhcoder.support.math.Direction;
 import dhcoder.support.opt.Opt;
 import dhcoder.support.state.StateMachine;
 import dhcoder.support.state.StateTransitionHandler;
@@ -17,37 +18,24 @@ import java.util.Random;
  */
 public final class OctoBehaviorComponent extends AbstractComponent {
 
-    private enum S {
+    private enum State {
         WAITING,
         MOVING,
         STOPPING,
     }
 
-    private enum E {
+    private enum Evt {
         MOVE,
         WAIT,
-    }
-
-    private enum Direction {
-        NORTH,
-        SOUTH,
-        EAST,
-        WEST;
-
-        private static final Direction[] CACHED = values();
-
-        public static Direction getRandom() {
-            return CACHED[random.nextInt(CACHED.length)];
-        }
     }
 
     private static final float SPEED = 30.0f;
     private static final Duration STOPPING_DURATION = Duration.fromSeconds(0.3f);
     private static final Random random = new Random();
     private final Duration remainingDuration = Duration.zero();
-    private StateMachine<S, E> octoState;
+    private StateMachine<State, Evt> octoState;
     private MotionComponent motionComponent;
-    private E followupEvent = E.MOVE;
+    private Evt followupEvent = Evt.MOVE;
 
     @Override
     public void initialize(final Entity owner) {
@@ -66,49 +54,49 @@ public final class OctoBehaviorComponent extends AbstractComponent {
         }
     }
 
-    private StateMachine<S, E> createStateMachine() {
-        StateMachine<S, E> fsm = new StateMachine<S, E>(S.WAITING);
+    private StateMachine<State, Evt> createStateMachine() {
+        StateMachine<State, Evt> fsm = new StateMachine<State, Evt>(State.WAITING);
 
-        fsm.registerEvent(S.WAITING, E.MOVE, new StateTransitionHandler<S, E>() {
+        fsm.registerEvent(State.WAITING, Evt.MOVE, new StateTransitionHandler<State, Evt>() {
             @Override
-            public S run(final S fromState, final E withEvent, final Opt eventData) {
+            public State run(final State fromState, final Evt withEvent, final Opt eventData) {
 
                 Vector2 velocity = Pools.vector2s.grabNew();
-                switch (Direction.getRandom()) {
-                    case NORTH:
+                switch (Direction.getRandomCardinal()) {
+                    case N:
                         velocity.set(0f, SPEED);
                         break;
-                    case SOUTH:
+                    case S:
                         velocity.set(0f, -SPEED);
                         break;
-                    case EAST:
+                    case E:
                         velocity.set(SPEED, 0f);
                         break;
-                    case WEST:
+                    case W:
                         velocity.set(-SPEED, 0f);
                         break;
                 }
                 motionComponent.setVelocity(velocity);
                 Pools.vector2s.free(velocity);
-                followupEvent = E.WAIT;
-                return S.MOVING;
+                followupEvent = Evt.WAIT;
+                return State.MOVING;
             }
         });
 
-        fsm.registerEvent(S.MOVING, E.WAIT, new StateTransitionHandler<S, E>() {
+        fsm.registerEvent(State.MOVING, Evt.WAIT, new StateTransitionHandler<State, Evt>() {
             @Override
-            public S run(final S fromState, final E withEvent, final Opt eventData) {
+            public State run(final State fromState, final Evt withEvent, final Opt eventData) {
                 motionComponent.stopSmoothly(STOPPING_DURATION);
                 remainingDuration.setFrom(STOPPING_DURATION);
-                return S.STOPPING;
+                return State.STOPPING;
             }
         });
 
-        fsm.registerEvent(S.STOPPING, E.WAIT, new StateTransitionHandler<S, E>() {
+        fsm.registerEvent(State.STOPPING, Evt.WAIT, new StateTransitionHandler<State, Evt>() {
             @Override
-            public S run(final S fromState, final E withEvent, final Opt eventData) {
-                followupEvent = E.MOVE;
-                return S.WAITING;
+            public State run(final State fromState, final Evt withEvent, final Opt eventData) {
+                followupEvent = Evt.MOVE;
+                return State.WAITING;
             }
         });
 
