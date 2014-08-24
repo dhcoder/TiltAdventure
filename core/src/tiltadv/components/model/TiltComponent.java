@@ -26,7 +26,7 @@ public final class TiltComponent extends AbstractComponent {
     }
 
     @Override
-    public void reset() {
+    protected void resetComponent() {
         tilt.setZero();
     }
 }

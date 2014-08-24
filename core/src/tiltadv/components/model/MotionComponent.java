@@ -70,7 +70,7 @@ public final class MotionComponent extends AbstractComponent {
     }
 
     @Override
-    public void reset() {
+    protected void resetComponent() {
         velocity.setZero();
         deceleration.setZero();
     }

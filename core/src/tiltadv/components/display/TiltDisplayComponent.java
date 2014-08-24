@@ -15,8 +15,9 @@ import tiltadv.memory.Pools;
  */
 public final class TiltDisplayComponent extends AbstractComponent {
 
-    private final TextureRegion arrowSprite;
-    private final Entity observedEntity;
+    private TextureRegion arrowSprite;
+    private Entity observedEntity;
+
     private TransformComponent transformComponent;
     private SpriteComponent spriteComponent;
     private TiltComponent tiltComponent;
@@ -57,7 +58,8 @@ public final class TiltDisplayComponent extends AbstractComponent {
     }
 
     @Override
-    public void reset() {
-        // TODO: Reset
+    protected void resetComponent() {
+        arrowSprite = null;
+        observedEntity = null;
     }
 }

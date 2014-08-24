@@ -3,7 +3,7 @@ package tiltadv.components.behavior;
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
-import dhcoder.support.math.Direction;
+import dhcoder.support.math.CardinalDirection;
 import dhcoder.support.opt.Opt;
 import dhcoder.support.state.StateMachine;
 import dhcoder.support.state.StateTransitionHandler;
@@ -66,7 +66,7 @@ public final class OctoBehaviorComponent extends AbstractComponent {
             public State run(final State fromState, final Evt withEvent, final Opt eventData) {
 
                 Vector2 velocity = Pools.vector2s.grabNew();
-                switch (Direction.getRandomCardinal()) {
+                switch (CardinalDirection.getRandom()) {
                     case N:
                         velocity.set(0f, SPEED);
                         break;
@@ -108,7 +108,7 @@ public final class OctoBehaviorComponent extends AbstractComponent {
     }
 
     @Override
-    public void reset() {
+    protected void resetComponent() {
         octoState.reset();
         followupEvent = Evt.MOVE;
         remainingDuration.setZero();

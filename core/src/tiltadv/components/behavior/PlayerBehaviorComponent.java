@@ -51,7 +51,7 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
     }
 
     @Override
-    public void reset() {
+    protected void resetComponent() {
         isMoving = false;
     }
 }

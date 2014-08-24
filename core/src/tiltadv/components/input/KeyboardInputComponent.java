@@ -6,6 +6,7 @@ import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.time.Duration;
 import tiltadv.components.model.TiltComponent;
+import tiltadv.memory.Pools;
 
 import static com.badlogic.gdx.Input.Keys;
 
@@ -13,8 +14,6 @@ import static com.badlogic.gdx.Input.Keys;
  * Component which handles the user using a keyboard to
  */
 public final class KeyboardInputComponent extends AbstractComponent {
-
-    private final Vector2 tilt = new Vector2(); // TODO: Replace with pool
     private TiltComponent tiltComponent;
 
     @Override
@@ -24,8 +23,7 @@ public final class KeyboardInputComponent extends AbstractComponent {
 
     @Override
     public void update(final Duration elapsedTime) {
-
-        tilt.setZero();
+        Vector2 tilt = Pools.vector2s.grabNew();
 
         if (Gdx.input.isKeyPressed(Keys.DPAD_LEFT)) { tilt.x = -2f; }
         else if (Gdx.input.isKeyPressed(Keys.DPAD_RIGHT)) { tilt.x = 2f; }
@@ -34,11 +32,12 @@ public final class KeyboardInputComponent extends AbstractComponent {
         else if (Gdx.input.isKeyPressed(Keys.DPAD_UP)) { tilt.y = 2f; }
 
         tiltComponent.setTilt(tilt);
+
+        Pools.vector2s.free(tilt);
     }
 
     @Override
-    public void reset() {
-        tilt.setZero();
+    protected void resetComponent() {
+        // Nothing to reset
     }
-
 }

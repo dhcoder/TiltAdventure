@@ -65,10 +65,15 @@ public abstract class CollisionComponent extends AbstractComponent {
     }
 
     @Override
-    public final void reset() {
+    public void dispose() {
         CollisionSystem collisionSystem = Services.get(CollisionSystem.class);
         collisionSystem.release(collider);
         collider = null;
+    }
+
+    @Override
+    protected void resetComponent() {
+        // Do nothing, dispose already clears everything
     }
 
 

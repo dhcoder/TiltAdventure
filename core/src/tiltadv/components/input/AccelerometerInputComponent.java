@@ -74,8 +74,8 @@ public final class AccelerometerInputComponent extends AbstractComponent {
     }
 
     @Override
-    public void reset() {
-        // TODO: Reset
+    protected void resetComponent() {
+        isTiltActivated = false;
     }
 
     // Given an input angle between 0 and 180, return

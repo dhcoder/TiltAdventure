@@ -43,7 +43,7 @@ public final class TransformComponent extends AbstractComponent {
     }
 
     @Override
-    public void reset() {
+    protected void resetComponent() {
         translate.set(0f, 0f);
         scale.set(1f, 1f);
         rotation.setDegrees(0f);

@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.math.Angle;
-import dhcoder.support.math.Direction;
+import dhcoder.support.math.CompassDirection;
 import dhcoder.support.time.Duration;
 import tiltadv.components.model.MotionComponent;
 import tiltadv.memory.Pools;
@@ -15,20 +15,21 @@ import tiltadv.memory.Pools;
  */
 public final class CharacterDisplayComponent extends AbstractComponent {
 
-    private final Animation animS;
-    private final Animation animSE;
-    private final Animation animE;
-    private final Animation animNE;
-    private final Animation animN;
-    private final Animation animNW;
-    private final Animation animW;
-    private final Animation animSW;
+    private Animation animS;
+    private Animation animSE;
+    private Animation animE;
+    private Animation animNE;
+    private Animation animN;
+    private Animation animNW;
+    private Animation animW;
+    private Animation animSW;
+
+    private float elapsedSoFar;
+    private Animation activeAnim;
 
     private MotionComponent motionComponent;
     private SpriteComponent spriteComponent;
-    private float elapsedSoFar;
-    private Direction activeDirection;
-    private Animation activeAnim;
+    private CompassDirection activeDirection;
 
     public CharacterDisplayComponent(final Animation animS, final Animation animE, final Animation animN,
         final Animation animW) {
@@ -47,7 +48,7 @@ public final class CharacterDisplayComponent extends AbstractComponent {
         this.animW = animW;
         this.animSW = animSW;
 
-        activeDirection = Direction.S;
+        activeDirection = CompassDirection.S;
         activeAnim = getAnimationForDirection(activeDirection);
     }
 
@@ -69,7 +70,7 @@ public final class CharacterDisplayComponent extends AbstractComponent {
             final Angle angle = Pools.angles.grabNew();
             angle.setDegrees(velocity.angle());
             if (!activeDirection.isFacing(angle)) {
-                activeDirection = Direction.getForAngle(angle);
+                activeDirection = CompassDirection.getForAngle(angle);
                 activeAnim = getAnimationForDirection(activeDirection);
             }
 
@@ -84,11 +85,21 @@ public final class CharacterDisplayComponent extends AbstractComponent {
     }
 
     @Override
-    public void reset() {
-        // TODO: Reset
+    protected void resetComponent() {
+        animS = null;
+        animSE = null;
+        animE = null;
+        animNE = null;
+        animN = null;
+        animNW = null;
+        animW = null;
+        animSW = null;
+
+        elapsedSoFar = 0f;
+        activeAnim = null;
     }
 
-    private Animation getAnimationForDirection(final Direction direction) {
+    private Animation getAnimationForDirection(final CompassDirection direction) {
         switch (direction) {
             case E:
                 return animE;

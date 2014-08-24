@@ -24,6 +24,7 @@ public final class SpriteComponent extends AbstractComponent {
      */
     private final Sprite sprite;
     private boolean hidden;
+
     private TransformComponent transformComponent;
     private SizeComponent sizeComponent;
 
@@ -34,10 +35,6 @@ public final class SpriteComponent extends AbstractComponent {
     public SpriteComponent(final TextureRegion textureRegion) {
         this();
         setTextureRegion(textureRegion);
-    }
-
-    public Sprite getSprite() {
-        return sprite;
     }
 
     public void setTextureRegion(final TextureRegion textureRegion) {
@@ -77,7 +74,8 @@ public final class SpriteComponent extends AbstractComponent {
     }
 
     @Override
-    public void reset() {
-        // TODO: reset
+    protected void resetComponent() {
+        sprite.setTexture(null);
+        hidden = false;
     }
 }

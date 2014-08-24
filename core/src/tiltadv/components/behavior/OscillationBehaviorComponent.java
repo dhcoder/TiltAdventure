@@ -57,7 +57,7 @@ public final class OscillationBehaviorComponent extends AbstractComponent {
     }
 
     @Override
-    public void reset() {
+    protected void resetComponent() {
         from.setZero();
         to.setZero();
         duration.setZero();
