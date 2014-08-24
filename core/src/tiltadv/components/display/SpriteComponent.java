@@ -32,14 +32,10 @@ public final class SpriteComponent extends AbstractComponent {
         sprite = new Sprite();
     }
 
-    public SpriteComponent(final TextureRegion textureRegion) {
-        this();
-        setTextureRegion(textureRegion);
-    }
-
-    public void setTextureRegion(final TextureRegion textureRegion) {
+    public SpriteComponent setTextureRegion(final TextureRegion textureRegion) {
         sprite.setRegion(textureRegion);
         sprite.setOrigin(textureRegion.getRegionWidth() / 2f, textureRegion.getRegionHeight() / 2f);
+        return this;
     }
 
     public void setHidden(final boolean hidden) {
@@ -70,6 +66,7 @@ public final class SpriteComponent extends AbstractComponent {
     @Override
     public void render(final Batch batch) {
         if (hidden) { return; }
+        if (sprite.getTexture() == null) { return; }
         sprite.draw(batch);
     }
 

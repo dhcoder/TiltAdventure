@@ -15,14 +15,16 @@ public final class TiltComponent extends AbstractComponent {
     private final Vector2 tilt = new Vector2();
 
     public TiltComponent() {
-        reset();
+        resetComponent();
     }
 
     public Vector2 getTilt() { return tilt; }
 
-    public void setTilt(final Vector2 tilt) {
+    public TiltComponent setTilt(final Vector2 tilt) {
         this.tilt.set(tilt.x, tilt.y);
         this.tilt.limit(MAX_TILT_VECTOR_LEN);
+
+        return this;
     }
 
     @Override

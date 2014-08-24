@@ -231,7 +231,7 @@ public final class GdxApplication extends ApplicationAdapter {
     private Entity addPlayerEntity() {
         Entity playerEntity = entities.newEntity();
         playerEntity.addComponent(new SpriteComponent());
-        SizeComponent sizeComponent = SizeComponent.from(Tiles.LINKDOWN1);
+        SizeComponent sizeComponent = new SizeComponent().setSizeFrom(Tiles.LINKDOWN1);
         playerEntity.addComponent(sizeComponent);
         playerEntity.addComponent(new TransformComponent());
         playerEntity.addComponent(new MotionComponent());
@@ -239,10 +239,8 @@ public final class GdxApplication extends ApplicationAdapter {
         playerEntity.addComponent(Gdx.app.getType() == ApplicationType.Android ? new AccelerometerInputComponent() :
             new KeyboardInputComponent());
         playerEntity.addComponent(new PlayerBehaviorComponent());
-        playerEntity.addComponent(
-            new CharacterDisplayComponent(Animations.PLAYER_S, Animations.PLAYER_SE, Animations.PLAYER_E,
-                Animations.PLAYER_NE, Animations.PLAYER_N, Animations.PLAYER_NW, Animations.PLAYER_W,
-                Animations.PLAYER_SW));
+        playerEntity.addComponent(new CharacterDisplayComponent()
+            .set(Animations.PLAYER_S, Animations.PLAYER_E, Animations.PLAYER_N, Animations.PLAYER_W));
         playerEntity.addComponent(new PlayerCollisionComponent().setShape(new Circle(sizeComponent.getSize().x / 2)));
 
         return playerEntity;
@@ -254,13 +252,12 @@ public final class GdxApplication extends ApplicationAdapter {
         Vector2 position = Pools.vector2s.grabNew().set(x, y);
 
         octoEnemy.addComponent(new SpriteComponent());
-        octoEnemy.addComponent(SizeComponent.from(Tiles.OCTODOWN1));
+        octoEnemy.addComponent(new SizeComponent().setSizeFrom(Tiles.OCTODOWN1));
         octoEnemy.addComponent(new TransformComponent().setTranslate(position));
         octoEnemy.addComponent(new MotionComponent());
         octoEnemy.addComponent(new OctoBehaviorComponent());
-        octoEnemy.addComponent(
-            new CharacterDisplayComponent(Animations.OCTODOWN, Animations.OCTORIGHT, Animations.OCTOUP,
-                Animations.OCTOLEFT));
+        octoEnemy.addComponent(new CharacterDisplayComponent()
+            .set(Animations.OCTODOWN, Animations.OCTORIGHT, Animations.OCTOUP, Animations.OCTOLEFT));
         octoEnemy.addComponent(new EnemyCollisionComponent().setShape(new Circle(Tiles.OCTOUP1.getRegionWidth() / 2)));
 
         Pools.vector2s.free(position);
@@ -269,20 +266,20 @@ public final class GdxApplication extends ApplicationAdapter {
     private void AddMovingRockEntity(final float xFrom, final float yFrom, final float xTo, final float yTo) {
 
         Entity rockEntity = entities.newEntity();
-        rockEntity.addComponent(new SpriteComponent(Tiles.ROCK));
-        rockEntity.addComponent(SizeComponent.from(Tiles.ROCK));
+        rockEntity.addComponent(new SpriteComponent().setTextureRegion(Tiles.ROCK));
+        rockEntity.addComponent(new SizeComponent().setSizeFrom(Tiles.ROCK));
         rockEntity.addComponent(new TransformComponent());
         rockEntity.addComponent(new OscillationBehaviorComponent()
             .set(new Vector2(xFrom, yFrom), new Vector2(xTo, yTo), Duration.fromSeconds(2f)));
-        rockEntity.addComponent(new ObstacleCollisionComponent().setShape(
-            new Rectangle(Tiles.ROCK.getRegionWidth() / 2, Tiles.ROCK.getRegionHeight() / 2)));
+        rockEntity.addComponent(new ObstacleCollisionComponent()
+            .setShape(new Rectangle(Tiles.ROCK.getRegionWidth() / 2, Tiles.ROCK.getRegionHeight() / 2)));
     }
 
     private void addFpsEntity() {
         Entity fpsEntity = entities.newEntity();
         fpsEntity.addComponent(new TransformComponent()
             .setTranslate(new Vector2(-VIEWPORT_WIDTH / 2, -VIEWPORT_HEIGHT / 2 + font.getLineHeight())));
-        fpsEntity.addComponent(new FpsDisplayComponent(font));
+        fpsEntity.addComponent(new FpsDisplayComponent().set(font));
     }
 
     private void addTiltIndicatorEntity(final Entity playerEntity) {
@@ -293,7 +290,7 @@ public final class GdxApplication extends ApplicationAdapter {
             new Vector2(VIEWPORT_WIDTH / 2 - Tiles.RODRIGHT.getRegionWidth() - MARGIN,
                 VIEWPORT_HEIGHT / 2 - Tiles.RODRIGHT.getRegionHeight() - MARGIN)));
         tiltIndicatorEntity.addComponent(new SpriteComponent());
-        tiltIndicatorEntity.addComponent(SizeComponent.from(Tiles.RODRIGHT));
+        tiltIndicatorEntity.addComponent(new SizeComponent().setSizeFrom(Tiles.RODRIGHT));
         tiltIndicatorEntity.addComponent(new TiltDisplayComponent(Tiles.RODRIGHT, playerEntity));
     }
 }

@@ -39,7 +39,7 @@ public final class OctoBehaviorComponent extends AbstractComponent {
 
     public OctoBehaviorComponent() {
         octoState = createStateMachine();
-        reset();
+        resetComponent();
     }
 
     @Override

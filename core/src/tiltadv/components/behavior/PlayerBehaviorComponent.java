@@ -20,7 +20,7 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
     private boolean isMoving;
 
     public PlayerBehaviorComponent() {
-        reset();
+        resetComponent();
     }
 
     @Override

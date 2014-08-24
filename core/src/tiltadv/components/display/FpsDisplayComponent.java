@@ -17,20 +17,23 @@ import static dhcoder.support.text.StringUtils.format;
 public final class FpsDisplayComponent extends AbstractComponent {
 
     private final static String FPS_LABEL_FORMAT = "FPS: {0}";
-    private final BitmapFont font;
+    private BitmapFont font;
     private TransformComponent transformComponent;
 
     private String[] fpsLabels;
     private String fpsLabel;
 
-    public FpsDisplayComponent(final BitmapFont font) {
-        this.font = font;
-
+    public FpsDisplayComponent() {
         fpsLabels = new String[61];
         fpsLabels[0] = format(FPS_LABEL_FORMAT, "--");
         for (int i = 1; i <= 60; ++i) {
             fpsLabels[i] = format(FPS_LABEL_FORMAT, i);
         }
+    }
+
+    public FpsDisplayComponent set(final BitmapFont font) {
+        this.font = font;
+        return this;
     }
 
     @Override

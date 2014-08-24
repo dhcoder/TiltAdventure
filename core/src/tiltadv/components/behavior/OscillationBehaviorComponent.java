@@ -21,7 +21,7 @@ public final class OscillationBehaviorComponent extends AbstractComponent {
     private TransformComponent transformComponent;
 
     public OscillationBehaviorComponent() {
-        reset();
+        resetComponent();
     }
 
     public OscillationBehaviorComponent set(final Vector2 from, final Vector2 to, final Duration duration) {

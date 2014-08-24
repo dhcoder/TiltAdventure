@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.math.Angle;
+import dhcoder.support.math.CardinalDirection;
 import dhcoder.support.math.CompassDirection;
 import dhcoder.support.time.Duration;
 import tiltadv.components.model.MotionComponent;
@@ -29,27 +30,19 @@ public final class CharacterDisplayComponent extends AbstractComponent {
 
     private MotionComponent motionComponent;
     private SpriteComponent spriteComponent;
-    private CompassDirection activeDirection;
+    private CompassDirection activeCompassDirection;
+    private CardinalDirection activeCardinalDirection;
+    private boolean isCardinal;
 
-    public CharacterDisplayComponent(final Animation animS, final Animation animE, final Animation animN,
+    public CharacterDisplayComponent set(final Animation animS, final Animation animE, final Animation animN,
         final Animation animW) {
-        this(animS, animS, animE, animE, animN, animN, animW, animW);
+        return set(animS, null, animE, null, animN, null, animW, null, true);
     }
 
-    public CharacterDisplayComponent(final Animation animS, final Animation animSE, final Animation animE,
+    public CharacterDisplayComponent set(final Animation animS, final Animation animSE, final Animation animE,
         final Animation animNE, final Animation animN, final Animation animNW, final Animation animW,
         final Animation animSW) {
-        this.animS = animS;
-        this.animSE = animSE;
-        this.animE = animE;
-        this.animNE = animNE;
-        this.animN = animN;
-        this.animNW = animNW;
-        this.animW = animW;
-        this.animSW = animSW;
-
-        activeDirection = CompassDirection.S;
-        activeAnim = getAnimationForDirection(activeDirection);
+        return set(animS, animSE, animE, animNE, animN, animNW, animW, animSW, false);
     }
 
     @Override
@@ -69,9 +62,17 @@ public final class CharacterDisplayComponent extends AbstractComponent {
 
             final Angle angle = Pools.angles.grabNew();
             angle.setDegrees(velocity.angle());
-            if (!activeDirection.isFacing(angle)) {
-                activeDirection = CompassDirection.getForAngle(angle);
-                activeAnim = getAnimationForDirection(activeDirection);
+            if (isCardinal) {
+                if (!activeCardinalDirection.isFacing(angle)) {
+                    activeCardinalDirection = CardinalDirection.getForAngle(angle);
+                    activeAnim = getAnimationForDirection(activeCardinalDirection);
+                }
+            }
+            else {
+                if (!activeCompassDirection.isFacing(angle)) {
+                    activeCompassDirection = CompassDirection.getForAngle(angle);
+                    activeAnim = getAnimationForDirection(activeCompassDirection);
+                }
             }
 
             Pools.angles.free(angle);
@@ -97,6 +98,31 @@ public final class CharacterDisplayComponent extends AbstractComponent {
 
         elapsedSoFar = 0f;
         activeAnim = null;
+
+        activeCardinalDirection = CardinalDirection.S;
+        activeCompassDirection = CompassDirection.S;
+    }
+
+    private CharacterDisplayComponent set(final Animation animS, final Animation animSE, final Animation animE,
+        final Animation animNE, final Animation animN, final Animation animNW, final Animation animW,
+        final Animation animSW, final boolean isCardinal) {
+
+        resetComponent();
+
+        this.animS = animS;
+        this.animSE = animSE;
+        this.animE = animE;
+        this.animNE = animNE;
+        this.animN = animN;
+        this.animNW = animNW;
+        this.animW = animW;
+        this.animSW = animSW;
+        this.isCardinal = isCardinal;
+
+        activeAnim = isCardinal ? getAnimationForDirection(activeCardinalDirection) :
+            getAnimationForDirection(activeCompassDirection);
+
+        return this;
     }
 
     private Animation getAnimationForDirection(final CompassDirection direction) {
@@ -121,4 +147,20 @@ public final class CharacterDisplayComponent extends AbstractComponent {
                 return animS;
         }
     }
+
+    private Animation getAnimationForDirection(final CardinalDirection direction) {
+        switch (direction) {
+            case E:
+                return animE;
+            case N:
+                return animN;
+            case W:
+                return animW;
+            case S:
+                return animS;
+            default:
+                return animS;
+        }
+    }
+
 }
