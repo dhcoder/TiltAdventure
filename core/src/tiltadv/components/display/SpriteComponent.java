@@ -42,6 +42,7 @@ public final class SpriteComponent extends AbstractComponent {
 
     public void setTextureRegion(final TextureRegion textureRegion) {
         sprite.setRegion(textureRegion);
+        sprite.setOrigin(textureRegion.getRegionWidth() / 2f, textureRegion.getRegionHeight() / 2f);
     }
 
     public void setHidden(final boolean hidden) {
@@ -63,7 +64,7 @@ public final class SpriteComponent extends AbstractComponent {
         Angle rotation = transformComponent.getRotation();
         Vector2 size = sizeComponent.getSize();
 
-        sprite.setPosition(translate.x - (size.x / 2f), translate.y - (size.y / 2f));
+        sprite.setCenter(translate.x, translate.y);
         sprite.setSize(size.x, size.y);
         sprite.setScale(scale.x, scale.y);
         sprite.setRotation(rotation.getDegrees());
