@@ -18,17 +18,17 @@ public class Key2<T1, T2> implements Poolable {
     private T1 value1;
     private T2 value2;
 
-    public Key2() {
-    }
+    public Key2() {}
 
     public Key2(final T1 value1, final T2 value2) {
         this.value1 = value1;
         this.value2 = value2;
     }
 
-    public final void set(final T1 value1, final T2 value2) {
+    public final Key2 set(final T1 value1, final T2 value2) {
         this.value1 = value1;
         this.value2 = value2;
+        return this;
     }
 
     @Override
