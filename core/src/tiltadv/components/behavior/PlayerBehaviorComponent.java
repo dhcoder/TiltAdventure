@@ -53,5 +53,8 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
     @Override
     protected void resetComponent() {
         isMoving = false;
+
+        motionComponent = null;
+        tiltComponent = null;
     }
 }

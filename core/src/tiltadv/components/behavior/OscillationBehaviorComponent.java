@@ -63,5 +63,7 @@ public final class OscillationBehaviorComponent extends AbstractComponent {
         duration.setZero();
         accumulated.setZero();
         onReturnTrip = false;
+
+        transformComponent = null;
     }
 }

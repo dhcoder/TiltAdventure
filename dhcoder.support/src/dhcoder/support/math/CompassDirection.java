@@ -17,13 +17,32 @@ public enum CompassDirection {
 
     private static final Random RANDOM = new Random();
     private static final CompassDirection[] CACHED = values();
+    // Regions that correspond with each 22.5° section of the circle
+    private static final CompassDirection[] REGIONS = new CompassDirection[CACHED.length * 2];
     private static final Angle[] ANGLES = new Angle[CACHED.length];
 
     static {
-        float angle = 0f;
+        REGIONS[0] = CompassDirection.E;
+        REGIONS[1] = CompassDirection.NE;
+        REGIONS[2] = CompassDirection.NE;
+        REGIONS[3] = CompassDirection.N;
+        REGIONS[4] = CompassDirection.N;
+        REGIONS[5] = CompassDirection.NW;
+        REGIONS[6] = CompassDirection.NW;
+        REGIONS[7] = CompassDirection.W;
+        REGIONS[8] = CompassDirection.W;
+        REGIONS[9] = CompassDirection.SW;
+        REGIONS[10] = CompassDirection.SW;
+        REGIONS[11] = CompassDirection.S;
+        REGIONS[12] = CompassDirection.S;
+        REGIONS[13] = CompassDirection.SE;
+        REGIONS[14] = CompassDirection.SE;
+        REGIONS[15] = CompassDirection.E;
+
+        float angleDeg = 0f;
         for (int i = 0; i < ANGLES.length; i++) {
-            ANGLES[i] = Angle.fromDegrees(angle);
-            angle += 45.0f;
+            ANGLES[i] = Angle.fromDegrees(angleDeg);
+            angleDeg += 45f; // 360 / 8 directions
         }
     }
 
@@ -32,15 +51,15 @@ public enum CompassDirection {
     }
 
     public static CompassDirection getForAngle(final Angle angle) {
-        int directionIndex = (int)(angle.getDegrees() + 22.5f) / 45;
-        directionIndex %= CACHED.length;
-        return CACHED[directionIndex];
+        int regionIndex = (int)(angle.getDegrees() / 22.5f);
+        return REGIONS[regionIndex];
     }
 
     public boolean isFacing(final Angle angle) {
-        float distanceFromAngle = Math.abs(ANGLES[this.ordinal()].getDegrees() - angle.getDegrees());
-        float allowedDistance = 22.5f;
+        return getForAngle(angle) == this;
+    }
 
-        return distanceFromAngle <= allowedDistance;
+    public Angle getAngle() {
+        return ANGLES[ordinal()];
     }
 }

@@ -8,8 +8,8 @@ import dhcoder.support.math.Angle;
 import dhcoder.support.math.CardinalDirection;
 import dhcoder.support.math.CompassDirection;
 import dhcoder.support.time.Duration;
+import tiltadv.components.model.HeadingComponent;
 import tiltadv.components.model.MotionComponent;
-import tiltadv.memory.Pools;
 
 /**
  * Component that renders a character which can move in any of the cardinal directions.
@@ -28,11 +28,13 @@ public final class CharacterDisplayComponent extends AbstractComponent {
     private float elapsedSoFar;
     private Animation activeAnim;
 
-    private MotionComponent motionComponent;
-    private SpriteComponent spriteComponent;
     private CompassDirection activeCompassDirection;
     private CardinalDirection activeCardinalDirection;
     private boolean isCardinal;
+
+    private MotionComponent motionComponent;
+    private HeadingComponent headingComponent;
+    private SpriteComponent spriteComponent;
 
     public CharacterDisplayComponent set(final Animation animS, final Animation animE, final Animation animN,
         final Animation animW) {
@@ -49,6 +51,7 @@ public final class CharacterDisplayComponent extends AbstractComponent {
     public void initialize(final Entity owner) {
         spriteComponent = owner.requireComponent(SpriteComponent.class);
         motionComponent = owner.requireComponent(MotionComponent.class);
+        headingComponent = owner.requireComponent(HeadingComponent.class);
 
         spriteComponent.setTextureRegion(activeAnim.getKeyFrame(0));
     }
@@ -59,30 +62,26 @@ public final class CharacterDisplayComponent extends AbstractComponent {
 
         if (!velocity.isZero()) {
             elapsedSoFar += elapsedTime.getSeconds();
-
-            final Angle angle = Pools.angles.grabNew();
-            angle.setDegrees(velocity.angle());
-            if (isCardinal) {
-                if (!activeCardinalDirection.isFacing(angle)) {
-                    activeCardinalDirection = CardinalDirection.getForAngle(angle);
-                    activeAnim = getAnimationForDirection(activeCardinalDirection);
-                }
-            }
-            else {
-                if (!activeCompassDirection.isFacing(angle)) {
-                    activeCompassDirection = CompassDirection.getForAngle(angle);
-                    activeAnim = getAnimationForDirection(activeCompassDirection);
-                }
-            }
-
-            Pools.angles.free(angle);
-
-            spriteComponent.setTextureRegion(activeAnim.getKeyFrame(elapsedSoFar));
         }
         else {
             elapsedSoFar = 0f;
-            spriteComponent.setTextureRegion(activeAnim.getKeyFrame(0));
         }
+
+        final Angle angle = headingComponent.getHeading();
+        if (isCardinal) {
+            if (!activeCardinalDirection.isFacing(angle)) {
+                activeCardinalDirection = CardinalDirection.getForAngle(angle);
+                activeAnim = getAnimationForDirection(activeCardinalDirection);
+            }
+        }
+        else {
+            if (!activeCompassDirection.isFacing(angle)) {
+                activeCompassDirection = CompassDirection.getForAngle(angle);
+                activeAnim = getAnimationForDirection(activeCompassDirection);
+            }
+        }
+
+        spriteComponent.setTextureRegion(activeAnim.getKeyFrame(elapsedSoFar));
     }
 
     @Override
@@ -101,6 +100,10 @@ public final class CharacterDisplayComponent extends AbstractComponent {
 
         activeCardinalDirection = CardinalDirection.S;
         activeCompassDirection = CompassDirection.S;
+
+        motionComponent = null;
+        headingComponent = null;
+        spriteComponent = null;
     }
 
     private CharacterDisplayComponent set(final Animation animS, final Animation animSE, final Animation animE,

@@ -29,10 +29,7 @@ import tiltadv.components.display.SpriteComponent;
 import tiltadv.components.display.TiltDisplayComponent;
 import tiltadv.components.input.AccelerometerInputComponent;
 import tiltadv.components.input.KeyboardInputComponent;
-import tiltadv.components.model.MotionComponent;
-import tiltadv.components.model.SizeComponent;
-import tiltadv.components.model.TiltComponent;
-import tiltadv.components.model.TransformComponent;
+import tiltadv.components.model.*;
 import tiltadv.globals.*;
 import tiltadv.memory.Pools;
 
@@ -136,6 +133,7 @@ public final class GdxApplication extends ApplicationAdapter {
             @Override
             public void initialize(final Entity entity) {
                 entity.addComponent(entities.newComponent(SpriteComponent.class));
+                entity.addComponent(entities.newComponent(HeadingComponent.class));
                 SizeComponent sizeComponent = entities.newComponent(SizeComponent.class).setSizeFrom(Tiles.LINKDOWN1);
                 entity.addComponent(sizeComponent);
                 entity.addComponent(entities.newComponent(TransformComponent.class));
@@ -156,6 +154,7 @@ public final class GdxApplication extends ApplicationAdapter {
             @Override
             public void initialize(final Entity entity) {
                 entity.addComponent(entities.newComponent(SpriteComponent.class));
+                entity.addComponent(entities.newComponent(HeadingComponent.class));
                 entity.addComponent(entities.newComponent(SizeComponent.class).setSizeFrom(Tiles.OCTODOWN1));
                 entity.addComponent(entities.newComponent(TransformComponent.class));
                 entity.addComponent(entities.newComponent(MotionComponent.class));

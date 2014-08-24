@@ -73,7 +73,7 @@ public abstract class CollisionComponent extends AbstractComponent {
 
     @Override
     protected void resetComponent() {
-        // Do nothing, dispose already clears everything
+        transformComponent = null;
     }
 
 

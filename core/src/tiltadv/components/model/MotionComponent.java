@@ -74,5 +74,7 @@ public final class MotionComponent extends AbstractComponent {
     protected void resetComponent() {
         velocity.setZero();
         deceleration.setZero();
+
+        transformComponent = null;
     }
 }

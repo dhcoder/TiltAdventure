@@ -75,5 +75,8 @@ public final class SpriteComponent extends AbstractComponent {
     protected void resetComponent() {
         sprite.setTexture(null);
         hidden = false;
+
+        sizeComponent = null;
+        transformComponent = null;
     }
 }

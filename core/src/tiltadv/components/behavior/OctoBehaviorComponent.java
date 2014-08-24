@@ -8,6 +8,7 @@ import dhcoder.support.opt.Opt;
 import dhcoder.support.state.StateMachine;
 import dhcoder.support.state.StateTransitionHandler;
 import dhcoder.support.time.Duration;
+import tiltadv.components.model.HeadingComponent;
 import tiltadv.components.model.MotionComponent;
 import tiltadv.memory.Pools;
 
@@ -35,6 +36,8 @@ public final class OctoBehaviorComponent extends AbstractComponent {
     private final Duration remainingDuration = Duration.zero();
     private final StateMachine<State, Evt> octoState;
     private Evt followupEvent;
+
+    private HeadingComponent headingComponent;
     private MotionComponent motionComponent;
 
     public OctoBehaviorComponent() {
@@ -44,6 +47,7 @@ public final class OctoBehaviorComponent extends AbstractComponent {
 
     @Override
     public void initialize(final Entity owner) {
+        headingComponent = owner.requireComponent(HeadingComponent.class);
         motionComponent = owner.requireComponent(MotionComponent.class);
     }
 
@@ -58,6 +62,16 @@ public final class OctoBehaviorComponent extends AbstractComponent {
         }
     }
 
+    @Override
+    protected void resetComponent() {
+        octoState.reset();
+        followupEvent = Evt.MOVE;
+        remainingDuration.setZero();
+
+        headingComponent = null;
+        motionComponent = null;
+    }
+
     private StateMachine<State, Evt> createStateMachine() {
         StateMachine<State, Evt> fsm = new StateMachine<State, Evt>(State.WAITING);
 
@@ -66,7 +80,9 @@ public final class OctoBehaviorComponent extends AbstractComponent {
             public State run(final State fromState, final Evt withEvent, final Opt eventData) {
 
                 Vector2 velocity = Pools.vector2s.grabNew();
-                switch (CardinalDirection.getRandom()) {
+                CardinalDirection nextDirection = CardinalDirection.getRandom();
+                headingComponent.setHeading(nextDirection.getAngle());
+                switch (nextDirection) {
                     case N:
                         velocity.set(0f, SPEED);
                         break;
@@ -105,12 +121,5 @@ public final class OctoBehaviorComponent extends AbstractComponent {
         });
 
         return fsm;
-    }
-
-    @Override
-    protected void resetComponent() {
-        octoState.reset();
-        followupEvent = Evt.MOVE;
-        remainingDuration.setZero();
     }
 }

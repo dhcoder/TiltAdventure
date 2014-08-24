@@ -28,21 +28,26 @@ public final class AccelerometerInputComponent extends AbstractComponent {
 
     private TiltComponent tiltComponent;
 
+    private final EventListener touchDownListener = new EventListener() {
+        @Override
+        public void run(final Object sender) {
+            isTiltActivated = true;
+        }
+    };
+
+    private final EventListener touchUpListener = new EventListener() {
+        @Override
+        public void run(final Object sender) {
+            isTiltActivated = false;
+        }
+    };
+
     @Override
     public void initialize(final Entity owner) {
         tiltComponent = owner.requireComponent(TiltComponent.class);
-        Events.onScreenTouchDown.addListener(new EventListener() {
-            @Override
-            public void run(final Object sender) {
-                isTiltActivated = true;
-            }
-        });
-        Events.onScreenTouchUp.addListener(new EventListener() {
-            @Override
-            public void run(final Object sender) {
-                isTiltActivated = false;
-            }
-        });
+
+        Events.onScreenTouchDown.addListener(touchDownListener);
+        Events.onScreenTouchUp.addListener(touchUpListener);
     }
 
     @Override
@@ -76,6 +81,11 @@ public final class AccelerometerInputComponent extends AbstractComponent {
     @Override
     protected void resetComponent() {
         isTiltActivated = false;
+
+        Events.onScreenTouchDown.removeListener(touchDownListener);
+        Events.onScreenTouchUp.removeListener(touchUpListener);
+
+        tiltComponent = null;
     }
 
     // Given an input angle between 0 and 180, return

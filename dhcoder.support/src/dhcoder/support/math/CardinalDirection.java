@@ -13,8 +13,9 @@ public enum CardinalDirection {
 
     private static final Random RANDOM = new Random();
     private static final CardinalDirection[] CACHED = values();
-    // Regions that correspond with 45° sections of the circle
+    // Regions that correspond with each 45° section of the circle
     private static final CardinalDirection[] REGIONS = new CardinalDirection[CACHED.length * 2];
+    private static final Angle[] ANGLES = new Angle[CACHED.length];
 
     static {
         REGIONS[0] = CardinalDirection.E;
@@ -25,6 +26,12 @@ public enum CardinalDirection {
         REGIONS[5] = CardinalDirection.S;
         REGIONS[6] = CardinalDirection.S;
         REGIONS[7] = CardinalDirection.E;
+
+        float angleDeg = 0f;
+        for (int i = 0; i < ANGLES.length; i++) {
+            ANGLES[i] = Angle.fromDegrees(angleDeg);
+            angleDeg += 90f; // 360 / 4 directions
+        }
     }
 
     public static CardinalDirection getRandom() {
@@ -38,5 +45,9 @@ public enum CardinalDirection {
 
     public boolean isFacing(final Angle angle) {
         return getForAngle(angle) == this;
+    }
+
+    public Angle getAngle() {
+        return ANGLES[this.ordinal()];
     }
 }

@@ -38,6 +38,6 @@ public final class KeyboardInputComponent extends AbstractComponent {
 
     @Override
     protected void resetComponent() {
-        // Nothing to reset
+        tiltComponent = null;
     }
 }
