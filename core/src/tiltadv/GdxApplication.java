@@ -127,10 +127,10 @@ public final class GdxApplication extends ApplicationAdapter {
 
     private void initializeEntities() {
         entities = new EntityManager(ENTITY_COUNT);
-        entities.preallocateComponents(TransformComponent.class, ENTITY_COUNT);
-        entities.preallocateComponents(MotionComponent.class, ENTITY_COUNT);
-        entities.preallocateComponents(SizeComponent.class, ENTITY_COUNT);
-        entities.preallocateComponents(SpriteComponent.class, ENTITY_COUNT);
+        entities.preallocate(TransformComponent.class, ENTITY_COUNT);
+        entities.preallocate(MotionComponent.class, ENTITY_COUNT);
+        entities.preallocate(SizeComponent.class, ENTITY_COUNT);
+        entities.preallocate(SpriteComponent.class, ENTITY_COUNT);
 
         addOctoEnemies();
 
@@ -179,20 +179,24 @@ public final class GdxApplication extends ApplicationAdapter {
         Vector2 wallPos = Pools.vector2s.grabNew();
 
         wallPos.set(left, 0f);
-        wallLeft.addComponent(new TransformComponent().setTranslate(wallPos));
-        wallLeft.addComponent(new ObstacleCollisionComponent().setShape(new Rectangle(wallSize, screenH)));
+        wallLeft.addComponent(entities.newComponent(TransformComponent.class).setTranslate(wallPos));
+        wallLeft.addComponent(
+            entities.newComponent(ObstacleCollisionComponent.class).setShape(new Rectangle(wallSize, screenH)));
 
         wallPos.set(right, 0f);
-        wallRight.addComponent(new TransformComponent().setTranslate(wallPos));
-        wallRight.addComponent(new ObstacleCollisionComponent().setShape(new Rectangle(wallSize, screenH)));
+        wallRight.addComponent(entities.newComponent(TransformComponent.class).setTranslate(wallPos));
+        wallRight.addComponent(
+            entities.newComponent(ObstacleCollisionComponent.class).setShape(new Rectangle(wallSize, screenH)));
 
         wallPos.set(0f, bottom);
-        wallBottom.addComponent(new TransformComponent().setTranslate(wallPos));
-        wallBottom.addComponent(new ObstacleCollisionComponent().setShape(new Rectangle(screenW, wallSize)));
+        wallBottom.addComponent(entities.newComponent(TransformComponent.class).setTranslate(wallPos));
+        wallBottom.addComponent(
+            entities.newComponent(ObstacleCollisionComponent.class).setShape(new Rectangle(screenW, wallSize)));
 
         wallPos.set(0f, top);
-        wallTop.addComponent(new TransformComponent().setTranslate(wallPos));
-        wallTop.addComponent(new ObstacleCollisionComponent().setShape(new Rectangle(screenW, wallSize)));
+        wallTop.addComponent(entities.newComponent(TransformComponent.class).setTranslate(wallPos));
+        wallTop.addComponent(
+            entities.newComponent(ObstacleCollisionComponent.class).setShape(new Rectangle(screenW, wallSize)));
 
         Pools.vector2s.free(wallPos);
     }
@@ -230,18 +234,20 @@ public final class GdxApplication extends ApplicationAdapter {
 
     private Entity addPlayerEntity() {
         Entity playerEntity = entities.newEntity();
-        playerEntity.addComponent(new SpriteComponent());
-        SizeComponent sizeComponent = new SizeComponent().setSizeFrom(Tiles.LINKDOWN1);
+        playerEntity.addComponent(entities.newComponent(SpriteComponent.class));
+        SizeComponent sizeComponent = entities.newComponent(SizeComponent.class).setSizeFrom(Tiles.LINKDOWN1);
         playerEntity.addComponent(sizeComponent);
-        playerEntity.addComponent(new TransformComponent());
-        playerEntity.addComponent(new MotionComponent());
-        playerEntity.addComponent(new TiltComponent());
-        playerEntity.addComponent(Gdx.app.getType() == ApplicationType.Android ? new AccelerometerInputComponent() :
-            new KeyboardInputComponent());
-        playerEntity.addComponent(new PlayerBehaviorComponent());
-        playerEntity.addComponent(new CharacterDisplayComponent()
+        playerEntity.addComponent(entities.newComponent(TransformComponent.class));
+        playerEntity.addComponent(entities.newComponent(MotionComponent.class));
+        playerEntity.addComponent(entities.newComponent(TiltComponent.class));
+        playerEntity.addComponent(
+            Gdx.app.getType() == ApplicationType.Android ? entities.newComponent(AccelerometerInputComponent.class) :
+                entities.newComponent(KeyboardInputComponent.class));
+        playerEntity.addComponent(entities.newComponent(PlayerBehaviorComponent.class));
+        playerEntity.addComponent(entities.newComponent(CharacterDisplayComponent.class)
             .set(Animations.PLAYER_S, Animations.PLAYER_E, Animations.PLAYER_N, Animations.PLAYER_W));
-        playerEntity.addComponent(new PlayerCollisionComponent().setShape(new Circle(sizeComponent.getSize().x / 2)));
+        playerEntity.addComponent(
+            entities.newComponent(PlayerCollisionComponent.class).setShape(new Circle(sizeComponent.getSize().x / 2)));
 
         return playerEntity;
     }
@@ -251,14 +257,15 @@ public final class GdxApplication extends ApplicationAdapter {
 
         Vector2 position = Pools.vector2s.grabNew().set(x, y);
 
-        octoEnemy.addComponent(new SpriteComponent());
-        octoEnemy.addComponent(new SizeComponent().setSizeFrom(Tiles.OCTODOWN1));
-        octoEnemy.addComponent(new TransformComponent().setTranslate(position));
-        octoEnemy.addComponent(new MotionComponent());
-        octoEnemy.addComponent(new OctoBehaviorComponent());
-        octoEnemy.addComponent(new CharacterDisplayComponent()
+        octoEnemy.addComponent(entities.newComponent(SpriteComponent.class));
+        octoEnemy.addComponent(entities.newComponent(SizeComponent.class).setSizeFrom(Tiles.OCTODOWN1));
+        octoEnemy.addComponent(entities.newComponent(TransformComponent.class).setTranslate(position));
+        octoEnemy.addComponent(entities.newComponent(MotionComponent.class));
+        octoEnemy.addComponent(entities.newComponent(OctoBehaviorComponent.class));
+        octoEnemy.addComponent(entities.newComponent(CharacterDisplayComponent.class)
             .set(Animations.OCTODOWN, Animations.OCTORIGHT, Animations.OCTOUP, Animations.OCTOLEFT));
-        octoEnemy.addComponent(new EnemyCollisionComponent().setShape(new Circle(Tiles.OCTOUP1.getRegionWidth() / 2)));
+        octoEnemy.addComponent(entities.newComponent(EnemyCollisionComponent.class)
+            .setShape(new Circle(Tiles.OCTOUP1.getRegionWidth() / 2)));
 
         Pools.vector2s.free(position);
     }
@@ -266,31 +273,31 @@ public final class GdxApplication extends ApplicationAdapter {
     private void AddMovingRockEntity(final float xFrom, final float yFrom, final float xTo, final float yTo) {
 
         Entity rockEntity = entities.newEntity();
-        rockEntity.addComponent(new SpriteComponent().setTextureRegion(Tiles.ROCK));
-        rockEntity.addComponent(new SizeComponent().setSizeFrom(Tiles.ROCK));
-        rockEntity.addComponent(new TransformComponent());
-        rockEntity.addComponent(new OscillationBehaviorComponent()
+        rockEntity.addComponent(entities.newComponent(SpriteComponent.class).setTextureRegion(Tiles.ROCK));
+        rockEntity.addComponent(entities.newComponent(SizeComponent.class).setSizeFrom(Tiles.ROCK));
+        rockEntity.addComponent(entities.newComponent(TransformComponent.class));
+        rockEntity.addComponent(entities.newComponent(OscillationBehaviorComponent.class)
             .set(new Vector2(xFrom, yFrom), new Vector2(xTo, yTo), Duration.fromSeconds(2f)));
-        rockEntity.addComponent(new ObstacleCollisionComponent()
+        rockEntity.addComponent(entities.newComponent(ObstacleCollisionComponent.class)
             .setShape(new Rectangle(Tiles.ROCK.getRegionWidth() / 2, Tiles.ROCK.getRegionHeight() / 2)));
     }
 
     private void addFpsEntity() {
         Entity fpsEntity = entities.newEntity();
-        fpsEntity.addComponent(new TransformComponent()
+        fpsEntity.addComponent(entities.newComponent(TransformComponent.class)
             .setTranslate(new Vector2(-VIEWPORT_WIDTH / 2, -VIEWPORT_HEIGHT / 2 + font.getLineHeight())));
-        fpsEntity.addComponent(new FpsDisplayComponent().set(font));
+        fpsEntity.addComponent(entities.newComponent(FpsDisplayComponent.class).set(font));
     }
 
     private void addTiltIndicatorEntity(final Entity playerEntity) {
         Entity tiltIndicatorEntity = entities.newEntity();
 
         final float MARGIN = 5f;
-        tiltIndicatorEntity.addComponent(new TransformComponent().setTranslate(
+        tiltIndicatorEntity.addComponent(entities.newComponent(TransformComponent.class).setTranslate(
             new Vector2(VIEWPORT_WIDTH / 2 - Tiles.RODRIGHT.getRegionWidth() - MARGIN,
                 VIEWPORT_HEIGHT / 2 - Tiles.RODRIGHT.getRegionHeight() - MARGIN)));
-        tiltIndicatorEntity.addComponent(new SpriteComponent());
-        tiltIndicatorEntity.addComponent(new SizeComponent().setSizeFrom(Tiles.RODRIGHT));
+        tiltIndicatorEntity.addComponent(entities.newComponent(SpriteComponent.class));
+        tiltIndicatorEntity.addComponent(entities.newComponent(SizeComponent.class).setSizeFrom(Tiles.RODRIGHT));
         tiltIndicatorEntity.addComponent(new TiltDisplayComponent(Tiles.RODRIGHT, playerEntity));
     }
 }

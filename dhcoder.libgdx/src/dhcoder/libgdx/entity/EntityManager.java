@@ -27,11 +27,11 @@ public final class EntityManager {
         componentPools = new ArrayMap<Class, Pool>(32);
     }
 
-    public void preallocateComponents(final Class<? extends Component> componentClass) {
-        preallocateComponents(componentClass, Pool.DEFAULT_CAPACITY);
-    }
-
-    public void preallocateComponents(final Class<? extends Component> componentClass, final int maxCount) {
+    /**
+     * Using {@link #newComponent(Class)} will generate new components from a dynamically increasing pool, but if you
+     * know ahead of time how many components you'll need, you can preallocate them here.
+     */
+    public void preallocate(final Class<? extends Component> componentClass, final int maxCount) {
         if (componentPools.containsKey(componentClass)) {
             throw new IllegalArgumentException(
                 format("Duplicate request to preallocate component type {0}", componentClass));
