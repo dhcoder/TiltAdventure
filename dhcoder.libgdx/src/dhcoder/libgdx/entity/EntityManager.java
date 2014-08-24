@@ -27,7 +27,6 @@ public final class EntityManager {
     private final Stack<Entity> queuedForRemoval;
     private final Pool<IntKey> keyPool = Pool.of(IntKey.class, 1);
     private final Pool<Opt> optPool = Pool.of(Opt.class, 1);
-    private boolean updating;
 
     public EntityManager(final int maxEntityCount) {
         entityPool = Pool.of(Entity.class, maxEntityCount);
@@ -91,32 +90,19 @@ public final class EntityManager {
     }
 
     public void freeEntity(final Entity entity) {
-        if (updating) {
-            queuedForRemoval.push(entity);
-            return;
-        }
-
-        freeEntityInternal(entity);
+        queuedForRemoval.push(entity);
     }
 
     public void update(final Duration elapsedTime) {
-
-        if (updating) {
-            throw new IllegalStateException("Attempt to update entities while an update is already in progress!");
-        }
-
-        updating = true;
-        {
-            List<Entity> entities = entityPool.getItemsInUse();
-            int numEntities = entities.size();
-            for (int i = 0; i < numEntities; ++i) {
-                entities.get(i).update(elapsedTime);
-            }
-        }
-        updating = false;
-
+        // Kill any dead objects from the last cycle
         while (!queuedForRemoval.empty()) {
             freeEntityInternal(queuedForRemoval.pop());
+        }
+
+        List<Entity> entities = entityPool.getItemsInUse();
+        int numEntities = entities.size();
+        for (int i = 0; i < numEntities; ++i) {
+            entities.get(i).update(elapsedTime);
         }
     }
 

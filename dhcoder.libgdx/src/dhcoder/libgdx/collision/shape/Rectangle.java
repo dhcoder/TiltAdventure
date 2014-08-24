@@ -38,7 +38,7 @@ public final class Rectangle implements Shape {
         halfWidth = halfHeight = 0f;
     }
 
-    public void setHalfSize(final float halfWidth, final float halfHeight) {
+    public Rectangle setHalfSize(final float halfWidth, final float halfHeight) {
         if (halfWidth < 0f || halfHeight < 0f) {
             throw new IllegalArgumentException(
                 format("Can't create rectangle with < 0 half-size ({0},{1})", halfWidth, halfHeight));
@@ -46,6 +46,7 @@ public final class Rectangle implements Shape {
 
         this.halfWidth = halfWidth;
         this.halfHeight = halfHeight;
+        return this;
     }
 
     public float getHalfWidth() {

@@ -64,12 +64,12 @@ public final class CollisionSystem {
         collidesWith[groupIdToIndex] = collidesWithMask;
     }
 
-    public Collider registerShape(final int groupId, final Shape shape) {
+    public Collider registerShape(final int groupId, final Shape shape, final CollisionListener listener) {
         requireValidGroupId(groupId);
         int groupIndex = groupIdToIndex(groupId);
 
         Collider collider = colliderPool.grabNew();
-        collider.initialize(groupId, shape);
+        collider.initialize(groupId, shape, listener);
         groups.get(groupIndex).add(collider);
 
         return collider;

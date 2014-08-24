@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.collision.CollisionSystem;
 import dhcoder.libgdx.collision.shape.Circle;
 import dhcoder.libgdx.collision.shape.Rectangle;
+import dhcoder.libgdx.collision.shape.Shape;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.libgdx.entity.EntityManager;
 import dhcoder.support.math.Angle;
@@ -21,6 +22,7 @@ import tiltadv.components.behavior.OctoBehaviorComponent;
 import tiltadv.components.behavior.OscillationBehaviorComponent;
 import tiltadv.components.behavior.PlayerBehaviorComponent;
 import tiltadv.components.collision.EnemyCollisionComponent;
+import tiltadv.components.collision.EnemyProjectileCollisionComponent;
 import tiltadv.components.collision.ObstacleCollisionComponent;
 import tiltadv.components.collision.PlayerCollisionComponent;
 import tiltadv.components.display.CharacterDisplayComponent;
@@ -49,10 +51,13 @@ public final class GdxApplication extends ApplicationAdapter {
     private OrthographicCamera camera;
     private SpriteBatch batch;
     private ShapeRenderer shapeRenderer;
-
     private CollisionSystem collisionSystem;
-
     private EntityManager entities;
+
+    private Shape octoBounds;
+    private Shape playerBounds;
+    private Shape octoRockBounds;
+    private Shape boulderBounds;
 
     @Override
     public void create() {
@@ -62,6 +67,7 @@ public final class GdxApplication extends ApplicationAdapter {
             shapeRenderer = new ShapeRenderer();
         }
         font = new BitmapFont();
+
         initializeServices();
         initializeEntities();
 
@@ -120,56 +126,76 @@ public final class GdxApplication extends ApplicationAdapter {
     private void initializeServices() {
         collisionSystem = new CollisionSystem(ENTITY_COUNT);
         Services.register(CollisionSystem.class, collisionSystem);
+
+        entities = new EntityManager(ENTITY_COUNT);
+        Services.register(EntityManager.class, entities);
     }
 
     private void initializeEntities() {
-        entities = new EntityManager(ENTITY_COUNT);
+
+        octoBounds = new Circle(Tiles.OCTOUP1.getRegionWidth() / 2f);
+        playerBounds = new Circle(Tiles.LINKUP1.getRegionWidth() / 2f);
+        octoRockBounds = new Circle(Tiles.ROCK.getRegionWidth() / 2f);
+        boulderBounds = new Rectangle(Tiles.BOULDER.getRegionWidth() / 2f, Tiles.BOULDER.getRegionHeight() / 2f);
+
         entities.preallocate(TransformComponent.class, ENTITY_COUNT);
         entities.preallocate(MotionComponent.class, ENTITY_COUNT);
         entities.preallocate(SizeComponent.class, ENTITY_COUNT);
         entities.preallocate(SpriteComponent.class, ENTITY_COUNT);
+        entities.preallocate(EnemyProjectileCollisionComponent.class, 20); // TODO: DON'T CHECK IN
 
         entities.registerTemplate(EntityId.PLAYER, new EntityManager.EntityCreator() {
             @Override
             public void initialize(final Entity entity) {
+                entity.addComponent(entities.newComponent(TransformComponent.class));
                 entity.addComponent(entities.newComponent(SpriteComponent.class));
                 entity.addComponent(entities.newComponent(HeadingComponent.class));
                 SizeComponent sizeComponent = entities.newComponent(SizeComponent.class).setSizeFrom(Tiles.LINKDOWN1);
                 entity.addComponent(sizeComponent);
-                entity.addComponent(entities.newComponent(TransformComponent.class));
                 entity.addComponent(entities.newComponent(MotionComponent.class));
                 entity.addComponent(entities.newComponent(TiltComponent.class));
                 entity.addComponent(Gdx.app.getType() == ApplicationType.Android ?
-                        entities.newComponent(AccelerometerInputComponent.class) :
-                        entities.newComponent(KeyboardInputComponent.class));
+                    entities.newComponent(AccelerometerInputComponent.class) :
+                    entities.newComponent(KeyboardInputComponent.class));
                 entity.addComponent(entities.newComponent(PlayerBehaviorComponent.class));
                 entity.addComponent(entities.newComponent(CharacterDisplayComponent.class)
                     .set(Animations.PLAYER_S, Animations.PLAYER_E, Animations.PLAYER_N, Animations.PLAYER_W));
-                entity.addComponent(entities.newComponent(PlayerCollisionComponent.class)
-                    .setShape(new Circle(sizeComponent.getSize().x / 2)));
+                entity.addComponent(entities.newComponent(PlayerCollisionComponent.class).setShape(playerBounds));
             }
         });
 
         entities.registerTemplate(EntityId.OCTO, new EntityManager.EntityCreator() {
             @Override
             public void initialize(final Entity entity) {
+                entity.addComponent(entities.newComponent(TransformComponent.class));
                 entity.addComponent(entities.newComponent(SpriteComponent.class));
                 entity.addComponent(entities.newComponent(HeadingComponent.class));
                 entity.addComponent(entities.newComponent(SizeComponent.class).setSizeFrom(Tiles.OCTODOWN1));
-                entity.addComponent(entities.newComponent(TransformComponent.class));
                 entity.addComponent(entities.newComponent(MotionComponent.class));
                 entity.addComponent(entities.newComponent(OctoBehaviorComponent.class));
                 entity.addComponent(entities.newComponent(CharacterDisplayComponent.class)
                     .set(Animations.OCTODOWN, Animations.OCTORIGHT, Animations.OCTOUP, Animations.OCTOLEFT));
-                entity.addComponent(entities.newComponent(EnemyCollisionComponent.class)
-                    .setShape(new Circle(Tiles.OCTOUP1.getRegionWidth() / 2)));
+                entity.addComponent(entities.newComponent(EnemyCollisionComponent.class).setShape(octoBounds));
+            }
+        });
+
+        entities.registerTemplate(EntityId.OCTO_ROCK, new EntityManager.EntityCreator() {
+            @Override
+            public void initialize(final Entity entity) {
+                entity.addComponent(entities.newComponent(TransformComponent.class));
+                entity.addComponent(entities.newComponent(SpriteComponent.class).setTextureRegion(Tiles.ROCK));
+                entity.addComponent(entities.newComponent(HeadingComponent.class));
+                entity.addComponent(entities.newComponent(SizeComponent.class).setSizeFrom(Tiles.ROCK));
+                entity.addComponent(entities.newComponent(MotionComponent.class));
+                entity.addComponent(
+                    entities.newComponent(EnemyProjectileCollisionComponent.class).setShape(octoRockBounds));
             }
         });
 
         addOctoEnemies();
 
         Entity playerEntity = addPlayerEntity();
-        addMovingRockEntities();
+        addMovingBoulderEntities();
         addTiltIndicatorEntity(playerEntity);
         addFpsEntity();
         addBoundaryWalls();
@@ -211,42 +237,40 @@ public final class GdxApplication extends ApplicationAdapter {
         Entity wallTop = entities.newEntity();
 
         Vector2 wallPos = Pools.vector2s.grabNew();
+        final Shape verticalWall = new Rectangle(wallSize, screenH);
+        final Shape horizontalWall = new Rectangle(screenW, wallSize);
 
         wallPos.set(left, 0f);
         wallLeft.addComponent(entities.newComponent(TransformComponent.class).setTranslate(wallPos));
-        wallLeft.addComponent(
-            entities.newComponent(ObstacleCollisionComponent.class).setShape(new Rectangle(wallSize, screenH)));
+        wallLeft.addComponent(entities.newComponent(ObstacleCollisionComponent.class).setShape(verticalWall));
 
         wallPos.set(right, 0f);
         wallRight.addComponent(entities.newComponent(TransformComponent.class).setTranslate(wallPos));
-        wallRight.addComponent(
-            entities.newComponent(ObstacleCollisionComponent.class).setShape(new Rectangle(wallSize, screenH)));
+        wallRight.addComponent(entities.newComponent(ObstacleCollisionComponent.class).setShape(verticalWall));
 
         wallPos.set(0f, bottom);
         wallBottom.addComponent(entities.newComponent(TransformComponent.class).setTranslate(wallPos));
-        wallBottom.addComponent(
-            entities.newComponent(ObstacleCollisionComponent.class).setShape(new Rectangle(screenW, wallSize)));
+        wallBottom.addComponent(entities.newComponent(ObstacleCollisionComponent.class).setShape(horizontalWall));
 
         wallPos.set(0f, top);
         wallTop.addComponent(entities.newComponent(TransformComponent.class).setTranslate(wallPos));
-        wallTop.addComponent(
-            entities.newComponent(ObstacleCollisionComponent.class).setShape(new Rectangle(screenW, wallSize)));
+        wallTop.addComponent(entities.newComponent(ObstacleCollisionComponent.class).setShape(horizontalWall));
 
         Pools.vector2s.free(wallPos);
     }
 
-    private void addMovingRockEntities() {
-        final int numRocks = 4;
+    private void addMovingBoulderEntities() {
+        final int numBoulders = 4;
         final float scaleX = 120;
         final float scaleY = 90;
         final float percent = .4f;
-        for (int i = 0; i < numRocks; ++i) {
-            float circleDistance = (float)i / (float)numRocks * Angle.TWO_PI;
+        for (int i = 0; i < numBoulders; ++i) {
+            float circleDistance = (float)i / (float)numBoulders * Angle.TWO_PI;
             float xTo = scaleX * cos(circleDistance);
             float yTo = scaleY * sin(circleDistance);
             float xFrom = xTo * percent;
             float yFrom = yTo * percent;
-            AddMovingRockEntity(xTo, yTo, xFrom, yFrom);
+            AddMovingBoulderEntity(xTo, yTo, xFrom, yFrom);
         }
     }
 
@@ -279,16 +303,16 @@ public final class GdxApplication extends ApplicationAdapter {
         Pools.vector2s.free(position);
     }
 
-    private void AddMovingRockEntity(final float xFrom, final float yFrom, final float xTo, final float yTo) {
+    private void AddMovingBoulderEntity(final float xFrom, final float yFrom, final float xTo, final float yTo) {
 
-        Entity rockEntity = entities.newEntity();
-        rockEntity.addComponent(entities.newComponent(SpriteComponent.class).setTextureRegion(Tiles.ROCK));
-        rockEntity.addComponent(entities.newComponent(SizeComponent.class).setSizeFrom(Tiles.ROCK));
-        rockEntity.addComponent(entities.newComponent(TransformComponent.class));
-        rockEntity.addComponent(entities.newComponent(OscillationBehaviorComponent.class)
+        Entity boulderEntity = entities.newEntity();
+        boulderEntity.addComponent(entities.newComponent(SpriteComponent.class).setTextureRegion(Tiles.BOULDER));
+        boulderEntity.addComponent(entities.newComponent(SizeComponent.class).setSizeFrom(Tiles.BOULDER));
+        boulderEntity.addComponent(entities.newComponent(TransformComponent.class));
+        boulderEntity.addComponent(entities.newComponent(OscillationBehaviorComponent.class)
             .set(new Vector2(xFrom, yFrom), new Vector2(xTo, yTo), Duration.fromSeconds(2f)));
-        rockEntity.addComponent(entities.newComponent(ObstacleCollisionComponent.class)
-            .setShape(new Rectangle(Tiles.ROCK.getRegionWidth() / 2, Tiles.ROCK.getRegionHeight() / 2)));
+        boulderEntity.addComponent(entities.newComponent(ObstacleCollisionComponent.class)
+            .setShape(new Rectangle(Tiles.BOULDER.getRegionWidth() / 2, Tiles.BOULDER.getRegionHeight() / 2)));
     }
 
     private void addFpsEntity() {

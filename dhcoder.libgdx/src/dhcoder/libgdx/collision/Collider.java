@@ -2,9 +2,8 @@ package dhcoder.libgdx.collision;
 
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.collision.shape.Shape;
-import dhcoder.support.event.ArgEvent;
-import dhcoder.support.memory.Pool;
 import dhcoder.support.memory.Poolable;
+import dhcoder.support.opt.Opt;
 
 import static dhcoder.libgdx.collision.shape.ShapeUtils.testIntersection;
 
@@ -13,16 +12,25 @@ import static dhcoder.libgdx.collision.shape.ShapeUtils.testIntersection;
  */
 public final class Collider implements Poolable {
 
-    private static final Pool<CollisionEventArgs> collisionEventArgsPool = Pool.of(CollisionEventArgs.class, 1);
-
-    public final ArgEvent<CollisionEventArgs> onCollided = new ArgEvent<CollisionEventArgs>();
-    public final ArgEvent<CollisionEventArgs> onSeparated = new ArgEvent<CollisionEventArgs>();
     private final Vector2 lastPosition = new Vector2();
     private final Vector2 currPosition = new Vector2();
 
+    private int groupId;
     private boolean isActive;
     private Shape shape;
-    private int groupId;
+    private Opt tag = Opt.withNoValue(); // Extra data associated with this collider
+    private CollisionListener listener;
+
+    /**
+     * Returns optional data associated with this collider.
+     */
+    public Opt getTag() {
+        return tag;
+    }
+
+    public void setTag(final Object tag) {
+        this.tag.set(tag);
+    }
 
     public boolean isActive() {
         return isActive;
@@ -69,8 +77,8 @@ public final class Collider implements Poolable {
     public void reset() {
         shape = null;
         groupId = -1;
-        onCollided.clearListeners();
         isActive = false;
+        listener = null;
     }
 
     /**
@@ -78,10 +86,11 @@ public final class Collider implements Poolable {
      * #updatePosition(float, float)} for the first time.
      */
     // Should only be called by CollisionSystem
-    void initialize(final int groupId, final Shape shape) {
+    void initialize(final int groupId, final Shape shape, final CollisionListener listener) {
         this.groupId = groupId;
         this.shape = shape;
         isActive = false;
+        this.listener = listener;
     }
 
     // Should only be called by CollisionSystem
@@ -96,22 +105,12 @@ public final class Collider implements Poolable {
 
     // Should only be called by CollisionSystem
     void fireCollision(final Collision collision) {
-        if (onCollided.hasListeners()) {
-            CollisionEventArgs args = collisionEventArgsPool.grabNew();
-            args.setCollision(collision);
-            onCollided.fire(this, args);
-            collisionEventArgsPool.free(args);
-        }
+        listener.onCollided(collision);
     }
 
     // Should only be called by CollisionSystem
     void fireSeparation(final Collision collision) {
-        if (onSeparated.hasListeners()) {
-            CollisionEventArgs args = collisionEventArgsPool.grabNew();
-            args.setCollision(collision);
-            onSeparated.fire(this, args);
-            collisionEventArgsPool.free(args);
-        }
+        listener.onSeparated(collision);
     }
 
 }

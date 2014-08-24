@@ -11,7 +11,8 @@ import dhcoder.support.memory.Pool;
 import dhcoder.support.time.Duration;
 
 /**
- * A collection of all memory pools used by our game.
+ * A collection of memory pools used by our game. These pools are meant for short, quick allocations, not long-lived
+ * instances.
  */
 public final class Pools {
 

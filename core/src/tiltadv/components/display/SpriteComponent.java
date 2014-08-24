@@ -45,8 +45,6 @@ public final class SpriteComponent extends AbstractComponent {
 
     @Override
     public void initialize(final Entity owner) {
-        owner.requireSingleInstance(SpriteComponent.class);
-
         transformComponent = owner.requireComponent(TransformComponent.class);
         sizeComponent = owner.requireComponent(SizeComponent.class);
     }

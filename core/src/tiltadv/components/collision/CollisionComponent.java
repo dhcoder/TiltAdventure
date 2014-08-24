@@ -3,12 +3,11 @@ package tiltadv.components.collision;
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.collision.Collider;
 import dhcoder.libgdx.collision.Collision;
-import dhcoder.libgdx.collision.CollisionEventArgs;
+import dhcoder.libgdx.collision.CollisionListener;
 import dhcoder.libgdx.collision.CollisionSystem;
 import dhcoder.libgdx.collision.shape.Shape;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
-import dhcoder.support.event.ArgEventListener;
 import dhcoder.support.time.Duration;
 import tiltadv.components.model.TransformComponent;
 import tiltadv.globals.Services;
@@ -20,7 +19,7 @@ import tiltadv.memory.Pools;
  * <p/>
  * Important: This and all subclasses depend on the {@link CollisionSystem} service being installed before being used.
  */
-public abstract class CollisionComponent extends AbstractComponent {
+public abstract class CollisionComponent extends AbstractComponent implements CollisionListener {
 
     private final int groupId;
     private Collider collider;
@@ -33,19 +32,7 @@ public abstract class CollisionComponent extends AbstractComponent {
     public final CollisionComponent setShape(final Shape shape) {
         CollisionSystem collisionSystem = Services.get(CollisionSystem.class);
 
-        collider = collisionSystem.registerShape(groupId, shape);
-        collider.onCollided.addListener(new ArgEventListener<CollisionEventArgs>() {
-            @Override
-            public void run(final Object sender, final CollisionEventArgs args) {
-                handleCollided(args.getCollision());
-            }
-        });
-        collider.onSeparated.addListener(new ArgEventListener<CollisionEventArgs>() {
-            @Override
-            public void run(final Object sender, final CollisionEventArgs args) {
-                handleSeparated(args.getCollision());
-            }
-        });
+        collider = collisionSystem.registerShape(groupId, shape, this);
 
         return this;
     }
@@ -53,6 +40,7 @@ public abstract class CollisionComponent extends AbstractComponent {
     @Override
     public final void initialize(final Entity owner) {
         transformComponent = owner.requireComponent(TransformComponent.class);
+        collider.setTag(owner);
     }
 
     @Override
@@ -72,10 +60,20 @@ public abstract class CollisionComponent extends AbstractComponent {
     }
 
     @Override
-    protected void resetComponent() {
+    protected final void resetComponent() {
         transformComponent = null;
+        handleReset();
     }
 
+    @Override
+    public final void onCollided(final Collision collision) {
+        handleCollided(collision);
+    }
+
+    @Override
+    public final void onSeparated(final Collision collision) {
+        handleSeparated(collision);
+    }
 
     /**
      * Sync the current entity's location with what the collision system says it should be.
@@ -97,4 +95,6 @@ public abstract class CollisionComponent extends AbstractComponent {
     protected void handleCollided(final Collision collision) {}
 
     protected void handleSeparated(final Collision collision) {}
+
+    protected void handleReset() {}
 }

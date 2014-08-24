@@ -3,6 +3,7 @@ package tiltadv.components.behavior;
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
+import dhcoder.libgdx.entity.EntityManager;
 import dhcoder.support.math.CardinalDirection;
 import dhcoder.support.opt.Opt;
 import dhcoder.support.state.StateMachine;
@@ -10,6 +11,9 @@ import dhcoder.support.state.StateTransitionHandler;
 import dhcoder.support.time.Duration;
 import tiltadv.components.model.HeadingComponent;
 import tiltadv.components.model.MotionComponent;
+import tiltadv.components.model.TransformComponent;
+import tiltadv.globals.EntityId;
+import tiltadv.globals.Services;
 import tiltadv.memory.Pools;
 
 import java.util.Random;
@@ -28,9 +32,12 @@ public final class OctoBehaviorComponent extends AbstractComponent {
     private enum Evt {
         MOVE,
         WAIT,
+        SHOOT,
     }
 
     private static final float SPEED = 30.0f;
+    private static final float PROJECTILE_SPEED = SPEED * 5f;
+    private static final float SHOOTING_CHANCE = 1f;
     private static final Duration STOPPING_DURATION = Duration.fromSeconds(0.3f);
     private static final Random random = new Random();
     private final Duration remainingDuration = Duration.zero();
@@ -39,6 +46,7 @@ public final class OctoBehaviorComponent extends AbstractComponent {
 
     private HeadingComponent headingComponent;
     private MotionComponent motionComponent;
+    private TransformComponent transformComponent;
 
     public OctoBehaviorComponent() {
         octoState = createStateMachine();
@@ -49,6 +57,7 @@ public final class OctoBehaviorComponent extends AbstractComponent {
     public void initialize(final Entity owner) {
         headingComponent = owner.requireComponent(HeadingComponent.class);
         motionComponent = owner.requireComponent(MotionComponent.class);
+        transformComponent = owner.requireComponent(TransformComponent.class);
     }
 
     @Override
@@ -70,6 +79,7 @@ public final class OctoBehaviorComponent extends AbstractComponent {
 
         headingComponent = null;
         motionComponent = null;
+        transformComponent = null;
     }
 
     private StateMachine<State, Evt> createStateMachine() {
@@ -103,6 +113,39 @@ public final class OctoBehaviorComponent extends AbstractComponent {
             }
         });
 
+        fsm.registerEvent(State.WAITING, Evt.SHOOT, new StateTransitionHandler<State, Evt>() {
+            @Override
+            public State run(final State fromState, final Evt withEvent, final Opt eventData) {
+                final EntityManager entityManager = Services.get(EntityManager.class);
+                final Entity rock = entityManager.newEntityFromTemplate(EntityId.OCTO_ROCK);
+                final MotionComponent rockMotion = rock.requireComponent(MotionComponent.class);
+                final TransformComponent rockPosition = rock.requireComponent(TransformComponent.class);
+                rockPosition.setTranslate(transformComponent.getTranslate());
+
+                CardinalDirection direction = CardinalDirection.getForAngle(headingComponent.getHeading());
+                Vector2 rockVelocity = Pools.vector2s.grabNew();
+                switch (direction) {
+                    case N:
+                        rockVelocity.set(0f, PROJECTILE_SPEED);
+                        break;
+                    case S:
+                        rockVelocity.set(0f, -PROJECTILE_SPEED);
+                        break;
+                    case E:
+                        rockVelocity.set(PROJECTILE_SPEED, 0f);
+                        break;
+                    case W:
+                        rockVelocity.set(-PROJECTILE_SPEED, 0f);
+                        break;
+                }
+                rockMotion.setVelocity(rockVelocity);
+                Pools.vector2s.free(rockVelocity);
+
+                followupEvent = Evt.MOVE;
+                return State.WAITING;
+            }
+        });
+
         fsm.registerEvent(State.MOVING, Evt.WAIT, new StateTransitionHandler<State, Evt>() {
             @Override
             public State run(final State fromState, final Evt withEvent, final Opt eventData) {
@@ -115,7 +158,7 @@ public final class OctoBehaviorComponent extends AbstractComponent {
         fsm.registerEvent(State.STOPPING, Evt.WAIT, new StateTransitionHandler<State, Evt>() {
             @Override
             public State run(final State fromState, final Evt withEvent, final Opt eventData) {
-                followupEvent = Evt.MOVE;
+                followupEvent = random.nextFloat() <= SHOOTING_CHANCE ? Evt.SHOOT : Evt.MOVE;
                 return State.WAITING;
             }
         });

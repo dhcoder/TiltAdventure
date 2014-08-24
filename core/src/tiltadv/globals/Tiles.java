@@ -33,6 +33,7 @@ public final class Tiles {
     public static final TextureRegion OCTORIGHT1;
     public static final TextureRegion OCTORIGHT2;
     public static final TextureRegion RODRIGHT;
+    public static final TextureRegion BOULDER;
     public static final TextureRegion ROCK;
     private static final Texture textureSource;
     private static final Texture tempTextureSource;
@@ -67,11 +68,15 @@ public final class Tiles {
         OCTORIGHT1 = new TextureRegion(textureSource, 240, 30, 16, 16);
         OCTORIGHT2 = new TextureRegion(textureSource, 240, 0, 16, 16);
         RODRIGHT = new TextureRegion(textureSource, 98, 126, 13, 4);
-        ROCK = new TextureRegion(textureSource, 120, 0, 16, 16);
+
+        BOULDER = new TextureRegion(textureSource, 120, 0, 16, 16);
+        ROCK = new TextureRegion(textureSource, 120, 30, 8, 10);
     }
 
     public static void dispose() {
+        // TODO: Use asset manager instead
         textureSource.dispose();
+        tempTextureSource.dispose();
     }
 
     private Tiles() { } // Disabled constructor

@@ -43,90 +43,35 @@ public final class Entity implements Poolable {
      * Returns the component that matches the input type, if found.
      */
     @SuppressWarnings("unchecked") // (T) cast is safe because of instanceof check
-    public <T extends Component> Opt<T> getComponent(final Class<T> classType) {
-        for (Component component : components) {
+    public <T extends Component> void getComponent(final Class<T> classType, final Opt<T> outComponent) {
+        outComponent.clear();
+        int numComponets = components.size();
+        for (int i = 0; i < numComponets; i++) {
+            Component component = components.get(i);
             if (classType.isInstance(component)) {
-                return Opt.of((T)component);
+                outComponent.set((T)component);
             }
         }
-
-        return Opt.withNoValue();
-    }
-
-    /**
-     * Returns the components that match the input type, although this may be an empty list.
-     */
-    @SuppressWarnings("unchecked") // (T) cast is safe because of instanceof check
-    public <T extends Component> List<T> getComponents(final Class<T> classType) {
-        List<T> matchingComponents = new ArrayList<T>();
-        for (Component component : components) {
-            if (classType.isInstance(component)) {
-                matchingComponents.add((T)component);
-            }
-        }
-
-        return matchingComponents;
-    }
-
-    /**
-     * Require that there only be exactly one instance of the specified {@link Component} type on this entity. This
-     * is a useful way for a component to assert that it, itself, is a singleton within the entity,
-     * when having multiple instances of it would not make sense.
-     * <p/>
-     * You should consider using {@link #requireComponent(Class)} instead because it often has the same results and is
-     * a bit more lightweight than this method.
-     *
-     * @return the singleton component, in case the calling class needs a reference to it.
-     * @throws IllegalStateException if there is more than one component that matches the class type parameter.
-     */
-    public <T extends Component> T requireSingleInstance(final Class<T> classType) throws IllegalStateException {
-
-        List<T> matchingComponents = getComponents(classType);
-        if (matchingComponents.size() != 1) {
-            throw new IllegalStateException(
-                format("Entity has {0} instances of component {1}, should only have 1", matchingComponents.size(),
-                    classType));
-        }
-
-        return matchingComponents.get(0);
-    }
-
-    /**
-     * Require that there be at least one instance of the specified {@link Component} on this entity. This is a
-     * useful way for one component that depends on another to assert that the data it needs is there.
-     *
-     * @return the matching components
-     * @throws IllegalStateException if there aren't any components that match the class type parameter.
-     */
-    public <T extends Component> List<T> requireComponents(final Class<T> classType) throws IllegalStateException {
-
-        List<T> matchingComponents = getComponents(classType);
-        if (matchingComponents.size() == 0) {
-            throw new IllegalStateException(
-                format("Entity doesn't have any instances of {0}, should have at least 1", classType));
-        }
-
-        return matchingComponents;
     }
 
     /**
      * Require that there be at least one instance of the specified {@link Component} on this entity, and return the
-     * first one. This method is similar to {@link #requireSingleInstance(Class)} but is a little bit more
-     * lightweight because it doesn't have to loop through all components to verify that there's not more than one.
+     * first one.
      *
      * @return the first matching component
      * @throws IllegalStateException if there aren't any components that match the class type parameter.
      */
     public <T extends Component> T requireComponent(final Class<T> classType) throws IllegalStateException {
-
-        Opt<T> componentOpt = getComponent(classType);
-
-        if (!componentOpt.hasValue()) {
-            throw new IllegalStateException(
-                format("Entity doesn't have any instances of {0}, should have at least 1", classType));
+        int numComponets = components.size();
+        for (int i = 0; i < numComponets; i++) {
+            Component component = components.get(i);
+            if (classType.isInstance(component)) {
+                return (T)component;
+            }
         }
 
-        return componentOpt.getValue();
+        throw new IllegalStateException(
+            format("Entity doesn't have any instances of {0}, should have at least 1", classType));
     }
 
     /**
@@ -147,6 +92,14 @@ public final class Entity implements Poolable {
      * Render this entity, via a {@link Batch}.
      */
     public void render(final Batch batch) {
+        if (!initialized) {
+            // TODO: Remote Entity.render!
+            // Some Entities are created dynamically and then get asked to render before they are ready. An upcoming
+            // refactoring will fix this by moving rendering out of Entity into another class (and each entity will be
+            // responsible to request that their sprite gets rendered each frame)
+            return;
+        }
+
         int numComponents = components.size(); // Simple iteration to avoid Iterator allocation
         for (int i = 0; i < numComponents; ++i) {
             components.get(i).render(batch);
@@ -167,10 +120,11 @@ public final class Entity implements Poolable {
     }
 
     private void initialize() {
-
         assert !initialized;
 
-        for (Component component : components) {
+        final int numComponents = components.size();
+        for (int i = 0; i < numComponents; i++) {
+            Component component = components.get(i);
             component.initialize(this);
         }
         initialized = true;

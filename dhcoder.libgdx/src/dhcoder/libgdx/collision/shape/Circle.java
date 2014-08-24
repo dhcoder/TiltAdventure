@@ -48,7 +48,8 @@ public final class Circle implements Shape {
         return radius;
     }
 
-    public void setRadius(final float radius) {
+    public Circle setRadius(final float radius) {
         this.radius = radius;
+        return this;
     }
 }
