@@ -42,66 +42,81 @@ public final class Duration implements Poolable {
         return seconds;
     }
 
-    public void setSeconds(final float secs) {
+    public Duration setSeconds(final float secs) {
         if (secs < 0f) {
             throw new IllegalArgumentException(format("Attempted to create a negative duration of {0} seconds", secs));
         }
         seconds = secs;
+        return this;
     }
 
     public float getMinutes() {
         return seconds / 60f;
     }
 
-    public void setMinutes(final float minutes) {
+    public Duration setMinutes(final float minutes) {
         setSeconds(minutes * 60f);
+        return this;
     }
 
     public float getMilliseconds() {
         return seconds * 1000f;
     }
 
-    public void setMilliseconds(final float milliseconds) {
+    public Duration setMilliseconds(final float milliseconds) {
         setSeconds(milliseconds / 1000f);
+        return this;
     }
 
-    public void setFrom(final Duration duration) {
+    public Duration setFrom(final Duration duration) {
         setSeconds(duration.seconds);
+        return this;
     }
 
-    public void addSeconds(final float secs) {
+    public Duration addSeconds(final float secs) {
         setSeconds(getSeconds() + secs);
+        return this;
     }
 
-    public void addMinutes(final float minutes) {
+    public Duration addMinutes(final float minutes) {
         setMinutes(getMinutes() + minutes);
+        return this;
     }
 
-    public void addMilliseconds(final float milliseconds) {
+    public Duration addMilliseconds(final float milliseconds) {
         setMilliseconds(getMilliseconds() + milliseconds);
+        return this;
     }
 
-    public void add(final Duration duration) {
+    public Duration add(final Duration duration) {
         setSeconds(getSeconds() + duration.getSeconds());
+        return this;
     }
 
-    public void subtractSeconds(final float secs) {
+    public Duration subtractSeconds(final float secs) {
         setSeconds(getSeconds() - secs);
+        return this;
     }
 
-    public void subtractMinutes(final float minutes) {
+    public Duration subtractMinutes(final float minutes) {
         setMinutes(getMinutes() - minutes);
+        return this;
     }
 
-    public void subtractMilliseconds(final float milliseconds) {
+    public Duration subtractMilliseconds(final float milliseconds) {
         setMilliseconds(getMilliseconds() - milliseconds);
+        return this;
     }
 
-    public void subtract(final Duration duration) {
+    public Duration subtract(final Duration duration) {
         setSeconds(getSeconds() - duration.getSeconds());
+        return this;
     }
 
-    public void setZero() { setSeconds(0f); }
+    public Duration setZero() {
+        setSeconds(0f);
+        return this;
+    }
 
     public boolean isZero() { return seconds == 0f; }
 

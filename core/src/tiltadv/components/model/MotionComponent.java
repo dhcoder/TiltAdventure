@@ -23,9 +23,10 @@ public final class MotionComponent extends AbstractComponent {
 
     public Vector2 getVelocity() { return velocity; }
 
-    public void setVelocity(final Vector2 velocity) {
+    public MotionComponent setVelocity(final Vector2 velocity) {
         this.velocity.set(velocity);
         deceleration.setZero();
+        return this;
     }
 
     /**

@@ -38,8 +38,9 @@ public final class SpriteComponent extends AbstractComponent {
         return this;
     }
 
-    public void setHidden(final boolean hidden) {
+    public SpriteComponent setHidden(final boolean hidden) {
         this.hidden = hidden;
+        return this;
     }
 
     @Override
