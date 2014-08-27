@@ -35,7 +35,7 @@ public final class CollisionSystem {
     private final Pool<Collider> colliderPool;
     private final Pool<Collision> collisionPool;
     private final Pool<ColliderKey> colliderKeyPool = Pool.of(ColliderKey.class, 1);
-    private final Pool<Vector2> vectorPool = Vector2PoolBuilder.build(3);
+    private final Pool<Vector2> vectorPool = Vector2PoolBuilder.build(2);
 
     private final int[] collidesWith; // group -> bitmask of groups it collides with
     private final ArrayList<ArrayList<Collider>> groups;
@@ -127,19 +127,13 @@ public final class CollisionSystem {
      * the target collider (by sliding alongside it)
      */
     public void revertCollision(final Collision collision) {
+        Vector2 repulsion = vectorPool.grabNew();
+        collision.getRepulsionBetweenColliders(repulsion);
 
         Collider source = collision.getSource();
-        Collider target = collision.getTarget();
-        Vector2 sourceCurrPos = source.getCurrPosition();
-        Vector2 sourceLastPos = source.getLastPosition();
-        Vector2 targetCurrPos = target.getCurrPosition();
-        Vector2 targetLastPos = target.getLastPosition();
-        Vector2 repulsion = vectorPool.grabNew();
-        getRepulsion(source.getShape(), sourceLastPos.x, sourceLastPos.y, sourceCurrPos.x, sourceCurrPos.y,
-            target.getShape(), targetLastPos.x, targetLastPos.y, targetCurrPos.x, targetCurrPos.y, repulsion);
 
         Vector2 finalPosition = vectorPool.grabNew();
-        finalPosition.set(sourceCurrPos).add(repulsion);
+        finalPosition.set(source.getCurrPosition()).add(repulsion);
         source.setCurrPosition(finalPosition);
 
         vectorPool.free(finalPosition);

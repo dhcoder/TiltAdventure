@@ -1,5 +1,6 @@
 package tiltadv.components.display;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -40,6 +41,16 @@ public final class SpriteComponent extends AbstractComponent {
 
     public SpriteComponent setHidden(final boolean hidden) {
         this.hidden = hidden;
+        return this;
+    }
+
+    public SpriteComponent setTint(final Color tint) {
+        sprite.setColor(tint);
+        return this;
+    }
+
+    public SpriteComponent setAlpha(final float alpha) {
+        sprite.setAlpha(alpha);
         return this;
     }
 
