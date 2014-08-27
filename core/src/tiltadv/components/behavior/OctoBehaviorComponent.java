@@ -92,20 +92,8 @@ public final class OctoBehaviorComponent extends AbstractComponent {
                 Vector2 velocity = Pools.vector2s.grabNew();
                 CardinalDirection nextDirection = CardinalDirection.getRandom();
                 headingComponent.setHeading(nextDirection.getAngle());
-                switch (nextDirection) {
-                    case N:
-                        velocity.set(0f, SPEED);
-                        break;
-                    case S:
-                        velocity.set(0f, -SPEED);
-                        break;
-                    case E:
-                        velocity.set(SPEED, 0f);
-                        break;
-                    case W:
-                        velocity.set(-SPEED, 0f);
-                        break;
-                }
+                velocity.set(SPEED, 0f);
+                velocity.rotate(nextDirection.getAngle().getDegrees());
                 motionComponent.setVelocity(velocity);
                 Pools.vector2s.free(velocity);
                 followupEvent = Evt.WAIT;
