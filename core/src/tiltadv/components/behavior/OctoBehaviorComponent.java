@@ -124,20 +124,8 @@ public final class OctoBehaviorComponent extends AbstractComponent {
 
                 CardinalDirection direction = CardinalDirection.getForAngle(headingComponent.getHeading());
                 Vector2 rockVelocity = Pools.vector2s.grabNew();
-                switch (direction) {
-                    case N:
-                        rockVelocity.set(0f, PROJECTILE_SPEED);
-                        break;
-                    case S:
-                        rockVelocity.set(0f, -PROJECTILE_SPEED);
-                        break;
-                    case E:
-                        rockVelocity.set(PROJECTILE_SPEED, 0f);
-                        break;
-                    case W:
-                        rockVelocity.set(-PROJECTILE_SPEED, 0f);
-                        break;
-                }
+                rockVelocity.set(PROJECTILE_SPEED, 0f);
+                rockVelocity.rotate(direction.getAngle().getDegrees());
                 rockMotion.setVelocity(rockVelocity);
                 Pools.vector2s.free(rockVelocity);
 
