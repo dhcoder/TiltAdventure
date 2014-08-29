@@ -126,7 +126,7 @@ public final class CollisionSystem {
      * Given a collision we want to revert, change the location of the source collider to a new destination that avoids
      * the target collider (by sliding alongside it)
      */
-    public void revertCollision(final Collision collision) {
+    public void revertCollision(final Collision collision, final CollisionListener listener) {
         Vector2 repulsion = vectorPool.grabNew();
         collision.getRepulsionBetweenColliders(repulsion);
 
@@ -140,6 +140,7 @@ public final class CollisionSystem {
         vectorPool.free(repulsion);
 
         // This collision never happened... remove it quietly...
+        listener.onReverted(collision);
         collisions.remove(collision.getKey());
         collisionPool.free(collision);
     }

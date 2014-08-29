@@ -73,11 +73,12 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
         }
     }
 
-    public void takeDamage(final Vector2 damageVector) {
+    public boolean takeDamage(final Vector2 damageVector) {
         if (isInvincible) {
-            return;
+            return false;
         }
         playerState.handleEvent(Evt.TAKE_DAMAGE, damageVector);
+        return true;
     }
 
     @Override

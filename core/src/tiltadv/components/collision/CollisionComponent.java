@@ -75,17 +75,8 @@ public abstract class CollisionComponent extends AbstractComponent implements Co
         handleSeparated(collision);
     }
 
-    /**
-     * Sync the current entity's location with what the collision system says it should be.
-     * <p/>
-     * Normally, the collision system simply mirrors the location of an entity. But occasionally, it talks back,
-     * saying that an entity shouldn't have moved where it did. In this case, we need to communicate that information
-     * back to the entity.
-     * <p/>
-     * Subclasses should call this method any time our collider has changed in a way that the associated entity should
-     * conform to.
-     */
-    protected final void syncEntityWithCollisionSystem() {
+    @Override
+    public final void onReverted(final Collision collision) {
         Vector2 translate = Pools.vector2s.grabNew();
         translate.set(collider.getCurrPosition().x, collider.getCurrPosition().y);
         transformComponent.setTranslate(translate);
