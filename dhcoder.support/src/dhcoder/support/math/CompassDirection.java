@@ -1,5 +1,7 @@
 package dhcoder.support.math;
 
+import dhcoder.support.memory.Pool;
+
 import java.util.Random;
 
 /**
@@ -20,6 +22,8 @@ public enum CompassDirection {
     // Regions that correspond with each 22.5° section of the circle
     private static final CompassDirection[] REGIONS = new CompassDirection[CACHED.length * 2];
     private static final Angle[] ANGLES = new Angle[CACHED.length];
+
+    private static final Pool<Angle> anglePool = Pool.of(Angle.class);
 
     static {
         REGIONS[0] = CompassDirection.E;
@@ -53,6 +57,17 @@ public enum CompassDirection {
     public static CompassDirection getForAngle(final Angle angle) {
         int regionIndex = (int)(angle.getDegrees() / 22.5f);
         return REGIONS[regionIndex];
+    }
+
+    public boolean isFacing(final Angle angle, final Angle epsilon) {
+        Angle angleMin = anglePool.grabNew().setFrom(angle).sub(epsilon);
+        Angle angleMax = anglePool.grabNew().setFrom(angle).add(epsilon);
+        boolean isFacing =
+            (getForAngle(angleMin) == this || getForAngle(angleMax) == this || getForAngle(angle) == this);
+
+        anglePool.free(angleMin);
+        anglePool.free(angleMax);
+        return isFacing;
     }
 
     public boolean isFacing(final Angle angle) {

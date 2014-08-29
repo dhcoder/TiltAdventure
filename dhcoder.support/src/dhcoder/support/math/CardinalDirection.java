@@ -1,10 +1,12 @@
 package dhcoder.support.math;
 
+import dhcoder.support.memory.Pool;
+
 import java.util.Random;
 
 /**
-* Like {@link CompassDirection} but with only 4 directions.
-*/
+ * Like {@link CompassDirection} but with only 4 directions.
+ */
 public enum CardinalDirection {
     E,
     N,
@@ -16,6 +18,8 @@ public enum CardinalDirection {
     // Regions that correspond with each 45° section of the circle
     private static final CardinalDirection[] REGIONS = new CardinalDirection[CACHED.length * 2];
     private static final Angle[] ANGLES = new Angle[CACHED.length];
+
+    private static final Pool<Angle> anglePool = Pool.of(Angle.class);
 
     static {
         REGIONS[0] = CardinalDirection.E;
@@ -41,6 +45,17 @@ public enum CardinalDirection {
     public static CardinalDirection getForAngle(final Angle angle) {
         int regionIndex = (int)(angle.getDegrees() / 45f);
         return REGIONS[regionIndex];
+    }
+
+    public boolean isFacing(final Angle angle, final Angle epsilon) {
+        Angle angleMin = anglePool.grabNew().setFrom(angle).sub(epsilon);
+        Angle angleMax = anglePool.grabNew().setFrom(angle).add(epsilon);
+        boolean isFacing =
+            (getForAngle(angleMin) == this || getForAngle(angleMax) == this || getForAngle(angle) == this);
+
+        anglePool.free(angleMin);
+        anglePool.free(angleMax);
+        return isFacing;
     }
 
     public boolean isFacing(final Angle angle) {

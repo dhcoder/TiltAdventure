@@ -54,7 +54,10 @@ public final class AccelerometerInputComponent extends AbstractComponent {
     public void update(final Duration elapsedTime) {
         Vector2 tilt = Pools.vector2s.grabNew();
 
-        if (isTiltActivated) {
+        //if (isTiltActivated) {
+        //TODO: Right now, we're always having tilt activated, but eventually, we need to be able to stop the character
+        // from moving if in defense mode...
+        if (true) {
             Vector3 accelerometerCurr = Pools.vector3s.grabNew();
             Vector3 accelerometerCurrNormalized = Pools.vector3s.grabNew();
             Quaternion rotationBetweenVectors = Pools.quaternions.grabNew();

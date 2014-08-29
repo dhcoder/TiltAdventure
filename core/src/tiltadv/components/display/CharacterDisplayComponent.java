@@ -16,6 +16,11 @@ import tiltadv.components.model.MotionComponent;
  */
 public final class CharacterDisplayComponent extends AbstractComponent {
 
+    // In order not to have a character pop between two animations when moving at just the right angle (say, at 45°
+    // right between NE and E), we add a bit of margin of error so that, once you're facing a direction, it sticks a bit
+    // and you actually have to changing your heading a bit more than usual to change direction.
+    private static final Angle HEADING_MARGIN = Angle.fromDegrees(2.5f);
+
     private Animation animS;
     private Animation animSE;
     private Animation animE;
@@ -69,13 +74,13 @@ public final class CharacterDisplayComponent extends AbstractComponent {
 
         final Angle angle = headingComponent.getHeading();
         if (isCardinal) {
-            if (!activeCardinalDirection.isFacing(angle)) {
+            if (!activeCardinalDirection.isFacing(angle, HEADING_MARGIN)) {
                 activeCardinalDirection = CardinalDirection.getForAngle(angle);
                 activeAnim = getAnimationForDirection(activeCardinalDirection);
             }
         }
         else {
-            if (!activeCompassDirection.isFacing(angle)) {
+            if (!activeCompassDirection.isFacing(angle, HEADING_MARGIN)) {
                 activeCompassDirection = CompassDirection.getForAngle(angle);
                 activeAnim = getAnimationForDirection(activeCompassDirection);
             }

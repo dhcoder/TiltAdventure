@@ -18,7 +18,7 @@ import tiltadv.memory.Pools;
 public final class PlayerBehaviorComponent extends AbstractComponent {
 
     private enum State {
-        STOPPED,
+        STANDING,
         MOVING,
         PARALYZED,
     }
@@ -31,11 +31,14 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
     private static final float TILT_MULTIPLIER = 70f;
     private static final float KNOCKBACK_MULTIPLIER = 150f;
     private static final Duration STOP_DURATION = Duration.fromSeconds(.3f);
-    private static final Duration PARALYZED_DURATION = Duration.fromSeconds(2f);
+    private static final Duration FROZEN_DURATION = Duration.fromSeconds(.3f);
+    private static final Duration INVINCIBLE_DURATION = Duration.fromSeconds(3f);
 
     private final StateMachine<State, Evt> playerState;
+    private final Duration frozenDuration = Duration.zero();
+    private final Duration invincibleDuration = Duration.zero();
 
-    private Duration paralyzedDuration = Duration.zero();
+    private boolean isInvincible;
 
     private TiltComponent tiltComponent;
     private MotionComponent motionComponent;
@@ -43,6 +46,11 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
 
     public PlayerBehaviorComponent() {
         playerState = createStateMachine();
+    }
+
+    private void setInvincible(final boolean isInvincible) {
+        spriteComponent.setAlpha(isInvincible ? .5f : 1f);
+        this.isInvincible = isInvincible;
     }
 
     @Override
@@ -55,29 +63,42 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
     @Override
     public void update(final Duration elapsedTime) {
         playerState.handleEvent(Evt.UPDATE, elapsedTime);
+
+        if (isInvincible) {
+            invincibleDuration.add(elapsedTime);
+            if (invincibleDuration.getSeconds() >= INVINCIBLE_DURATION.getSeconds()) {
+                invincibleDuration.setZero();
+                setInvincible(false);
+            }
+        }
     }
 
     public void takeDamage(final Vector2 damageVector) {
+        if (isInvincible) {
+            return;
+        }
         playerState.handleEvent(Evt.TAKE_DAMAGE, damageVector);
     }
 
     @Override
     protected void resetComponent() {
         playerState.reset();
-        paralyzedDuration.setZero();
+        frozenDuration.setZero();
+        invincibleDuration.setZero();
+        isInvincible = false;
 
         motionComponent = null;
         tiltComponent = null;
     }
 
     private StateMachine<State, Evt> createStateMachine() {
-        StateMachine<State, Evt> fsm = new StateMachine<State, Evt>(State.STOPPED);
+        StateMachine<State, Evt> fsm = new StateMachine<State, Evt>(State.STANDING);
 
-        fsm.registerEvent(State.STOPPED, Evt.UPDATE, new StateTransitionHandler<State, Evt>() {
+        fsm.registerEvent(State.STANDING, Evt.UPDATE, new StateTransitionHandler<State, Evt>() {
             @Override
             public State run(final State fromState, final Evt withEvent, final Opt eventData) {
                 Vector2 tilt = tiltComponent.getTilt();
-                return tilt.isZero() ? State.STOPPED : State.MOVING;
+                return tilt.isZero() ? State.STANDING : State.MOVING;
             }
         });
 
@@ -93,7 +114,7 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
                 }
                 else {
                     motionComponent.stopSmoothly(STOP_DURATION);
-                    return State.STOPPED;
+                    return State.STANDING;
                 }
             }
         });
@@ -107,7 +128,7 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
             }
         });
 
-        fsm.registerEvent(State.STOPPED, Evt.TAKE_DAMAGE, new StateTransitionHandler<State, Evt>() {
+        fsm.registerEvent(State.STANDING, Evt.TAKE_DAMAGE, new StateTransitionHandler<State, Evt>() {
             @Override
             public State run(final State fromState, final Evt withEvent, final Opt eventData) {
                 Vector2 damageVector = (Vector2)eventData.getValue();
@@ -120,11 +141,10 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
             @Override
             public State run(final State fromState, final Evt withEvent, final Opt eventData) {
                 Duration elapsedTime = (Duration)eventData.getValue();
-                paralyzedDuration.add(elapsedTime);
-                if (paralyzedDuration.getSeconds() >= PARALYZED_DURATION.getSeconds()) {
-                    paralyzedDuration.setZero();
-                    spriteComponent.setAlpha(1f);
-                    return State.STOPPED;
+                frozenDuration.add(elapsedTime);
+                if (frozenDuration.getSeconds() >= FROZEN_DURATION.getSeconds()) {
+                    frozenDuration.setZero();
+                    return State.STANDING;
                 }
                 return State.PARALYZED;
             }
@@ -138,6 +158,6 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
         motionComponent.setImpulse(impulse, STOP_DURATION);
         Pools.vector2s.free(impulse);
 
-        spriteComponent.setAlpha(0.5f);
+        setInvincible(true);
     }
 }
