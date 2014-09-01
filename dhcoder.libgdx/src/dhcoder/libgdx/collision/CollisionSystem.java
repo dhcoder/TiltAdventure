@@ -123,10 +123,10 @@ public final class CollisionSystem {
     }
 
     /**
-     * Given a collision we want to revert, change the location of the source collider to a new destination that avoids
-     * the target collider (by sliding alongside it)
+     * Given a collision, change the location of the source collider to a new destination so that it no longer
+     * penetrates the target collider.
      */
-    public void revertCollision(final Collision collision, final CollisionListener listener) {
+    public void extractSourceCollider(final Collision collision, final CollisionListener listener) {
         Vector2 repulsion = vectorPool.grabNew();
         collision.getRepulsionBetweenColliders(repulsion);
 

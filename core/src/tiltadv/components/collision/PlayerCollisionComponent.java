@@ -23,7 +23,7 @@ public final class PlayerCollisionComponent extends CollisionComponent {
     protected void handleCollided(final Collision collision) {
         if (collision.getTarget().getGroupId() == Group.OBSTACLES) {
             CollisionSystem collisionSystem = Services.get(CollisionSystem.class);
-            collisionSystem.revertCollision(collision, this);
+            collisionSystem.extractSourceCollider(collision, this);
         }
     }
 }
