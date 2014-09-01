@@ -9,6 +9,10 @@ import dhcoder.support.memory.Poolable;
  */
 public interface Shape extends Poolable {
     boolean containsPoint(float x, float y);
+    float getLeft(float xOrigin);
+    float getBottom(float yOrigin);
+    float getRight(float xOrigin);
+    float getTop(float yOrigin);
 
     void render(ShapeRenderer renderer, float x, float y);
 }

@@ -48,6 +48,18 @@ public final class Circle implements Shape {
         return radius;
     }
 
+    @Override
+    public float getLeft(final float xOrigin) { return xOrigin - radius; }
+
+    @Override
+    public float getBottom(final float yOrigin) { return yOrigin - radius; }
+
+    @Override
+    public float getRight(final float xOrigin) { return xOrigin + radius; }
+
+    @Override
+    public float getTop(final float yOrigin) { return yOrigin + radius; }
+
     public Circle setRadius(final float radius) {
         this.radius = radius;
         return this;
