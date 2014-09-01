@@ -90,7 +90,11 @@ public final class EntityManager {
     }
 
     public void freeEntity(final Entity entity) {
-        queuedForRemoval.push(entity);
+        // It's possible that this method can get called more than once before we have a chance to actually remove the
+        // entity, so we guard against that here.
+        if (!queuedForRemoval.contains(entity)) {
+            queuedForRemoval.push(entity);
+        }
     }
 
     public void update(final Duration elapsedTime) {
