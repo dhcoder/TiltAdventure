@@ -113,5 +113,9 @@ public final class Collider implements Poolable {
         listener.onSeparated(collision);
     }
 
+    void fireReverted(final Collision collision) {
+        listener.onReverted(collision);
+    }
+
 }
 

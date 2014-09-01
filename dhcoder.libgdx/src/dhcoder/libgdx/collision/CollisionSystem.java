@@ -126,7 +126,7 @@ public final class CollisionSystem {
      * Given a collision, change the location of the source collider to a new destination so that it no longer
      * penetrates the target collider.
      */
-    public void extractSourceCollider(final Collision collision, final CollisionListener listener) {
+    public void extractSourceCollider(final Collision collision) {
         Vector2 repulsion = vectorPool.grabNew();
         collision.getRepulsionBetweenColliders(repulsion);
 
@@ -140,7 +140,7 @@ public final class CollisionSystem {
         vectorPool.free(repulsion);
 
         // This collision never happened... remove it quietly...
-        listener.onReverted(collision);
+        source.fireReverted(collision);
         collisions.remove(collision.getKey());
         collisionPool.free(collision);
     }

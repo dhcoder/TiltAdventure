@@ -28,7 +28,7 @@ public final class EnemyCollisionComponent extends CollisionComponent {
         final int groupId = collision.getTarget().getGroupId();
         if (groupId == Group.OBSTACLES) {
             CollisionSystem collisionSystem = Services.get(CollisionSystem.class);
-            collisionSystem.extractSourceCollider(collision, this);
+            collisionSystem.extractSourceCollider(collision);
         }
         else if (groupId == Group.PLAYER) {
             Entity playerEntity = (Entity)collision.getTarget().getTag().getValue();
@@ -39,11 +39,6 @@ public final class EnemyCollisionComponent extends CollisionComponent {
             collisionDirection.nor().scl(-1f); // Flip this to the point of view of the player.
             boolean tookDamage = playerBehavior.takeDamage(collisionDirection);
             Pools.vector2s.free(collisionDirection);
-
-            if (!tookDamage) {
-                CollisionSystem collisionSystem = Services.get(CollisionSystem.class);
-                collisionSystem.extractSourceCollider(collision, this);
-            }
         }
     }
 }
