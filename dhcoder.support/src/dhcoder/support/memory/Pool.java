@@ -1,7 +1,5 @@
 package dhcoder.support.memory;
 
-import dhcoder.support.opt.Opt;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -90,7 +88,6 @@ public final class Pool<T> {
     private final ResetMethod<T> reset;
     private final Stack<T> freeItems;
     private final ArrayList<T> itemsInUse;
-    private final Opt<IntStack> markersOpt = Opt.withNoValue();
     private boolean resizable;
     private int capacity;
 
@@ -156,17 +153,12 @@ public final class Pool<T> {
         return newItem;
     }
 
-    public Pool<T> mark() {
-        if (!markersOpt.hasValue()) {
-            markersOpt.set(new IntStack(2));
-        }
-
-        markersOpt.getValue().push(itemsInUse.size());
-        return this;
+    public int mark() {
+        return itemsInUse.size();
     }
 
-    public void resetMark() {
-        freeCount(itemsInUse.size() - markersOpt.getValue().pop());
+    public void freeToMark(final int mark) {
+        freeCount(itemsInUse.size() - mark);
     }
 
     public void freeCount(final int count) {
