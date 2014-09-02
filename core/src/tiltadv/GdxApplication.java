@@ -311,8 +311,7 @@ public final class GdxApplication extends ApplicationAdapter {
         boulderEntity.addComponent(entities.newComponent(TransformComponent.class));
         boulderEntity.addComponent(entities.newComponent(OscillationBehaviorComponent.class)
             .set(new Vector2(xFrom, yFrom), new Vector2(xTo, yTo), Duration.fromSeconds(2f)));
-        boulderEntity.addComponent(entities.newComponent(ObstacleCollisionComponent.class)
-            .setShape(new Rectangle(Tiles.BOULDER.getRegionWidth() / 2, Tiles.BOULDER.getRegionHeight() / 2)));
+        boulderEntity.addComponent(entities.newComponent(ObstacleCollisionComponent.class).setShape(boulderBounds));
     }
 
     private void addFpsEntity() {
