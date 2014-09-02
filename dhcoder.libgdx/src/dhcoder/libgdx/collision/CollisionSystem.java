@@ -5,25 +5,24 @@ import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.collision.shape.Shape;
 import dhcoder.libgdx.pool.Vector2PoolBuilder;
 import dhcoder.support.collection.ArrayMap;
+import dhcoder.support.math.IntCoord;
 import dhcoder.support.memory.Pool;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static dhcoder.libgdx.collision.shape.ShapeUtils.getRepulsion;
 import static dhcoder.support.collection.ListUtils.swapToEndAndRemove;
 import static dhcoder.support.text.StringUtils.format;
 
 /**
  * Class which manages a collection of shapes and reports back when any of them overlap.
  * <p/>
- * To use this class, first register a bunch of shapes by calling {@link #registerShape(int,
- * Shape)}. Each shape is associated with a group ID, which must be a bitmask value (1, 2, 4, 8,
- * etc.). You must also specify which groups can collides with which via {@link #registerCollidesWith(int,
- * int)} after creating it, or else nothing will collide with anything.
+ * To use this class, first register a bunch of shapes by calling {@link #registerShape(int, Shape,
+ * CollisionListener)}. When a collision happens, the listener passed into this method will be notified.
  * <p/>
- * Each registration method returns a {@link Collider} which you use to listen for collisions (by adding a
- * listener to {@link Collider#onCollided} and to update the position of the shapes.
+ * Each shape is associated with a group ID, which must be a bitmask value (1, 2, 4, 8,
+ * etc.). Use {@link #registerCollidesWith(int, int)} when creating a collision system to specify which groups can
+ * collide with one another.
  * <p/>
  * Finally, call {@link #triggerCollisions()} to cause the manager to run through all items and fire the events for
  * any that collided.
@@ -31,16 +30,21 @@ import static dhcoder.support.text.StringUtils.format;
 public final class CollisionSystem {
 
     private static final int NUM_GROUPS = 32; // One group per integer bit, so 32 bits means 32 groups.
-
+    private static final int REGION_SIZE = 40; // Divide the screen into NxN rectangles, and only do collision checks
+    private static final int HALF_REGION_SIZE = REGION_SIZE / 2;
+    // within those regions.
     private final Pool<Collider> colliderPool;
     private final Pool<Collision> collisionPool;
-    private final Pool<ColliderKey> colliderKeyPool = Pool.of(ColliderKey.class, 1);
     private final Pool<Vector2> vectorPool = Vector2PoolBuilder.build(2);
+    private final Pool<ColliderKey> colliderKeyPool = Pool.of(ColliderKey.class, 1);
+    private final Pool<CollisionRegion> regionPool = Pool.of(CollisionRegion.class, 20).setResizable(true);
+    private final Pool<IntCoord> intCoordPool = Pool.of(IntCoord.class, 3);
 
     private final int[] collidesWith; // group -> bitmask of groups it collides with
     private final ArrayList<ArrayList<Collider>> groups;
 
     private final ArrayMap<ColliderKey, Collision> collisions;
+    private final ArrayMap<IntCoord, CollisionRegion> regionMap;
 
     public CollisionSystem(final int colliderCapacity) {
         colliderPool = Pool.of(Collider.class, colliderCapacity);
@@ -55,6 +59,7 @@ public final class CollisionSystem {
         for (int i = 0; i < NUM_GROUPS; ++i) {
             groups.add(new ArrayList<Collider>(colliderCapacity));
         }
+        regionMap = new ArrayMap<IntCoord, CollisionRegion>();
     }
 
     public void registerCollidesWith(final int groupId, final int collidesWithMask) {
@@ -69,55 +74,32 @@ public final class CollisionSystem {
         int groupIndex = groupIdToIndex(groupId);
 
         Collider collider = colliderPool.grabNew();
-        collider.initialize(groupId, shape, listener);
+        collider.initialize(this, groupId, shape, listener);
         groups.get(groupIndex).add(collider);
 
         return collider;
     }
 
     public void triggerCollisions() {
-        ColliderKey key = colliderKeyPool.grabNew();
-        for (int groupSourceIndex = 0; groupSourceIndex < NUM_GROUPS; ++groupSourceIndex) {
-            ArrayList<Collider> groupSource = groups.get(groupSourceIndex);
-            int groupSourceSize = groupSource.size();
-            for (int groupTargetIndex = 0; groupTargetIndex < NUM_GROUPS; ++groupTargetIndex) {
-                if (groupsCanCollide(groupSourceIndex, groupTargetIndex)) {
-                    ArrayList<Collider> groupTarget = groups.get(groupTargetIndex);
-                    int groupTargetSize = groupTarget.size();
-                    for (int colliderSourceIndex = 0; colliderSourceIndex < groupSourceSize; ++colliderSourceIndex) {
-                        Collider colliderSource = groupSource.get(colliderSourceIndex);
-                        for (int colliderTargetIndex = 0; colliderTargetIndex < groupTargetSize;
-                             ++colliderTargetIndex) {
-                            Collider colliderTarget = groupTarget.get(colliderTargetIndex);
-                            key.set(colliderSource, colliderTarget);
-                            if (colliderSource.collidesWith(colliderTarget)) {
-                                Collision collision;
-                                if (!collisions.containsKey(key)) {
-                                    collision = collisionPool.grabNew();
-                                    collision.set(colliderSource, colliderTarget);
-                                    collisions.put(collision.getKey(), collision);
-                                    boolean debugTest = collisions.containsKey(key);
-                                    colliderSource.fireCollision(collision);
-                                }
-                                else {
-                                    // collision = collisions.get(key);
-                                    // Report continued collision?
-                                }
-                            }
-                            else if (collisions.containsKey(key)) {
-                                Collision collision = collisions.remove(key);
-                                colliderSource.fireSeparation(collision);
-                                collisionPool.free(collision);
-                            }
-                        }
-                    }
-                }
+        List<CollisionRegion> regions = regionPool.getItemsInUse();
+        int numRegions = regions.size();
+        for (int i = 0; i < numRegions; i++) {
+            CollisionRegion region = regions.get(i);
+            region.triggerCollisions();
+        }
+
+        for (int i = 0; i < numRegions; i++) {
+            CollisionRegion region = regions.get(i);
+            if (region.isEmpty()) {
+                regionMap.remove(region.getCoordinates());
+                regionPool.free(region);
+                --numRegions;
             }
         }
-        colliderKeyPool.free(key);
     }
 
     public void release(final Collider collider) {
+        removeColliderFromRegions(collider);
         removeFromGroup(collider);
         colliderPool.free(collider);
     }
@@ -146,13 +128,124 @@ public final class CollisionSystem {
     }
 
     public void render(final ShapeRenderer renderer) {
-        List<Collider> colliders = colliderPool.getItemsInUse();
+        final List<Collider> colliders = colliderPool.getItemsInUse();
         int numColliders = colliders.size();
         for (int i = 0; i < numColliders; i++) {
             Collider collider = colliders.get(i);
             Vector2 pos = collider.getCurrPosition();
             collider.getShape().render(renderer, pos.x, pos.y);
         }
+
+        final List<CollisionRegion> regions = regionPool.getItemsInUse();
+        int numRegions = regions.size();
+        for (int i = 0; i < numRegions; i++) {
+            CollisionRegion region = regions.get(i);
+            final IntCoord coords = region.getCoordinates();
+            float x = (coords.getX() * REGION_SIZE) - REGION_SIZE / 2f;
+            float y = (coords.getY() * REGION_SIZE) - REGION_SIZE / 2f;
+            renderer.rect(x+2, y+2, REGION_SIZE-4, REGION_SIZE-4);
+        }
+    }
+
+    void addColliderIntoRegions(final Collider collider) {
+        int mark = intCoordPool.mark();
+        IntCoord topLeft = intCoordPool.grabNew();
+        IntCoord bottomRight = intCoordPool.grabNew();
+        getColliderBounds(collider, topLeft, bottomRight);
+        IntCoord currCoord = intCoordPool.grabNew();
+        for (int x = topLeft.getX(); x <= bottomRight.getX(); ++x) {
+            for (int y = topLeft.getY(); y >= bottomRight.getY(); --y) {
+                currCoord.set(x, y);
+                CollisionRegion region;
+                if (!regionMap.containsKey(currCoord)) {
+                    region = regionPool.grabNew().setCollisionSystem(this).setCoordinates(currCoord);
+                    regionMap.put(region.getCoordinates(), region);
+                }
+                else {
+                    region = regionMap.get(currCoord);
+                }
+                region.addCollider(collider);
+            }
+        }
+
+        intCoordPool.freeToMark(mark);
+    }
+
+    void removeColliderFromRegions(final Collider collider) {
+        int mark = intCoordPool.mark();
+        IntCoord topLeft = intCoordPool.grabNew();
+        IntCoord bottomRight = intCoordPool.grabNew();
+        getColliderBounds(collider, topLeft, bottomRight);
+        IntCoord currCoord = intCoordPool.grabNew();
+        for (int x = topLeft.getX(); x <= bottomRight.getX(); ++x) {
+            for (int y = topLeft.getY(); y >= bottomRight.getY(); --y) {
+                currCoord.set(x, y);
+                CollisionRegion region = regionMap.get(currCoord);
+                region.remove(collider);
+            }
+        }
+
+        intCoordPool.freeToMark(mark);
+    }
+
+    void testForCollision(final Collider sourceCollider, final Collider targetCollider) {
+        if (!groupsCanCollide(sourceCollider.getGroupId(), targetCollider.getGroupId())) {
+            return;
+        }
+
+        ColliderKey key = colliderKeyPool.grabNew();
+        key.set(sourceCollider, targetCollider);
+        if (sourceCollider.collidesWith(targetCollider)) {
+            if (!collisions.containsKey(key)) {
+                Collision collision = collisionPool.grabNew();
+                collision.set(sourceCollider, targetCollider);
+                collisions.put(collision.getKey(), collision);
+                sourceCollider.fireNewCollision(collision);
+            }
+//            else {
+//                // TODO: Report continued collision in progress
+//            }
+        }
+        else if (collisions.containsKey(key)) {
+            Collision collision = collisions.remove(key);
+            sourceCollider.fireSeparation(collision);
+            collisionPool.free(collision);
+        }
+        colliderKeyPool.free(key);
+    }
+
+    private void getColliderBounds(final Collider collider, final IntCoord outTopLeft, final IntCoord outBottomRight) {
+        Vector2 origin = collider.getCurrPosition();
+        Shape shape = collider.getShape();
+        float left = shape.getLeft(origin.x);
+        float right = shape.getRight(origin.x);
+        float top = shape.getTop(origin.y);
+        float bottom = shape.getBottom(origin.y);
+        int leftCoord = (int)((Math.abs(left) + HALF_REGION_SIZE) / REGION_SIZE);
+        int rightCoord = (int)((Math.abs(right) + HALF_REGION_SIZE) / REGION_SIZE);
+        int topCoord = (int)((Math.abs(top) + HALF_REGION_SIZE) / REGION_SIZE);
+        int bottomCoord = (int)((Math.abs(bottom) + HALF_REGION_SIZE) / REGION_SIZE);
+        if (left < 0) {
+            leftCoord = -leftCoord;
+        }
+        if (right < 0) {
+            rightCoord = -rightCoord;
+        }
+        if (top < 0) {
+            topCoord = -topCoord;
+        }
+        if (bottom < 0) {
+            bottomCoord = -bottomCoord;
+        }
+
+        outTopLeft.set(leftCoord, topCoord);
+        outBottomRight.set(rightCoord, bottomCoord);
+    }
+
+    private boolean groupsCanCollide(final int sourceGroupId, final int targetGroupId) {
+        final int sourceGroupIndex = groupIdToIndex(sourceGroupId);
+        int collidesWithMask = collidesWith[sourceGroupIndex];
+        return (collidesWithMask & targetGroupId) != 0;
     }
 
     private void requireValidGroupId(final int group) {
@@ -177,12 +270,5 @@ public final class CollisionSystem {
             index++;
         }
         return index;
-    }
-
-    private boolean groupsCanCollide(final int sourceGroupIndex, final int targetGroupIndex) {
-        int collidesWithMask = collidesWith[sourceGroupIndex];
-        int targetGroupMask = 1 << targetGroupIndex;
-
-        return (collidesWithMask & targetGroupMask) != 0;
     }
 }

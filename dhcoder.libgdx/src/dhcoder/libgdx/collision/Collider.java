@@ -15,6 +15,7 @@ public final class Collider implements Poolable {
     private final Vector2 lastPosition = new Vector2();
     private final Vector2 currPosition = new Vector2();
 
+    private CollisionSystem system;
     private int groupId;
     private boolean isActive;
     private Shape shape;
@@ -55,7 +56,9 @@ public final class Collider implements Poolable {
     // Used to rewrite history, telling the collider that it didn't really go to where it thought it did...
     // This is useful, for example, to pop a shape out after it penetrated an object that should be solid.
     void setCurrPosition(final Vector2 currPosition) {
+        system.removeColliderFromRegions(this);
         this.currPosition.set(currPosition);
+        system.addColliderIntoRegions(this);
     }
 
     public Vector2 getLastPosition() {
@@ -63,18 +66,27 @@ public final class Collider implements Poolable {
     }
 
     public void updatePosition(final float x, final float y) {
-        lastPosition.set(currPosition);
-        currPosition.set(x, y);
-
-        if (!isActive) {
-            isActive = true; // If just activated, currPosition wasn't valid until just now
+        if (isActive) {
+            if (lastPosition.epsilonEquals(x, y, 0f)) {
+                return;
+            }
+            system.removeColliderFromRegions(this);
             lastPosition.set(currPosition);
+            currPosition.set(x, y);
+            system.addColliderIntoRegions(this);
+        }
+        if (!isActive) {
+            isActive = true;
+            currPosition.set(x, y);
+            lastPosition.set(currPosition);
+            system.addColliderIntoRegions(this);
         }
     }
 
     // Should only be called by CollisionSystem
     @Override
     public void reset() {
+        system = null;
         shape = null;
         groupId = -1;
         isActive = false;
@@ -86,7 +98,9 @@ public final class Collider implements Poolable {
      * #updatePosition(float, float)} for the first time.
      */
     // Should only be called by CollisionSystem
-    void initialize(final int groupId, final Shape shape, final CollisionListener listener) {
+    void initialize(final CollisionSystem system, final int groupId, final Shape shape,
+        final CollisionListener listener) {
+        this.system = system;
         this.groupId = groupId;
         this.shape = shape;
         isActive = false;
@@ -104,7 +118,7 @@ public final class Collider implements Poolable {
     }
 
     // Should only be called by CollisionSystem
-    void fireCollision(final Collision collision) {
+    void fireNewCollision(final Collision collision) {
         listener.onCollided(collision);
     }
 
@@ -113,6 +127,7 @@ public final class Collider implements Poolable {
         listener.onSeparated(collision);
     }
 
+    // Should only be called by CollisionSystem
     void fireReverted(final Collision collision) {
         listener.onReverted(collision);
     }
