@@ -29,6 +29,7 @@ import static dhcoder.support.text.StringUtils.format;
  */
 public final class CollisionSystem {
 
+    public static final int REGION_MARGIN = 2;
     private static final int NUM_GROUPS = 32; // One group per integer bit, so 32 bits means 32 groups.
     private static final int REGION_SIZE = 40; // Divide the screen into NxN rectangles, and only do collision checks
     private static final int HALF_REGION_SIZE = REGION_SIZE / 2;
@@ -88,12 +89,24 @@ public final class CollisionSystem {
             region.triggerCollisions();
         }
 
+        // Clean up any regions that are now empty after resolving collisions
         for (int i = 0; i < numRegions; i++) {
             CollisionRegion region = regions.get(i);
             if (region.isEmpty()) {
                 regionMap.remove(region.getCoordinates());
                 regionPool.free(region);
                 --numRegions;
+            }
+        }
+
+        // Clean up any collisions that are pointing to a collider that was freed after resolving collisions
+        final List<Collision> collisions = collisionPool.getItemsInUse();
+        int numCollisions = collisions.size();
+        for (int i = 0; i < numCollisions; i++) {
+            Collision collision = collisions.get(i);
+            if (!collision.getSource().isActive() || !collision.getTarget().isActive()) {
+                freeCollision(collision);
+                --numCollisions;
             }
         }
     }
@@ -123,8 +136,7 @@ public final class CollisionSystem {
 
         // This collision never happened... remove it quietly...
         source.fireReverted(collision);
-        collisions.remove(collision.getKey());
-        collisionPool.free(collision);
+        freeCollision(collision);
     }
 
     public void render(final ShapeRenderer renderer) {
@@ -143,7 +155,8 @@ public final class CollisionSystem {
             final IntCoord coords = region.getCoordinates();
             float x = (coords.getX() * REGION_SIZE) - REGION_SIZE / 2f;
             float y = (coords.getY() * REGION_SIZE) - REGION_SIZE / 2f;
-            renderer.rect(x+2, y+2, REGION_SIZE-4, REGION_SIZE-4);
+            renderer.rect(x + REGION_MARGIN, y + REGION_MARGIN, REGION_SIZE - REGION_MARGIN * 2,
+                REGION_SIZE - REGION_MARGIN * 2);
         }
     }
 
@@ -212,6 +225,11 @@ public final class CollisionSystem {
             collisionPool.free(collision);
         }
         colliderKeyPool.free(key);
+    }
+
+    private void freeCollision(final Collision collision) {
+        collisions.remove(collision.getKey());
+        collisionPool.free(collision);
     }
 
     private void getColliderBounds(final Collider collider, final IntCoord outTopLeft, final IntCoord outBottomRight) {
