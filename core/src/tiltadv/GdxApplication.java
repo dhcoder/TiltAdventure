@@ -221,15 +221,13 @@ public final class GdxApplication extends ApplicationAdapter {
     }
 
     private void addBoundaryWalls() {
-        float screenW = VIEWPORT_WIDTH;
-        float screenH = VIEWPORT_HEIGHT;
-        float halfScreenW = screenW / 2f;
-        float halfScreenH = screenH / 2f;
-        float top = halfScreenH;
-        float bottom = -halfScreenH;
-        float left = -halfScreenW;
-        float right = halfScreenW;
-        float wallSize = .5f;
+        float halfScreenW = (float)VIEWPORT_WIDTH / 2f;
+        float halfScreenH = (float)VIEWPORT_HEIGHT / 2f;
+        float halfWallSize = 20f;
+        float top = halfScreenH + halfWallSize;
+        float bottom = -halfScreenH - halfWallSize;
+        float left = -halfScreenW - halfWallSize;
+        float right = halfScreenW + halfWallSize;
 
         Entity wallLeft = entities.newEntity();
         Entity wallRight = entities.newEntity();
@@ -237,8 +235,8 @@ public final class GdxApplication extends ApplicationAdapter {
         Entity wallTop = entities.newEntity();
 
         Vector2 wallPos = Pools.vector2s.grabNew();
-        final Shape verticalWall = new Rectangle(wallSize, screenH);
-        final Shape horizontalWall = new Rectangle(screenW, wallSize);
+        final Shape verticalWall = new Rectangle(halfWallSize, halfScreenH);
+        final Shape horizontalWall = new Rectangle(halfScreenW, halfWallSize);
 
         wallPos.set(left, 0f);
         wallLeft.addComponent(entities.newComponent(TransformComponent.class).setTranslate(wallPos));
@@ -275,11 +273,11 @@ public final class GdxApplication extends ApplicationAdapter {
     }
 
     private void update() {
-
+        int mark = Pools.durations.mark();
         Duration elapsedTime = Pools.durations.grabNew();
         elapsedTime.setSeconds(Math.min(Gdx.graphics.getRawDeltaTime(), MAX_DELTA_TIME_SECS));
         entities.update(elapsedTime);
-        Pools.durations.free(elapsedTime);
+        Pools.durations.freeToMark(mark);
 
         collisionSystem.triggerCollisions();
 
