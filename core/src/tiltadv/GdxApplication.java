@@ -64,7 +64,7 @@ public final class GdxApplication extends ApplicationAdapter {
     public void create() {
         camera = new OrthographicCamera(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
         batch = new SpriteBatch();
-        if (Settings.IN_DEV_MODE) {
+        if (DevSettings.IN_DEV_MODE) {
             shapeRenderer = new ShapeRenderer();
         }
         font = new BitmapFont();
@@ -106,7 +106,7 @@ public final class GdxApplication extends ApplicationAdapter {
         entities.render(batch);
         batch.end();
 
-        if (Settings.IN_DEV_MODE && DevSettings.SHOW_COLLISION_SHAPES) {
+        if (DevSettings.IN_DEV_MODE && DevSettings.SHOW_COLLISION_SHAPES) {
             shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
             collisionSystem.render(shapeRenderer);
             shapeRenderer.end();
@@ -119,7 +119,7 @@ public final class GdxApplication extends ApplicationAdapter {
         font.dispose();
         Tiles.dispose();
 
-        if (Settings.IN_DEV_MODE) {
+        if (DevSettings.IN_DEV_MODE) {
             shapeRenderer.dispose();
         }
     }
@@ -286,7 +286,7 @@ public final class GdxApplication extends ApplicationAdapter {
 
         camera.update();
         batch.setProjectionMatrix(camera.combined);
-        if (Settings.IN_DEV_MODE) {
+        if (DevSettings.IN_DEV_MODE) {
             shapeRenderer.setProjectionMatrix(camera.combined);
         }
     }
