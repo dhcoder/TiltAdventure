@@ -10,6 +10,7 @@ public final class AndroidLauncher extends AndroidApplication {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
+        config.useCompass = false;
         initialize(new GdxApplication(), config);
     }
 }
