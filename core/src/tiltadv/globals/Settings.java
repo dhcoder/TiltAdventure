@@ -15,6 +15,11 @@ public final class Settings {
      */
     public static final boolean IN_DEV_MODE = Boolean.getBoolean("tiltadv.dev");
 
+    /**
+     * Whether the game should be allowed to vibrate.
+     */
+    public static final boolean VIBRATION_ENABLED = true;
+
     private Settings() {}
 
 }

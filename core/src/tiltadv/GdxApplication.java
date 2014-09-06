@@ -33,6 +33,7 @@ import tiltadv.components.input.AccelerometerInputComponent;
 import tiltadv.components.input.KeyboardInputComponent;
 import tiltadv.components.model.*;
 import tiltadv.globals.*;
+import tiltadv.input.Vibrator;
 import tiltadv.memory.Pools;
 
 import static com.badlogic.gdx.math.MathUtils.cos;
@@ -129,6 +130,8 @@ public final class GdxApplication extends ApplicationAdapter {
 
         entities = new EntityManager(ENTITY_COUNT);
         Services.register(EntityManager.class, entities);
+
+        Services.register(Vibrator.class, new Vibrator());
     }
 
     private void initializeEntities() {
