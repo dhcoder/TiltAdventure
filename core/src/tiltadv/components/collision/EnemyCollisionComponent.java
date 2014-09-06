@@ -37,7 +37,7 @@ public final class EnemyCollisionComponent extends CollisionComponent {
             Vector2 collisionDirection = Pools.vector2s.grabNew();
             collision.getRepulsionBetweenColliders(collisionDirection);
             collisionDirection.nor().scl(-1f); // Flip this to the point of view of the player.
-            boolean tookDamage = playerBehavior.takeDamage(collisionDirection);
+            playerBehavior.takeDamage(collisionDirection);
             Pools.vector2s.free(collisionDirection);
         }
     }
