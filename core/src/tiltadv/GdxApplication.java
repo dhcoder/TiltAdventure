@@ -139,7 +139,7 @@ public final class GdxApplication extends ApplicationAdapter {
         octoBounds = new Circle(Tiles.OCTOUP1.getRegionWidth() / 2f);
         playerBounds = new Circle(Tiles.LINKUP1.getRegionWidth() / 2f);
         octoRockBounds = new Circle(Tiles.ROCK.getRegionWidth() / 2f);
-        boulderBounds = new Rectangle(Tiles.BOULDER.getRegionWidth() / 2f, Tiles.BOULDER.getRegionHeight() / 2f);
+        boulderBounds = new Circle(Tiles.BOULDER.getRegionWidth() / 2f);
 
         entities.preallocate(TransformComponent.class, ENTITY_COUNT);
         entities.preallocate(MotionComponent.class, ENTITY_COUNT);
