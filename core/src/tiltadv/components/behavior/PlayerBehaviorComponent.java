@@ -1,6 +1,5 @@
 package tiltadv.components.behavior;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
@@ -9,10 +8,10 @@ import dhcoder.support.state.StateMachine;
 import dhcoder.support.state.StateTransitionHandler;
 import dhcoder.support.time.Duration;
 import tiltadv.components.display.SpriteComponent;
+import tiltadv.components.model.HeadingComponent;
 import tiltadv.components.model.MotionComponent;
 import tiltadv.components.model.TiltComponent;
 import tiltadv.globals.Services;
-import tiltadv.globals.Settings;
 import tiltadv.input.Vibrator;
 import tiltadv.memory.Pools;
 
@@ -44,9 +43,10 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
 
     private boolean isInvincible;
 
-    private TiltComponent tiltComponent;
+    private HeadingComponent headingComponent;
     private MotionComponent motionComponent;
     private SpriteComponent spriteComponent;
+    private TiltComponent tiltComponent;
 
     public PlayerBehaviorComponent() {
         playerState = createStateMachine();
@@ -59,9 +59,10 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
 
     @Override
     public void initialize(final Entity owner) {
-        tiltComponent = owner.requireComponent(TiltComponent.class);
+        headingComponent = owner.requireComponent(HeadingComponent.class);
         motionComponent = owner.requireComponent(MotionComponent.class);
         spriteComponent = owner.requireComponent(SpriteComponent.class);
+        tiltComponent = owner.requireComponent(TiltComponent.class);
     }
 
     @Override
@@ -74,6 +75,10 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
                 invincibleDuration.setZero();
                 setInvincible(false);
             }
+        }
+
+        if (playerState.getCurrentState() == State.MOVING) {
+            headingComponent.setHeadingFrom(tiltComponent.getTilt());
         }
     }
 
@@ -94,7 +99,9 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
         invincibleDuration.setZero();
         isInvincible = false;
 
+        headingComponent = null;
         motionComponent = null;
+        spriteComponent = null;
         tiltComponent = null;
     }
 
