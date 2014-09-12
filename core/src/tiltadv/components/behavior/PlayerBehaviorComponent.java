@@ -52,11 +52,6 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
         playerState = createStateMachine();
     }
 
-    private void setInvincible(final boolean isInvincible) {
-        spriteComponent.setAlpha(isInvincible ? .5f : 1f);
-        this.isInvincible = isInvincible;
-    }
-
     @Override
     public void initialize(final Entity owner) {
         headingComponent = owner.requireComponent(HeadingComponent.class);
@@ -82,8 +77,20 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
         }
     }
 
-    public boolean canTakeDamage()
-    {
+    @Override
+    protected void resetComponent() {
+        playerState.reset();
+        frozenDuration.setZero();
+        invincibleDuration.setZero();
+        isInvincible = false;
+
+        headingComponent = null;
+        motionComponent = null;
+        spriteComponent = null;
+        tiltComponent = null;
+    }
+
+    public boolean canTakeDamage() {
         return !isInvincible;
     }
 
@@ -98,17 +105,9 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
         return true;
     }
 
-    @Override
-    protected void resetComponent() {
-        playerState.reset();
-        frozenDuration.setZero();
-        invincibleDuration.setZero();
-        isInvincible = false;
-
-        headingComponent = null;
-        motionComponent = null;
-        spriteComponent = null;
-        tiltComponent = null;
+    private void setInvincible(final boolean isInvincible) {
+        spriteComponent.setAlpha(isInvincible ? .5f : 1f);
+        this.isInvincible = isInvincible;
     }
 
     private StateMachine<State, Evt> createStateMachine() {

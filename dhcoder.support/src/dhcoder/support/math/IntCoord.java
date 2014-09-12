@@ -51,13 +51,15 @@ public final class IntCoord implements Poolable {
     }
 
     @Override
-    public String toString() {
-        return format("({0}x{1})", x, y);
+    public void reset() {
+        set(0, 0);
     }
 
     @Override
-    public void reset() {
-        set(0, 0);
+    public int hashCode() {
+        int result = x;
+        result = 31 * result + y;
+        return result;
     }
 
     @Override
@@ -74,9 +76,7 @@ public final class IntCoord implements Poolable {
     }
 
     @Override
-    public int hashCode() {
-        int result = x;
-        result = 31 * result + y;
-        return result;
+    public String toString() {
+        return format("({0}x{1})", x, y);
     }
 }

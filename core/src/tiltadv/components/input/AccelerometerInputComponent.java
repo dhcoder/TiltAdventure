@@ -25,22 +25,19 @@ public final class AccelerometerInputComponent extends AbstractComponent {
     // TODO: Allow multiple configuration, maybe? (Flat, upside-down, configurable?)
     private final Vector3 referenceVector = new Vector3(.4f, 0f, 1f).nor();
     private boolean isTiltActivated;
-
-    private TiltComponent tiltComponent;
-
     private final EventListener touchDownListener = new EventListener() {
         @Override
         public void run(final Object sender) {
             isTiltActivated = true;
         }
     };
-
     private final EventListener touchUpListener = new EventListener() {
         @Override
         public void run(final Object sender) {
             isTiltActivated = false;
         }
     };
+    private TiltComponent tiltComponent;
 
     @Override
     public void initialize(final Entity owner) {

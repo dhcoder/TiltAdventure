@@ -5,7 +5,10 @@ package dhcoder.libgdx.collision;
  */
 public interface CollisionListener {
     void onCollided(Collision collision);
+
     void onOverlapping(Collision collision);
+
     void onSeparated(Collision collision);
+
     void onReverted(Collision collision);
 }

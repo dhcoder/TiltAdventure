@@ -50,16 +50,16 @@ public final class PlayerSensorCollisionComponent extends CollisionComponent {
     }
 
     @Override
-    protected void handleReset() {
-        playerBehaviorComponent = null;
-        headingComponent = null;
-        sizeComponent = null;
-    }
-
-    @Override
     protected void handleCollided(final Collision collision) {
         if (collision.getTarget().getGroupId() == Group.ENEMY) {
             //playerBehaviorComponent.attack();
         }
+    }
+
+    @Override
+    protected void handleReset() {
+        playerBehaviorComponent = null;
+        headingComponent = null;
+        sizeComponent = null;
     }
 }

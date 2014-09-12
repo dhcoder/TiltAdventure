@@ -5,8 +5,8 @@ import dhcoder.support.memory.Pool;
 import java.util.Random;
 
 /**
-* Enumeration for compass directions and various utility methods.
-*/
+ * Enumeration for compass directions and various utility methods.
+ */
 public enum CompassDirection {
     E,
     NE,

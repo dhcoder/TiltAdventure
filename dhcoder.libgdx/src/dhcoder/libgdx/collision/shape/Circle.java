@@ -30,25 +30,6 @@ public final class Circle implements Shape {
     }
 
     @Override
-    public void render(final ShapeRenderer renderer, final float x, final float y) {
-        renderer.circle(x, y, radius);
-    }
-
-    @Override
-    public String toString() {
-        return format("r={0}", radius);
-    }
-
-    @Override
-    public void reset() {
-        setRadius(0f);
-    }
-
-    public float getRadius() {
-        return radius;
-    }
-
-    @Override
     public float getLeft(final float xOrigin) { return xOrigin - radius; }
 
     @Override
@@ -67,6 +48,25 @@ public final class Circle implements Shape {
 
     @Override
     public float getHalfHeight() {
+        return radius;
+    }
+
+    @Override
+    public void render(final ShapeRenderer renderer, final float x, final float y) {
+        renderer.circle(x, y, radius);
+    }
+
+    @Override
+    public String toString() {
+        return format("r={0}", radius);
+    }
+
+    @Override
+    public void reset() {
+        setRadius(0f);
+    }
+
+    public float getRadius() {
         return radius;
     }
 

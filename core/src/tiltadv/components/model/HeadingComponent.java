@@ -14,6 +14,7 @@ import dhcoder.support.math.Angle;
 public final class HeadingComponent extends AbstractComponent {
 
     private final Angle heading = Angle.fromDegrees(0f);
+
     public Angle getHeading() { return heading; }
 
     public HeadingComponent setHeading(final Angle heading) {

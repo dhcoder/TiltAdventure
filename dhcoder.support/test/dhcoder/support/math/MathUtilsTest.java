@@ -2,7 +2,9 @@ package dhcoder.support.math;
 
 import org.junit.Test;
 
-import static dhcoder.support.math.MathUtils.*;
+import static dhcoder.support.math.MathUtils.clamp;
+import static dhcoder.support.math.MathUtils.isPowerOfTwo;
+import static dhcoder.support.math.MathUtils.log2;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 

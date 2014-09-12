@@ -37,13 +37,13 @@ public final class Animations {
         PLAYER_W.setPlayMode(Animation.PlayMode.LOOP);
         PLAYER_SW = new Animation(0.1f, Tiles.LINKLEFT1, Tiles.LINKLEFT2);
         PLAYER_SW.setPlayMode(Animation.PlayMode.LOOP);
-        OCTOUP  = new Animation(0.1f, Tiles.OCTOUP1, Tiles.OCTOUP2);
+        OCTOUP = new Animation(0.1f, Tiles.OCTOUP1, Tiles.OCTOUP2);
         OCTOUP.setPlayMode(Animation.PlayMode.LOOP);
-        OCTODOWN  = new Animation(0.1f, Tiles.OCTODOWN1, Tiles.OCTODOWN2);
+        OCTODOWN = new Animation(0.1f, Tiles.OCTODOWN1, Tiles.OCTODOWN2);
         OCTODOWN.setPlayMode(Animation.PlayMode.LOOP);
-        OCTOLEFT  = new Animation(0.1f, Tiles.OCTOLEFT1, Tiles.OCTOLEFT2);
+        OCTOLEFT = new Animation(0.1f, Tiles.OCTOLEFT1, Tiles.OCTOLEFT2);
         OCTOLEFT.setPlayMode(Animation.PlayMode.LOOP);
-        OCTORIGHT  = new Animation(0.1f, Tiles.OCTORIGHT1, Tiles.OCTORIGHT2);
+        OCTORIGHT = new Animation(0.1f, Tiles.OCTORIGHT1, Tiles.OCTORIGHT2);
         OCTORIGHT.setPlayMode(Animation.PlayMode.LOOP);
     }
 
