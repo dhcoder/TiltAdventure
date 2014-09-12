@@ -78,7 +78,7 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
     }
 
     @Override
-    protected void resetComponent() {
+    public void reset() {
         playerState.reset();
         frozenDuration.setZero();
         invincibleDuration.setZero();

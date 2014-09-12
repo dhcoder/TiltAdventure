@@ -70,18 +70,15 @@ public abstract class CollisionComponent extends AbstractComponent implements Co
     }
 
     @Override
-    public final void dispose() {
+    public final void reset() {
+        handleReset();
+
         CollisionSystem collisionSystem = Services.get(CollisionSystem.class);
         collisionSystem.release(collider);
         collider = null;
-    }
 
-    @Override
-    protected final void resetComponent() {
         transformComponent = null;
         offset.setZero();
-
-        handleReset();
     }
 
     @Override

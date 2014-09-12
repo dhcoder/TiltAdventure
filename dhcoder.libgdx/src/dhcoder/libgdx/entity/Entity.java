@@ -22,7 +22,7 @@ public final class Entity implements Poolable {
     /**
      * Restricted access - use {@link EntityManager#newEntity} instead.
      */
-    private Entity() {}
+    Entity() {}
 
     /**
      * Add a component to the entity. You can safely add components after you've created an entity but before you call
@@ -31,12 +31,13 @@ public final class Entity implements Poolable {
      * @throws IllegalStateException if you try to add a component to an entity that's already in use (that is, has
      *                               been updated at least once).
      */
-    public void addComponent(final Component component) {
+    public Entity addComponent(final Component component) {
         if (initialized) {
             throw new IllegalStateException("Can't add a component to an Entity that's already in use.");
         }
 
         this.components.add(component);
+        return this;
     }
 
     /**

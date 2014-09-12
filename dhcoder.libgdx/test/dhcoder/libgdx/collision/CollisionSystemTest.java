@@ -2,7 +2,6 @@ package dhcoder.libgdx.collision;
 
 import dhcoder.libgdx.collision.shape.Circle;
 import dhcoder.libgdx.collision.shape.Rectangle;
-import dhcoder.support.event.ArgEventListener;
 import org.junit.Test;
 
 import static dhcoder.libgdx.collision.shape.ShapeUtils.testIntersection;
@@ -11,12 +10,23 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 public final class CollisionSystemTest {
 
-    private class CollisionListener implements ArgEventListener<CollisionEventArgs> {
+    private class TestCollisionListener implements CollisionListener {
 
         private int collisionCount;
 
         @Override
-        public void run(final Object sender, final CollisionEventArgs args) { collisionCount++; }
+        public void onCollided(final Collision collision) {
+            collisionCount++;
+        }
+
+        @Override
+        public void onOverlapping(final Collision collision) {}
+
+        @Override
+        public void onSeparated(final Collision collision) {}
+
+        @Override
+        public void onReverted(final Collision collision) {}
 
         public int getCollisionCount() {
             return collisionCount;
@@ -29,15 +39,12 @@ public final class CollisionSystemTest {
     @Test
     public void defaultCollidersAreInactiveAndWontCollide() {
         CollisionSystem collisionSystem = new CollisionSystem(2);
+        TestCollisionListener listenerA = new TestCollisionListener();
+        TestCollisionListener listenerB = new TestCollisionListener();
         collisionSystem.registerCollidesWith(GROUP_A, GROUP_B);
         collisionSystem.registerCollidesWith(GROUP_B, GROUP_A);
-        Collider colliderA = collisionSystem.registerShape(GROUP_A, new Circle(4));
-        Collider colliderB = collisionSystem.registerShape(GROUP_B, new Circle(5));
-
-        CollisionListener listenerA = new CollisionListener();
-        CollisionListener listenerB = new CollisionListener();
-        colliderA.onCollided.addListener(listenerA);
-        colliderB.onCollided.addListener(listenerB);
+        Collider colliderA = collisionSystem.registerShape(GROUP_A, new Circle(4), listenerA);
+        Collider colliderB = collisionSystem.registerShape(GROUP_B, new Circle(5), listenerB);
 
         // First, affirm these shapes would obviously collide being at the origin
         assertThat(testIntersection(new Circle(4), 0, 0, new Circle(5), 0, 0), equalTo(true));
@@ -71,16 +78,14 @@ public final class CollisionSystemTest {
     @Test
     public void collisionManagerReportsCollisionBetweenCircleAndCircle() {
         CollisionSystem collisionSystem = new CollisionSystem(2);
+        TestCollisionListener listenerA = new TestCollisionListener();
+        TestCollisionListener listenerB = new TestCollisionListener();
+
         collisionSystem.registerCollidesWith(GROUP_A, GROUP_B);
-        Collider colliderA = collisionSystem.registerShape(GROUP_A, new Circle(4));
-        Collider colliderB = collisionSystem.registerShape(GROUP_B, new Circle(5));
+        Collider colliderA = collisionSystem.registerShape(GROUP_A, new Circle(4), listenerA);
+        Collider colliderB = collisionSystem.registerShape(GROUP_B, new Circle(5), listenerB);
         colliderA.updatePosition(-5, 0);
         colliderB.updatePosition(5, 0);
-
-        CollisionListener listenerA = new CollisionListener();
-        CollisionListener listenerB = new CollisionListener();
-        colliderA.onCollided.addListener(listenerA);
-        colliderB.onCollided.addListener(listenerB);
 
         collisionSystem.triggerCollisions();
         assertThat(listenerA.getCollisionCount(), equalTo(0));
@@ -95,16 +100,13 @@ public final class CollisionSystemTest {
     @Test
     public void collisionManagerReportsCollisionBetweenRectangleAndRectangle() {
         CollisionSystem collisionSystem = new CollisionSystem(2);
+        TestCollisionListener listenerA = new TestCollisionListener();
+        TestCollisionListener listenerB = new TestCollisionListener();
         collisionSystem.registerCollidesWith(GROUP_A, GROUP_B);
-        Collider colliderA = collisionSystem.registerShape(GROUP_A, new Rectangle(4, 3));
-        Collider colliderB = collisionSystem.registerShape(GROUP_B, new Rectangle(3, 4));
+        Collider colliderA = collisionSystem.registerShape(GROUP_A, new Rectangle(4, 3), listenerA);
+        Collider colliderB = collisionSystem.registerShape(GROUP_B, new Rectangle(3, 4), listenerB);
         colliderA.updatePosition(-5, 0);
         colliderB.updatePosition(5, 0);
-
-        CollisionListener listenerA = new CollisionListener();
-        CollisionListener listenerB = new CollisionListener();
-        colliderA.onCollided.addListener(listenerA);
-        colliderB.onCollided.addListener(listenerB);
 
         collisionSystem.triggerCollisions();
         assertThat(listenerA.getCollisionCount(), equalTo(0));
@@ -119,17 +121,14 @@ public final class CollisionSystemTest {
     @Test
     public void collisionManagerReportsCollisionBetweenCircleAndRectangle() {
         CollisionSystem collisionSystem = new CollisionSystem(2);
+        TestCollisionListener listenerA = new TestCollisionListener();
+        TestCollisionListener listenerB = new TestCollisionListener();
         collisionSystem.registerCollidesWith(GROUP_A, GROUP_B);
         collisionSystem.registerCollidesWith(GROUP_B, GROUP_A);
-        Collider colliderA = collisionSystem.registerShape(GROUP_A, new Circle(5));
-        Collider colliderB = collisionSystem.registerShape(GROUP_B, new Rectangle(3, 4));
+        Collider colliderA = collisionSystem.registerShape(GROUP_A, new Circle(5), listenerA);
+        Collider colliderB = collisionSystem.registerShape(GROUP_B, new Rectangle(3, 4), listenerB);
         colliderA.updatePosition(-5, 0);
         colliderB.updatePosition(5, 0);
-
-        CollisionListener listenerA = new CollisionListener();
-        CollisionListener listenerB = new CollisionListener();
-        colliderA.onCollided.addListener(listenerA);
-        colliderB.onCollided.addListener(listenerB);
 
         collisionSystem.triggerCollisions();
         assertThat(listenerA.getCollisionCount(), equalTo(0));
@@ -144,16 +143,13 @@ public final class CollisionSystemTest {
     @Test
     public void collisionGroupsCanCollideWithThemselves() {
         CollisionSystem collisionSystem = new CollisionSystem(2);
+        TestCollisionListener listenerA = new TestCollisionListener();
+        TestCollisionListener listenerB = new TestCollisionListener();
         collisionSystem.registerCollidesWith(GROUP_A, GROUP_A);
-        Collider colliderA = collisionSystem.registerShape(GROUP_A, new Circle(5));
-        Collider colliderB = collisionSystem.registerShape(GROUP_A, new Circle(3));
+        Collider colliderA = collisionSystem.registerShape(GROUP_A, new Circle(5), listenerA);
+        Collider colliderB = collisionSystem.registerShape(GROUP_A, new Circle(3), listenerB);
         colliderA.updatePosition(0, 0);
         colliderB.updatePosition(0, 0);
-
-        CollisionListener listenerA = new CollisionListener();
-        CollisionListener listenerB = new CollisionListener();
-        colliderA.onCollided.addListener(listenerA);
-        colliderB.onCollided.addListener(listenerB);
 
         collisionSystem.triggerCollisions();
         assertThat(listenerA.getCollisionCount(), equalTo(1));

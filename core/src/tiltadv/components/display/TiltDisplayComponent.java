@@ -58,7 +58,7 @@ public final class TiltDisplayComponent extends AbstractComponent {
     }
 
     @Override
-    protected void resetComponent() {
+    public void reset() {
         arrowSprite = null;
         observedEntity = null;
 

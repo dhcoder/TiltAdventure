@@ -14,10 +14,6 @@ public final class TiltComponent extends AbstractComponent {
     private static final float MAX_TILT_VECTOR_LEN = 2.8f;
     private final Vector2 tilt = new Vector2();
 
-    public TiltComponent() {
-        resetComponent();
-    }
-
     public Vector2 getTilt() { return tilt; }
 
     public TiltComponent setTilt(final Vector2 tilt) {
@@ -28,7 +24,7 @@ public final class TiltComponent extends AbstractComponent {
     }
 
     @Override
-    protected void resetComponent() {
+    public void reset() {
         tilt.setZero();
     }
 }

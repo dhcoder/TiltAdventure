@@ -30,7 +30,7 @@ public final class LifetimeComponent extends AbstractComponent {
     }
 
     @Override
-    protected void resetComponent() {
+    public void reset() {
         owner = null;
         elapsedSoFar.reset();
         lifetime.reset();

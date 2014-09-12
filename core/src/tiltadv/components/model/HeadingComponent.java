@@ -28,7 +28,7 @@ public final class HeadingComponent extends AbstractComponent {
     }
 
     @Override
-    protected void resetComponent() {
+    public void reset() {
         heading.reset();
     }
 }

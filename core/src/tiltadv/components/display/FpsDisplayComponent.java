@@ -54,7 +54,7 @@ public final class FpsDisplayComponent extends AbstractComponent {
     }
 
     @Override
-    protected void resetComponent() {
+    public void reset() {
         transformComponent = null;
     }
 }

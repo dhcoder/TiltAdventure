@@ -41,6 +41,10 @@ public final class CharacterDisplayComponent extends AbstractComponent {
     private HeadingComponent headingComponent;
     private SpriteComponent spriteComponent;
 
+    CharacterDisplayComponent() {
+        reset();
+    }
+
     public CharacterDisplayComponent set(final Animation animS, final Animation animE, final Animation animN,
         final Animation animW) {
         return set(animS, null, animE, null, animN, null, animW, null, true);
@@ -90,7 +94,7 @@ public final class CharacterDisplayComponent extends AbstractComponent {
     }
 
     @Override
-    protected void resetComponent() {
+    public void reset() {
         animS = null;
         animSE = null;
         animE = null;
@@ -114,8 +118,6 @@ public final class CharacterDisplayComponent extends AbstractComponent {
     private CharacterDisplayComponent set(final Animation animS, final Animation animSE, final Animation animE,
         final Animation animNE, final Animation animN, final Animation animNW, final Animation animW,
         final Animation animSW, final boolean isCardinal) {
-
-        resetComponent();
 
         this.animS = animS;
         this.animSE = animSE;

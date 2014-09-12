@@ -19,13 +19,5 @@ public abstract class AbstractComponent implements Component {
     public void render(final Batch batch) {}
 
     @Override
-    public void dispose() {}
-
-    @Override
-    public final void reset() {
-        dispose();
-        resetComponent();
-    }
-
-    protected abstract void resetComponent();
+    public void reset() {}
 }

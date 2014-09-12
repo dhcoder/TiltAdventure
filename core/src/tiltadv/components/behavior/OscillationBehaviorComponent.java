@@ -20,9 +20,7 @@ public final class OscillationBehaviorComponent extends AbstractComponent {
     private boolean onReturnTrip;
     private TransformComponent transformComponent;
 
-    public OscillationBehaviorComponent() {
-        resetComponent();
-    }
+    public OscillationBehaviorComponent() { reset(); }
 
     public OscillationBehaviorComponent set(final Vector2 from, final Vector2 to, final Duration duration) {
         this.from.set(from);
@@ -57,7 +55,7 @@ public final class OscillationBehaviorComponent extends AbstractComponent {
     }
 
     @Override
-    protected void resetComponent() {
+    public void reset() {
         from.setZero();
         to.setZero();
         duration.setZero();

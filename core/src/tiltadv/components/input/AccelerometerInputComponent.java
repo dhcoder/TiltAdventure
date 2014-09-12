@@ -79,7 +79,7 @@ public final class AccelerometerInputComponent extends AbstractComponent {
     }
 
     @Override
-    protected void resetComponent() {
+    public void reset() {
         isTiltActivated = false;
 
         Events.onScreenTouchDown.removeListener(touchDownListener);

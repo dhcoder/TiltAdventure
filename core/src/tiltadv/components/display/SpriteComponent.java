@@ -81,7 +81,7 @@ public final class SpriteComponent extends AbstractComponent {
     }
 
     @Override
-    protected void resetComponent() {
+    public void reset() {
         sprite.setTexture(null);
         hidden = false;
 

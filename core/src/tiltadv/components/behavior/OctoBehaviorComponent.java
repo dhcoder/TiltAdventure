@@ -50,7 +50,7 @@ public final class OctoBehaviorComponent extends AbstractComponent {
 
     public OctoBehaviorComponent() {
         octoState = createStateMachine();
-        resetComponent();
+        reset();
     }
 
     @Override
@@ -72,7 +72,7 @@ public final class OctoBehaviorComponent extends AbstractComponent {
     }
 
     @Override
-    protected void resetComponent() {
+    public void reset() {
         octoState.reset();
         followupEvent = Evt.MOVE;
         remainingDuration.setZero();

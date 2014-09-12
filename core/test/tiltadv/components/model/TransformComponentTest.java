@@ -11,7 +11,7 @@ public final class TransformComponentTest {
 
     @Test
     public void defaultComponentHasExpectedValues() {
-        TransformComponent transformComponent = new TransformComponent.Builder().build();
+        TransformComponent transformComponent = new TransformComponent();
 
         assertThat(transformComponent.getTranslate(), equalTo(new Vector2(0f, 0f)));
         assertThat(transformComponent.getScale(), equalTo(new Vector2(1f, 1f)));
@@ -24,7 +24,7 @@ public final class TransformComponentTest {
         Vector2 sneakyScale = new Vector2(1f, 1f);
 
         TransformComponent transformComponent =
-            new TransformComponent.Builder().setTranslate(sneakyTranslate).setScale(sneakyScale).build();
+            new TransformComponent().setTranslate(sneakyTranslate).setScale(sneakyScale);
 
         sneakyTranslate.set(123f, -456f);
         assertThat(transformComponent.getTranslate(), equalTo(new Vector2(0f, 0f)));
@@ -35,7 +35,7 @@ public final class TransformComponentTest {
 
     @Test
     public void settingComponentValuesWorks() {
-        TransformComponent transformComponent = new TransformComponent.Builder().build();
+        TransformComponent transformComponent = new TransformComponent();
 
         Vector2 newTranslate = new Vector2(123f, -456f);
         transformComponent.setTranslate(newTranslate);

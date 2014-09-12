@@ -29,7 +29,7 @@ public final class SizeComponent extends AbstractComponent {
     }
 
     @Override
-    protected void resetComponent() {
+    public void reset() {
         size.setZero();
     }
 }
