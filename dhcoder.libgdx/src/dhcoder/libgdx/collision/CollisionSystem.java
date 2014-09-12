@@ -213,11 +213,12 @@ public final class CollisionSystem {
                 Collision collision = collisionPool.grabNew();
                 collision.set(sourceCollider, targetCollider);
                 collisions.put(collision.getKey(), collision);
-                sourceCollider.fireNewCollision(collision);
+                sourceCollider.fireCollision(collision);
             }
-//            else {
-//                // TODO: Report continued collision in progress
-//            }
+            else {
+                Collision collision = collisions.get(key);
+                sourceCollider.fireOverlapping(collision);
+            }
         }
         else if (collisions.containsKey(key)) {
             Collision collision = collisions.remove(key);

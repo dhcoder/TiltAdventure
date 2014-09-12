@@ -118,8 +118,12 @@ public final class Collider implements Poolable {
     }
 
     // Should only be called by CollisionSystem
-    void fireNewCollision(final Collision collision) {
+    void fireCollision(final Collision collision) {
         listener.onCollided(collision);
+    }
+
+    void fireOverlapping(final Collision collision) {
+        listener.onOverlapping(collision);
     }
 
     // Should only be called by CollisionSystem

@@ -31,14 +31,25 @@ public final class EnemyCollisionComponent extends CollisionComponent {
             collisionSystem.extractSourceCollider(collision);
         }
         else if (groupId == Group.PLAYER) {
-            Entity playerEntity = (Entity)collision.getTarget().getTag().getValue();
-            PlayerBehaviorComponent playerBehavior = playerEntity.requireComponent(PlayerBehaviorComponent.class);
-
-            Vector2 collisionDirection = Pools.vector2s.grabNew();
-            collision.getRepulsionBetweenColliders(collisionDirection);
-            collisionDirection.nor().scl(-1f); // Flip this to the point of view of the player.
-            playerBehavior.takeDamage(collisionDirection);
-            Pools.vector2s.free(collisionDirection);
+            handlePlayerCollision(collision);
         }
+    }
+
+    @Override
+    protected void handleOverlapping(final Collision collision) {
+        final int groupId = collision.getTarget().getGroupId();
+        if (groupId == Group.PLAYER) {
+            handlePlayerCollision(collision);
+        }
+    }
+
+    private void handlePlayerCollision(final Collision collision) {Entity playerEntity = (Entity)collision.getTarget().getTag().getValue();
+        PlayerBehaviorComponent playerBehavior = playerEntity.requireComponent(PlayerBehaviorComponent.class);
+
+        Vector2 collisionDirection = Pools.vector2s.grabNew();
+        collision.getRepulsionBetweenColliders(collisionDirection);
+        collisionDirection.nor().scl(-1f); // Flip this to the point of view of the player.
+        playerBehavior.takeDamage(collisionDirection);
+        Pools.vector2s.free(collisionDirection);
     }
 }

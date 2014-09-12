@@ -53,7 +53,7 @@ public abstract class CollisionComponent extends AbstractComponent implements Co
     }
 
     @Override
-    public void dispose() {
+    public final void dispose() {
         CollisionSystem collisionSystem = Services.get(CollisionSystem.class);
         collisionSystem.release(collider);
         collider = null;
@@ -66,14 +66,13 @@ public abstract class CollisionComponent extends AbstractComponent implements Co
     }
 
     @Override
-    public final void onCollided(final Collision collision) {
-        handleCollided(collision);
-    }
+    public final void onCollided(final Collision collision) { handleCollided(collision); }
 
     @Override
-    public final void onSeparated(final Collision collision) {
-        handleSeparated(collision);
-    }
+    public final void onOverlapping(final Collision collision) { handleOverlapping(collision); }
+
+    @Override
+    public final void onSeparated(final Collision collision) { handleSeparated(collision); }
 
     @Override
     public final void onReverted(final Collision collision) {
@@ -84,6 +83,8 @@ public abstract class CollisionComponent extends AbstractComponent implements Co
     }
 
     protected void handleCollided(final Collision collision) {}
+
+    protected void handleOverlapping(final Collision collision) {}
 
     protected void handleSeparated(final Collision collision) {}
 
