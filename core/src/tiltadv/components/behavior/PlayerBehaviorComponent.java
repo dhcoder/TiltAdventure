@@ -82,10 +82,16 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
         }
     }
 
+    public boolean canTakeDamage()
+    {
+        return !isInvincible;
+    }
+
     public boolean takeDamage(final Vector2 damageVector) {
-        if (isInvincible) {
+        if (!canTakeDamage()) {
             return false;
         }
+
         playerState.handleEvent(Evt.TAKE_DAMAGE, damageVector);
         Vibrator vibrator = Services.get(Vibrator.class);
         vibrator.vibrate(Vibrator.QUICK);

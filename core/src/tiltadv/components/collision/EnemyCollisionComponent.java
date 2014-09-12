@@ -47,6 +47,10 @@ public final class EnemyCollisionComponent extends CollisionComponent {
         Entity playerEntity = (Entity)collision.getTarget().getTag().getValue();
         PlayerBehaviorComponent playerBehavior = playerEntity.requireComponent(PlayerBehaviorComponent.class);
 
+        if (!playerBehavior.canTakeDamage()) {
+            return;
+        }
+        
         Vector2 collisionDirection = Pools.vector2s.grabNew();
         collision.getRepulsionBetweenColliders(collisionDirection);
         collisionDirection.nor().scl(-1f); // Flip this to the point of view of the player.
