@@ -43,7 +43,8 @@ public final class EnemyCollisionComponent extends CollisionComponent {
         }
     }
 
-    private void handlePlayerCollision(final Collision collision) {Entity playerEntity = (Entity)collision.getTarget().getTag().getValue();
+    private void handlePlayerCollision(final Collision collision) {
+        Entity playerEntity = (Entity)collision.getTarget().getTag().getValue();
         PlayerBehaviorComponent playerBehavior = playerEntity.requireComponent(PlayerBehaviorComponent.class);
 
         Vector2 collisionDirection = Pools.vector2s.grabNew();
