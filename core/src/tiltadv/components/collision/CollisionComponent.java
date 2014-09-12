@@ -24,6 +24,7 @@ public abstract class CollisionComponent extends AbstractComponent implements Co
     private final int groupId;
     private Collider collider;
     private TransformComponent transformComponent;
+    private Vector2 offset = new Vector2();
 
     public CollisionComponent(final int groupId) {
         this.groupId = groupId;
@@ -37,19 +38,35 @@ public abstract class CollisionComponent extends AbstractComponent implements Co
         return this;
     }
 
+    public Collider getCollider() {
+        return collider;
+    }
+
+    public Vector2 getOffset() {
+        return offset;
+    }
+
+    public CollisionComponent setOffset(final Vector2 offset) {
+        this.offset.set(offset);
+        return this;
+    }
+
     @Override
     public final void initialize(final Entity owner) {
         transformComponent = owner.requireComponent(TransformComponent.class);
         collider.setTag(owner);
+        handleInitialize(owner);
     }
 
     @Override
     public final void update(final Duration elapsedTime) {
         if (collider == null) {
-            return;
+            return; // This can happen if this component was freed during an update loop
         }
 
-        collider.updatePosition(transformComponent.getTranslate().x, transformComponent.getTranslate().y);
+        handleUpdate(elapsedTime);
+        collider.updatePosition(transformComponent.getTranslate().x + offset.x,
+            transformComponent.getTranslate().y + offset.y);
     }
 
     @Override
@@ -62,6 +79,8 @@ public abstract class CollisionComponent extends AbstractComponent implements Co
     @Override
     protected final void resetComponent() {
         transformComponent = null;
+        offset.setZero();
+
         handleReset();
     }
 
@@ -82,6 +101,10 @@ public abstract class CollisionComponent extends AbstractComponent implements Co
         transformComponent.setTranslate(translate);
         Pools.vector2s.freeToMark(mark);
     }
+
+    protected void handleInitialize(final Entity owner) {}
+
+    protected void handleUpdate(final Duration elapsedTime) {}
 
     protected void handleCollided(final Collision collision) {}
 

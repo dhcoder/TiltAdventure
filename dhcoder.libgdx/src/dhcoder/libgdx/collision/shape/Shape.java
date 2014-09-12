@@ -13,6 +13,8 @@ public interface Shape extends Poolable {
     float getBottom(float yOrigin);
     float getRight(float xOrigin);
     float getTop(float yOrigin);
+    float getHalfWidth();
+    float getHalfHeight();
 
     void render(ShapeRenderer renderer, float x, float y);
 }

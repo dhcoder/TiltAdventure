@@ -29,6 +29,28 @@ public final class Rectangle implements Shape {
     }
 
     @Override
+    public float getLeft(final float xOrigin) { return xOrigin - halfWidth; }
+
+    @Override
+    public float getBottom(final float yOrigin) { return yOrigin - halfHeight; }
+
+    @Override
+    public float getRight(final float xOrigin) { return xOrigin + halfWidth; }
+
+    @Override
+    public float getTop(final float yOrigin) { return yOrigin + halfHeight; }
+
+    @Override
+    public float getHalfWidth() {
+        return halfWidth;
+    }
+
+    @Override
+    public float getHalfHeight() {
+        return halfHeight;
+    }
+
+    @Override
     public void render(final ShapeRenderer renderer, final float x, final float y) {
         renderer.rect(x - halfWidth, y - halfHeight, halfWidth * 2, halfHeight * 2);
     }
@@ -48,26 +70,6 @@ public final class Rectangle implements Shape {
         this.halfHeight = halfHeight;
         return this;
     }
-
-    public float getHalfWidth() {
-        return halfWidth;
-    }
-
-    public float getHalfHeight() {
-        return halfHeight;
-    }
-
-    @Override
-    public float getLeft(final float xOrigin) { return xOrigin - halfWidth; }
-
-    @Override
-    public float getBottom(final float yOrigin) { return yOrigin - halfHeight; }
-
-    @Override
-    public float getRight(final float xOrigin) { return xOrigin + halfWidth; }
-
-    @Override
-    public float getTop(final float yOrigin) { return yOrigin + halfHeight; }
 
     @Override
     public String toString() {

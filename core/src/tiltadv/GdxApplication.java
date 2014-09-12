@@ -25,14 +25,24 @@ import tiltadv.components.collision.EnemyCollisionComponent;
 import tiltadv.components.collision.EnemyProjectileCollisionComponent;
 import tiltadv.components.collision.ObstacleCollisionComponent;
 import tiltadv.components.collision.PlayerCollisionComponent;
+import tiltadv.components.collision.PlayerSensorCollisionComponent;
 import tiltadv.components.display.CharacterDisplayComponent;
 import tiltadv.components.display.FpsDisplayComponent;
 import tiltadv.components.display.SpriteComponent;
 import tiltadv.components.display.TiltDisplayComponent;
 import tiltadv.components.input.AccelerometerInputComponent;
 import tiltadv.components.input.KeyboardInputComponent;
-import tiltadv.components.model.*;
-import tiltadv.globals.*;
+import tiltadv.components.model.HeadingComponent;
+import tiltadv.components.model.MotionComponent;
+import tiltadv.components.model.SizeComponent;
+import tiltadv.components.model.TiltComponent;
+import tiltadv.components.model.TransformComponent;
+import tiltadv.globals.Animations;
+import tiltadv.globals.DevSettings;
+import tiltadv.globals.EntityId;
+import tiltadv.globals.Events;
+import tiltadv.globals.Services;
+import tiltadv.globals.Tiles;
 import tiltadv.input.Vibrator;
 import tiltadv.memory.Pools;
 
@@ -57,6 +67,7 @@ public final class GdxApplication extends ApplicationAdapter {
 
     private Shape octoBounds;
     private Shape playerBounds;
+    private Shape playerSensorBounds;
     private Shape octoRockBounds;
     private Shape boulderBounds;
 
@@ -138,6 +149,7 @@ public final class GdxApplication extends ApplicationAdapter {
 
         octoBounds = new Circle(Tiles.OCTOUP1.getRegionWidth() / 2f);
         playerBounds = new Circle(Tiles.LINKUP1.getRegionWidth() / 2f);
+        playerSensorBounds = playerBounds;
         octoRockBounds = new Circle(Tiles.ROCK.getRegionWidth() / 2f);
         boulderBounds = new Circle(Tiles.BOULDER.getRegionWidth() / 2f);
 
@@ -164,6 +176,8 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(entities.newComponent(CharacterDisplayComponent.class)
                     .set(Animations.PLAYER_S, Animations.PLAYER_E, Animations.PLAYER_N, Animations.PLAYER_W));
                 entity.addComponent(entities.newComponent(PlayerCollisionComponent.class).setShape(playerBounds));
+                entity.addComponent(
+                    entities.newComponent(PlayerSensorCollisionComponent.class).setShape(playerSensorBounds));
             }
         });
 
