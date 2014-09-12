@@ -76,10 +76,11 @@ public abstract class CollisionComponent extends AbstractComponent implements Co
 
     @Override
     public final void onReverted(final Collision collision) {
+        int mark = Pools.vector2s.mark();
         Vector2 translate = Pools.vector2s.grabNew();
         translate.set(collider.getCurrPosition().x, collider.getCurrPosition().y);
         transformComponent.setTranslate(translate);
-        Pools.vector2s.free(translate);
+        Pools.vector2s.freeToMark(mark);
     }
 
     protected void handleCollided(final Collision collision) {}
