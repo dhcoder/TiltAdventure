@@ -3,12 +3,12 @@ package tiltadv.components.behavior;
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
-import dhcoder.libgdx.entity.EntityManager;
 import dhcoder.support.math.CardinalDirection;
 import dhcoder.support.opt.Opt;
 import dhcoder.support.state.StateMachine;
 import dhcoder.support.state.StateTransitionHandler;
 import dhcoder.support.time.Duration;
+import tiltadv.components.combat.HealthComponent;
 import tiltadv.components.model.HeadingComponent;
 import tiltadv.components.model.MotionComponent;
 import tiltadv.components.model.TransformComponent;
@@ -20,8 +20,7 @@ import java.util.Random;
 /**
  * Component that maintains the state and logic of the octo enemy.
  */
-public final class OctoBehaviorComponent extends AbstractComponent {
-
+public final class OctoBehaviorComponent extends AbstractComponent implements HealthComponent.Listener {
     private enum State {
         WAITING,
         MOVING,
@@ -42,8 +41,7 @@ public final class OctoBehaviorComponent extends AbstractComponent {
     private final Duration remainingDuration = Duration.zero();
     private final StateMachine<State, Evt> octoState;
     private Evt followupEvent;
-
-    private EntityManager entityManager;
+    private Entity owner;
     private HeadingComponent headingComponent;
     private MotionComponent motionComponent;
     private TransformComponent transformComponent;
@@ -54,8 +52,18 @@ public final class OctoBehaviorComponent extends AbstractComponent {
     }
 
     @Override
+    public void onHurt() {
+
+    }
+
+    @Override
+    public void onDied() {
+        owner.getManager().freeEntity(owner);
+    }
+
+    @Override
     public void initialize(final Entity owner) {
-        entityManager = owner.getManager();
+        this.owner = owner;
 
         headingComponent = owner.requireComponent(HeadingComponent.class);
         motionComponent = owner.requireComponent(MotionComponent.class);
@@ -79,7 +87,7 @@ public final class OctoBehaviorComponent extends AbstractComponent {
         followupEvent = Evt.MOVE;
         remainingDuration.setZero();
 
-        entityManager = null;
+        owner = null;
         headingComponent = null;
         motionComponent = null;
         transformComponent = null;
@@ -107,7 +115,7 @@ public final class OctoBehaviorComponent extends AbstractComponent {
         fsm.registerEvent(State.WAITING, Evt.SHOOT, new StateTransitionHandler<State, Evt>() {
             @Override
             public State run(final State fromState, final Evt withEvent, final Opt eventData) {
-                final Entity rock = entityManager.newEntityFromTemplate(EntityId.OCTO_ROCK);
+                final Entity rock = owner.getManager().newEntityFromTemplate(EntityId.OCTO_ROCK);
                 final MotionComponent rockMotion = rock.requireComponent(MotionComponent.class);
                 final TransformComponent rockPosition = rock.requireComponent(TransformComponent.class);
                 rockPosition.setTranslate(transformComponent.getTranslate());

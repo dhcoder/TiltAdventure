@@ -81,8 +81,7 @@ public final class Entity implements Poolable {
             }
         }
 
-        throw new IllegalStateException(
-            format("Entity doesn't have any instances of {0}, should have at least 1", classType));
+        throw new IllegalStateException(format("Entity doesn't have any instances of {0}", classType));
     }
 
     /**

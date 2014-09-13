@@ -4,7 +4,8 @@ import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.collision.Collision;
 import dhcoder.libgdx.collision.CollisionSystem;
 import dhcoder.libgdx.entity.Entity;
-import tiltadv.components.behavior.PlayerBehaviorComponent;
+import tiltadv.components.combat.AttackComponent;
+import tiltadv.components.combat.HealthComponent;
 import tiltadv.globals.Group;
 import tiltadv.globals.Services;
 import tiltadv.memory.Pools;
@@ -17,6 +18,18 @@ public final class EnemyCollisionComponent extends CollisionComponent {
     static {
         CollisionSystem collisionSystem = Services.get(CollisionSystem.class);
         collisionSystem.registerCollidesWith(Group.ENEMY, Group.OBSTACLES | Group.PLAYER);
+    }
+
+    private AttackComponent attackComponent;
+
+    @Override
+    protected void handleInitialize(final Entity owner) {
+        attackComponent = owner.requireComponent(AttackComponent.class);
+    }
+
+    @Override
+    protected void handleReset() {
+        attackComponent = null;
     }
 
     public EnemyCollisionComponent() {
@@ -45,15 +58,15 @@ public final class EnemyCollisionComponent extends CollisionComponent {
 
     private void handlePlayerCollision(final Collision collision) {
         Entity playerEntity = (Entity)collision.getTarget().getTag().getValue();
-        PlayerBehaviorComponent playerBehavior = playerEntity.requireComponent(PlayerBehaviorComponent.class);
-        if (!playerBehavior.canTakeDamage()) {
+        HealthComponent playerHealth = playerEntity.requireComponent(HealthComponent.class);
+        if (!playerHealth.canTakeDamage()) {
             return;
         }
 
         Vector2 collisionDirection = Pools.vector2s.grabNew();
         collision.getRepulsionBetweenColliders(collisionDirection);
         collisionDirection.nor().scl(-1f); // Flip this to the point of view of the player.
-        playerBehavior.takeDamage(collisionDirection);
+        playerHealth.takeDamage(collisionDirection, attackComponent.getStrength());
         Pools.vector2s.free(collisionDirection);
     }
 }

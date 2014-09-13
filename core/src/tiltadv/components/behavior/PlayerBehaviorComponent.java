@@ -7,7 +7,7 @@ import dhcoder.support.opt.Opt;
 import dhcoder.support.state.StateMachine;
 import dhcoder.support.state.StateTransitionHandler;
 import dhcoder.support.time.Duration;
-import tiltadv.components.display.SpriteComponent;
+import tiltadv.components.combat.HealthComponent;
 import tiltadv.components.model.HeadingComponent;
 import tiltadv.components.model.MotionComponent;
 import tiltadv.components.model.TiltComponent;
@@ -18,7 +18,7 @@ import tiltadv.memory.Pools;
 /**
  * Component that maintains the state and logic of the main player's avatar.
  */
-public final class PlayerBehaviorComponent extends AbstractComponent {
+public final class PlayerBehaviorComponent extends AbstractComponent implements HealthComponent.Listener {
 
     private enum State {
         STANDING,
@@ -27,25 +27,20 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
     }
 
     private enum Evt {
-        TAKE_DAMAGE,
+        PARALYZE,
         UPDATE,
     }
 
     private static final float TILT_MULTIPLIER = 70f;
-    private static final float KNOCKBACK_MULTIPLIER = 150f;
     private static final Duration STOP_DURATION = Duration.fromSeconds(.3f);
     private static final Duration FROZEN_DURATION = Duration.fromSeconds(.3f);
     private static final Duration INVINCIBLE_DURATION = Duration.fromSeconds(3f);
 
     private final StateMachine<State, Evt> playerState;
     private final Duration frozenDuration = Duration.zero();
-    private final Duration invincibleDuration = Duration.zero();
-
-    private boolean isInvincible;
 
     private HeadingComponent headingComponent;
     private MotionComponent motionComponent;
-    private SpriteComponent spriteComponent;
     private TiltComponent tiltComponent;
 
     public PlayerBehaviorComponent() {
@@ -56,21 +51,14 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
     public void initialize(final Entity owner) {
         headingComponent = owner.requireComponent(HeadingComponent.class);
         motionComponent = owner.requireComponent(MotionComponent.class);
-        spriteComponent = owner.requireComponent(SpriteComponent.class);
         tiltComponent = owner.requireComponent(TiltComponent.class);
+
+        owner.requireComponent(HealthComponent.class).setListener(this);
     }
 
     @Override
     public void update(final Duration elapsedTime) {
         playerState.handleEvent(Evt.UPDATE, elapsedTime);
-
-        if (isInvincible) {
-            invincibleDuration.add(elapsedTime);
-            if (invincibleDuration.getSeconds() >= INVINCIBLE_DURATION.getSeconds()) {
-                invincibleDuration.setZero();
-                setInvincible(false);
-            }
-        }
 
         if (playerState.getCurrentState() == State.MOVING) {
             headingComponent.setHeadingFrom(tiltComponent.getTilt());
@@ -81,33 +69,23 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
     public void reset() {
         playerState.reset();
         frozenDuration.setZero();
-        invincibleDuration.setZero();
-        isInvincible = false;
 
         headingComponent = null;
         motionComponent = null;
-        spriteComponent = null;
         tiltComponent = null;
     }
 
-    public boolean canTakeDamage() {
-        return !isInvincible;
-    }
-
-    public boolean takeDamage(final Vector2 damageVector) {
-        if (!canTakeDamage()) {
-            return false;
-        }
-
-        playerState.handleEvent(Evt.TAKE_DAMAGE, damageVector);
+    @Override
+    public void onHurt() {
+        playerState.handleEvent(Evt.PARALYZE);
         Vibrator vibrator = Services.get(Vibrator.class);
         vibrator.vibrate(Vibrator.QUICK);
-        return true;
     }
 
-    private void setInvincible(final boolean isInvincible) {
-        spriteComponent.setAlpha(isInvincible ? .5f : 1f);
-        this.isInvincible = isInvincible;
+    @Override
+    public void onDied() {
+        // TODO: Handle death later...
+        onHurt();
     }
 
     private StateMachine<State, Evt> createStateMachine() {
@@ -138,20 +116,16 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
             }
         });
 
-        fsm.registerEvent(State.MOVING, Evt.TAKE_DAMAGE, new StateTransitionHandler<State, Evt>() {
+        fsm.registerEvent(State.MOVING, Evt.PARALYZE, new StateTransitionHandler<State, Evt>() {
             @Override
             public State run(final State fromState, final Evt withEvent, final Opt eventData) {
-                Vector2 damageVector = (Vector2)eventData.getValue();
-                knockback(damageVector);
                 return State.PARALYZED;
             }
         });
 
-        fsm.registerEvent(State.STANDING, Evt.TAKE_DAMAGE, new StateTransitionHandler<State, Evt>() {
+        fsm.registerEvent(State.STANDING, Evt.PARALYZE, new StateTransitionHandler<State, Evt>() {
             @Override
             public State run(final State fromState, final Evt withEvent, final Opt eventData) {
-                Vector2 damageVector = (Vector2)eventData.getValue();
-                knockback(damageVector);
                 return State.PARALYZED;
             }
         });
@@ -170,13 +144,5 @@ public final class PlayerBehaviorComponent extends AbstractComponent {
         });
 
         return fsm;
-    }
-
-    private void knockback(final Vector2 direction) {
-        Vector2 impulse = Pools.vector2s.grabNew().set(direction).scl(KNOCKBACK_MULTIPLIER);
-        motionComponent.setImpulse(impulse, STOP_DURATION);
-        Pools.vector2s.free(impulse);
-
-        setInvincible(true);
     }
 }

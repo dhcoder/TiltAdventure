@@ -7,6 +7,7 @@ import dhcoder.libgdx.entity.EntityManager;
  */
 public enum EntityId {
     PLAYER,
+    PLAYER_SWORD,
     OCTO,
     OCTO_ROCK,
     BOULDER,

@@ -13,17 +13,17 @@ import tiltadv.memory.Pools;
 /**
  * Component that maintains the collision logic for the main player's avatar.
  */
-public final class EnemyProjectileCollisionComponent extends CollisionComponent {
+public final class SwordCollisionComponent extends CollisionComponent {
 
     static {
         CollisionSystem collisionSystem = Services.get(CollisionSystem.class);
-        collisionSystem.registerCollidesWith(Group.ENEMY_PROJECTILE, Group.OBSTACLES | Group.PLAYER);
+        collisionSystem.registerCollidesWith(Group.PLAYER_SWORD, Group.ENEMY);
     }
 
     private AttackComponent attackComponent;
 
-    public EnemyProjectileCollisionComponent() {
-        super(Group.ENEMY_PROJECTILE);
+    public SwordCollisionComponent() {
+        super(Group.PLAYER_SWORD);
     }
 
     @Override
@@ -39,9 +39,9 @@ public final class EnemyProjectileCollisionComponent extends CollisionComponent 
     @Override
     protected void handleCollided(final Collision collision) {
 
-        if (collision.getTarget().getGroupId() == Group.PLAYER) {
-            Entity playerEntity = (Entity)collision.getTarget().getTag().getValue();
-            HealthComponent healthComponent = playerEntity.requireComponent(HealthComponent.class);
+        if (collision.getTarget().getGroupId() == Group.ENEMY) {
+            Entity enemyEntity = (Entity)collision.getTarget().getTag().getValue();
+            HealthComponent healthComponent = enemyEntity.requireComponent(HealthComponent.class);
 
             Vector2 collisionDirection = Pools.vector2s.grabNew();
             collision.getRepulsionBetweenColliders(collisionDirection);
@@ -49,9 +49,5 @@ public final class EnemyProjectileCollisionComponent extends CollisionComponent 
             healthComponent.takeDamage(collisionDirection, attackComponent.getStrength());
             Pools.vector2s.free(collisionDirection);
         }
-
-        // Projectile dies on collision
-        Entity sourceEntity = (Entity)collision.getSource().getTag().getValue();
-        sourceEntity.getManager().freeEntity(sourceEntity);
     }
 }
