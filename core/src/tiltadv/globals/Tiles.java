@@ -8,14 +8,14 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
  */
 public final class Tiles {
 
-    public static final TextureRegion PLAYER_S;
-    public static final TextureRegion PLAYER_SE;
-    public static final TextureRegion PLAYER_E;
-    public static final TextureRegion PLAYER_NE;
-    public static final TextureRegion PLAYER_N;
-    public static final TextureRegion PLAYER_NW;
-    public static final TextureRegion PLAYER_W;
-    public static final TextureRegion PLAYER_SW;
+//    public static final TextureRegion PLAYER_S;
+//    public static final TextureRegion PLAYER_SE;
+//    public static final TextureRegion PLAYER_E;
+//    public static final TextureRegion PLAYER_NE;
+//    public static final TextureRegion PLAYER_N;
+//    public static final TextureRegion PLAYER_NW;
+//    public static final TextureRegion PLAYER_W;
+//    public static final TextureRegion PLAYER_SW;
     public static final TextureRegion LINKDOWN1;
     public static final TextureRegion LINKDOWN2;
     public static final TextureRegion LINKLEFT1;
@@ -35,21 +35,21 @@ public final class Tiles {
     public static final TextureRegion RODRIGHT;
     public static final TextureRegion BOULDER;
     public static final TextureRegion ROCK;
+    public static final TextureRegion SWORDRIGHT;
     private static final Texture textureSource;
-    private static final Texture tempTextureSource;
 
     static {
         textureSource = new Texture("Tiles.png");
-        tempTextureSource = new Texture("Dude.png");
-
-        PLAYER_S = new TextureRegion(tempTextureSource, 0, 0, 32, 32);
-        PLAYER_SE = new TextureRegion(tempTextureSource, 32, 0, 32, 32);
-        PLAYER_E = new TextureRegion(tempTextureSource, 64, 0, 32, 32);
-        PLAYER_NE = new TextureRegion(tempTextureSource, 96, 0, 32, 32);
-        PLAYER_N = new TextureRegion(tempTextureSource, 128, 0, 32, 32);
-        PLAYER_NW = new TextureRegion(tempTextureSource, 160, 0, 32, 32);
-        PLAYER_W = new TextureRegion(tempTextureSource, 192, 0, 32, 32);
-        PLAYER_SW = new TextureRegion(tempTextureSource, 224, 0, 32, 32);
+//        tempTextureSource = new Texture("Dude.png");
+//
+//        PLAYER_S = new TextureRegion(tempTextureSource, 0, 0, 32, 32);
+//        PLAYER_SE = new TextureRegion(tempTextureSource, 32, 0, 32, 32);
+//        PLAYER_E = new TextureRegion(tempTextureSource, 64, 0, 32, 32);
+//        PLAYER_NE = new TextureRegion(tempTextureSource, 96, 0, 32, 32);
+//        PLAYER_N = new TextureRegion(tempTextureSource, 128, 0, 32, 32);
+//        PLAYER_NW = new TextureRegion(tempTextureSource, 160, 0, 32, 32);
+//        PLAYER_W = new TextureRegion(tempTextureSource, 192, 0, 32, 32);
+//        PLAYER_SW = new TextureRegion(tempTextureSource, 224, 0, 32, 32);
 
         LINKDOWN1 = new TextureRegion(textureSource, 0, 0, 16, 16);
         LINKDOWN2 = new TextureRegion(textureSource, 0, 30, 16, 16);
@@ -71,12 +71,13 @@ public final class Tiles {
 
         BOULDER = new TextureRegion(textureSource, 120, 0, 16, 16);
         ROCK = new TextureRegion(textureSource, 120, 30, 8, 10);
+        SWORDRIGHT = new TextureRegion(textureSource, 120, 60, 12, 7);
     }
 
     public static void dispose() {
         // TODO: Use asset manager instead
         textureSource.dispose();
-        tempTextureSource.dispose();
+//        tempTextureSource.dispose();
     }
 
     private Tiles() { } // Disabled constructor
