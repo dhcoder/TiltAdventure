@@ -9,8 +9,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 public final class EntityTest {
 
-    private final class DummyComponent extends AbstractComponent {
-
+    private static final class DummyComponent extends AbstractComponent {
         private Entity owner;
 
         public Entity getOwner() {
@@ -26,12 +25,12 @@ public final class EntityTest {
     /**
      * This class exists only to be found by a {@link DependentComponent}
      */
-    private final class SourceComponent extends AbstractComponent {}
+    private static final class SourceComponent extends AbstractComponent {}
 
     /**
      * This component expects to find a {@link SourceComponent} on the {@link Entity} it's attached to.
      */
-    private final class DependentComponent extends AbstractComponent {
+    private static final class DependentComponent extends AbstractComponent {
 
         private SourceComponent sourceComponent;
 
@@ -45,32 +44,21 @@ public final class EntityTest {
         }
     }
 
-    /**
-     * This component asserts that it is the only one that exists on an entity
-     */
-    private final class SingletonComponent extends AbstractComponent {
-
-        private boolean initialized;
-
-        public boolean isInitialized() {
-            return initialized;
-        }
-
-        @Override
-        public void initialize(final Entity owner) {
-            SingletonComponent singletonComponent = owner.requireComponent(SingletonComponent.class);
-            assertThat(singletonComponent, equalTo(this));
-            initialized = true;
-        }
-
+    @Test
+    public void managerCanCreateEntities() {
+        EntityManager manager = new EntityManager(1);
+        Entity entity = manager.newEntity();
+        assertThat(entity.getManager(), equalTo(manager));
     }
 
     @Test
     public void componentGetsInitializedWithItsOwningEntityOnFirstUpdate() {
-        DummyComponent dummyComponent = new DummyComponent();
+        EntityManager manager = new EntityManager(1);
+
+        DummyComponent dummyComponent = manager.newComponent(DummyComponent.class);
         assertThat(dummyComponent.getOwner(), equalTo(null));
 
-        Entity entity = new Entity();
+        Entity entity = manager.newEntity();
         entity.addComponent(dummyComponent);
         assertThat(dummyComponent.getOwner(), equalTo(null));
 
@@ -79,10 +67,13 @@ public final class EntityTest {
     }
 
     @Test
-    public void getComponentReturnsExpectedValues() {
-        DummyComponent dummyComponent = new DummyComponent();
-        SourceComponent sourceComponent = new SourceComponent();
-        final Entity entity = new Entity();
+    public void requireComponentReturnsExpectedValues() {
+        EntityManager manager = new EntityManager(1);
+
+        DummyComponent dummyComponent = manager.newComponent(DummyComponent.class);
+        SourceComponent sourceComponent = manager.newComponent(SourceComponent.class);
+
+        final Entity entity = manager.newEntity();
         entity.addComponent(dummyComponent).addComponent(sourceComponent);
         entity.update(Duration.zero());
         assertThat(entity.requireComponent(DummyComponent.class), equalTo(dummyComponent));
@@ -98,9 +89,12 @@ public final class EntityTest {
 
     @Test
     public void dependantComponentCanFindOtherComponent() {
-        SourceComponent sourceComponent = new SourceComponent();
-        DependentComponent dependantComponent = new DependentComponent();
-        Entity entity = new Entity();
+        EntityManager manager = new EntityManager(1);
+
+        SourceComponent sourceComponent = manager.newComponent(SourceComponent.class);
+        DependentComponent dependantComponent = manager.newComponent(DependentComponent.class);
+        Entity entity = manager.newEntity();
+
         entity.addComponent(sourceComponent).addComponent(dependantComponent);
         entity.update(Duration.zero());
         assertThat(sourceComponent, equalTo(dependantComponent.getSourceComponent()));
@@ -108,12 +102,15 @@ public final class EntityTest {
 
     @Test
     public void dependantComponentCanFindOtherComponent_EntityConstructedReverseOrder() {
-        SourceComponent sourceComponent = new SourceComponent();
-        DependentComponent dependentComponent = new DependentComponent();
-        // Constructor order shouldn't matter here, even if we pass in dependantComponent first
-        Entity entity = new Entity();
-        entity.addComponent(dependentComponent).addComponent(sourceComponent);
+        EntityManager manager = new EntityManager(1);
+
+        SourceComponent sourceComponent = manager.newComponent(SourceComponent.class);
+        DependentComponent dependantComponent = manager.newComponent(DependentComponent.class);
+
+        // Component order shouldn't matter here, even if we pass in dependantComponent first
+        Entity entity = manager.newEntity();
+        entity.addComponent(dependantComponent).addComponent(sourceComponent);
         entity.update(Duration.zero());
-        assertThat(sourceComponent, equalTo(dependentComponent.getSourceComponent()));
+        assertThat(sourceComponent, equalTo(dependantComponent.getSourceComponent()));
     }
 }

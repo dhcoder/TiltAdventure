@@ -4,7 +4,6 @@ import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.collision.Collision;
 import dhcoder.libgdx.collision.CollisionSystem;
 import dhcoder.libgdx.entity.Entity;
-import dhcoder.libgdx.entity.EntityManager;
 import tiltadv.components.behavior.PlayerBehaviorComponent;
 import tiltadv.globals.Group;
 import tiltadv.globals.Services;
@@ -39,8 +38,7 @@ public final class EnemyProjectileCollisionComponent extends CollisionComponent 
         }
 
         // Projectile dies on collision
-        EntityManager entities = Services.get(EntityManager.class);
         Entity sourceEntity = (Entity)collision.getSource().getTag().getValue();
-        entities.freeEntity(sourceEntity);
+        sourceEntity.getManager().freeEntity(sourceEntity);
     }
 }

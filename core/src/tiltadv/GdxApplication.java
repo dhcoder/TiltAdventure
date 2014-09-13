@@ -139,13 +139,13 @@ public final class GdxApplication extends ApplicationAdapter {
         collisionSystem = new CollisionSystem(ENTITY_COUNT);
         Services.register(CollisionSystem.class, collisionSystem);
 
-        entities = new EntityManager(ENTITY_COUNT);
-        Services.register(EntityManager.class, entities);
 
         Services.register(Vibrator.class, new Vibrator());
     }
 
     private void initializeEntities() {
+
+        entities = new EntityManager(ENTITY_COUNT);
 
         octoBounds = new Circle(Tiles.OCTOUP1.getRegionWidth() / 2f);
         playerBounds = new Circle(Tiles.LINKUP1.getRegionWidth() / 2f);

@@ -29,7 +29,18 @@ public final class EntityManager {
     private final Pool<Opt> optPool = Pool.of(Opt.class, 1);
 
     public EntityManager(final int maxEntityCount) {
-        entityPool = Pool.of(Entity.class, maxEntityCount);
+        final EntityManager manager = this; // For assigning within a closure
+        entityPool = new Pool<Entity>(new Pool.AllocateMethod<Entity>() {
+            @Override
+            public Entity run() {
+                return new Entity(manager);
+            }
+        }, new Pool.ResetMethod<Entity>() {
+            @Override
+            public void run(final Entity item) {
+                item.reset();
+            }
+        }, maxEntityCount);
         queuedForRemoval = new Stack<Entity>();
         queuedForRemoval.ensureCapacity(maxEntityCount / 10);
         componentPools = new ArrayMap<Class, Pool>(32);
@@ -88,6 +99,10 @@ public final class EntityManager {
         return (C)componentPools.get(componentClass).grabNew();
     }
 
+    /**
+     * Call when you are done with this entity and want to release its resources. If an update cycle is in progress,
+     * it will be freed after the cycle has finished.
+     */
     public void freeEntity(final Entity entity) {
         // It's possible that this method can get called more than once before we have a chance to actually remove the
         // entity, so we guard against that here.
@@ -137,7 +152,7 @@ public final class EntityManager {
     }
 
     private void freeEntityInternal(final Entity entity) {
-        entity.freeComponents(this);
+        entity.freeComponents();
         entityPool.free(entity);
     }
 }

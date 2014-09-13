@@ -12,17 +12,26 @@ import static dhcoder.support.text.StringUtils.format;
 
 /**
  * A skeletal game object whose behavior is implemented by {@link Component}s.
+ * <p/>
+ * Allocate an entity and its components through a manager, using {@link EntityManager#newEntity()},
+ * {@link EntityManager#newEntityFromTemplate(Enum)}, and {@link EntityManager#newComponent(Class)}. You can then
+ * free an entity and its components by calling {@link EntityManager#freeEntity(Entity)}.
  */
 public final class Entity implements Poolable {
 
     // Map a component's type to the component itself
     private final List<Component> components = new ArrayList<Component>();
+    private final EntityManager manager;
     private boolean initialized;
 
     /**
      * Restricted access - use {@link EntityManager#newEntity} instead.
      */
-    Entity() {}
+    Entity(final EntityManager manager) { this.manager = manager; }
+
+    public EntityManager getManager() {
+        return manager;
+    }
 
     /**
      * Add a component to the entity. You can safely add components after you've created an entity but before you call
@@ -113,10 +122,11 @@ public final class Entity implements Poolable {
         initialized = false;
     }
 
-    void freeComponents(final EntityManager entityManager) {
+    // Called by EntityManager
+    void freeComponents() {
         int numComponents = components.size(); // Simple iteration to avoid Iterator allocation
         for (int i = 0; i < numComponents; ++i) {
-            entityManager.freeComponent(components.get(i));
+            manager.freeComponent(components.get(i));
         }
     }
 

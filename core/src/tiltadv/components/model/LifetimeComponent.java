@@ -2,9 +2,7 @@ package tiltadv.components.model;
 
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
-import dhcoder.libgdx.entity.EntityManager;
 import dhcoder.support.time.Duration;
-import tiltadv.globals.Services;
 
 /**
  * Component that regulates the lifetime of an object, killing it after a certain about of time passes.
@@ -24,8 +22,7 @@ public final class LifetimeComponent extends AbstractComponent {
     public void update(final Duration elapsedTime) {
         elapsedSoFar.add(elapsedTime);
         if (elapsedSoFar.getSeconds() > lifetime.getSeconds()) {
-            EntityManager entities = Services.get(EntityManager.class);
-            entities.freeEntity(owner);
+            owner.getManager().freeEntity(owner);
         }
     }
 

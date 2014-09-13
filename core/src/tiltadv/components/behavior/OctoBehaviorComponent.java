@@ -13,7 +13,6 @@ import tiltadv.components.model.HeadingComponent;
 import tiltadv.components.model.MotionComponent;
 import tiltadv.components.model.TransformComponent;
 import tiltadv.globals.EntityId;
-import tiltadv.globals.Services;
 import tiltadv.memory.Pools;
 
 import java.util.Random;
@@ -44,6 +43,7 @@ public final class OctoBehaviorComponent extends AbstractComponent {
     private final StateMachine<State, Evt> octoState;
     private Evt followupEvent;
 
+    private EntityManager entityManager;
     private HeadingComponent headingComponent;
     private MotionComponent motionComponent;
     private TransformComponent transformComponent;
@@ -55,6 +55,8 @@ public final class OctoBehaviorComponent extends AbstractComponent {
 
     @Override
     public void initialize(final Entity owner) {
+        entityManager = owner.getManager();
+
         headingComponent = owner.requireComponent(HeadingComponent.class);
         motionComponent = owner.requireComponent(MotionComponent.class);
         transformComponent = owner.requireComponent(TransformComponent.class);
@@ -77,6 +79,7 @@ public final class OctoBehaviorComponent extends AbstractComponent {
         followupEvent = Evt.MOVE;
         remainingDuration.setZero();
 
+        entityManager = null;
         headingComponent = null;
         motionComponent = null;
         transformComponent = null;
@@ -104,7 +107,6 @@ public final class OctoBehaviorComponent extends AbstractComponent {
         fsm.registerEvent(State.WAITING, Evt.SHOOT, new StateTransitionHandler<State, Evt>() {
             @Override
             public State run(final State fromState, final Evt withEvent, final Opt eventData) {
-                final EntityManager entityManager = Services.get(EntityManager.class);
                 final Entity rock = entityManager.newEntityFromTemplate(EntityId.OCTO_ROCK);
                 final MotionComponent rockMotion = rock.requireComponent(MotionComponent.class);
                 final TransformComponent rockPosition = rock.requireComponent(TransformComponent.class);
