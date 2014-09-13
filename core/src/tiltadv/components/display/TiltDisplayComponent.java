@@ -26,9 +26,10 @@ public final class TiltDisplayComponent extends AbstractComponent {
      * Create a tilt indicator by passing in a sprite which represents an arrow facing straight right. This component
      * will rotate and render the arrow appropriately.
      */
-    public TiltDisplayComponent(final TextureRegion arrowTexture, final Entity observedEntity) {
+    public TiltDisplayComponent set(final TextureRegion arrowTexture, final Entity observedEntity) {
         this.arrowSprite = arrowTexture;
         this.observedEntity = observedEntity;
+        return this;
     }
 
     @Override

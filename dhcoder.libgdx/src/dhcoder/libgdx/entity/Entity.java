@@ -40,13 +40,14 @@ public final class Entity implements Poolable {
      * @throws IllegalStateException if you try to add a component to an entity that's already in use (that is, has
      *                               been updated at least once).
      */
-    public Entity addComponent(final Component component) {
+    public <C extends Component> C addComponent(final Class<C> componentClass) {
         if (initialized) {
             throw new IllegalStateException("Can't add a component to an Entity that's already in use.");
         }
 
+        C component = manager.newComponent(componentClass);
         this.components.add(component);
-        return this;
+        return component;
     }
 
     /**

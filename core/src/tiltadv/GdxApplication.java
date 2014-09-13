@@ -139,7 +139,6 @@ public final class GdxApplication extends ApplicationAdapter {
         collisionSystem = new CollisionSystem(ENTITY_COUNT);
         Services.register(CollisionSystem.class, collisionSystem);
 
-
         Services.register(Vibrator.class, new Vibrator());
     }
 
@@ -162,50 +161,46 @@ public final class GdxApplication extends ApplicationAdapter {
         entities.registerTemplate(EntityId.PLAYER, new EntityManager.EntityCreator() {
             @Override
             public void initialize(final Entity entity) {
-                entity.addComponent(entities.newComponent(TransformComponent.class));
-                entity.addComponent(entities.newComponent(SpriteComponent.class));
-                entity.addComponent(entities.newComponent(HeadingComponent.class));
-                SizeComponent sizeComponent = entities.newComponent(SizeComponent.class).setSizeFrom(Tiles.LINKDOWN1);
-                entity.addComponent(sizeComponent);
-                entity.addComponent(entities.newComponent(MotionComponent.class));
-                entity.addComponent(entities.newComponent(TiltComponent.class));
-                entity.addComponent(Gdx.app.getType() == ApplicationType.Android ?
-                    entities.newComponent(AccelerometerInputComponent.class) :
-                    entities.newComponent(KeyboardInputComponent.class));
-                entity.addComponent(entities.newComponent(PlayerBehaviorComponent.class));
-                entity.addComponent(entities.newComponent(CharacterDisplayComponent.class)
-                    .set(Animations.PLAYER_S, Animations.PLAYER_E, Animations.PLAYER_N, Animations.PLAYER_W));
-                entity.addComponent(entities.newComponent(PlayerCollisionComponent.class).setShape(playerBounds));
-                entity.addComponent(
-                    entities.newComponent(PlayerSensorCollisionComponent.class).setShape(playerSensorBounds));
+                entity.addComponent(TransformComponent.class);
+                entity.addComponent(SpriteComponent.class);
+                entity.addComponent(HeadingComponent.class);
+                entity.addComponent(SizeComponent.class).setSizeFrom(Tiles.LINKDOWN1);
+                entity.addComponent(MotionComponent.class);
+                entity.addComponent(TiltComponent.class);
+                entity.addComponent(Gdx.app.getType() == ApplicationType.Android ? AccelerometerInputComponent.class :
+                    KeyboardInputComponent.class);
+                entity.addComponent(PlayerBehaviorComponent.class);
+                entity.addComponent(CharacterDisplayComponent.class)
+                    .set(Animations.PLAYER_S, Animations.PLAYER_E, Animations.PLAYER_N, Animations.PLAYER_W);
+                entity.addComponent(PlayerCollisionComponent.class).setShape(playerBounds);
+                entity.addComponent(PlayerSensorCollisionComponent.class).setShape(playerSensorBounds);
             }
         });
 
         entities.registerTemplate(EntityId.OCTO, new EntityManager.EntityCreator() {
             @Override
             public void initialize(final Entity entity) {
-                entity.addComponent(entities.newComponent(TransformComponent.class));
-                entity.addComponent(entities.newComponent(SpriteComponent.class));
-                entity.addComponent(entities.newComponent(HeadingComponent.class));
-                entity.addComponent(entities.newComponent(SizeComponent.class).setSizeFrom(Tiles.OCTODOWN1));
-                entity.addComponent(entities.newComponent(MotionComponent.class));
-                entity.addComponent(entities.newComponent(OctoBehaviorComponent.class));
-                entity.addComponent(entities.newComponent(CharacterDisplayComponent.class)
-                    .set(Animations.OCTODOWN, Animations.OCTORIGHT, Animations.OCTOUP, Animations.OCTOLEFT));
-                entity.addComponent(entities.newComponent(EnemyCollisionComponent.class).setShape(octoBounds));
+                entity.addComponent(TransformComponent.class);
+                entity.addComponent(SpriteComponent.class);
+                entity.addComponent(HeadingComponent.class);
+                entity.addComponent(SizeComponent.class).setSizeFrom(Tiles.OCTODOWN1);
+                entity.addComponent(MotionComponent.class);
+                entity.addComponent(OctoBehaviorComponent.class);
+                entity.addComponent(CharacterDisplayComponent.class)
+                    .set(Animations.OCTODOWN, Animations.OCTORIGHT, Animations.OCTOUP, Animations.OCTOLEFT);
+                entity.addComponent(EnemyCollisionComponent.class).setShape(octoBounds);
             }
         });
 
         entities.registerTemplate(EntityId.OCTO_ROCK, new EntityManager.EntityCreator() {
             @Override
             public void initialize(final Entity entity) {
-                entity.addComponent(entities.newComponent(TransformComponent.class));
-                entity.addComponent(entities.newComponent(SpriteComponent.class).setTextureRegion(Tiles.ROCK));
-                entity.addComponent(entities.newComponent(HeadingComponent.class));
-                entity.addComponent(entities.newComponent(SizeComponent.class).setSizeFrom(Tiles.ROCK));
-                entity.addComponent(entities.newComponent(MotionComponent.class));
-                entity.addComponent(
-                    entities.newComponent(EnemyProjectileCollisionComponent.class).setShape(octoRockBounds));
+                entity.addComponent(TransformComponent.class);
+                entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.ROCK);
+                entity.addComponent(HeadingComponent.class);
+                entity.addComponent(SizeComponent.class).setSizeFrom(Tiles.ROCK);
+                entity.addComponent(MotionComponent.class);
+                entity.addComponent(EnemyProjectileCollisionComponent.class).setShape(octoRockBounds);
             }
         });
 
@@ -256,20 +251,20 @@ public final class GdxApplication extends ApplicationAdapter {
         final Shape horizontalWall = new Rectangle(halfScreenW, halfWallSize);
 
         wallPos.set(left, 0f);
-        wallLeft.addComponent(entities.newComponent(TransformComponent.class).setTranslate(wallPos));
-        wallLeft.addComponent(entities.newComponent(ObstacleCollisionComponent.class).setShape(verticalWall));
+        wallLeft.addComponent(TransformComponent.class).setTranslate(wallPos);
+        wallLeft.addComponent(ObstacleCollisionComponent.class).setShape(verticalWall);
 
         wallPos.set(right, 0f);
-        wallRight.addComponent(entities.newComponent(TransformComponent.class).setTranslate(wallPos));
-        wallRight.addComponent(entities.newComponent(ObstacleCollisionComponent.class).setShape(verticalWall));
+        wallRight.addComponent(TransformComponent.class).setTranslate(wallPos);
+        wallRight.addComponent(ObstacleCollisionComponent.class).setShape(verticalWall);
 
         wallPos.set(0f, bottom);
-        wallBottom.addComponent(entities.newComponent(TransformComponent.class).setTranslate(wallPos));
-        wallBottom.addComponent(entities.newComponent(ObstacleCollisionComponent.class).setShape(horizontalWall));
+        wallBottom.addComponent(TransformComponent.class).setTranslate(wallPos);
+        wallBottom.addComponent(ObstacleCollisionComponent.class).setShape(horizontalWall);
 
         wallPos.set(0f, top);
-        wallTop.addComponent(entities.newComponent(TransformComponent.class).setTranslate(wallPos));
-        wallTop.addComponent(entities.newComponent(ObstacleCollisionComponent.class).setShape(horizontalWall));
+        wallTop.addComponent(TransformComponent.class).setTranslate(wallPos);
+        wallTop.addComponent(ObstacleCollisionComponent.class).setShape(horizontalWall);
 
         Pools.vector2s.free(wallPos);
     }
@@ -321,30 +316,30 @@ public final class GdxApplication extends ApplicationAdapter {
     private void AddMovingBoulderEntity(final float xFrom, final float yFrom, final float xTo, final float yTo) {
 
         Entity boulderEntity = entities.newEntity();
-        boulderEntity.addComponent(entities.newComponent(SpriteComponent.class).setTextureRegion(Tiles.BOULDER));
-        boulderEntity.addComponent(entities.newComponent(SizeComponent.class).setSizeFrom(Tiles.BOULDER));
-        boulderEntity.addComponent(entities.newComponent(TransformComponent.class));
-        boulderEntity.addComponent(entities.newComponent(OscillationBehaviorComponent.class)
-            .set(new Vector2(xFrom, yFrom), new Vector2(xTo, yTo), Duration.fromSeconds(2f)));
-        boulderEntity.addComponent(entities.newComponent(ObstacleCollisionComponent.class).setShape(boulderBounds));
+        boulderEntity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.BOULDER);
+        boulderEntity.addComponent(SizeComponent.class).setSizeFrom(Tiles.BOULDER);
+        boulderEntity.addComponent(TransformComponent.class);
+        boulderEntity.addComponent(OscillationBehaviorComponent.class)
+            .set(new Vector2(xFrom, yFrom), new Vector2(xTo, yTo), Duration.fromSeconds(2f));
+        boulderEntity.addComponent(ObstacleCollisionComponent.class).setShape(boulderBounds);
     }
 
     private void addFpsEntity() {
         Entity fpsEntity = entities.newEntity();
-        fpsEntity.addComponent(entities.newComponent(TransformComponent.class)
-            .setTranslate(new Vector2(-VIEWPORT_WIDTH / 2, -VIEWPORT_HEIGHT / 2 + font.getLineHeight())));
-        fpsEntity.addComponent(entities.newComponent(FpsDisplayComponent.class).set(font));
+        fpsEntity.addComponent(TransformComponent.class)
+            .setTranslate(new Vector2(-VIEWPORT_WIDTH / 2, -VIEWPORT_HEIGHT / 2 + font.getLineHeight()));
+        fpsEntity.addComponent(FpsDisplayComponent.class).set(font);
     }
 
     private void addTiltIndicatorEntity(final Entity playerEntity) {
         Entity tiltIndicatorEntity = entities.newEntity();
 
         final float MARGIN = 5f;
-        tiltIndicatorEntity.addComponent(entities.newComponent(TransformComponent.class).setTranslate(
+        tiltIndicatorEntity.addComponent(TransformComponent.class).setTranslate(
             new Vector2(VIEWPORT_WIDTH / 2 - Tiles.RODRIGHT.getRegionWidth() - MARGIN,
-                VIEWPORT_HEIGHT / 2 - Tiles.RODRIGHT.getRegionHeight() - MARGIN)));
-        tiltIndicatorEntity.addComponent(entities.newComponent(SpriteComponent.class));
-        tiltIndicatorEntity.addComponent(entities.newComponent(SizeComponent.class).setSizeFrom(Tiles.RODRIGHT));
-        tiltIndicatorEntity.addComponent(new TiltDisplayComponent(Tiles.RODRIGHT, playerEntity));
+                VIEWPORT_HEIGHT / 2 - Tiles.RODRIGHT.getRegionHeight() - MARGIN));
+        tiltIndicatorEntity.addComponent(SpriteComponent.class);
+        tiltIndicatorEntity.addComponent(SizeComponent.class).setSizeFrom(Tiles.RODRIGHT);
+        tiltIndicatorEntity.addComponent(TiltDisplayComponent.class).set(Tiles.RODRIGHT, playerEntity);
     }
 }
