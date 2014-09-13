@@ -90,6 +90,7 @@ public final class Pool<T> {
     private final ArrayList<T> itemsInUse;
     private boolean resizable;
     private int capacity;
+    private int maxCapacity;
 
     public Pool(final AllocateMethod<T> allocate, final ResetMethod<T> reset) {
         this(allocate, reset, DEFAULT_CAPACITY);
@@ -104,6 +105,9 @@ public final class Pool<T> {
         this.reset = reset;
         this.capacity = capacity;
 
+        resizable = false;
+        maxCapacity = capacity;
+
         freeItems = new Stack<T>();
         freeItems.ensureCapacity(capacity);
         itemsInUse = new ArrayList<T>(capacity);
@@ -111,16 +115,23 @@ public final class Pool<T> {
         for (int i = 0; i < capacity; i++) {
             freeItems.push(allocate.run());
         }
-
-        this.resizable = false; // TODO: This should default to true for production builds
     }
 
-    public Pool setResizable(final boolean resizable) {
-        this.resizable = resizable;
+    public Pool makeResizable(final int maxCapacity) {
+        if (maxCapacity < capacity) {
+            throw new IllegalArgumentException(
+                format("Can't set pool's max capacity {0} smaller than its current capactiy {1}", maxCapacity,
+                    capacity));
+        }
+
+        resizable = true;
+        this.maxCapacity = maxCapacity;
         return this;
     }
 
     public int getCapacity() { return capacity; }
+
+    public int getMaxCapacity() { return maxCapacity; }
 
     public List<T> getItemsInUse() {
         return itemsInUse;
@@ -131,14 +142,15 @@ public final class Pool<T> {
     public T grabNew() {
         if (getRemainingCount() == 0) {
 
-            if (!resizable) {
+            if (!resizable || capacity == maxCapacity) {
                 throw new IllegalStateException(
                     format("Requested too many items from this pool (capacity: {0}) - are you forgetting to free some?",
                         capacity));
             }
 
             int oldCapacity = capacity;
-            capacity *= 2;
+            capacity = Math.min(capacity * 2, maxCapacity);
+
             freeItems.ensureCapacity(capacity);
             itemsInUse.ensureCapacity(capacity);
 
@@ -163,7 +175,7 @@ public final class Pool<T> {
 
     public void freeCount(final int count) {
         int indexToFree = itemsInUse.size() - 1;
-        for (int i = 0; i < count; ++i) {
+        for (int i = count - 1; i >= 0; --i) {
             T item = itemsInUse.get(indexToFree);
             returnItemToPool(item);
             itemsInUse.remove(indexToFree);

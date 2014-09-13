@@ -93,7 +93,8 @@ public final class EntityManager {
 
     public <C extends Component> C newComponent(final Class<C> componentClass) {
         if (!componentPools.containsKey(componentClass)) {
-            componentPools.put(componentClass, Pool.of(componentClass, Pool.DEFAULT_CAPACITY).setResizable(true));
+            componentPools.put(componentClass,
+                Pool.of(componentClass, Pool.DEFAULT_CAPACITY).makeResizable(entityPool.getMaxCapacity()));
         }
 
         return (C)componentPools.get(componentClass).grabNew();

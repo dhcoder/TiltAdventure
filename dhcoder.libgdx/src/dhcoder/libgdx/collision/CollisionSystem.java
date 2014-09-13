@@ -38,7 +38,7 @@ public final class CollisionSystem {
     private final Pool<Collision> collisionPool;
     private final Pool<Vector2> vectorPool = Vector2PoolBuilder.build(2);
     private final Pool<ColliderKey> colliderKeyPool = Pool.of(ColliderKey.class, 1);
-    private final Pool<CollisionRegion> regionPool = Pool.of(CollisionRegion.class, 20).setResizable(true);
+    private final Pool<CollisionRegion> regionPool = Pool.of(CollisionRegion.class, 20).makeResizable(200);
     private final Pool<IntCoord> intCoordPool = Pool.of(IntCoord.class, 3);
 
     private final int[] collidesWith; // group -> bitmask of groups it collides with
