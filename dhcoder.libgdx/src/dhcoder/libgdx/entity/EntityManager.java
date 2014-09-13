@@ -39,11 +39,10 @@ public final class EntityManager {
     public void registerTemplate(final Enum id, final EntityCreator entityCreator) {
         Opt<EntityCreator> entityCreatorOpt = optPool.grabNew();
         getEntityCreator(id, entityCreatorOpt);
-        optPool.free(entityCreatorOpt);
-
         if (entityCreatorOpt.hasValue()) {
             throw new IllegalArgumentException(format("Attempt to register duplicate entity template id {0}", id));
         }
+        optPool.free(entityCreatorOpt);
 
         templates.put(new IntKey(id.ordinal()), entityCreator);
     }
