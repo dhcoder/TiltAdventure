@@ -17,10 +17,17 @@ public final class Collider implements Poolable {
 
     private CollisionSystem system;
     private int groupId;
-    private boolean isActive;
+    private boolean isInitialized;
+    private boolean isEnabled;
     private Shape shape;
     private Opt tag = Opt.withNoValue(); // Extra data associated with this collider
     private CollisionListener listener;
+
+    /**
+     * Restricted access - use {@link CollisionSystem#registerShape(int, Shape, CollisionListener)} to create a
+     * collider.
+     */
+    Collider() { reset(); }
 
     /**
      * Returns optional data associated with this collider.
@@ -34,7 +41,11 @@ public final class Collider implements Poolable {
     }
 
     public boolean isActive() {
-        return isActive;
+        return isInitialized && isEnabled;
+    }
+
+    public void setEnabled(final boolean isEnabled) {
+        this.isEnabled = isEnabled;
     }
 
     public Shape getShape() {
@@ -66,7 +77,7 @@ public final class Collider implements Poolable {
     }
 
     public void updatePosition(final float x, final float y) {
-        if (isActive) {
+        if (isInitialized) {
             if (lastPosition.epsilonEquals(x, y, 0f)) {
                 return;
             }
@@ -75,8 +86,8 @@ public final class Collider implements Poolable {
             currPosition.set(x, y);
             system.addColliderIntoRegions(this);
         }
-        if (!isActive) {
-            isActive = true;
+        if (!isInitialized) {
+            isInitialized = true;
             currPosition.set(x, y);
             lastPosition.set(currPosition);
             system.addColliderIntoRegions(this);
@@ -89,7 +100,8 @@ public final class Collider implements Poolable {
         system = null;
         shape = null;
         groupId = -1;
-        isActive = false;
+        isInitialized = false;
+        isEnabled = true;
         listener = null;
     }
 
@@ -98,18 +110,17 @@ public final class Collider implements Poolable {
      * #updatePosition(float, float)} for the first time.
      */
     // Should only be called by CollisionSystem
-    void initialize(final CollisionSystem system, final int groupId, final Shape shape,
-        final CollisionListener listener) {
+    void set(final CollisionSystem system, final int groupId, final Shape shape, final CollisionListener listener) {
         this.system = system;
         this.groupId = groupId;
         this.shape = shape;
-        isActive = false;
+        isInitialized = false;
         this.listener = listener;
     }
 
     // Should only be called by CollisionSystem
     boolean collidesWith(final Collider otherCollider) {
-        if (!isActive || !otherCollider.isActive || otherCollider == this) {
+        if (!isActive() || !otherCollider.isActive() || otherCollider == this) {
             return false;
         }
 

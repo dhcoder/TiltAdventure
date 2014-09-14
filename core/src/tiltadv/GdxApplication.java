@@ -153,7 +153,7 @@ public final class GdxApplication extends ApplicationAdapter {
 
         octoBounds = new Circle(Tiles.OCTOUP1.getRegionWidth() / 2f);
         playerBounds = new Circle(Tiles.LINKUP1.getRegionWidth() / 2f);
-        playerSensorBounds = playerBounds;
+        playerSensorBounds = new Circle(Tiles.SWORDRIGHT.getRegionWidth() / 2f);
         playerSwordBounds = new Circle(2f);
         octoRockBounds = new Circle(Tiles.ROCK.getRegionWidth() / 2f);
         boulderBounds = new Circle(Tiles.BOULDER.getRegionWidth() / 2f);
@@ -187,12 +187,12 @@ public final class GdxApplication extends ApplicationAdapter {
         entities.registerTemplate(EntityId.PLAYER_SWORD, new EntityManager.EntityCreator() {
             @Override
             public void initialize(final Entity entity) {
-                entity.addComponent(AttackComponent.class);
                 entity.addComponent(SwordCollisionComponent.class).setShape(playerSwordBounds);
+                entity.addComponent(SwordBehaviorComponent.class);
+                entity.addComponent(AttackComponent.class);
                 entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.SWORDRIGHT);
                 entity.addComponent(TransformComponent.class);
                 entity.addComponent(SizeComponent.class).setSizeFrom(Tiles.SWORDRIGHT);
-                entity.addComponent(SwordBehaviorComponent.class);
             }
         });
 

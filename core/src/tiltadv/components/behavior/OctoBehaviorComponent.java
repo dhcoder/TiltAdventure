@@ -52,9 +52,7 @@ public final class OctoBehaviorComponent extends AbstractComponent implements He
     }
 
     @Override
-    public void onHurt() {
-
-    }
+    public void onHurt() {}
 
     @Override
     public void onDied() {

@@ -37,14 +37,6 @@ public final class Entity implements Poolable {
         return manager;
     }
 
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(final boolean active) {
-        this.active = active;
-    }
-
     /**
      * Add a component to the entity. You can safely add components after you've created an entity but before you call
      * {@link #update(Duration)} for the very first time.
@@ -104,10 +96,6 @@ public final class Entity implements Poolable {
             initialize();
         }
 
-        if (!active) {
-            return;
-        }
-
         int numComponents = components.size(); // Simple iteration to avoid Iterator allocation
         for (int i = 0; i < numComponents; ++i) {
             components.get(i).update(elapsedTime);
@@ -126,10 +114,6 @@ public final class Entity implements Poolable {
             return;
         }
 
-        if (!active) {
-            return;
-        }
-
         int numComponents = components.size(); // Simple iteration to avoid Iterator allocation
         for (int i = 0; i < numComponents; ++i) {
             components.get(i).render(batch);
@@ -140,7 +124,6 @@ public final class Entity implements Poolable {
     public void reset() {
         components.clear();
         initialized = false;
-        active = true;
     }
 
     // Called by EntityManager

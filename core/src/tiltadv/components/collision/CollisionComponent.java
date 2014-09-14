@@ -36,6 +36,10 @@ public abstract class CollisionComponent extends AbstractComponent implements Co
         return this;
     }
 
+    public final Shape getShape() {
+        return collider.getShape();
+    }
+
     public Collider getCollider() {
         return collider;
     }

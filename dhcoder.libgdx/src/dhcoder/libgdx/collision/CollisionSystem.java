@@ -75,7 +75,7 @@ public final class CollisionSystem {
         int groupIndex = groupIdToIndex(groupId);
 
         Collider collider = colliderPool.grabNew();
-        collider.initialize(this, groupId, shape, listener);
+        collider.set(this, groupId, shape, listener);
         groups.get(groupIndex).add(collider);
 
         return collider;
@@ -144,6 +144,9 @@ public final class CollisionSystem {
         int numColliders = colliders.size();
         for (int i = 0; i < numColliders; i++) {
             Collider collider = colliders.get(i);
+//            if (!collider.isActive()) {
+//                continue;
+//            }
             Vector2 pos = collider.getCurrPosition();
             collider.getShape().render(renderer, pos.x, pos.y);
         }

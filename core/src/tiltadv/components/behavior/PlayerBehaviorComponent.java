@@ -90,7 +90,7 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
     public void onHurt() {
         playerState.handleEvent(Evt.PARALYZE);
         Vibrator vibrator = Services.get(Vibrator.class);
-        vibrator.vibrate(Vibrator.QUICK);
+        vibrator.vibrate(Vibrator.SHORT);
     }
 
     @Override

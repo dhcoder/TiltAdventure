@@ -12,7 +12,7 @@ public final class Vibrator {
     /**
      * A duration to use with {@link #vibrate(Duration)} for a quick vibration burst (50 ms)
      */
-    public static final Duration QUICK = Duration.fromMilliseconds(50);
+    public static final Duration SHORT = Duration.fromMilliseconds(50);
 
     /**
      * A duration to use with {@link #vibrate(Duration)} for a moderate vibration (200 ms)
