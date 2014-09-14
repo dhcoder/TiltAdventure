@@ -32,9 +32,7 @@ public abstract class CollisionComponent extends AbstractComponent implements Co
 
     public final CollisionComponent setShape(final Shape shape) {
         CollisionSystem collisionSystem = Services.get(CollisionSystem.class);
-
         collider = collisionSystem.registerShape(groupId, shape, this);
-
         return this;
     }
 
@@ -53,6 +51,10 @@ public abstract class CollisionComponent extends AbstractComponent implements Co
 
     @Override
     public final void initialize(final Entity owner) {
+        if (collider == null) {
+            throw new IllegalStateException("Collider not set. Did you call setShape?");
+        }
+
         transformComponent = owner.requireComponent(TransformComponent.class);
         collider.setTag(owner);
         handleInitialize(owner);
@@ -97,6 +99,10 @@ public abstract class CollisionComponent extends AbstractComponent implements Co
         translate.set(collider.getCurrPosition().x, collider.getCurrPosition().y);
         transformComponent.setTranslate(translate);
         Pools.vector2s.freeToMark(mark);
+    }
+
+    protected TransformComponent getTransformComponent() {
+        return transformComponent;
     }
 
     protected void handleInitialize(final Entity owner) {}

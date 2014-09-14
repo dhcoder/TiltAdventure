@@ -68,6 +68,8 @@ public final class OctoBehaviorComponent extends AbstractComponent implements He
         headingComponent = owner.requireComponent(HeadingComponent.class);
         motionComponent = owner.requireComponent(MotionComponent.class);
         transformComponent = owner.requireComponent(TransformComponent.class);
+
+        owner.requireComponent(HealthComponent.class).setListener(this);
     }
 
     @Override

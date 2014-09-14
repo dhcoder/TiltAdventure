@@ -7,10 +7,12 @@ import dhcoder.support.opt.Opt;
 import dhcoder.support.state.StateMachine;
 import dhcoder.support.state.StateTransitionHandler;
 import dhcoder.support.time.Duration;
+import tiltadv.components.collision.PlayerSensorCollisionComponent;
 import tiltadv.components.combat.HealthComponent;
 import tiltadv.components.model.HeadingComponent;
 import tiltadv.components.model.MotionComponent;
 import tiltadv.components.model.TiltComponent;
+import tiltadv.globals.EntityId;
 import tiltadv.globals.Services;
 import tiltadv.input.Vibrator;
 import tiltadv.memory.Pools;
@@ -34,11 +36,12 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
     private static final float TILT_MULTIPLIER = 70f;
     private static final Duration STOP_DURATION = Duration.fromSeconds(.3f);
     private static final Duration FROZEN_DURATION = Duration.fromSeconds(.3f);
-    private static final Duration INVINCIBLE_DURATION = Duration.fromSeconds(3f);
 
     private final StateMachine<State, Evt> playerState;
     private final Duration frozenDuration = Duration.zero();
 
+    private Entity owner;
+    private Entity swordEntity;
     private HeadingComponent headingComponent;
     private MotionComponent motionComponent;
     private TiltComponent tiltComponent;
@@ -49,11 +52,14 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
 
     @Override
     public void initialize(final Entity owner) {
+        this.owner = owner;
         headingComponent = owner.requireComponent(HeadingComponent.class);
         motionComponent = owner.requireComponent(MotionComponent.class);
         tiltComponent = owner.requireComponent(TiltComponent.class);
-
         owner.requireComponent(HealthComponent.class).setListener(this);
+
+        swordEntity = owner.getManager().newEntityFromTemplate(EntityId.PLAYER_SWORD);
+        owner.requireComponent(PlayerSensorCollisionComponent.class).setSwordEntity(swordEntity);
     }
 
     @Override
@@ -67,6 +73,10 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
 
     @Override
     public void reset() {
+        owner.getManager().freeEntity(swordEntity);
+        swordEntity = null;
+        owner = null;
+
         playerState.reset();
         frozenDuration.setZero();
 

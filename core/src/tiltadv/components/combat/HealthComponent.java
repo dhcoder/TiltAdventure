@@ -3,7 +3,6 @@ package tiltadv.components.combat;
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
-import dhcoder.support.opt.Opt;
 import dhcoder.support.time.Duration;
 import tiltadv.components.display.SpriteComponent;
 import tiltadv.components.model.MotionComponent;
@@ -22,12 +21,13 @@ public final class HealthComponent extends AbstractComponent {
 
     private static final float KNOCKBACK_MULTIPLIER = 150f;
     private static final Duration STOP_DURATION = Duration.fromSeconds(.3f);
-    private static final Duration INVINCIBLE_DURATION = Duration.fromSeconds(3f);
+    private static final Duration DEFAULT_INVINCIBLE_DURATION = Duration.fromSeconds(2f);
 
     private final Duration invincibleDuration = Duration.zero();
-    private final Opt<Listener> listenerOpt = Opt.withNoValue();
+    private final Duration invincibleElapsed = Duration.zero();
     public int health;
     private boolean isInvincible;
+    private Listener listener;
     private DefenseComponent defenseComponent;
     private MotionComponent motionComponent;
     private SpriteComponent spriteComponent;
@@ -35,11 +35,11 @@ public final class HealthComponent extends AbstractComponent {
     public HealthComponent() { reset(); }
 
     public Listener getListener() {
-        return listenerOpt.getValue();
+        return listener;
     }
 
     public HealthComponent setListener(final Listener listener) {
-        listenerOpt.set(listener);
+        this.listener = listener;
         return this;
     }
 
@@ -52,8 +52,17 @@ public final class HealthComponent extends AbstractComponent {
         return this;
     }
 
+    public HealthComponent setInvicibilityDuration(final Duration duration) {
+        invincibleDuration.setFrom(duration);
+        return this;
+    }
+
     @Override
     public void initialize(final Entity owner) {
+        if (listener == null) {
+            throw new IllegalStateException("HealthComponent listener must be set!");
+        }
+
         defenseComponent = owner.requireComponent(DefenseComponent.class);
         motionComponent = owner.requireComponent(MotionComponent.class);
         spriteComponent = owner.requireComponent(SpriteComponent.class);
@@ -62,9 +71,9 @@ public final class HealthComponent extends AbstractComponent {
     @Override
     public void update(final Duration elapsedTime) {
         if (isInvincible) {
-            invincibleDuration.add(elapsedTime);
-            if (invincibleDuration.getSeconds() >= INVINCIBLE_DURATION.getSeconds()) {
-                invincibleDuration.setZero();
+            invincibleElapsed.add(elapsedTime);
+            if (invincibleElapsed.getSeconds() >= invincibleDuration.getSeconds()) {
+                invincibleElapsed.setZero();
                 setInvincible(false);
             }
         }
@@ -73,9 +82,13 @@ public final class HealthComponent extends AbstractComponent {
     @Override
     public void reset() {
         health = 1;
-        invincibleDuration.setZero();
+        invincibleElapsed.setZero();
+        invincibleDuration.setFrom(DEFAULT_INVINCIBLE_DURATION);
         isInvincible = false;
+        listener = null;
         defenseComponent = null;
+        motionComponent = null;
+        spriteComponent = null;
     }
 
     public boolean canTakeDamage() {
@@ -90,7 +103,6 @@ public final class HealthComponent extends AbstractComponent {
         knockback(damageVector);
         health = Math.max(0, health - defenseComponent.reduceDamage(damage));
 
-        Listener listener = listenerOpt.getValue();
         if (health > 0) {
             listener.onHurt();
         }

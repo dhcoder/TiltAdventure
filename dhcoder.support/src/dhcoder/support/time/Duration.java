@@ -31,6 +31,12 @@ public final class Duration implements Poolable {
         return duration;
     }
 
+    public static Duration from(final Duration duration) {
+        Duration clonsedDuration = new Duration();
+        clonsedDuration.setFrom(duration);
+        return clonsedDuration;
+    }
+
     private float seconds;
 
     /**

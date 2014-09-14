@@ -6,9 +6,9 @@ import dhcoder.libgdx.collision.Collision;
 import dhcoder.libgdx.collision.CollisionSystem;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.time.Duration;
-import tiltadv.components.behavior.PlayerBehaviorComponent;
 import tiltadv.components.model.HeadingComponent;
 import tiltadv.components.model.SizeComponent;
+import tiltadv.components.model.TransformComponent;
 import tiltadv.globals.Group;
 import tiltadv.globals.Services;
 import tiltadv.memory.Pools;
@@ -23,30 +23,54 @@ public final class PlayerSensorCollisionComponent extends CollisionComponent {
         collisionSystem.registerCollidesWith(Group.PLAYER_SENSOR, Group.ENEMY);
     }
 
-    private PlayerBehaviorComponent playerBehaviorComponent;
     private HeadingComponent headingComponent;
     private SizeComponent sizeComponent;
+
+    private Entity swordEntity;
+    private TransformComponent swordTransformComponent;
 
     public PlayerSensorCollisionComponent() {
         super(Group.PLAYER_SENSOR);
     }
 
+    public Entity getSwordEntity() {
+        return swordEntity;
+    }
+
+    public PlayerSensorCollisionComponent setSwordEntity(final Entity swordEntity) {
+        this.swordEntity = swordEntity;
+        swordTransformComponent = swordEntity.requireComponent(TransformComponent.class);
+        return this;
+    }
+
     @Override
     protected void handleInitialize(final Entity owner) {
-        playerBehaviorComponent = owner.requireComponent(PlayerBehaviorComponent.class);
         headingComponent = owner.requireComponent(HeadingComponent.class);
         sizeComponent = owner.requireComponent(SizeComponent.class);
+
+        if (swordEntity == null) {
+            throw new IllegalStateException("SwordEntity not set");
+        }
     }
 
     @Override
     protected void handleUpdate(final Duration elapsedTime) {
         Collider collider = getCollider();
 
+        int mark = Pools.vector2s.mark();
         Vector2 offset = Pools.vector2s.grabNew();
         offset.set(sizeComponent.getSize().x / 2f + collider.getShape().getHalfWidth(), 0f);
         offset.rotate(headingComponent.getHeading().getDegrees());
         setOffset(offset);
-        Pools.vector2s.freeCount(1);
+
+        // TODO: Temp sword placement
+        Vector2 swordOrigin = Pools.vector2s.grabNew();
+        swordOrigin.set(getTransformComponent().getTranslate()).add(offset);
+        swordTransformComponent.setTranslate(swordOrigin);
+        swordTransformComponent.setRotation(headingComponent.getHeading());
+
+        Pools.vector2s.freeToMark(mark);
+
     }
 
     @Override
@@ -58,8 +82,10 @@ public final class PlayerSensorCollisionComponent extends CollisionComponent {
 
     @Override
     protected void handleReset() {
-        playerBehaviorComponent = null;
         headingComponent = null;
         sizeComponent = null;
+
+        swordTransformComponent = null;
+        swordEntity = null;
     }
 }

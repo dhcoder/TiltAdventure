@@ -26,6 +26,7 @@ import tiltadv.components.collision.EnemyProjectileCollisionComponent;
 import tiltadv.components.collision.ObstacleCollisionComponent;
 import tiltadv.components.collision.PlayerCollisionComponent;
 import tiltadv.components.collision.PlayerSensorCollisionComponent;
+import tiltadv.components.collision.SwordCollisionComponent;
 import tiltadv.components.combat.AttackComponent;
 import tiltadv.components.combat.DefenseComponent;
 import tiltadv.components.combat.HealthComponent;
@@ -61,20 +62,20 @@ public final class GdxApplication extends ApplicationAdapter {
     // delta times between frames can be HUGE. Let's clamp to a reasonable max here. This also prevents physics update
     // logic from dealing with time steps that are too large (at which point, objects start going through walls, etc.)
     private static final float MAX_DELTA_TIME_SECS = 1f / 30f;
+    private static final Duration ENEMY_INVINCIBILITY_DURATION = Duration.fromSeconds(.5f);
     private BitmapFont font;
     private OrthographicCamera camera;
     private SpriteBatch batch;
     private ShapeRenderer shapeRenderer;
     private CollisionSystem collisionSystem;
     private EntityManager entities;
-
     private Shape octoBounds;
     private Shape playerBounds;
     private Shape playerSensorBounds;
+    private Shape playerSwordBounds;
     private Shape octoRockBounds;
     private Shape boulderBounds;
 
-    @Override
     public void create() {
         camera = new OrthographicCamera(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
         batch = new SpriteBatch();
@@ -152,6 +153,7 @@ public final class GdxApplication extends ApplicationAdapter {
         octoBounds = new Circle(Tiles.OCTOUP1.getRegionWidth() / 2f);
         playerBounds = new Circle(Tiles.LINKUP1.getRegionWidth() / 2f);
         playerSensorBounds = playerBounds;
+        playerSwordBounds = new Circle(Tiles.SWORDRIGHT.getRegionWidth() / 2f);
         octoRockBounds = new Circle(Tiles.ROCK.getRegionWidth() / 2f);
         boulderBounds = new Circle(Tiles.BOULDER.getRegionWidth() / 2f);
 
@@ -163,7 +165,6 @@ public final class GdxApplication extends ApplicationAdapter {
         entities.registerTemplate(EntityId.PLAYER, new EntityManager.EntityCreator() {
             @Override
             public void initialize(final Entity entity) {
-                entity.addComponent(HealthComponent.class).setHealth(10);
                 entity.addComponent(DefenseComponent.class);
                 entity.addComponent(TransformComponent.class);
                 entity.addComponent(SpriteComponent.class);
@@ -174,6 +175,7 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(Gdx.app.getType() == ApplicationType.Android ? AccelerometerInputComponent.class :
                     KeyboardInputComponent.class);
                 entity.addComponent(PlayerBehaviorComponent.class);
+                entity.addComponent(HealthComponent.class).setHealth(10);
                 entity.addComponent(CharacterDisplayComponent.class)
                     .set(Animations.PLAYER_S, Animations.PLAYER_E, Animations.PLAYER_N, Animations.PLAYER_W);
                 entity.addComponent(PlayerCollisionComponent.class).setShape(playerBounds);
@@ -181,10 +183,20 @@ public final class GdxApplication extends ApplicationAdapter {
             }
         });
 
+        entities.registerTemplate(EntityId.PLAYER_SWORD, new EntityManager.EntityCreator() {
+            @Override
+            public void initialize(final Entity entity) {
+                entity.addComponent(AttackComponent.class);
+                entity.addComponent(SwordCollisionComponent.class).setShape(playerSwordBounds);
+                entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.SWORDRIGHT);
+                entity.addComponent(TransformComponent.class);
+                entity.addComponent(SizeComponent.class).setSizeFrom(Tiles.SWORDRIGHT);
+            }
+        });
+
         entities.registerTemplate(EntityId.OCTO, new EntityManager.EntityCreator() {
             @Override
             public void initialize(final Entity entity) {
-                entity.addComponent(HealthComponent.class).setHealth(3);
                 entity.addComponent(AttackComponent.class);
                 entity.addComponent(DefenseComponent.class);
                 entity.addComponent(TransformComponent.class);
@@ -193,6 +205,8 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(SizeComponent.class).setSizeFrom(Tiles.OCTODOWN1);
                 entity.addComponent(MotionComponent.class);
                 entity.addComponent(OctoBehaviorComponent.class);
+                entity.addComponent(HealthComponent.class).setHealth(3)
+                    .setInvicibilityDuration(ENEMY_INVINCIBILITY_DURATION);
                 entity.addComponent(CharacterDisplayComponent.class)
                     .set(Animations.OCTODOWN, Animations.OCTORIGHT, Animations.OCTOUP, Animations.OCTOLEFT);
                 entity.addComponent(EnemyCollisionComponent.class).setShape(octoBounds);

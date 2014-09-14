@@ -37,17 +37,28 @@ public final class SwordCollisionComponent extends CollisionComponent {
     }
 
     @Override
-    protected void handleCollided(final Collision collision) {
-
+    protected void handleOverlapping(final Collision collision) {
         if (collision.getTarget().getGroupId() == Group.ENEMY) {
-            Entity enemyEntity = (Entity)collision.getTarget().getTag().getValue();
-            HealthComponent healthComponent = enemyEntity.requireComponent(HealthComponent.class);
-
-            Vector2 collisionDirection = Pools.vector2s.grabNew();
-            collision.getRepulsionBetweenColliders(collisionDirection);
-            collisionDirection.nor().scl(-1f); // Flip this to the point of view of the player.
-            healthComponent.takeDamage(collisionDirection, attackComponent.getStrength());
-            Pools.vector2s.free(collisionDirection);
+            handleEnemyCollision(collision);
         }
+    }
+
+    @Override
+    protected void handleCollided(final Collision collision) {
+        if (collision.getTarget().getGroupId() == Group.ENEMY) {
+            handleEnemyCollision(collision);
+        }
+    }
+
+    private void handleEnemyCollision(final Collision collision) {Entity enemyEntity = (Entity)collision.getTarget().getTag().getValue();
+        HealthComponent healthComponent = enemyEntity.requireComponent(HealthComponent.class);
+        if (!healthComponent.canTakeDamage())
+            return;
+
+        Vector2 collisionDirection = Pools.vector2s.grabNew();
+        collision.getRepulsionBetweenColliders(collisionDirection);
+        collisionDirection.nor().scl(-1f); // Flip this to the point of view of the player.
+        healthComponent.takeDamage(collisionDirection, attackComponent.getStrength());
+        Pools.vector2s.free(collisionDirection);
     }
 }
