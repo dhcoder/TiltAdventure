@@ -64,7 +64,7 @@ public final class GdxApplication extends ApplicationAdapter {
     // delta times between frames can be HUGE. Let's clamp to a reasonable max here. This also prevents physics update
     // logic from dealing with time steps that are too large (at which point, objects start going through walls, etc.)
     private static final float MAX_DELTA_TIME_SECS = 1f / 30f;
-    private static final Duration ENEMY_INVINCIBILITY_DURATION = Duration.fromSeconds(.5f);
+    private static final Duration ENEMY_INVINCIBILITY_DURATION = Duration.zero();
     private BitmapFont font;
     private OrthographicCamera camera;
     private SpriteBatch batch;

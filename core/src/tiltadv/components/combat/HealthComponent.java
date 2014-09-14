@@ -114,6 +114,12 @@ public final class HealthComponent extends AbstractComponent {
     }
 
     private void setInvincible(final boolean isInvincible) {
+
+        if (invincibleDuration.isZero()) {
+            return; // Invincibility disabled for this component
+            // TODO: Move invinciblity logic to player behavior component?
+        }
+
         spriteComponent.setAlpha(isInvincible ? .5f : 1f);
         this.isInvincible = isInvincible;
     }

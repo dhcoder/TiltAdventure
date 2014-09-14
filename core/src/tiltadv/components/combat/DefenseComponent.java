@@ -4,6 +4,8 @@ import dhcoder.libgdx.entity.AbstractComponent;
 
 /**
  * Component that maintains logic for how much damage should be mitigated when this entity gets attacked.
+ *
+ * TODO: Merge this with HealthComponent?
  */
 public final class DefenseComponent extends AbstractComponent {
 

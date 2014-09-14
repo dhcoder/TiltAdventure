@@ -39,13 +39,6 @@ public final class SwordCollisionComponent extends CollisionComponent {
     }
 
     @Override
-    protected void handleOverlapping(final Collision collision) {
-        if (collision.getTarget().getGroupId() == Group.ENEMY) {
-            handleEnemyCollision(collision);
-        }
-    }
-
-    @Override
     protected void handleReset() {
         attackComponent = null;
     }
