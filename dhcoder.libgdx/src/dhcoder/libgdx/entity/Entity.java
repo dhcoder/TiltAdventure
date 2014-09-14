@@ -22,15 +22,27 @@ public final class Entity implements Poolable {
     // Map a component's type to the component itself
     private final List<Component> components = new ArrayList<Component>();
     private final EntityManager manager;
+    private boolean active;
     private boolean initialized;
 
     /**
      * Restricted access - use {@link EntityManager#newEntity} instead.
      */
-    Entity(final EntityManager manager) { this.manager = manager; }
+    Entity(final EntityManager manager) {
+        reset();
+        this.manager = manager;
+    }
 
     public EntityManager getManager() {
         return manager;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(final boolean active) {
+        this.active = active;
     }
 
     /**
@@ -92,6 +104,10 @@ public final class Entity implements Poolable {
             initialize();
         }
 
+        if (!active) {
+            return;
+        }
+
         int numComponents = components.size(); // Simple iteration to avoid Iterator allocation
         for (int i = 0; i < numComponents; ++i) {
             components.get(i).update(elapsedTime);
@@ -110,6 +126,10 @@ public final class Entity implements Poolable {
             return;
         }
 
+        if (!active) {
+            return;
+        }
+
         int numComponents = components.size(); // Simple iteration to avoid Iterator allocation
         for (int i = 0; i < numComponents; ++i) {
             components.get(i).render(batch);
@@ -120,6 +140,7 @@ public final class Entity implements Poolable {
     public void reset() {
         components.clear();
         initialized = false;
+        active = true;
     }
 
     // Called by EntityManager

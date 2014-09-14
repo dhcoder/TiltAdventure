@@ -6,9 +6,10 @@ import dhcoder.libgdx.collision.Collision;
 import dhcoder.libgdx.collision.CollisionSystem;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.time.Duration;
+import tiltadv.components.behavior.SwordBehaviorComponent;
+import tiltadv.components.combat.HealthComponent;
 import tiltadv.components.model.HeadingComponent;
 import tiltadv.components.model.SizeComponent;
-import tiltadv.components.model.TransformComponent;
 import tiltadv.globals.Group;
 import tiltadv.globals.Services;
 import tiltadv.memory.Pools;
@@ -27,7 +28,7 @@ public final class PlayerSensorCollisionComponent extends CollisionComponent {
     private SizeComponent sizeComponent;
 
     private Entity swordEntity;
-    private TransformComponent swordTransformComponent;
+    private SwordBehaviorComponent swordBehaviorComponent;
 
     public PlayerSensorCollisionComponent() {
         super(Group.PLAYER_SENSOR);
@@ -39,7 +40,7 @@ public final class PlayerSensorCollisionComponent extends CollisionComponent {
 
     public PlayerSensorCollisionComponent setSwordEntity(final Entity swordEntity) {
         this.swordEntity = swordEntity;
-        swordTransformComponent = swordEntity.requireComponent(TransformComponent.class);
+        swordBehaviorComponent = swordEntity.requireComponent(SwordBehaviorComponent.class);
         return this;
     }
 
@@ -63,12 +64,6 @@ public final class PlayerSensorCollisionComponent extends CollisionComponent {
         offset.rotate(headingComponent.getHeading().getDegrees());
         setOffset(offset);
 
-        // TODO: Temp sword placement
-        Vector2 swordOrigin = Pools.vector2s.grabNew();
-        swordOrigin.set(getTransformComponent().getTranslate()).add(offset);
-        swordTransformComponent.setTranslate(swordOrigin);
-        swordTransformComponent.setRotation(headingComponent.getHeading());
-
         Pools.vector2s.freeToMark(mark);
 
     }
@@ -76,7 +71,20 @@ public final class PlayerSensorCollisionComponent extends CollisionComponent {
     @Override
     protected void handleCollided(final Collision collision) {
         if (collision.getTarget().getGroupId() == Group.ENEMY) {
-            //playerBehaviorComponent.attack();
+            handleEnemyCollision(collision);
+        }
+    }
+
+    @Override
+    protected void handleOverlapping(final Collision collision) {
+        if (collision.getTarget().getGroupId() == Group.ENEMY) {
+            handleEnemyCollision(collision);
+        }
+    }
+
+    private void handleEnemyCollision(final Collision collision) {Entity enemyEntity = (Entity)collision.getTarget().getTag().getValue();
+        if (enemyEntity.requireComponent(HealthComponent.class).canTakeDamage()) {
+            swordBehaviorComponent.swing();
         }
     }
 
@@ -85,7 +93,7 @@ public final class PlayerSensorCollisionComponent extends CollisionComponent {
         headingComponent = null;
         sizeComponent = null;
 
-        swordTransformComponent = null;
         swordEntity = null;
+        swordBehaviorComponent = null;
     }
 }

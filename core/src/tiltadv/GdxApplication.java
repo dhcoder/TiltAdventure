@@ -21,6 +21,7 @@ import dhcoder.support.time.Duration;
 import tiltadv.components.behavior.OctoBehaviorComponent;
 import tiltadv.components.behavior.OscillationBehaviorComponent;
 import tiltadv.components.behavior.PlayerBehaviorComponent;
+import tiltadv.components.behavior.SwordBehaviorComponent;
 import tiltadv.components.collision.EnemyCollisionComponent;
 import tiltadv.components.collision.EnemyProjectileCollisionComponent;
 import tiltadv.components.collision.ObstacleCollisionComponent;
@@ -153,7 +154,7 @@ public final class GdxApplication extends ApplicationAdapter {
         octoBounds = new Circle(Tiles.OCTOUP1.getRegionWidth() / 2f);
         playerBounds = new Circle(Tiles.LINKUP1.getRegionWidth() / 2f);
         playerSensorBounds = playerBounds;
-        playerSwordBounds = new Circle(Tiles.SWORDRIGHT.getRegionWidth() / 2f);
+        playerSwordBounds = new Circle(2f);
         octoRockBounds = new Circle(Tiles.ROCK.getRegionWidth() / 2f);
         boulderBounds = new Circle(Tiles.BOULDER.getRegionWidth() / 2f);
 
@@ -191,6 +192,7 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.SWORDRIGHT);
                 entity.addComponent(TransformComponent.class);
                 entity.addComponent(SizeComponent.class).setSizeFrom(Tiles.SWORDRIGHT);
+                entity.addComponent(SwordBehaviorComponent.class);
             }
         });
 

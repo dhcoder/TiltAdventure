@@ -59,6 +59,7 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
         owner.requireComponent(HealthComponent.class).setListener(this);
 
         swordEntity = owner.getManager().newEntityFromTemplate(EntityId.PLAYER_SWORD);
+        swordEntity.requireComponent(SwordBehaviorComponent.class).setParent(owner);
         owner.requireComponent(PlayerSensorCollisionComponent.class).setSwordEntity(swordEntity);
     }
 

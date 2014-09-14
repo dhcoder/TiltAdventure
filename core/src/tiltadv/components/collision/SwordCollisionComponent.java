@@ -32,8 +32,10 @@ public final class SwordCollisionComponent extends CollisionComponent {
     }
 
     @Override
-    protected void handleReset() {
-        attackComponent = null;
+    protected void handleCollided(final Collision collision) {
+        if (collision.getTarget().getGroupId() == Group.ENEMY) {
+            handleEnemyCollision(collision);
+        }
     }
 
     @Override
@@ -44,16 +46,14 @@ public final class SwordCollisionComponent extends CollisionComponent {
     }
 
     @Override
-    protected void handleCollided(final Collision collision) {
-        if (collision.getTarget().getGroupId() == Group.ENEMY) {
-            handleEnemyCollision(collision);
-        }
+    protected void handleReset() {
+        attackComponent = null;
     }
 
-    private void handleEnemyCollision(final Collision collision) {Entity enemyEntity = (Entity)collision.getTarget().getTag().getValue();
+    private void handleEnemyCollision(final Collision collision) {
+        Entity enemyEntity = (Entity)collision.getTarget().getTag().getValue();
         HealthComponent healthComponent = enemyEntity.requireComponent(HealthComponent.class);
-        if (!healthComponent.canTakeDamage())
-            return;
+        if (!healthComponent.canTakeDamage()) { return; }
 
         Vector2 collisionDirection = Pools.vector2s.grabNew();
         collision.getRepulsionBetweenColliders(collisionDirection);
