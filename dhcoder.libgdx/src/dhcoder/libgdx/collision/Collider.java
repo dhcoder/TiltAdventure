@@ -14,13 +14,12 @@ public final class Collider implements Poolable {
 
     private final Vector2 lastPosition = new Vector2();
     private final Vector2 currPosition = new Vector2();
-
+    private final Opt tag = Opt.withNoValue(); // Extra data associated with this collider
     private CollisionSystem system;
     private int groupId;
     private boolean isInitialized;
     private boolean isEnabled;
     private Shape shape;
-    private Opt tag = Opt.withNoValue(); // Extra data associated with this collider
     private CollisionListener listener;
 
     /**

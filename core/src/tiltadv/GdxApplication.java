@@ -17,6 +17,7 @@ import dhcoder.libgdx.collision.shape.Shape;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.libgdx.entity.EntityManager;
 import dhcoder.support.math.Angle;
+import dhcoder.support.memory.Pool;
 import dhcoder.support.time.Duration;
 import tiltadv.components.behavior.OctoBehaviorComponent;
 import tiltadv.components.behavior.OscillationBehaviorComponent;
@@ -82,6 +83,7 @@ public final class GdxApplication extends ApplicationAdapter {
         batch = new SpriteBatch();
         if (DevSettings.IN_DEV_MODE) {
             shapeRenderer = new ShapeRenderer();
+            Pool.RUN_SANITY_CHECKS = true;
         }
         font = new BitmapFont();
 

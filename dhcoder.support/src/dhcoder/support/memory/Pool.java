@@ -1,7 +1,9 @@
 package dhcoder.support.memory;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -64,6 +66,10 @@ public final class Pool<T> {
     }
 
     public static final int DEFAULT_CAPACITY = 10;
+    /**
+     * If true, run reflection sanity checks on the objects to make sure they were reset appropriately.
+     */
+    public static boolean RUN_SANITY_CHECKS = false;
 
     public static <P extends Poolable> Pool<P> of(final Class<P> poolableClass) {
         return of(poolableClass, DEFAULT_CAPACITY);
@@ -195,5 +201,33 @@ public final class Pool<T> {
     private void returnItemToPool(final T item) {
         reset.run(item);
         freeItems.push(item);
+        if (RUN_SANITY_CHECKS) {
+            runSanityChecks(item);
+        }
+    }
+
+    private void runSanityChecks(final T item) {
+        final Field[] fields = item.getClass().getDeclaredFields();
+        for (int i = 0; i < fields.length; i++) {
+            Field field = fields[i];
+            if (field.getType().isPrimitive() || field.getType().isEnum()) {
+                continue;
+            }
+            if (Modifier.isFinal(field.getModifiers())) {
+                continue;
+            }
+            try {
+                field.setAccessible(true);
+                if (field.get(item) != null) {
+                    throw new IllegalStateException(
+                        format("Reset leaves non-final field {0}#{1} non-null", item.getClass().getSimpleName(),
+                            field.getName()));
+                }
+            } catch (IllegalAccessException e) {
+                throw new IllegalStateException(
+                    format("Unexpected illegal access of field {0}#{1}", item.getClass().getSimpleName(),
+                        field.getName()));
+            }
+        }
     }
 }
