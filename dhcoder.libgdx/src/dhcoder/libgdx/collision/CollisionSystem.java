@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.collision.shape.Shape;
 import dhcoder.libgdx.pool.Vector2PoolBuilder;
 import dhcoder.support.collection.ArrayMap;
+import dhcoder.support.collection.ArraySet;
 import dhcoder.support.math.IntCoord;
 import dhcoder.support.memory.Pool;
 
@@ -45,6 +46,7 @@ public final class CollisionSystem {
     private final ArrayList<ArrayList<Collider>> groups;
 
     private final ArrayMap<ColliderKey, Collision> collisions;
+    private final ArraySet<ColliderKey> collidedThisFrame;
     private final ArrayMap<IntCoord, CollisionRegion> regionMap;
 
     public CollisionSystem(final int colliderCapacity) {
@@ -54,6 +56,7 @@ public final class CollisionSystem {
         int collisionCapacity = colliderCapacity * 2;
         collisionPool = Pool.of(Collision.class, collisionCapacity);
         collisions = new ArrayMap<ColliderKey, Collision>(collisionCapacity);
+        collidedThisFrame = new ArraySet<ColliderKey>(20);
 
         collidesWith = new int[NUM_GROUPS];
         groups = new ArrayList<ArrayList<Collider>>(NUM_GROUPS);
@@ -82,6 +85,8 @@ public final class CollisionSystem {
     }
 
     public void triggerCollisions() {
+        collidedThisFrame.clear();
+
         List<CollisionRegion> regions = regionPool.getItemsInUse();
         int numRegions = regions.size();
         for (int i = 0; i < numRegions; i++) {
@@ -144,9 +149,6 @@ public final class CollisionSystem {
         int numColliders = colliders.size();
         for (int i = 0; i < numColliders; i++) {
             Collider collider = colliders.get(i);
-//            if (!collider.isActive()) {
-//                continue;
-//            }
             Vector2 pos = collider.getCurrPosition();
             collider.getShape().render(renderer, pos.x, pos.y);
         }
@@ -211,7 +213,15 @@ public final class CollisionSystem {
 
         ColliderKey key = colliderKeyPool.grabNew();
         key.set(sourceCollider, targetCollider);
+        if (collidedThisFrame.contains(key)) {
+            // We already tested this exact collision this loop. This can sometimes happen when two objects both
+            // stretch over multiple collision regions, so we see their collision twice. Ignore this one!
+            colliderKeyPool.free(key);
+            return;
+        }
+
         if (sourceCollider.collidesWith(targetCollider)) {
+            collidedThisFrame.put(key);
             if (!collisions.containsKey(key)) {
                 Collision collision = collisionPool.grabNew();
                 collision.set(sourceCollider, targetCollider);
