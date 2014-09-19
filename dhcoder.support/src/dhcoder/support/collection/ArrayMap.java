@@ -182,7 +182,7 @@ public final class ArrayMap<K, V> {
     }
 
     public void clear() {
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < capacity; i++) {
             keyIsDead[i] = false;
             keys.set(i, null);
             values.set(i, null);
@@ -232,8 +232,8 @@ public final class ArrayMap<K, V> {
         int positiveHashCode = key.hashCode() & 0x7FFFFFFF;
         int initialIndex = positiveHashCode % capacity;
         int index = initialIndex;
-        int quadraticOffset = 1;
-        while (keys.get(index) != null || keyIsDead[index]) {
+        int loopCount = 1;
+        while ((keys.get(index) != null || keyIsDead[index]) && loopCount <= capacity) {
             if (indexMethod == IndexMethod.PUT && keyIsDead[index]) {
                 outIndex.set(index); // This used to be a bucket for a key that got removed. Take it!
                 return;
@@ -244,8 +244,8 @@ public final class ArrayMap<K, V> {
                 return;
             }
 
-            index = (initialIndex + quadraticOffset * quadraticOffset) % capacity;
-            quadraticOffset++;
+            index = (initialIndex + loopCount * loopCount) % capacity; // Quadratic probing
+            loopCount++;
         }
 
         if (indexMethod == IndexMethod.PUT) {
