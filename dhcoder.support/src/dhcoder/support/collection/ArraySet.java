@@ -3,13 +3,13 @@ package dhcoder.support.collection;
 /**
  * Like {@link ArrayMap} but where you only care whether a key is present or not and values don't matter.
  */
-public final class ArraySet<K> {
+public final class ArraySet<E> {
 
-    private ArrayMap<K, Object> internalMap;
+    private ArrayMap<E, Object> internalMap;
 
-    public ArraySet() { internalMap = new ArrayMap<K, Object>(); }
+    public ArraySet() { internalMap = new ArrayMap<E, Object>(); }
 
-    public ArraySet(final int expectedSize) { internalMap = new ArrayMap<K, Object>(expectedSize); }
+    public ArraySet(final int expectedSize) { internalMap = new ArrayMap<E, Object>(expectedSize); }
 
     /**
      * Create a set with an expected size and load factor. The load factor dictates how full a hashtable should get
@@ -18,16 +18,18 @@ public final class ArraySet<K> {
      * @throws IllegalArgumentException if the input load factor is not between 0 and 1.
      */
     public ArraySet(final int expectedSize, final float loadFactor) {
-        internalMap = new ArrayMap<K, Object>(expectedSize, loadFactor);
+        internalMap = new ArrayMap<E, Object>(expectedSize, loadFactor);
     }
 
     public int getSize() { return internalMap.getSize(); }
 
     public boolean isEmpty() { return internalMap.isEmpty(); }
 
-    public boolean containsKey(final K key) { return internalMap.containsKey(key); }
+    public boolean contains(final E element) { return internalMap.containsKey(element); }
 
-    public void put(final K key) { internalMap.put(key, null); }
+    public void put(final E element) { internalMap.put(element, null); }
 
-    public void remove(final K key) { internalMap.remove(key); }
+    public void remove(final E element) { internalMap.remove(element); }
+
+    public void clear() { internalMap.clear(); }
 }

@@ -181,6 +181,16 @@ public final class ArrayMap<K, V> {
         return value;
     }
 
+    public void clear() {
+        for (int i = 0; i < size; i++) {
+            keyIsDead[i] = false;
+            keys.set(i, null);
+            values.set(i, null);
+        }
+
+        size = 0;
+    }
+
     private void increaseCapacity() {
         int oldCapacity = capacity;
         capacity = getNextPrimeSize(capacity + 1);
