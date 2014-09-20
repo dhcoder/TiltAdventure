@@ -107,6 +107,7 @@ public final class CharacterDisplayComponent extends AbstractComponent {
         elapsedSoFar = 0f;
         activeAnim = null;
 
+        isCardinal = false;
         activeCardinalDirection = CardinalDirection.S;
         activeCompassDirection = CompassDirection.S;
 

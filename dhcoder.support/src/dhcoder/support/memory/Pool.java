@@ -91,7 +91,7 @@ public final class Pool<T> {
         }
 
         if (RUN_SANITY_CHECKS) {
-            referenceObjectOpt.set(allocate.run());
+            referenceObjectOpt.set(allocate.run()); // Allocate one extra object for reference
         }
     }
 
