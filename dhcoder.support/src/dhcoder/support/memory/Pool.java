@@ -119,7 +119,7 @@ public final class Pool<T> {
         itemsInUse = new ArrayList<T>(capacity);
 
         for (int i = 0; i < capacity; i++) {
-            freeItems.push(allocate.run());
+            freeItems.push(allocateItem());
         }
     }
 
@@ -161,13 +161,21 @@ public final class Pool<T> {
             itemsInUse.ensureCapacity(capacity);
 
             for (int i = oldCapacity; i < capacity; i++) {
-                freeItems.push(allocate.run());
+                freeItems.push(allocateItem());
             }
         }
 
         T newItem = freeItems.pop();
         itemsInUse.add(newItem);
 
+        return newItem;
+    }
+
+    private T allocateItem() {
+        T newItem = allocate.run();
+        if (RUN_SANITY_CHECKS) {
+            runSanityChecks(newItem);
+        }
         return newItem;
     }
 
@@ -213,7 +221,7 @@ public final class Pool<T> {
             if (field.getType().isPrimitive() || field.getType().isEnum()) {
                 continue;
             }
-            if (Modifier.isFinal(field.getModifiers())) {
+            if (Modifier.isFinal(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) {
                 continue;
             }
             try {

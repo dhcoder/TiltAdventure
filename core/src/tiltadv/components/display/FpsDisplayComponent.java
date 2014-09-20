@@ -17,10 +17,9 @@ import static dhcoder.support.text.StringUtils.format;
 public final class FpsDisplayComponent extends AbstractComponent {
 
     private final static String FPS_LABEL_FORMAT = "FPS: {0}";
+    private final String[] fpsLabels;
     private BitmapFont font;
     private TransformComponent transformComponent;
-
-    private String[] fpsLabels;
     private String fpsLabel;
 
     public FpsDisplayComponent() {
@@ -56,5 +55,7 @@ public final class FpsDisplayComponent extends AbstractComponent {
     @Override
     public void reset() {
         transformComponent = null;
+        fpsLabel = null;
+        font = null;
     }
 }
