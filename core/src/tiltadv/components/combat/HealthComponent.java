@@ -8,6 +8,8 @@ import tiltadv.components.display.SpriteComponent;
 import tiltadv.components.model.MotionComponent;
 import tiltadv.memory.Pools;
 
+import static dhcoder.support.contract.ContractUtils.requireNonNull;
+
 /**
  * Component that maintains logic for how an entity responds to taking damage.
  */
@@ -59,9 +61,7 @@ public final class HealthComponent extends AbstractComponent {
 
     @Override
     public void initialize(final Entity owner) {
-        if (listener == null) {
-            throw new IllegalStateException("HealthComponent listener must be set!");
-        }
+        requireNonNull(listener, "HealthComponent listener must be set");
 
         defenseComponent = owner.requireComponent(DefenseComponent.class);
         motionComponent = owner.requireComponent(MotionComponent.class);

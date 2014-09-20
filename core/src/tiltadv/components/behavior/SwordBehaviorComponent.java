@@ -12,6 +12,8 @@ import tiltadv.components.model.SizeComponent;
 import tiltadv.components.model.TransformComponent;
 import tiltadv.memory.Pools;
 
+import static dhcoder.support.contract.ContractUtils.requireNonNull;
+
 /**
  * Class that oscillates an entity between two locations, both easing out of and into each location.
  */
@@ -38,13 +40,6 @@ public final class SwordBehaviorComponent extends AbstractComponent {
 
     public SwordBehaviorComponent() { reset(); }
 
-    public void setParent(final Entity parent) {
-        this.parent = parent;
-        parentTransformComponent = parent.requireComponent(TransformComponent.class);
-        parentHeadingComponent = parent.requireComponent(HeadingComponent.class);
-        parentSizeComponent = parent.requireComponent(SizeComponent.class);
-    }
-
     public void swing() {
         if (isActive) {
             return; // Ignore call to swing while swinging
@@ -53,17 +48,20 @@ public final class SwordBehaviorComponent extends AbstractComponent {
         gotSwingRequest = true; // Handle
     }
 
-    private void setActive(final boolean active) {
-        isActive = active;
-        collisionComponent.getCollider().setEnabled(active);
-        spriteComponent.setHidden(!active);
+    public Entity getParent() {
+        return parent;
+    }
+
+    public void setParent(final Entity parent) {
+        this.parent = parent;
+        parentTransformComponent = parent.requireComponent(TransformComponent.class);
+        parentHeadingComponent = parent.requireComponent(HeadingComponent.class);
+        parentSizeComponent = parent.requireComponent(SizeComponent.class);
     }
 
     @Override
     public void initialize(final Entity owner) {
-        if (parent == null) {
-            throw new IllegalStateException("parent must be set");
-        }
+        requireNonNull(parent, "Parent must be set");
 
         spriteComponent = owner.requireComponent(SpriteComponent.class);
         transformComponent = owner.requireComponent(TransformComponent.class);
@@ -146,5 +144,11 @@ public final class SwordBehaviorComponent extends AbstractComponent {
         parentTransformComponent = null;
         parentHeadingComponent = null;
         parentSizeComponent = null;
+    }
+
+    private void setActive(final boolean active) {
+        isActive = active;
+        collisionComponent.getCollider().setEnabled(active);
+        spriteComponent.setHidden(!active);
     }
 }
