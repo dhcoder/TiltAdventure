@@ -1,14 +1,13 @@
 package dhcoder.support.memory;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
+import dhcoder.support.opt.Opt;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
 import static dhcoder.support.collection.ListUtils.swapToEndAndRemove;
+import static dhcoder.support.memory.ReflectionUtils.assertSame;
 import static dhcoder.support.text.StringUtils.format;
 
 /**
@@ -31,38 +30,6 @@ public final class Pool<T> {
 
     public static interface ResetMethod<T> {
         void run(T item);
-    }
-
-    private static final class ReflectionAllocator<T> {
-        private static IllegalArgumentException newConstructionException(final Class<?> targetClass) {
-            return new IllegalArgumentException(
-                format("Class type {0} must have an empty constructor and be instantiable", targetClass));
-        }
-
-        private final Class<T> targetClass;
-        private final Constructor<T> constructor;
-
-        public ReflectionAllocator(final Class<T> targetClass) {
-            this.targetClass = targetClass;
-            try {
-                constructor = targetClass.getDeclaredConstructor();
-                constructor.setAccessible(true);
-            } catch (NoSuchMethodException e) {
-                throw newConstructionException(targetClass);
-            }
-        }
-
-        public T allocate() {
-            try {
-                return constructor.newInstance();
-            } catch (InstantiationException e) {
-                throw newConstructionException(targetClass);
-            } catch (IllegalAccessException e) {
-                throw newConstructionException(targetClass);
-            } catch (InvocationTargetException e) {
-                throw newConstructionException(targetClass);
-            }
-        }
     }
 
     public static final int DEFAULT_CAPACITY = 10;
@@ -94,6 +61,7 @@ public final class Pool<T> {
     private final ResetMethod<T> reset;
     private final Stack<T> freeItems;
     private final ArrayList<T> itemsInUse;
+    private final Opt<T> referenceObjectOpt = Opt.withNoValue();
     private boolean resizable;
     private int capacity;
     private int maxCapacity;
@@ -119,7 +87,11 @@ public final class Pool<T> {
         itemsInUse = new ArrayList<T>(capacity);
 
         for (int i = 0; i < capacity; i++) {
-            freeItems.push(allocateItem());
+            freeItems.push(allocate.run());
+        }
+
+        if (RUN_SANITY_CHECKS) {
+            referenceObjectOpt.set(allocate.run());
         }
     }
 
@@ -161,21 +133,13 @@ public final class Pool<T> {
             itemsInUse.ensureCapacity(capacity);
 
             for (int i = oldCapacity; i < capacity; i++) {
-                freeItems.push(allocateItem());
+                freeItems.push(allocate.run());
             }
         }
 
         T newItem = freeItems.pop();
         itemsInUse.add(newItem);
 
-        return newItem;
-    }
-
-    private T allocateItem() {
-        T newItem = allocate.run();
-        if (RUN_SANITY_CHECKS) {
-            runSanityChecks(newItem);
-        }
         return newItem;
     }
 
@@ -210,32 +174,8 @@ public final class Pool<T> {
         reset.run(item);
         freeItems.push(item);
         if (RUN_SANITY_CHECKS) {
-            runSanityChecks(item);
+            assertSame(referenceObjectOpt.getValue(), item);
         }
     }
 
-    private void runSanityChecks(final T item) {
-        final Field[] fields = item.getClass().getDeclaredFields();
-        for (int i = 0; i < fields.length; i++) {
-            Field field = fields[i];
-            if (field.getType().isPrimitive() || field.getType().isEnum()) {
-                continue;
-            }
-            if (Modifier.isFinal(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) {
-                continue;
-            }
-            try {
-                field.setAccessible(true);
-                if (field.get(item) != null) {
-                    throw new IllegalStateException(
-                        format("Reset leaves non-final field {0}#{1} non-null", item.getClass().getSimpleName(),
-                            field.getName()));
-                }
-            } catch (IllegalAccessException e) {
-                throw new IllegalStateException(
-                    format("Unexpected illegal access of field {0}#{1}", item.getClass().getSimpleName(),
-                        field.getName()));
-            }
-        }
-    }
 }
