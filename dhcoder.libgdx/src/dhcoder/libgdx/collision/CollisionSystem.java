@@ -213,14 +213,15 @@ public final class CollisionSystem {
 
         ColliderKey key = colliderKeyPool.grabNew();
         key.set(sourceCollider, targetCollider);
-        if (collidedThisFrame.contains(key)) {
-            // We already tested this exact collision this loop. This can sometimes happen when two objects both
-            // stretch over multiple collision regions, so we see their collision twice. Ignore this one!
-            colliderKeyPool.free(key);
-            return;
-        }
 
         if (sourceCollider.collidesWith(targetCollider)) {
+            if (collidedThisFrame.contains(key)) {
+                // We already tested this exact collision this loop. This can sometimes happen when two objects both
+                // stretch over multiple collision regions, so we see their collision twice. Ignore this one!
+                colliderKeyPool.free(key);
+                return;
+            }
+
             collidedThisFrame.put(key);
             if (!collisions.containsKey(key)) {
                 Collision collision = collisionPool.grabNew();
