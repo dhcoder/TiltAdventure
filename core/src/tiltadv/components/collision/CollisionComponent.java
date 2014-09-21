@@ -13,6 +13,8 @@ import tiltadv.components.model.TransformComponent;
 import tiltadv.globals.Services;
 import tiltadv.memory.Pools;
 
+import static dhcoder.support.contract.ContractUtils.requireNonNull;
+
 /**
  * Component that checks if this {@link Entity} collides with any other {@link Entity} that also has a collision
  * component.
@@ -55,9 +57,7 @@ public abstract class CollisionComponent extends AbstractComponent implements Co
 
     @Override
     public final void initialize(final Entity owner) {
-        if (collider == null) {
-            throw new IllegalStateException("Collider not set. Did you call setShape?");
-        }
+        requireNonNull(collider, "Collider not set. Did you call setShape?");
 
         transformComponent = owner.requireComponent(TransformComponent.class);
         collider.setTag(owner);

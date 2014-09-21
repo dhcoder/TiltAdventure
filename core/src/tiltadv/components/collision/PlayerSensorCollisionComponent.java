@@ -14,6 +14,8 @@ import tiltadv.globals.Group;
 import tiltadv.globals.Services;
 import tiltadv.memory.Pools;
 
+import static dhcoder.support.contract.ContractUtils.requireNonNull;
+
 /**
  * Component that maintains the collision logic for the main player's avatar.
  */
@@ -49,9 +51,7 @@ public final class PlayerSensorCollisionComponent extends CollisionComponent {
         headingComponent = owner.requireComponent(HeadingComponent.class);
         sizeComponent = owner.requireComponent(SizeComponent.class);
 
-        if (swordEntity == null) {
-            throw new IllegalStateException("SwordEntity not set");
-        }
+        requireNonNull(swordEntity, "SwordEntity not set");
     }
 
     @Override
@@ -82,8 +82,10 @@ public final class PlayerSensorCollisionComponent extends CollisionComponent {
         }
     }
 
-    private void handleEnemyCollision(final Collision collision) {Entity enemyEntity = (Entity)collision.getTarget().getTag().getValue();
-        if (enemyEntity.requireComponent(HealthComponent.class).canTakeDamage()) {
+    private void handleEnemyCollision(final Collision collision) {
+        Entity enemyEntity = (Entity)collision.getTarget().getTag().getValue();
+        final HealthComponent healthComponent = enemyEntity.requireComponent(HealthComponent.class);
+        if (healthComponent.canTakeDamage()) {
             swordBehaviorComponent.swing();
         }
     }
