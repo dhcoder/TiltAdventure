@@ -6,6 +6,8 @@ import dhcoder.libgdx.collision.CollisionSystem;
 import dhcoder.libgdx.entity.Entity;
 import tiltadv.components.combat.AttackComponent;
 import tiltadv.components.combat.HealthComponent;
+import tiltadv.components.hierarchy.ParentComponent;
+import tiltadv.components.model.TransformComponent;
 import tiltadv.globals.Group;
 import tiltadv.globals.Services;
 import tiltadv.memory.Pools;
@@ -21,6 +23,7 @@ public final class SwordCollisionComponent extends CollisionComponent {
     }
 
     private AttackComponent attackComponent;
+    private Entity owner;
 
     public SwordCollisionComponent() {
         super(Group.PLAYER_SWORD);
@@ -28,6 +31,7 @@ public final class SwordCollisionComponent extends CollisionComponent {
 
     @Override
     protected void handleInitialize(final Entity owner) {
+        this.owner = owner;
         attackComponent = owner.requireComponent(AttackComponent.class);
     }
 
@@ -40,17 +44,22 @@ public final class SwordCollisionComponent extends CollisionComponent {
 
     @Override
     protected void handleReset() {
+        owner = null;
         attackComponent = null;
     }
 
     private void handleEnemyCollision(final Collision collision) {
         Entity enemyEntity = (Entity)collision.getTarget().getTag().getValue();
         HealthComponent healthComponent = enemyEntity.requireComponent(HealthComponent.class);
-        if (!healthComponent.canTakeDamage()) { return; }
+        if (!healthComponent.canTakeDamage()) {
+            return;
+        }
 
         Vector2 collisionDirection = Pools.vector2s.grabNew();
-        collision.getRepulsionBetweenColliders(collisionDirection);
-        collisionDirection.nor().scl(-1f); // Flip this to the point of view of the player.
+        Entity parentEntity = owner.requireComponent(ParentComponent.class).getParent();
+        collisionDirection.set(enemyEntity.requireComponent(TransformComponent.class).getTranslate());
+        collisionDirection.sub(parentEntity.requireComponent(TransformComponent.class).getTranslate());
+        collisionDirection.nor();
         healthComponent.takeDamage(collisionDirection, attackComponent.getStrength());
         Pools.vector2s.free(collisionDirection);
     }

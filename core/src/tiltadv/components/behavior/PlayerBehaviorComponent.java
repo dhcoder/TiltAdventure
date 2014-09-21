@@ -9,6 +9,7 @@ import dhcoder.support.state.StateTransitionHandler;
 import dhcoder.support.time.Duration;
 import tiltadv.components.collision.PlayerSensorCollisionComponent;
 import tiltadv.components.combat.HealthComponent;
+import tiltadv.components.hierarchy.ParentComponent;
 import tiltadv.components.model.HeadingComponent;
 import tiltadv.components.model.MotionComponent;
 import tiltadv.components.model.TiltComponent;
@@ -59,7 +60,7 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
         owner.requireComponent(HealthComponent.class).setListener(this);
 
         swordEntity = owner.getManager().newEntityFromTemplate(EntityId.PLAYER_SWORD);
-        swordEntity.requireComponent(SwordBehaviorComponent.class).setParent(owner);
+        swordEntity.requireComponent(ParentComponent.class).setParent(owner);
         owner.requireComponent(PlayerSensorCollisionComponent.class).setSwordEntity(swordEntity);
     }
 

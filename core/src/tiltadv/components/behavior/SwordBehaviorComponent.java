@@ -7,12 +7,11 @@ import dhcoder.support.math.Angle;
 import dhcoder.support.time.Duration;
 import tiltadv.components.collision.SwordCollisionComponent;
 import tiltadv.components.display.SpriteComponent;
+import tiltadv.components.hierarchy.ParentComponent;
 import tiltadv.components.model.HeadingComponent;
 import tiltadv.components.model.SizeComponent;
 import tiltadv.components.model.TransformComponent;
 import tiltadv.memory.Pools;
-
-import static dhcoder.support.contract.ContractUtils.requireNonNull;
 
 /**
  * Class that oscillates an entity between two locations, both easing out of and into each location.
@@ -33,7 +32,6 @@ public final class SwordBehaviorComponent extends AbstractComponent {
     private SwordCollisionComponent collisionComponent;
     private SpriteComponent spriteComponent;
 
-    private Entity parent;
     private TransformComponent parentTransformComponent;
     private SizeComponent parentSizeComponent;
     private HeadingComponent parentHeadingComponent;
@@ -48,20 +46,12 @@ public final class SwordBehaviorComponent extends AbstractComponent {
         gotSwingRequest = true; // Handle
     }
 
-    public Entity getParent() {
-        return parent;
-    }
-
-    public void setParent(final Entity parent) {
-        this.parent = parent;
+    @Override
+    public void initialize(final Entity owner) {
+        Entity parent = owner.requireComponent(ParentComponent.class).getParent();
         parentTransformComponent = parent.requireComponent(TransformComponent.class);
         parentHeadingComponent = parent.requireComponent(HeadingComponent.class);
         parentSizeComponent = parent.requireComponent(SizeComponent.class);
-    }
-
-    @Override
-    public void initialize(final Entity owner) {
-        requireNonNull(parent, "Parent must be set");
 
         spriteComponent = owner.requireComponent(SpriteComponent.class);
         transformComponent = owner.requireComponent(TransformComponent.class);
@@ -93,7 +83,7 @@ public final class SwordBehaviorComponent extends AbstractComponent {
         elapsedSoFar.add(elapsedTime);
         if (elapsedSoFar.getSeconds() > DURATION.getSeconds()) {
             elapsedSoFar.setFrom(DURATION);
-            onReturnTrip = !onReturnTrip;
+//            onReturnTrip = !onReturnTrip;
             setActive(false);
             return;
         }
@@ -119,7 +109,7 @@ public final class SwordBehaviorComponent extends AbstractComponent {
         transformComponent.setRotation(currAngle);
 
         Vector2 swordTip = Pools.vector2s.grabNew();
-        swordTip.set(sizeComponent.getSize().x / 2f + collisionComponent.getShape().getHalfWidth(), 0f);
+        swordTip.set(sizeComponent.getSize().x / 2f, 0f);
         swordTip.rotate(currAngle.getDegrees());
         collisionComponent.setOffset(swordTip);
 
@@ -140,7 +130,6 @@ public final class SwordBehaviorComponent extends AbstractComponent {
         sizeComponent = null;
         collisionComponent = null;
 
-        parent = null;
         parentTransformComponent = null;
         parentHeadingComponent = null;
         parentSizeComponent = null;

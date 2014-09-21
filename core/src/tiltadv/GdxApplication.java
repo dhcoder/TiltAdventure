@@ -32,10 +32,12 @@ import tiltadv.components.collision.SwordCollisionComponent;
 import tiltadv.components.combat.AttackComponent;
 import tiltadv.components.combat.DefenseComponent;
 import tiltadv.components.combat.HealthComponent;
+import tiltadv.components.combat.KnockbackComponent;
 import tiltadv.components.display.CharacterDisplayComponent;
 import tiltadv.components.display.FpsDisplayComponent;
 import tiltadv.components.display.SpriteComponent;
 import tiltadv.components.display.TiltDisplayComponent;
+import tiltadv.components.hierarchy.ParentComponent;
 import tiltadv.components.input.AccelerometerInputComponent;
 import tiltadv.components.input.KeyboardInputComponent;
 import tiltadv.components.model.HeadingComponent;
@@ -156,7 +158,7 @@ public final class GdxApplication extends ApplicationAdapter {
         octoBounds = new Circle(Tiles.OCTOUP1.getRegionWidth() / 2f);
         playerBounds = new Circle(Tiles.LINKUP1.getRegionWidth() / 2f);
         playerSensorBounds = new Circle(Tiles.SWORDRIGHT.getRegionWidth() / 2f);
-        playerSwordBounds = new Circle(2f);
+        playerSwordBounds = new Circle(5f);
         octoRockBounds = new Circle(Tiles.ROCK.getRegionWidth() / 2f);
         boulderBounds = new Circle(Tiles.BOULDER.getRegionWidth() / 2f);
 
@@ -168,6 +170,7 @@ public final class GdxApplication extends ApplicationAdapter {
         entities.registerTemplate(EntityId.PLAYER, new EntityManager.EntityCreator() {
             @Override
             public void initialize(final Entity entity) {
+                entity.addComponent(KnockbackComponent.class);
                 entity.addComponent(DefenseComponent.class);
                 entity.addComponent(TransformComponent.class);
                 entity.addComponent(SpriteComponent.class);
@@ -189,6 +192,7 @@ public final class GdxApplication extends ApplicationAdapter {
         entities.registerTemplate(EntityId.PLAYER_SWORD, new EntityManager.EntityCreator() {
             @Override
             public void initialize(final Entity entity) {
+                entity.addComponent(ParentComponent.class); // Set by the PlayerBehaviorComponent
                 entity.addComponent(SwordCollisionComponent.class).setShape(playerSwordBounds);
                 entity.addComponent(SwordBehaviorComponent.class);
                 entity.addComponent(AttackComponent.class);
@@ -201,6 +205,7 @@ public final class GdxApplication extends ApplicationAdapter {
         entities.registerTemplate(EntityId.OCTO, new EntityManager.EntityCreator() {
             @Override
             public void initialize(final Entity entity) {
+                entity.addComponent(KnockbackComponent.class).setMultiplier(2f);
                 entity.addComponent(AttackComponent.class);
                 entity.addComponent(DefenseComponent.class);
                 entity.addComponent(TransformComponent.class);

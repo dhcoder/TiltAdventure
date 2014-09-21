@@ -33,20 +33,13 @@ public final class HealthComponent extends AbstractComponent {
     private DefenseComponent defenseComponent;
     private MotionComponent motionComponent;
     private SpriteComponent spriteComponent;
+    private KnockbackComponent knockbackComponent;
 
     public HealthComponent() { reset(); }
-
-    public Listener getListener() {
-        return listener;
-    }
 
     public HealthComponent setListener(final Listener listener) {
         this.listener = listener;
         return this;
-    }
-
-    public int getHealth() {
-        return health;
     }
 
     public HealthComponent setHealth(final int health) {
@@ -66,6 +59,7 @@ public final class HealthComponent extends AbstractComponent {
         defenseComponent = owner.requireComponent(DefenseComponent.class);
         motionComponent = owner.requireComponent(MotionComponent.class);
         spriteComponent = owner.requireComponent(SpriteComponent.class);
+        knockbackComponent = owner.requireComponent(KnockbackComponent.class);
     }
 
     @Override
@@ -89,6 +83,7 @@ public final class HealthComponent extends AbstractComponent {
         defenseComponent = null;
         motionComponent = null;
         spriteComponent = null;
+        knockbackComponent = null;
     }
 
     public boolean canTakeDamage() {
@@ -125,7 +120,8 @@ public final class HealthComponent extends AbstractComponent {
     }
 
     private void knockback(final Vector2 direction) {
-        Vector2 impulse = Pools.vector2s.grabNew().set(direction).scl(KNOCKBACK_MULTIPLIER);
+        Vector2 impulse =
+            Pools.vector2s.grabNew().set(direction).scl(KNOCKBACK_MULTIPLIER * knockbackComponent.getMultiplier());
         motionComponent.setImpulse(impulse, STOP_DURATION);
         Pools.vector2s.free(impulse);
 
