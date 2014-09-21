@@ -167,6 +167,7 @@ public final class CollisionSystem {
 
     void addColliderIntoRegions(final Collider collider) {
         int mark = intCoordPool.mark();
+
         IntCoord topLeft = intCoordPool.grabNew();
         IntCoord bottomRight = intCoordPool.grabNew();
         getColliderBounds(collider, topLeft, bottomRight);
@@ -191,6 +192,7 @@ public final class CollisionSystem {
 
     void removeColliderFromRegions(final Collider collider) {
         int mark = intCoordPool.mark();
+
         IntCoord topLeft = intCoordPool.grabNew();
         IntCoord bottomRight = intCoordPool.grabNew();
         getColliderBounds(collider, topLeft, bottomRight);
