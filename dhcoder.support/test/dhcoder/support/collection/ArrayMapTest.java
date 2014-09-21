@@ -1,5 +1,6 @@
 package dhcoder.support.collection;
 
+import dhcoder.support.opt.Opt;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -7,6 +8,10 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 public final class ArrayMapTest {
 
+    /**
+     * Class that always return a hashcode of 1, letting us test objects with different values but where the hashcode
+     * would otherwise collide.
+     */
     private final class HashCollisionItem {
         private final int value;
 
@@ -29,6 +34,10 @@ public final class ArrayMapTest {
         }
     }
 
+    /**
+     * Class that always returns a negative hashcode. Useful to make sure negative hashcodes don't break {@link
+     * ArrayMap}s.
+     */
     private final class NegativeHashItem {
         private final int value;
 
@@ -130,6 +139,32 @@ public final class ArrayMapTest {
     }
 
     @Test
+    public void getWithOptWorks() {
+        ArrayMap<Integer, String> numericStringMap = new ArrayMap<Integer, String>();
+
+        numericStringMap.put(1, "one");
+        numericStringMap.put(2, "two");
+        numericStringMap.put(3, "three");
+        numericStringMap.put(4, "four");
+        numericStringMap.put(5, "five");
+        numericStringMap.put(6, "six");
+        numericStringMap.put(7, "seven");
+        numericStringMap.put(8, "eight");
+        numericStringMap.put(9, "nine");
+
+        Opt<String> valueOpt = Opt.withNoValue();
+
+        numericStringMap.get(1, valueOpt);
+        assertThat(valueOpt.getValue(), equalTo("one"));
+
+        numericStringMap.get(8, valueOpt);
+        assertThat(valueOpt.getValue(), equalTo("eight"));
+
+        numericStringMap.get(99, valueOpt);
+        assertThat(valueOpt.hasValue(), equalTo(false));
+    }
+
+    @Test
     public void arrayMapHandlesHashCollisions() {
         ArrayMap<HashCollisionItem, Integer> hashCollisionMap = new ArrayMap<HashCollisionItem, Integer>();
 
@@ -212,4 +247,24 @@ public final class ArrayMapTest {
         }
     }
 
+    @Test
+    public void removingElementsDoesntBreakGetQuery() {
+        ArrayMap<Integer, Integer> numericMap = new ArrayMap<Integer, Integer>(10);
+        int capactiy = numericMap.getCapacity();
+
+        // Add and remove a key for each index of the map. This will effectively leave the map empty but full of dead
+        // spaces (which are saved for probing reasons).
+        for (int i = 0; i < capactiy; ++i) {
+            numericMap.put(i, i);
+            numericMap.remove(i);
+        }
+
+        // Adding/removing keys shouldn't have triggered a resize
+        assertThat(numericMap.getCapacity(), equalTo(capactiy));
+        assertThat(numericMap.getSize(), equalTo(0));
+
+        // Checking the value of a key should loop around the whole table once, since the probing will keep encountering
+        // dead spaces. The map should detect this and exit without running into an infinite loop.
+        assertThat(numericMap.containsKey(1), equalTo(false));
+    }
 }

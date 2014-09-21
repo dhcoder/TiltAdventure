@@ -1,6 +1,7 @@
 package dhcoder.support.collection;
 
 import dhcoder.support.memory.Pool;
+import dhcoder.support.opt.Opt;
 import dhcoder.support.opt.OptInt;
 
 import java.util.ArrayList;
@@ -114,6 +115,14 @@ public final class ArrayMap<K, V> {
         return size;
     }
 
+    /**
+     * Returns the potential capacity of this ArrayMap. Note that an ArrayMap will get resized before max capacity is
+     * reached, depending on its load factor, so don't expect to fill one completely.
+     */
+    public int getCapacity() {
+        return capacity;
+    }
+
     public boolean isEmpty() {
         return size == 0;
     }
@@ -127,10 +136,11 @@ public final class ArrayMap<K, V> {
         return containsKey;
     }
 
-    public boolean containsValue(final V value) {
-        return (values.contains(value));
-    }
-
+    /**
+     * Gets the value associated with the passed in key, or throws an exception if that key is not registered.
+     *
+     * @throws IllegalArgumentException if no value is associated with the passed in key.
+     */
     public V get(final K key) {
         OptInt indexOpt = indexPool.grabNew();
         getIndex(key, IndexMethod.GET, indexOpt);
@@ -142,6 +152,20 @@ public final class ArrayMap<K, V> {
         indexPool.free(indexOpt);
 
         return value;
+    }
+
+    /**
+     * This method is functionally equivalent to but more efficient than using {@link #containsKey(Object)} followed
+     * by {@link #get(Object)}.
+     */
+    public void get(final K key, final Opt<V> outValueOpt) {
+        outValueOpt.clear();
+        OptInt indexOpt = indexPool.grabNew();
+        getIndex(key, IndexMethod.GET, indexOpt);
+        if (indexOpt.hasValue()) {
+            outValueOpt.set(values.get(indexOpt.getValue()));
+        }
+        indexPool.free(indexOpt);
     }
 
     public void put(final K key, final V value) {
