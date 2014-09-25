@@ -7,10 +7,13 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
+import dhcoder.libgdx.render.RenderSystem;
+import dhcoder.libgdx.render.Renderable;
 import dhcoder.support.math.Angle;
 import dhcoder.support.time.Duration;
 import tiltadv.components.model.SizeComponent;
 import tiltadv.components.model.TransformComponent;
+import tiltadv.globals.Services;
 
 /**
  * A component that encapsulates the logic of rendering a sprite.
@@ -18,7 +21,7 @@ import tiltadv.components.model.TransformComponent;
  * If a {@link SizeComponent} is available on the owning {@link Entity}, the sprite will render itself using that value.
  * Otherwise, it will render to the size of the current sprite.
  */
-public final class SpriteComponent extends AbstractComponent {
+public final class SpriteComponent extends AbstractComponent implements Renderable {
 
     /**
      * The source sprite used by this component. Use {@link Sprite#set(Sprite)} if you need to change it, later.
@@ -58,6 +61,9 @@ public final class SpriteComponent extends AbstractComponent {
     public void initialize(final Entity owner) {
         transformComponent = owner.requireComponent(TransformComponent.class);
         sizeComponent = owner.requireComponent(SizeComponent.class);
+
+        RenderSystem renderSystem = Services.get(RenderSystem.class);
+        renderSystem.add(this);
     }
 
     @Override
@@ -87,5 +93,8 @@ public final class SpriteComponent extends AbstractComponent {
 
         sizeComponent = null;
         transformComponent = null;
+
+        RenderSystem renderSystem = Services.get(RenderSystem.class);
+        renderSystem.remove(this);
     }
 }

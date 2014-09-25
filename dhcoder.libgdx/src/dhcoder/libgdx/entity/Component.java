@@ -1,6 +1,5 @@
 package dhcoder.libgdx.entity;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
 import dhcoder.support.memory.Poolable;
 import dhcoder.support.time.Duration;
 
@@ -21,9 +20,4 @@ public interface Component extends Poolable {
      * Updates this component. The passed in time is in seconds.
      */
     void update(Duration elapsedTime);
-
-    /**
-     * Renders this component, via a {@link Batch}.
-     */
-    void render(Batch batch);
 }

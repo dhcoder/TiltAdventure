@@ -1,6 +1,5 @@
 package dhcoder.libgdx.entity;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import dhcoder.support.collection.ArrayMap;
 import dhcoder.support.collection.IntKey;
 import dhcoder.support.memory.Pool;
@@ -122,15 +121,6 @@ public final class EntityManager {
         int numEntities = entities.size();
         for (int i = 0; i < numEntities; ++i) {
             entities.get(i).update(elapsedTime);
-        }
-    }
-
-    public void render(final SpriteBatch batch) {
-        List<Entity> entities = entityPool.getItemsInUse();
-        int numEntities = entities.size(); // Simple iteration to avoid Iterator allocation
-
-        for (int i = 0; i < numEntities; ++i) {
-            entities.get(i).render(batch);
         }
     }
 

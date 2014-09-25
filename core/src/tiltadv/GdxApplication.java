@@ -16,6 +16,7 @@ import dhcoder.libgdx.collision.shape.Rectangle;
 import dhcoder.libgdx.collision.shape.Shape;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.libgdx.entity.EntityManager;
+import dhcoder.libgdx.render.RenderSystem;
 import dhcoder.support.math.Angle;
 import dhcoder.support.memory.Pool;
 import dhcoder.support.time.Duration;
@@ -71,8 +72,9 @@ public final class GdxApplication extends ApplicationAdapter {
     private OrthographicCamera camera;
     private SpriteBatch batch;
     private ShapeRenderer shapeRenderer;
-    private CollisionSystem collisionSystem;
     private EntityManager entities;
+    private CollisionSystem collisionSystem;
+    private RenderSystem renderSystem;
     private Shape octoBounds;
     private Shape playerBounds;
     private Shape playerSensorBounds;
@@ -123,7 +125,7 @@ public final class GdxApplication extends ApplicationAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         batch.begin();
-        entities.render(batch);
+        renderSystem.render(batch);
         batch.end();
 
         if (DevSettings.IN_DEV_MODE && DevSettings.SHOW_COLLISION_SHAPES) {
@@ -147,6 +149,9 @@ public final class GdxApplication extends ApplicationAdapter {
     private void initializeServices() {
         collisionSystem = new CollisionSystem(ENTITY_COUNT);
         Services.register(CollisionSystem.class, collisionSystem);
+
+        renderSystem = new RenderSystem(ENTITY_COUNT);
+        Services.register(RenderSystem.class, renderSystem);
 
         Services.register(Vibrator.class, new Vibrator());
     }

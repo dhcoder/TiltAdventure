@@ -6,15 +6,18 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
+import dhcoder.libgdx.render.RenderSystem;
+import dhcoder.libgdx.render.Renderable;
 import dhcoder.support.time.Duration;
 import tiltadv.components.model.TransformComponent;
+import tiltadv.globals.Services;
 
 import static dhcoder.support.text.StringUtils.format;
 
 /**
  * Simple utility class that shows the current framerate.
  */
-public final class FpsDisplayComponent extends AbstractComponent {
+public final class FpsDisplayComponent extends AbstractComponent implements Renderable {
 
     private final static String FPS_LABEL_FORMAT = "FPS: {0}";
     private final String[] fpsLabels;
@@ -38,6 +41,9 @@ public final class FpsDisplayComponent extends AbstractComponent {
     @Override
     public void initialize(final Entity owner) {
         transformComponent = owner.requireComponent(TransformComponent.class);
+
+        RenderSystem renderSystem = Services.get(RenderSystem.class);
+        renderSystem.add(this);
     }
 
     @Override
@@ -57,5 +63,8 @@ public final class FpsDisplayComponent extends AbstractComponent {
         transformComponent = null;
         fpsLabel = null;
         font = null;
+
+        RenderSystem renderSystem = Services.get(RenderSystem.class);
+        renderSystem.remove(this);
     }
 }

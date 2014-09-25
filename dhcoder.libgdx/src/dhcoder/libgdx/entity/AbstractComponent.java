@@ -1,6 +1,5 @@
 package dhcoder.libgdx.entity;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
 import dhcoder.support.time.Duration;
 
 /**
@@ -14,9 +13,6 @@ public abstract class AbstractComponent implements Component {
 
     @Override
     public void update(final Duration elapsedTime) {}
-
-    @Override
-    public void render(final Batch batch) {}
 
     @Override
     public void reset() {}

@@ -1,6 +1,5 @@
 package dhcoder.libgdx.entity;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
 import dhcoder.support.memory.Poolable;
 import dhcoder.support.opt.Opt;
 import dhcoder.support.time.Duration;
@@ -99,24 +98,6 @@ public final class Entity implements Poolable {
         int numComponents = components.size(); // Simple iteration to avoid Iterator allocation
         for (int i = 0; i < numComponents; ++i) {
             components.get(i).update(elapsedTime);
-        }
-    }
-
-    /**
-     * Render this entity, via a {@link Batch}.
-     */
-    public void render(final Batch batch) {
-        if (!initialized) {
-            // TODO: Remote Entity.render!
-            // Some Entities are created dynamically and then get asked to render before they are ready. An upcoming
-            // refactoring will fix this by moving rendering out of Entity into another class (and each entity will be
-            // responsible to request that their sprite gets rendered each frame)
-            return;
-        }
-
-        int numComponents = components.size(); // Simple iteration to avoid Iterator allocation
-        for (int i = 0; i < numComponents; ++i) {
-            components.get(i).render(batch);
         }
     }
 
