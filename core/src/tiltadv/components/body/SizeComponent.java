@@ -1,4 +1,4 @@
-package tiltadv.components.model;
+package tiltadv.components.body;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;

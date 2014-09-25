@@ -11,8 +11,8 @@ import dhcoder.libgdx.render.RenderSystem;
 import dhcoder.libgdx.render.Renderable;
 import dhcoder.support.math.Angle;
 import dhcoder.support.time.Duration;
-import tiltadv.components.model.SizeComponent;
-import tiltadv.components.model.TransformComponent;
+import tiltadv.components.body.SizeComponent;
+import tiltadv.components.body.TransformComponent;
 import tiltadv.globals.Services;
 
 /**

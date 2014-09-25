@@ -9,7 +9,7 @@ import dhcoder.libgdx.entity.Entity;
 import dhcoder.libgdx.render.RenderSystem;
 import dhcoder.libgdx.render.Renderable;
 import dhcoder.support.time.Duration;
-import tiltadv.components.model.TransformComponent;
+import tiltadv.components.body.TransformComponent;
 import tiltadv.globals.Services;
 
 import static dhcoder.support.text.StringUtils.format;

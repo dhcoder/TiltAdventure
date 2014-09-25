@@ -9,7 +9,7 @@ import dhcoder.libgdx.collision.shape.Shape;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.time.Duration;
-import tiltadv.components.model.TransformComponent;
+import tiltadv.components.body.TransformComponent;
 import tiltadv.globals.Services;
 import tiltadv.memory.Pools;
 

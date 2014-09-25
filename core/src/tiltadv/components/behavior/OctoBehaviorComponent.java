@@ -9,9 +9,9 @@ import dhcoder.support.state.StateMachine;
 import dhcoder.support.state.StateTransitionHandler;
 import dhcoder.support.time.Duration;
 import tiltadv.components.combat.HealthComponent;
-import tiltadv.components.model.HeadingComponent;
-import tiltadv.components.model.MotionComponent;
-import tiltadv.components.model.TransformComponent;
+import tiltadv.components.body.HeadingComponent;
+import tiltadv.components.body.MotionComponent;
+import tiltadv.components.body.TransformComponent;
 import tiltadv.globals.EntityId;
 import tiltadv.memory.Pools;
 

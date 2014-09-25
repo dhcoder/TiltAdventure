@@ -7,7 +7,7 @@ import dhcoder.libgdx.entity.Entity;
 import tiltadv.components.combat.AttackComponent;
 import tiltadv.components.combat.HealthComponent;
 import tiltadv.components.hierarchy.ParentComponent;
-import tiltadv.components.model.TransformComponent;
+import tiltadv.components.body.TransformComponent;
 import tiltadv.globals.Group;
 import tiltadv.globals.Services;
 import tiltadv.memory.Pools;

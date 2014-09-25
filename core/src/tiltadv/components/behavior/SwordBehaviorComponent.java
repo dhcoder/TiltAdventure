@@ -8,9 +8,9 @@ import dhcoder.support.time.Duration;
 import tiltadv.components.collision.SwordCollisionComponent;
 import tiltadv.components.display.SpriteComponent;
 import tiltadv.components.hierarchy.ParentComponent;
-import tiltadv.components.model.HeadingComponent;
-import tiltadv.components.model.SizeComponent;
-import tiltadv.components.model.TransformComponent;
+import tiltadv.components.body.HeadingComponent;
+import tiltadv.components.body.SizeComponent;
+import tiltadv.components.body.TransformComponent;
 import tiltadv.memory.Pools;
 
 /**

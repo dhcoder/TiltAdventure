@@ -8,8 +8,8 @@ import dhcoder.support.math.Angle;
 import dhcoder.support.math.CardinalDirection;
 import dhcoder.support.math.CompassDirection;
 import dhcoder.support.time.Duration;
-import tiltadv.components.model.HeadingComponent;
-import tiltadv.components.model.MotionComponent;
+import tiltadv.components.body.HeadingComponent;
+import tiltadv.components.body.MotionComponent;
 
 /**
  * Component that renders a character which can move in any of the cardinal directions.

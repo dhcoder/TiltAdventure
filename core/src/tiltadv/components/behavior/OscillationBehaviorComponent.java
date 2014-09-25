@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.time.Duration;
-import tiltadv.components.model.TransformComponent;
+import tiltadv.components.body.TransformComponent;
 import tiltadv.memory.Pools;
 
 /**

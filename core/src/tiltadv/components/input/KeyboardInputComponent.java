@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.time.Duration;
-import tiltadv.components.model.TiltComponent;
+import tiltadv.components.body.TiltComponent;
 import tiltadv.memory.Pools;
 
 import static com.badlogic.gdx.Input.Keys;

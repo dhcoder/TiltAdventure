@@ -5,7 +5,7 @@ import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.time.Duration;
 import tiltadv.components.display.SpriteComponent;
-import tiltadv.components.model.MotionComponent;
+import tiltadv.components.body.MotionComponent;
 import tiltadv.memory.Pools;
 
 import static dhcoder.support.contract.ContractUtils.requireNonNull;
