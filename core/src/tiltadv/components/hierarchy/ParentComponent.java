@@ -12,8 +12,6 @@ public final class ParentComponent extends AbstractComponent {
 
     private Entity parent;
 
-    public ParentComponent() { reset(); }
-
     public Entity getParent() {
         return parent;
     }

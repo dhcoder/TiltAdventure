@@ -24,6 +24,11 @@ import tiltadv.components.behavior.OctoBehaviorComponent;
 import tiltadv.components.behavior.OscillationBehaviorComponent;
 import tiltadv.components.behavior.PlayerBehaviorComponent;
 import tiltadv.components.behavior.SwordBehaviorComponent;
+import tiltadv.components.body.HeadingComponent;
+import tiltadv.components.body.MotionComponent;
+import tiltadv.components.body.SizeComponent;
+import tiltadv.components.body.TiltComponent;
+import tiltadv.components.body.TransformComponent;
 import tiltadv.components.collision.EnemyCollisionComponent;
 import tiltadv.components.collision.EnemyProjectileCollisionComponent;
 import tiltadv.components.collision.ObstacleCollisionComponent;
@@ -39,13 +44,9 @@ import tiltadv.components.display.FpsDisplayComponent;
 import tiltadv.components.display.SpriteComponent;
 import tiltadv.components.display.TiltDisplayComponent;
 import tiltadv.components.hierarchy.ParentComponent;
+import tiltadv.components.hierarchy.children.PlayerChildrenComponent;
 import tiltadv.components.input.AccelerometerInputComponent;
 import tiltadv.components.input.KeyboardInputComponent;
-import tiltadv.components.body.HeadingComponent;
-import tiltadv.components.body.MotionComponent;
-import tiltadv.components.body.SizeComponent;
-import tiltadv.components.body.TiltComponent;
-import tiltadv.components.body.TransformComponent;
 import tiltadv.globals.Animations;
 import tiltadv.globals.DevSettings;
 import tiltadv.globals.EntityId;
@@ -185,6 +186,7 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(TiltComponent.class);
                 entity.addComponent(Gdx.app.getType() == ApplicationType.Android ? AccelerometerInputComponent.class :
                     KeyboardInputComponent.class);
+                entity.addComponent(PlayerChildrenComponent.class);
                 entity.addComponent(PlayerBehaviorComponent.class);
                 entity.addComponent(HealthComponent.class).setHealth(10);
                 entity.addComponent(CharacterDisplayComponent.class)

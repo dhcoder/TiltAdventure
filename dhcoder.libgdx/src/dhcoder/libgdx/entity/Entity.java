@@ -107,6 +107,13 @@ public final class Entity implements Poolable {
         initialized = false;
     }
 
+    /**
+     * Convenience method for {@link EntityManager#freeEntity(Entity)} called with this entity.
+     */
+    public void free() {
+        getManager().freeEntity(this);
+    }
+
     // Called by EntityManager
     void freeComponents() {
         int numComponents = components.size(); // Simple iteration to avoid Iterator allocation

@@ -7,12 +7,12 @@ import dhcoder.support.opt.Opt;
 import dhcoder.support.state.StateMachine;
 import dhcoder.support.state.StateTransitionHandler;
 import dhcoder.support.time.Duration;
-import tiltadv.components.collision.PlayerSensorCollisionComponent;
-import tiltadv.components.combat.HealthComponent;
-import tiltadv.components.hierarchy.ParentComponent;
 import tiltadv.components.body.HeadingComponent;
 import tiltadv.components.body.MotionComponent;
 import tiltadv.components.body.TiltComponent;
+import tiltadv.components.collision.PlayerSensorCollisionComponent;
+import tiltadv.components.combat.HealthComponent;
+import tiltadv.components.hierarchy.children.PlayerChildrenComponent;
 import tiltadv.globals.EntityId;
 import tiltadv.globals.Services;
 import tiltadv.input.Vibrator;
@@ -59,8 +59,9 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
         tiltComponent = owner.requireComponent(TiltComponent.class);
         owner.requireComponent(HealthComponent.class).setListener(this);
 
-        swordEntity = owner.getManager().newEntityFromTemplate(EntityId.PLAYER_SWORD);
-        swordEntity.requireComponent(ParentComponent.class).setParent(owner);
+        PlayerChildrenComponent children = owner.requireComponent(PlayerChildrenComponent.class);
+        Entity swordEntity = owner.getManager().newEntityFromTemplate(EntityId.PLAYER_SWORD);
+        children.addSword(swordEntity);
         owner.requireComponent(PlayerSensorCollisionComponent.class).setSwordEntity(swordEntity);
     }
 
