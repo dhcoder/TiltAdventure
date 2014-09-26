@@ -87,6 +87,13 @@ public final class SpriteComponent extends AbstractComponent implements Renderab
     }
 
     @Override
+    public float getZ() {
+        // The lower the sprite is on the screen, the higher its z-value is. Ex: Standing at y = 5 means you are in
+        // front of an object at y = 20.
+        return -(sprite.getY() - sprite.getHeight());
+    }
+
+    @Override
     public void reset() {
         sprite.setTexture(null);
         hidden = false;

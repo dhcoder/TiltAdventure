@@ -1,17 +1,25 @@
 package dhcoder.libgdx.render;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.utils.Array;
 
-import java.util.ArrayList;
+import java.util.Comparator;
 
 /**
  * System that renders a bunch of renderable components.
  */
 public final class RenderSystem {
-    private final ArrayList<Renderable> renderables;
+    private static final Comparator<Renderable> RENDERABLE_COMPARATOR = new Comparator<Renderable>() {
+        @Override
+        public int compare(final Renderable r1, final Renderable r2) {
+            return Float.compare(r1.getZ(), r2.getZ());
+        }
+    };
+
+    private final Array<Renderable> renderables;
 
     public RenderSystem(final int capacity) {
-        renderables = new ArrayList<Renderable>(capacity);
+        renderables = new Array<Renderable>(capacity);
     }
 
     /**
@@ -22,7 +30,7 @@ public final class RenderSystem {
     }
 
     public void remove(final Renderable renderable) {
-        renderables.remove(renderable);
+        renderables.removeValue(renderable, true);
     }
 
     /**
@@ -30,7 +38,8 @@ public final class RenderSystem {
      * of render requests will be cleared, and must be added again for the next frame.
      */
     public void render(final Batch batch) {
-        int numSprites = renderables.size();
+        renderables.sort(RENDERABLE_COMPARATOR);
+        int numSprites = renderables.size;
         for (int i = 0; i < numSprites; i++) {
             Renderable renderable = renderables.get(i);
             renderable.render(batch);

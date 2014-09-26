@@ -67,4 +67,9 @@ public final class FpsDisplayComponent extends AbstractComponent implements Rend
         RenderSystem renderSystem = Services.get(RenderSystem.class);
         renderSystem.remove(this);
     }
+
+    @Override
+    public float getZ() {
+        return 9999; // TODO: Temp value here to make sure FPS appears on top. This class will eventually get deleted.
+    }
 }
