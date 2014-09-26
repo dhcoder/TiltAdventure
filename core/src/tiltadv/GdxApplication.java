@@ -326,6 +326,9 @@ public final class GdxApplication extends ApplicationAdapter {
         int mark = Pools.durations.mark();
         Duration elapsedTime = Pools.durations.grabNew();
         elapsedTime.setSeconds(Math.min(Gdx.graphics.getRawDeltaTime(), MAX_DELTA_TIME_SECS));
+        if (DevSettings.IN_DEV_MODE) {
+            elapsedTime.setSeconds(elapsedTime.getSeconds() / DevSettings.SLOW_MO_FACTOR);
+        }
         entities.update(elapsedTime);
         Pools.durations.freeToMark(mark);
 

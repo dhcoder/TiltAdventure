@@ -16,9 +16,14 @@ public final class DevSettings {
     public static final boolean IN_DEV_MODE = Boolean.getBoolean("tiltadv.dev");
 
     /**
-     * If true and in dev mode, we should render shape overlays over all entities set up for collision.
+     * If {@code true} and in dev mode, we should render shape overlays over all entities set up for collision.
      */
-    public static boolean SHOW_COLLISION_SHAPES = true;
+    public static boolean SHOW_COLLISION_SHAPES = false;
+
+    /**
+     * Slow-mo multiplier. Setting to {@code 4f} means 4x slowdown.
+     */
+    public static float SLOW_MO_FACTOR = 1f;
 
     private DevSettings() {}
 
