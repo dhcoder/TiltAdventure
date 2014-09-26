@@ -29,19 +29,13 @@ public final class PlayerSensorCollisionComponent extends CollisionComponent {
     private HeadingComponent headingComponent;
     private SizeComponent sizeComponent;
 
-    private Entity swordEntity;
     private SwordBehaviorComponent swordBehaviorComponent;
 
     public PlayerSensorCollisionComponent() {
         super(Group.PLAYER_SENSOR);
     }
 
-    public Entity getSwordEntity() {
-        return swordEntity;
-    }
-
     public PlayerSensorCollisionComponent setSwordEntity(final Entity swordEntity) {
-        this.swordEntity = swordEntity;
         swordBehaviorComponent = swordEntity.requireComponent(SwordBehaviorComponent.class);
         return this;
     }
@@ -51,7 +45,7 @@ public final class PlayerSensorCollisionComponent extends CollisionComponent {
         headingComponent = owner.requireComponent(HeadingComponent.class);
         sizeComponent = owner.requireComponent(SizeComponent.class);
 
-        requireNonNull(swordEntity, "SwordEntity not set");
+        requireNonNull(swordBehaviorComponent, "SwordEntity not set");
     }
 
     @Override
@@ -95,7 +89,6 @@ public final class PlayerSensorCollisionComponent extends CollisionComponent {
         headingComponent = null;
         sizeComponent = null;
 
-        swordEntity = null;
         swordBehaviorComponent = null;
     }
 }

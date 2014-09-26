@@ -30,10 +30,9 @@ public abstract class ChildrenComponent extends AbstractComponent {
         children.clear();
     }
 
-    protected ChildrenComponent add(final Entity child) {
+    protected void add(final Entity child) {
         child.requireComponent(ParentComponent.class).setParent(owner);
         children.add(child);
-        return this;
     }
 
     protected void handleInitialize(final Entity owner) {}

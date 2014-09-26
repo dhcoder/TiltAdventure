@@ -176,6 +176,7 @@ public final class GdxApplication extends ApplicationAdapter {
         entities.registerTemplate(EntityId.PLAYER, new EntityManager.EntityCreator() {
             @Override
             public void initialize(final Entity entity) {
+                entity.addComponent(PlayerChildrenComponent.class);
                 entity.addComponent(KnockbackComponent.class);
                 entity.addComponent(DefenseComponent.class);
                 entity.addComponent(TransformComponent.class);
@@ -186,7 +187,6 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(TiltComponent.class);
                 entity.addComponent(Gdx.app.getType() == ApplicationType.Android ? AccelerometerInputComponent.class :
                     KeyboardInputComponent.class);
-                entity.addComponent(PlayerChildrenComponent.class);
                 entity.addComponent(PlayerBehaviorComponent.class);
                 entity.addComponent(HealthComponent.class).setHealth(10);
                 entity.addComponent(CharacterDisplayComponent.class)
