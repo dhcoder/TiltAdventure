@@ -2,12 +2,15 @@ package tiltadv.components.body;
 
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.entity.AbstractComponent;
+import dhcoder.support.event.Event;
 import dhcoder.support.math.Angle;
 
 /**
  * A component that encapsulates an entity's position, scale, and rotation values.
  */
 public final class TransformComponent extends AbstractComponent {
+
+    public final Event onTranslateChanged = new Event();
 
     private final Vector2 translate = new Vector2();
     private final Vector2 scale = new Vector2();
@@ -20,7 +23,12 @@ public final class TransformComponent extends AbstractComponent {
     }
 
     public TransformComponent setTranslate(final Vector2 translate) {
+        if (this.translate.equals(translate)) {
+            return this;
+        }
+
         this.translate.set(translate);
+        onTranslateChanged.fire(this);
         return this;
     }
 
