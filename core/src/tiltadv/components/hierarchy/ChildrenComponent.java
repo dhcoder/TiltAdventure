@@ -38,6 +38,4 @@ public abstract class ChildrenComponent extends AbstractComponent {
     protected void handleInitialize(final Entity owner) {}
 
     protected void handleReset() {}
-
-    ;
 }
