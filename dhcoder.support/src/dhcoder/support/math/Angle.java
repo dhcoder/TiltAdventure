@@ -64,8 +64,7 @@ public final class Angle implements Poolable {
     /**
      * Use {@link #fromDegrees(float)} or {@link #fromRadians(float)} instead.
      */
-    private Angle() {
-    }
+    private Angle() {}
 
     public float getDegrees() {
         if (!degreesOpt.hasValue()) {
