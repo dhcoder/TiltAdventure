@@ -18,7 +18,7 @@ public final class OffsetComponent extends AbstractComponent {
     private final EventListener handleTranslateChanged = new EventListener() {
         @Override
         public void run(final Object sender) {
-            if (isUpdating) {
+            if (isSyncing) {
                 return;
             }
 
@@ -28,13 +28,10 @@ public final class OffsetComponent extends AbstractComponent {
             else if (sender == parentTransformComponent) {
                 syncChildToParent();
             }
-            else {
-                throw new IllegalStateException("Unexpected translate event in OffsetComponent");
-            }
         }
     };
 
-    private boolean isUpdating;
+    private boolean isSyncing;
     private TransformComponent transformComponent;
     private TransformComponent parentTransformComponent;
 
@@ -44,7 +41,7 @@ public final class OffsetComponent extends AbstractComponent {
     }
 
     @Override
-    public final void initialize(final Entity owner) {
+    public void initialize(final Entity owner) {
         transformComponent = owner.requireComponent(TransformComponent.class);
 
         Entity parent = owner.requireComponent(ParentComponent.class).getParent();
@@ -55,9 +52,9 @@ public final class OffsetComponent extends AbstractComponent {
     }
 
     @Override
-    public final void reset() {
+    public void reset() {
         offset.setZero();
-        isUpdating = false;
+        isSyncing = false;
 
         transformComponent.onTranslateChanged.removeListener(handleTranslateChanged);
         parentTransformComponent.onTranslateChanged.removeListener(handleTranslateChanged);
@@ -68,25 +65,27 @@ public final class OffsetComponent extends AbstractComponent {
 
     @Override
     public void update(final Duration elapsedTime) {
-        isUpdating = true;
         syncChildToParent();
-        isUpdating = false;
     }
 
     private void syncChildToParent() {
+        isSyncing = true;
         int mark = Pools.vector2s.mark();
         final Vector2 translate = Pools.vector2s.grabNew().set(parentTransformComponent.getTranslate());
         translate.add(offset);
         transformComponent.setTranslate(translate);
         Pools.vector2s.freeToMark(mark);
+        isSyncing = false;
     }
 
     private void syncParentToChild() {
+        isSyncing = true;
         int mark = Pools.vector2s.mark();
         final Vector2 translate = Pools.vector2s.grabNew().set(transformComponent.getTranslate());
         translate.sub(offset);
         parentTransformComponent.setTranslate(translate);
         Pools.vector2s.freeToMark(mark);
+        isSyncing = false;
     }
 
 }
