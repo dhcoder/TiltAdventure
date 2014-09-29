@@ -23,12 +23,18 @@ public final class TransformComponent extends AbstractComponent {
     }
 
     public TransformComponent setTranslate(final Vector2 translate) {
+        return setTranslate(translate, true);
+    }
+
+    public TransformComponent setTranslate(final Vector2 translate, final boolean sendUpdate) {
         if (this.translate.equals(translate)) {
             return this;
         }
 
         this.translate.set(translate);
-        onTranslateChanged.fire(this);
+        if (sendUpdate) {
+            onTranslateChanged.fire(this);
+        }
         return this;
     }
 

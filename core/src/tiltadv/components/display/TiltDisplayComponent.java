@@ -44,7 +44,7 @@ public final class TiltDisplayComponent extends AbstractComponent {
     @Override
     public void update(final Duration elapsedTime) {
         Vector2 tilt = tiltComponent.getTilt();
-        if (tilt.isZero(1f)) {
+        if (tilt.isZero()) {
             spriteComponent.setHidden(true);
             return;
         }

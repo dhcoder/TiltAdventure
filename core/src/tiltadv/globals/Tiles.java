@@ -32,10 +32,10 @@ public final class Tiles {
     public static final TextureRegion OCTOUP2;
     public static final TextureRegion OCTORIGHT1;
     public static final TextureRegion OCTORIGHT2;
-    public static final TextureRegion RODRIGHT;
     public static final TextureRegion BOULDER;
     public static final TextureRegion ROCK;
     public static final TextureRegion SWORDRIGHT;
+    public static final TextureRegion SENSOR;
     private static final Texture textureSource;
 
     static {
@@ -67,11 +67,11 @@ public final class Tiles {
         OCTOUP2 = new TextureRegion(textureSource, 210, 30, 16, 16);
         OCTORIGHT1 = new TextureRegion(textureSource, 240, 30, 16, 16);
         OCTORIGHT2 = new TextureRegion(textureSource, 240, 0, 16, 16);
-        RODRIGHT = new TextureRegion(textureSource, 98, 126, 13, 4);
 
         BOULDER = new TextureRegion(textureSource, 120, 0, 16, 16);
         ROCK = new TextureRegion(textureSource, 120, 30, 8, 10);
         SWORDRIGHT = new TextureRegion(textureSource, 120, 60, 12, 7);
+        SENSOR = new TextureRegion(textureSource, 151, 61, 15, 15);
     }
 
     public static void dispose() {

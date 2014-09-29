@@ -18,10 +18,6 @@ public final class OffsetComponent extends AbstractComponent {
     private final EventListener handleTranslateChanged = new EventListener() {
         @Override
         public void run(final Object sender) {
-            if (isSyncing) {
-                return;
-            }
-
             if (sender == transformComponent) {
                 syncParentToChild();
             }
@@ -73,7 +69,7 @@ public final class OffsetComponent extends AbstractComponent {
         int mark = Pools.vector2s.mark();
         final Vector2 translate = Pools.vector2s.grabNew().set(parentTransformComponent.getTranslate());
         translate.add(offset);
-        transformComponent.setTranslate(translate);
+        transformComponent.setTranslate(translate, false);
         Pools.vector2s.freeToMark(mark);
         isSyncing = false;
     }
@@ -83,7 +79,7 @@ public final class OffsetComponent extends AbstractComponent {
         int mark = Pools.vector2s.mark();
         final Vector2 translate = Pools.vector2s.grabNew().set(transformComponent.getTranslate());
         translate.sub(offset);
-        parentTransformComponent.setTranslate(translate);
+        parentTransformComponent.setTranslate(translate, false);
         Pools.vector2s.freeToMark(mark);
         isSyncing = false;
     }

@@ -10,7 +10,6 @@ import dhcoder.support.time.Duration;
 import tiltadv.components.body.HeadingComponent;
 import tiltadv.components.body.MotionComponent;
 import tiltadv.components.body.TiltComponent;
-import tiltadv.components.collision.PlayerSensorCollisionComponent;
 import tiltadv.components.combat.HealthComponent;
 import tiltadv.components.hierarchy.children.PlayerChildrenComponent;
 import tiltadv.globals.Services;
@@ -59,7 +58,7 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
         owner.requireComponent(HealthComponent.class).setListener(this);
 
         PlayerChildrenComponent children = owner.requireComponent(PlayerChildrenComponent.class);
-        owner.requireComponent(PlayerSensorCollisionComponent.class).setSwordEntity(children.getSwordEntity());
+//        owner.requireComponent(PlayerSensorCollisionComponent.class).setSwordEntity(children.getSwordEntity());
     }
 
     @Override

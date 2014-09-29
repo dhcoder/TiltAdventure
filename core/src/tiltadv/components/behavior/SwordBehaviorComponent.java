@@ -9,7 +9,6 @@ import tiltadv.components.collision.SwordCollisionComponent;
 import tiltadv.components.display.SpriteComponent;
 import tiltadv.components.hierarchy.ParentComponent;
 import tiltadv.components.body.HeadingComponent;
-import tiltadv.components.body.SizeComponent;
 import tiltadv.components.body.TransformComponent;
 import tiltadv.memory.Pools;
 
@@ -28,12 +27,10 @@ public final class SwordBehaviorComponent extends AbstractComponent {
     private boolean onReturnTrip;
 
     private TransformComponent transformComponent;
-    private SizeComponent sizeComponent;
     private SwordCollisionComponent collisionComponent;
     private SpriteComponent spriteComponent;
 
     private TransformComponent parentTransformComponent;
-    private SizeComponent parentSizeComponent;
     private HeadingComponent parentHeadingComponent;
 
     public SwordBehaviorComponent() { reset(); }
@@ -51,11 +48,9 @@ public final class SwordBehaviorComponent extends AbstractComponent {
         Entity parent = owner.requireComponent(ParentComponent.class).getParent();
         parentTransformComponent = parent.requireComponent(TransformComponent.class);
         parentHeadingComponent = parent.requireComponent(HeadingComponent.class);
-        parentSizeComponent = parent.requireComponent(SizeComponent.class);
 
         spriteComponent = owner.requireComponent(SpriteComponent.class);
         transformComponent = owner.requireComponent(TransformComponent.class);
-        sizeComponent = owner.requireComponent(SizeComponent.class);
         collisionComponent = owner.requireComponent(SwordCollisionComponent.class);
 
         setActive(false);
@@ -102,14 +97,12 @@ public final class SwordBehaviorComponent extends AbstractComponent {
 
         int vectorMark = Pools.vector2s.mark();
         Vector2 currTranslate = Pools.vector2s.grabNew();
-        currTranslate.set((parentSizeComponent.getSize().x * .8f + sizeComponent.getSize().x) / 2f, 0f);
         currTranslate.rotate(currAngle.getDegrees());
         currTranslate.add(parentTransformComponent.getTranslate());
         transformComponent.setTranslate(currTranslate);
         transformComponent.setRotation(currAngle);
 
         Vector2 swordTip = Pools.vector2s.grabNew();
-        swordTip.set(sizeComponent.getSize().x / 2f, 0f);
         swordTip.rotate(currAngle.getDegrees());
         collisionComponent.setOffset(swordTip);
 
@@ -127,12 +120,10 @@ public final class SwordBehaviorComponent extends AbstractComponent {
 
         spriteComponent = null;
         transformComponent = null;
-        sizeComponent = null;
         collisionComponent = null;
 
         parentTransformComponent = null;
         parentHeadingComponent = null;
-        parentSizeComponent = null;
     }
 
     private void setActive(final boolean active) {
