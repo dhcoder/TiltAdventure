@@ -7,7 +7,6 @@ import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.math.Angle;
 import dhcoder.support.time.Duration;
 import tiltadv.components.body.TiltComponent;
-import tiltadv.components.body.TransformComponent;
 import tiltadv.memory.Pools;
 
 /**
@@ -18,7 +17,6 @@ public final class TiltDisplayComponent extends AbstractComponent {
     private TextureRegion arrowSprite;
     private Entity observedEntity;
 
-    private TransformComponent transformComponent;
     private SpriteComponent spriteComponent;
     private TiltComponent tiltComponent;
 
@@ -34,7 +32,6 @@ public final class TiltDisplayComponent extends AbstractComponent {
 
     @Override
     public void initialize(final Entity owner) {
-        transformComponent = owner.requireComponent(TransformComponent.class);
         spriteComponent = owner.requireComponent(SpriteComponent.class);
         spriteComponent.setTextureRegion(arrowSprite);
 
@@ -53,7 +50,7 @@ public final class TiltDisplayComponent extends AbstractComponent {
         {
             Angle angle = Pools.angles.grabNew();
             angle.setDegrees(tilt.angle());
-            transformComponent.setRotation(angle);
+            spriteComponent.setRotation(angle);
             Pools.angles.free(angle);
         }
     }
@@ -65,6 +62,5 @@ public final class TiltDisplayComponent extends AbstractComponent {
 
         spriteComponent = null;
         tiltComponent = null;
-        transformComponent = null;
     }
 }

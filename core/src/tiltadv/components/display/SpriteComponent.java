@@ -11,7 +11,7 @@ import dhcoder.libgdx.render.RenderSystem;
 import dhcoder.libgdx.render.Renderable;
 import dhcoder.support.math.Angle;
 import dhcoder.support.opt.OptFloat;
-import tiltadv.components.body.TransformComponent;
+import tiltadv.components.body.PositionComponent;
 import tiltadv.globals.Services;
 
 /**
@@ -27,7 +27,7 @@ public final class SpriteComponent extends AbstractComponent implements Renderab
     private boolean hidden;
     private final OptFloat zOpt = OptFloat.withNoValue();
 
-    private TransformComponent transformComponent;
+    private PositionComponent positionComponent;
 
     public SpriteComponent() {
         sprite = new Sprite();
@@ -51,6 +51,11 @@ public final class SpriteComponent extends AbstractComponent implements Renderab
         return this;
     }
 
+    public SpriteComponent setRotation(final Angle angle) {
+        sprite.setRotation(angle.getDegrees());
+        return this;
+    }
+
     public SpriteComponent setAlpha(final float alpha) {
         sprite.setAlpha(alpha);
         return this;
@@ -58,7 +63,7 @@ public final class SpriteComponent extends AbstractComponent implements Renderab
 
     @Override
     public void initialize(final Entity owner) {
-        transformComponent = owner.requireComponent(TransformComponent.class);
+        positionComponent = owner.requireComponent(PositionComponent.class);
 
         RenderSystem renderSystem = Services.get(RenderSystem.class);
         renderSystem.add(this);
@@ -69,14 +74,9 @@ public final class SpriteComponent extends AbstractComponent implements Renderab
         if (hidden) { return; }
         if (sprite.getTexture() == null) { return; }
 
-        Vector2 translate = transformComponent.getTranslate();
-        Vector2 scale = transformComponent.getScale();
-        Angle rotation = transformComponent.getRotation();
+        Vector2 translate = positionComponent.getPosition();
 
         sprite.setCenter(translate.x, translate.y);
-        sprite.setScale(scale.x, scale.y);
-        sprite.setRotation(rotation.getDegrees());
-
         sprite.draw(batch);
     }
 
@@ -100,7 +100,7 @@ public final class SpriteComponent extends AbstractComponent implements Renderab
         hidden = false;
         zOpt.reset();
 
-        transformComponent = null;
+        positionComponent = null;
 
         RenderSystem renderSystem = Services.get(RenderSystem.class);
         renderSystem.remove(this);

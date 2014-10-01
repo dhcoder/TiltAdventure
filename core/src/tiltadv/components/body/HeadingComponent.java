@@ -7,7 +7,7 @@ import dhcoder.support.math.Angle;
 
 /**
  * Component that encapsulates the logic of calculating an {@link Entity}'s velocity and acceleration. Expects the
- * existence of a {@link TransformComponent} to act upon.
+ * existence of a {@link PositionComponent} to act upon.
  * <p/>
  * TODO: Add tests and documentation, maybe also remove some public methods here.
  */

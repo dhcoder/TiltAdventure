@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.time.Duration;
-import tiltadv.components.body.TransformComponent;
+import tiltadv.components.body.PositionComponent;
 import tiltadv.memory.Pools;
 
 /**
@@ -18,7 +18,7 @@ public final class OscillationBehaviorComponent extends AbstractComponent {
     private final Duration duration = Duration.zero();
     private final Duration accumulated = Duration.zero();
     private boolean onReturnTrip;
-    private TransformComponent transformComponent;
+    private PositionComponent positionComponent;
 
     public OscillationBehaviorComponent() { reset(); }
 
@@ -31,7 +31,7 @@ public final class OscillationBehaviorComponent extends AbstractComponent {
 
     @Override
     public void initialize(final Entity owner) {
-        transformComponent = owner.requireComponent(TransformComponent.class);
+        positionComponent = owner.requireComponent(PositionComponent.class);
     }
 
     @Override
@@ -50,7 +50,7 @@ public final class OscillationBehaviorComponent extends AbstractComponent {
         Vector2 currPos = Pools.vector2s.grabNew();
         currPos.set(start);
         currPos.interpolate(end, percent, Interpolation.sine);
-        transformComponent.setTranslate(currPos);
+        positionComponent.setPosition(currPos);
         Pools.vector2s.free(currPos);
     }
 
@@ -62,6 +62,6 @@ public final class OscillationBehaviorComponent extends AbstractComponent {
         accumulated.setZero();
         onReturnTrip = false;
 
-        transformComponent = null;
+        positionComponent = null;
     }
 }

@@ -8,7 +8,7 @@ import tiltadv.memory.Pools;
 
 /**
  * Component that encapsulates the logic of calculating an {@link Entity}'s velocity and acceleration. Expects the
- * existence of a {@link TransformComponent} to act upon.
+ * existence of a {@link PositionComponent} to act upon.
  * <p/>
  * TODO: Add tests and documentation, maybe also remove some public methods here.
  */
@@ -19,7 +19,7 @@ public final class MotionComponent extends AbstractComponent {
     // The velocity of this entity is measured in pixels/sec² (after one sec, velocity should be reduced by this much)
     private final Vector2 deceleration = new Vector2();
 
-    private TransformComponent transformComponent;
+    private PositionComponent positionComponent;
 
     public Vector2 getVelocity() { return velocity; }
 
@@ -51,7 +51,7 @@ public final class MotionComponent extends AbstractComponent {
 
     @Override
     public void initialize(final Entity owner) {
-        transformComponent = owner.requireComponent(TransformComponent.class);
+        positionComponent = owner.requireComponent(PositionComponent.class);
     }
 
     @Override
@@ -70,9 +70,9 @@ public final class MotionComponent extends AbstractComponent {
         // Adjust current position based on how much velocity was applied over the last time range
         {
             Vector2 translate = Pools.vector2s.grabNew();
-            translate.set(transformComponent.getTranslate());
+            translate.set(positionComponent.getPosition());
             translate.mulAdd(velocity, elapsedTime.getSeconds());
-            transformComponent.setTranslate(translate);
+            positionComponent.setPosition(translate);
             Pools.vector2s.free(translate);
         }
     }
@@ -82,6 +82,6 @@ public final class MotionComponent extends AbstractComponent {
         velocity.setZero();
         deceleration.setZero();
 
-        transformComponent = null;
+        positionComponent = null;
     }
 }

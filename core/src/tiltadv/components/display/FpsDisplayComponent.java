@@ -9,7 +9,7 @@ import dhcoder.libgdx.entity.Entity;
 import dhcoder.libgdx.render.RenderSystem;
 import dhcoder.libgdx.render.Renderable;
 import dhcoder.support.time.Duration;
-import tiltadv.components.body.TransformComponent;
+import tiltadv.components.body.PositionComponent;
 import tiltadv.globals.Services;
 
 import static dhcoder.support.text.StringUtils.format;
@@ -22,7 +22,7 @@ public final class FpsDisplayComponent extends AbstractComponent implements Rend
     private final static String FPS_LABEL_FORMAT = "FPS: {0}";
     private final String[] fpsLabels;
     private BitmapFont font;
-    private TransformComponent transformComponent;
+    private PositionComponent positionComponent;
     private String fpsLabel;
 
     public FpsDisplayComponent() {
@@ -40,7 +40,7 @@ public final class FpsDisplayComponent extends AbstractComponent implements Rend
 
     @Override
     public void initialize(final Entity owner) {
-        transformComponent = owner.requireComponent(TransformComponent.class);
+        positionComponent = owner.requireComponent(PositionComponent.class);
 
         RenderSystem renderSystem = Services.get(RenderSystem.class);
         renderSystem.add(this);
@@ -54,13 +54,13 @@ public final class FpsDisplayComponent extends AbstractComponent implements Rend
 
     @Override
     public void render(final Batch batch) {
-        Vector2 translate = transformComponent.getTranslate();
+        Vector2 translate = positionComponent.getPosition();
         font.draw(batch, fpsLabel, translate.x, translate.y);
     }
 
     @Override
     public void reset() {
-        transformComponent = null;
+        positionComponent = null;
         fpsLabel = null;
         font = null;
 

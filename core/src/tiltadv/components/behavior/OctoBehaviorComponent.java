@@ -11,7 +11,7 @@ import dhcoder.support.time.Duration;
 import tiltadv.components.combat.HealthComponent;
 import tiltadv.components.body.HeadingComponent;
 import tiltadv.components.body.MotionComponent;
-import tiltadv.components.body.TransformComponent;
+import tiltadv.components.body.PositionComponent;
 import tiltadv.globals.EntityId;
 import tiltadv.memory.Pools;
 
@@ -44,7 +44,7 @@ public final class OctoBehaviorComponent extends AbstractComponent implements He
     private Entity owner;
     private HeadingComponent headingComponent;
     private MotionComponent motionComponent;
-    private TransformComponent transformComponent;
+    private PositionComponent positionComponent;
 
     public OctoBehaviorComponent() {
         octoState = createStateMachine();
@@ -65,7 +65,7 @@ public final class OctoBehaviorComponent extends AbstractComponent implements He
 
         headingComponent = owner.requireComponent(HeadingComponent.class);
         motionComponent = owner.requireComponent(MotionComponent.class);
-        transformComponent = owner.requireComponent(TransformComponent.class);
+        positionComponent = owner.requireComponent(PositionComponent.class);
 
         owner.requireComponent(HealthComponent.class).setListener(this);
     }
@@ -90,7 +90,7 @@ public final class OctoBehaviorComponent extends AbstractComponent implements He
         owner = null;
         headingComponent = null;
         motionComponent = null;
-        transformComponent = null;
+        positionComponent = null;
     }
 
     private StateMachine<State, Evt> createStateMachine() {
@@ -117,8 +117,8 @@ public final class OctoBehaviorComponent extends AbstractComponent implements He
             public State run(final State fromState, final Evt withEvent, final Opt eventData) {
                 final Entity rock = owner.getManager().newEntityFromTemplate(EntityId.OCTO_ROCK);
                 final MotionComponent rockMotion = rock.requireComponent(MotionComponent.class);
-                final TransformComponent rockPosition = rock.requireComponent(TransformComponent.class);
-                rockPosition.setTranslate(transformComponent.getTranslate());
+                final PositionComponent rockPosition = rock.requireComponent(PositionComponent.class);
+                rockPosition.setPosition(positionComponent.getPosition());
 
                 CardinalDirection direction = CardinalDirection.getForAngle(headingComponent.getHeading());
                 Vector2 rockVelocity = Pools.vector2s.grabNew();

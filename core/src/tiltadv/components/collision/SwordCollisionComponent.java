@@ -7,7 +7,7 @@ import dhcoder.libgdx.entity.Entity;
 import tiltadv.components.combat.AttackComponent;
 import tiltadv.components.combat.HealthComponent;
 import tiltadv.components.hierarchy.ParentComponent;
-import tiltadv.components.body.TransformComponent;
+import tiltadv.components.body.PositionComponent;
 import tiltadv.globals.Group;
 import tiltadv.globals.Services;
 import tiltadv.memory.Pools;
@@ -57,8 +57,8 @@ public final class SwordCollisionComponent extends CollisionComponent {
 
         Vector2 collisionDirection = Pools.vector2s.grabNew();
         Entity parentEntity = owner.requireComponent(ParentComponent.class).getParent();
-        collisionDirection.set(enemyEntity.requireComponent(TransformComponent.class).getTranslate());
-        collisionDirection.sub(parentEntity.requireComponent(TransformComponent.class).getTranslate());
+        collisionDirection.set(enemyEntity.requireComponent(PositionComponent.class).getPosition());
+        collisionDirection.sub(parentEntity.requireComponent(PositionComponent.class).getPosition());
         collisionDirection.nor();
         healthComponent.takeDamage(collisionDirection, attackComponent.getStrength());
         Pools.vector2s.free(collisionDirection);

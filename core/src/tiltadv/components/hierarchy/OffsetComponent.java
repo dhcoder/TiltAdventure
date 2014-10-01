@@ -5,11 +5,11 @@ import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.event.EventListener;
 import dhcoder.support.time.Duration;
-import tiltadv.components.body.TransformComponent;
+import tiltadv.components.body.PositionComponent;
 import tiltadv.memory.Pools;
 
 /**
- * A component that links a child with its parent (each which must have a {@link TransformComponent}) so that when one
+ * A component that links a child with its parent (each which must have a {@link PositionComponent}) so that when one
  * moves, the other follows along.
  */
 public final class OffsetComponent extends AbstractComponent {
@@ -18,18 +18,18 @@ public final class OffsetComponent extends AbstractComponent {
     private final EventListener handleTranslateChanged = new EventListener() {
         @Override
         public void run(final Object sender) {
-            if (sender == transformComponent) {
+            if (sender == positionComponent) {
                 syncParentToChild();
             }
-            else if (sender == parentTransformComponent) {
+            else if (sender == parentPositionComponent) {
                 syncChildToParent();
             }
         }
     };
 
     private boolean isSyncing;
-    private TransformComponent transformComponent;
-    private TransformComponent parentTransformComponent;
+    private PositionComponent positionComponent;
+    private PositionComponent parentPositionComponent;
 
     public OffsetComponent setOffset(final Vector2 offset) {
         this.offset.set(offset);
@@ -38,13 +38,13 @@ public final class OffsetComponent extends AbstractComponent {
 
     @Override
     public void initialize(final Entity owner) {
-        transformComponent = owner.requireComponent(TransformComponent.class);
+        positionComponent = owner.requireComponent(PositionComponent.class);
 
         Entity parent = owner.requireComponent(ParentComponent.class).getParent();
-        parentTransformComponent = parent.requireComponent(TransformComponent.class);
+        parentPositionComponent = parent.requireComponent(PositionComponent.class);
 
-        transformComponent.onTranslateChanged.addListener(handleTranslateChanged);
-        parentTransformComponent.onTranslateChanged.addListener(handleTranslateChanged);
+        positionComponent.onTranslateChanged.addListener(handleTranslateChanged);
+        parentPositionComponent.onTranslateChanged.addListener(handleTranslateChanged);
     }
 
     @Override
@@ -52,11 +52,11 @@ public final class OffsetComponent extends AbstractComponent {
         offset.setZero();
         isSyncing = false;
 
-        transformComponent.onTranslateChanged.removeListener(handleTranslateChanged);
-        parentTransformComponent.onTranslateChanged.removeListener(handleTranslateChanged);
+        positionComponent.onTranslateChanged.removeListener(handleTranslateChanged);
+        parentPositionComponent.onTranslateChanged.removeListener(handleTranslateChanged);
 
-        transformComponent = null;
-        parentTransformComponent = null;
+        positionComponent = null;
+        parentPositionComponent = null;
     }
 
     @Override
@@ -67,9 +67,9 @@ public final class OffsetComponent extends AbstractComponent {
     private void syncChildToParent() {
         isSyncing = true;
         int mark = Pools.vector2s.mark();
-        final Vector2 translate = Pools.vector2s.grabNew().set(parentTransformComponent.getTranslate());
+        final Vector2 translate = Pools.vector2s.grabNew().set(parentPositionComponent.getPosition());
         translate.add(offset);
-        transformComponent.setTranslate(translate, false);
+        positionComponent.setTranslate(translate, false);
         Pools.vector2s.freeToMark(mark);
         isSyncing = false;
     }
@@ -77,9 +77,9 @@ public final class OffsetComponent extends AbstractComponent {
     private void syncParentToChild() {
         isSyncing = true;
         int mark = Pools.vector2s.mark();
-        final Vector2 translate = Pools.vector2s.grabNew().set(transformComponent.getTranslate());
+        final Vector2 translate = Pools.vector2s.grabNew().set(positionComponent.getPosition());
         translate.sub(offset);
-        parentTransformComponent.setTranslate(translate, false);
+        parentPositionComponent.setTranslate(translate, false);
         Pools.vector2s.freeToMark(mark);
         isSyncing = false;
     }

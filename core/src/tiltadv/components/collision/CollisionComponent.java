@@ -9,7 +9,7 @@ import dhcoder.libgdx.collision.shape.Shape;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.time.Duration;
-import tiltadv.components.body.TransformComponent;
+import tiltadv.components.body.PositionComponent;
 import tiltadv.globals.Services;
 import tiltadv.memory.Pools;
 
@@ -25,7 +25,7 @@ public abstract class CollisionComponent extends AbstractComponent implements Co
 
     private final int groupId;
     private Collider collider;
-    private TransformComponent transformComponent;
+    private PositionComponent positionComponent;
     private Vector2 offset = new Vector2();
 
     public CollisionComponent(final int groupId) {
@@ -59,7 +59,7 @@ public abstract class CollisionComponent extends AbstractComponent implements Co
     public final void initialize(final Entity owner) {
         requireNonNull(collider, "Collider not set. Did you call setShape?");
 
-        transformComponent = owner.requireComponent(TransformComponent.class);
+        positionComponent = owner.requireComponent(PositionComponent.class);
         collider.setTag(owner);
         handleInitialize(owner);
     }
@@ -71,8 +71,8 @@ public abstract class CollisionComponent extends AbstractComponent implements Co
         }
 
         handleUpdate(elapsedTime);
-        collider.updatePosition(transformComponent.getTranslate().x + offset.x,
-            transformComponent.getTranslate().y + offset.y);
+        collider.updatePosition(positionComponent.getPosition().x + offset.x,
+            positionComponent.getPosition().y + offset.y);
     }
 
     @Override
@@ -83,7 +83,7 @@ public abstract class CollisionComponent extends AbstractComponent implements Co
         collisionSystem.release(collider);
         collider = null;
 
-        transformComponent = null;
+        positionComponent = null;
         offset.setZero();
     }
 
@@ -101,12 +101,12 @@ public abstract class CollisionComponent extends AbstractComponent implements Co
         int mark = Pools.vector2s.mark();
         Vector2 translate = Pools.vector2s.grabNew();
         translate.set(collider.getCurrPosition().x, collider.getCurrPosition().y);
-        transformComponent.setTranslate(translate);
+        positionComponent.setPosition(translate);
         Pools.vector2s.freeToMark(mark);
     }
 
-    protected TransformComponent getTransformComponent() {
-        return transformComponent;
+    protected PositionComponent getPositionComponent() {
+        return positionComponent;
     }
 
     protected void handleInitialize(final Entity owner) {}

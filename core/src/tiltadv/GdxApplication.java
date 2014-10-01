@@ -27,8 +27,8 @@ import tiltadv.components.behavior.PlayerSensorBehaviorComponent;
 import tiltadv.components.behavior.SwordBehaviorComponent;
 import tiltadv.components.body.HeadingComponent;
 import tiltadv.components.body.MotionComponent;
+import tiltadv.components.body.PositionComponent;
 import tiltadv.components.body.TiltComponent;
-import tiltadv.components.body.TransformComponent;
 import tiltadv.components.collision.EnemyCollisionComponent;
 import tiltadv.components.collision.EnemyProjectileCollisionComponent;
 import tiltadv.components.collision.ObstacleCollisionComponent;
@@ -169,7 +169,7 @@ public final class GdxApplication extends ApplicationAdapter {
         octoRockBounds = new Circle(Tiles.ROCK.getRegionWidth() / 2f);
         boulderBounds = new Circle(Tiles.BOULDER.getRegionWidth() / 2f);
 
-        entities.preallocate(TransformComponent.class, ENTITY_COUNT);
+        entities.preallocate(PositionComponent.class, ENTITY_COUNT);
         entities.preallocate(MotionComponent.class, ENTITY_COUNT);
         entities.preallocate(SpriteComponent.class, ENTITY_COUNT);
 
@@ -179,7 +179,7 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(PlayerChildrenComponent.class);
                 entity.addComponent(KnockbackComponent.class);
                 entity.addComponent(DefenseComponent.class);
-                entity.addComponent(TransformComponent.class);
+                entity.addComponent(PositionComponent.class);
                 entity.addComponent(SpriteComponent.class);
                 entity.addComponent(HeadingComponent.class);
                 entity.addComponent(MotionComponent.class);
@@ -203,7 +203,7 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(SwordBehaviorComponent.class);
                 entity.addComponent(AttackComponent.class);
                 entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.SWORDRIGHT);
-                entity.addComponent(TransformComponent.class);
+                entity.addComponent(PositionComponent.class);
             }
         });
 
@@ -211,7 +211,7 @@ public final class GdxApplication extends ApplicationAdapter {
             @Override
             public void initialize(final Entity entity) {
                 entity.addComponent(ParentComponent.class);  // Child to Player Entity
-                entity.addComponent(TransformComponent.class);
+                entity.addComponent(PositionComponent.class);
                 entity.addComponent(OffsetComponent.class);
                 entity.addComponent(PlayerSensorCollisionComponent.class).setShape(playerSensorBounds);
                 entity.addComponent(PlayerSensorBehaviorComponent.class);
@@ -225,7 +225,7 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(KnockbackComponent.class).setMultiplier(2f);
                 entity.addComponent(AttackComponent.class);
                 entity.addComponent(DefenseComponent.class);
-                entity.addComponent(TransformComponent.class);
+                entity.addComponent(PositionComponent.class);
                 entity.addComponent(SpriteComponent.class);
                 entity.addComponent(HeadingComponent.class);
                 entity.addComponent(MotionComponent.class);
@@ -242,7 +242,7 @@ public final class GdxApplication extends ApplicationAdapter {
             @Override
             public void initialize(final Entity entity) {
                 entity.addComponent(AttackComponent.class);
-                entity.addComponent(TransformComponent.class);
+                entity.addComponent(PositionComponent.class);
                 entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.ROCK);
                 entity.addComponent(HeadingComponent.class);
                 entity.addComponent(MotionComponent.class);
@@ -297,19 +297,19 @@ public final class GdxApplication extends ApplicationAdapter {
         final Shape horizontalWall = new Rectangle(halfScreenW, halfWallSize);
 
         wallPos.set(left, 0f);
-        wallLeft.addComponent(TransformComponent.class).setTranslate(wallPos);
+        wallLeft.addComponent(PositionComponent.class).setPosition(wallPos);
         wallLeft.addComponent(ObstacleCollisionComponent.class).setShape(verticalWall);
 
         wallPos.set(right, 0f);
-        wallRight.addComponent(TransformComponent.class).setTranslate(wallPos);
+        wallRight.addComponent(PositionComponent.class).setPosition(wallPos);
         wallRight.addComponent(ObstacleCollisionComponent.class).setShape(verticalWall);
 
         wallPos.set(0f, bottom);
-        wallBottom.addComponent(TransformComponent.class).setTranslate(wallPos);
+        wallBottom.addComponent(PositionComponent.class).setPosition(wallPos);
         wallBottom.addComponent(ObstacleCollisionComponent.class).setShape(horizontalWall);
 
         wallPos.set(0f, top);
-        wallTop.addComponent(TransformComponent.class).setTranslate(wallPos);
+        wallTop.addComponent(PositionComponent.class).setPosition(wallPos);
         wallTop.addComponent(ObstacleCollisionComponent.class).setShape(horizontalWall);
 
         Pools.vector2s.free(wallPos);
@@ -355,10 +355,10 @@ public final class GdxApplication extends ApplicationAdapter {
 
     private void addOctoEnemy(final float x, final float y) {
         Entity octoEnemy = entities.newEntityFromTemplate(EntityId.OCTO);
-        TransformComponent transformComponent = octoEnemy.requireComponent(TransformComponent.class);
+        PositionComponent positionComponent = octoEnemy.requireComponent(PositionComponent.class);
 
         Vector2 position = Pools.vector2s.grabNew().set(x, y);
-        transformComponent.setTranslate(position);
+        positionComponent.setPosition(position);
         Pools.vector2s.free(position);
     }
 
@@ -366,7 +366,7 @@ public final class GdxApplication extends ApplicationAdapter {
 
         Entity boulderEntity = entities.newEntity();
         boulderEntity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.BOULDER);
-        boulderEntity.addComponent(TransformComponent.class);
+        boulderEntity.addComponent(PositionComponent.class);
         boulderEntity.addComponent(OscillationBehaviorComponent.class)
             .set(new Vector2(xFrom, yFrom), new Vector2(xTo, yTo), Duration.fromSeconds(2f));
         boulderEntity.addComponent(ObstacleCollisionComponent.class).setShape(boulderBounds);
@@ -374,8 +374,8 @@ public final class GdxApplication extends ApplicationAdapter {
 
     private void addFpsEntity() {
         Entity fpsEntity = entities.newEntity();
-        fpsEntity.addComponent(TransformComponent.class)
-            .setTranslate(new Vector2(-VIEWPORT_WIDTH / 2, -VIEWPORT_HEIGHT / 2 + font.getLineHeight()));
+        fpsEntity.addComponent(PositionComponent.class)
+            .setPosition(new Vector2(-VIEWPORT_WIDTH / 2, -VIEWPORT_HEIGHT / 2 + font.getLineHeight()));
         fpsEntity.addComponent(FpsDisplayComponent.class).set(font);
     }
 
@@ -383,7 +383,7 @@ public final class GdxApplication extends ApplicationAdapter {
         Entity tiltIndicatorEntity = entities.newEntity();
 
         final float MARGIN = 5f;
-        tiltIndicatorEntity.addComponent(TransformComponent.class).setTranslate(
+        tiltIndicatorEntity.addComponent(PositionComponent.class).setPosition(
             new Vector2(VIEWPORT_WIDTH / 2 - Tiles.SWORDRIGHT.getRegionWidth() - MARGIN,
                 VIEWPORT_HEIGHT / 2 - Tiles.SWORDRIGHT.getRegionHeight() - MARGIN));
         tiltIndicatorEntity.addComponent(SpriteComponent.class);
