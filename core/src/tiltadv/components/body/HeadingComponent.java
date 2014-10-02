@@ -29,6 +29,6 @@ public final class HeadingComponent extends AbstractComponent {
 
     @Override
     public void reset() {
-        heading.reset();
+        heading.setDegrees(0f);
     }
 }

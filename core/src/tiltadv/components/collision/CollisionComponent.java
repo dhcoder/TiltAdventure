@@ -24,12 +24,16 @@ import static dhcoder.support.contract.ContractUtils.requireNonNull;
 public abstract class CollisionComponent extends AbstractComponent implements CollisionListener {
 
     private final int groupId;
+    private final Vector2 offset = new Vector2();
     private Collider collider;
     private PositionComponent positionComponent;
-    private Vector2 offset = new Vector2();
 
     public CollisionComponent(final int groupId) {
         this.groupId = groupId;
+    }
+
+    public final Shape getShape() {
+        return collider.getShape();
     }
 
     public final CollisionComponent setShape(final Shape shape) {
@@ -38,16 +42,8 @@ public abstract class CollisionComponent extends AbstractComponent implements Co
         return this;
     }
 
-    public final Shape getShape() {
-        return collider.getShape();
-    }
-
     public Collider getCollider() {
         return collider;
-    }
-
-    public Vector2 getOffset() {
-        return offset;
     }
 
     public CollisionComponent setOffset(final Vector2 offset) {
@@ -71,8 +67,8 @@ public abstract class CollisionComponent extends AbstractComponent implements Co
         }
 
         handleUpdate(elapsedTime);
-        collider.updatePosition(positionComponent.getPosition().x + offset.x,
-            positionComponent.getPosition().y + offset.y);
+        collider
+            .updatePosition(positionComponent.getPosition().x + offset.x, positionComponent.getPosition().y + offset.y);
     }
 
     @Override
@@ -100,13 +96,9 @@ public abstract class CollisionComponent extends AbstractComponent implements Co
     public final void onReverted(final Collision collision) {
         int mark = Pools.vector2s.mark();
         Vector2 translate = Pools.vector2s.grabNew();
-        translate.set(collider.getCurrPosition().x, collider.getCurrPosition().y);
+        translate.set(collider.getCurrPosition().x, collider.getCurrPosition().y).sub(offset);
         positionComponent.setPosition(translate);
         Pools.vector2s.freeToMark(mark);
-    }
-
-    protected PositionComponent getPositionComponent() {
-        return positionComponent;
     }
 
     protected void handleInitialize(final Entity owner) {}

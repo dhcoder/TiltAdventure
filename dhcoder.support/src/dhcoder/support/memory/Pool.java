@@ -35,6 +35,11 @@ public final class Pool<T> {
     public static final int DEFAULT_CAPACITY = 10;
     /**
      * If true, run reflection sanity checks on the objects to make sure they were reset appropriately.
+     *
+     * This is done using {@link ReflectionUtils#assertSame(Object, Object)}, so you may wish to register your own
+     * equality testers using {@link ReflectionUtils#registerEqualityTester(Class, ReflectionUtils.EqualityTester)} in
+     * case you need to specify a special-case equals method when the default equals method isn't cutting it (for
+     * example, if an equals method wasn't provided by a third party class).
      */
     public static boolean RUN_SANITY_CHECKS = false;
 

@@ -102,6 +102,10 @@ public final class Collider implements Poolable {
         isInitialized = false;
         isEnabled = true;
         listener = null;
+        lastPosition.setZero();
+        currPosition.setZero();
+        tag.clear();
+
     }
 
     /**

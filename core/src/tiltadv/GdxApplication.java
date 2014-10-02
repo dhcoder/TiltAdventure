@@ -7,6 +7,7 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -19,6 +20,7 @@ import dhcoder.libgdx.entity.EntityManager;
 import dhcoder.libgdx.render.RenderSystem;
 import dhcoder.support.math.Angle;
 import dhcoder.support.memory.Pool;
+import dhcoder.support.memory.ReflectionUtils;
 import dhcoder.support.time.Duration;
 import tiltadv.components.behavior.OctoBehaviorComponent;
 import tiltadv.components.behavior.OscillationBehaviorComponent;
@@ -89,7 +91,15 @@ public final class GdxApplication extends ApplicationAdapter {
         batch = new SpriteBatch();
         if (DevSettings.IN_DEV_MODE) {
             shapeRenderer = new ShapeRenderer();
+
             Pool.RUN_SANITY_CHECKS = true;
+            ReflectionUtils.registerEqualityTester(Sprite.class, new ReflectionUtils.EqualityTester<Sprite>() {
+                @Override
+                public boolean areSame(final Sprite sprite1, final Sprite sprite2) {
+                    // Simplify sprite comparison for now, making sure we set the sprites to null on reset
+                    return sprite1.getTexture() == null && sprite2.getTexture() == null;
+                }
+            });
         }
         font = new BitmapFont();
 

@@ -148,6 +148,7 @@ public final class Angle implements Poolable {
 
     @Override
     public void reset() {
-        setDegrees(0f);
+        degreesOpt.set(0f);
+        radiansOpt.set(0f);
     }
 }
