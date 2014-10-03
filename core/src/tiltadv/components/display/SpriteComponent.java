@@ -56,6 +56,11 @@ public final class SpriteComponent extends AbstractComponent implements Renderab
         return this;
     }
 
+    public SpriteComponent setOffset(final Vector2 offset) {
+        offset.set(offset);
+        return this;
+    }
+
     @Override
     public void initialize(final Entity owner) {
         positionComponent = owner.requireComponent(PositionComponent.class);
