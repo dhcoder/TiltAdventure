@@ -13,6 +13,7 @@ import dhcoder.support.math.Angle;
 import dhcoder.support.opt.OptFloat;
 import tiltadv.components.body.PositionComponent;
 import tiltadv.globals.Services;
+import tiltadv.memory.Pools;
 
 /**
  * A component that encapsulates the logic of rendering a sprite.
@@ -20,18 +21,12 @@ import tiltadv.globals.Services;
  */
 public final class SpriteComponent extends AbstractComponent implements Renderable {
 
-    /**
-     * The source sprite used by this component. Use {@link Sprite#set(Sprite)} if you need to change it, later.
-     */
-    private final Sprite sprite;
+    private final Sprite sprite = new Sprite();
+    private final Vector2 offset = new Vector2();
     private boolean hidden;
     private final OptFloat zOpt = OptFloat.withNoValue();
 
     private PositionComponent positionComponent;
-
-    public SpriteComponent() {
-        sprite = new Sprite();
-    }
 
     public SpriteComponent setTextureRegion(final TextureRegion textureRegion) {
         sprite.setRegion(textureRegion);
@@ -74,10 +69,13 @@ public final class SpriteComponent extends AbstractComponent implements Renderab
         if (hidden) { return; }
         if (sprite.getTexture() == null) { return; }
 
-        Vector2 translate = positionComponent.getPosition();
+        Vector2 translate = Pools.vector2s.grabNew().set(positionComponent.getPosition());
+        translate.add(offset);
 
         sprite.setCenter(translate.x, translate.y);
         sprite.draw(batch);
+
+        Pools.vector2s.freeCount(1);
     }
 
     @Override
@@ -96,6 +94,7 @@ public final class SpriteComponent extends AbstractComponent implements Renderab
 
     @Override
     public void reset() {
+        offset.setZero();
         sprite.setTexture(null);
         hidden = false;
         zOpt.reset();
