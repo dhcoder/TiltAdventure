@@ -15,6 +15,8 @@ import tiltadv.components.body.PositionComponent;
 import tiltadv.globals.Services;
 import tiltadv.memory.Pools;
 
+import static dhcoder.libgdx.memory.LibgdxUtils.resetSprite;
+
 /**
  * A component that encapsulates the logic of rendering a sprite.
  * <p/>
@@ -23,8 +25,8 @@ public final class SpriteComponent extends AbstractComponent implements Renderab
 
     private final Sprite sprite = new Sprite();
     private final Vector2 offset = new Vector2();
-    private boolean hidden;
     private final OptFloat zOpt = OptFloat.withNoValue();
+    private boolean hidden;
 
     private PositionComponent positionComponent;
 
@@ -51,13 +53,18 @@ public final class SpriteComponent extends AbstractComponent implements Renderab
         return this;
     }
 
+    public SpriteComponent setFlip(final boolean flipX, final boolean flipY) {
+        sprite.setFlip(flipX, flipY);
+        return this;
+    }
+
     public SpriteComponent setAlpha(final float alpha) {
         sprite.setAlpha(alpha);
         return this;
     }
 
     public SpriteComponent setOffset(final Vector2 offset) {
-        offset.set(offset);
+        this.offset.set(offset);
         return this;
     }
 
@@ -100,7 +107,7 @@ public final class SpriteComponent extends AbstractComponent implements Renderab
     @Override
     public void reset() {
         offset.setZero();
-        sprite.setTexture(null);
+        resetSprite(sprite);
         hidden = false;
         zOpt.reset();
 

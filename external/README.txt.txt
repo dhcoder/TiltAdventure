@@ -1,0 +1,1 @@
+Files which should get checked into source control but not loaded by our IDE go in here.

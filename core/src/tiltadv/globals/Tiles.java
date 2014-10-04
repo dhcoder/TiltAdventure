@@ -16,14 +16,16 @@ public final class Tiles {
 //    public static final TextureRegion PLAYER_NW;
 //    public static final TextureRegion PLAYER_W;
 //    public static final TextureRegion PLAYER_SW;
-    public static final TextureRegion LINKDOWN1;
-    public static final TextureRegion LINKDOWN2;
-    public static final TextureRegion LINKLEFT1;
-    public static final TextureRegion LINKLEFT2;
-    public static final TextureRegion LINKUP1;
-    public static final TextureRegion LINKUP2;
-    public static final TextureRegion LINKRIGHT1;
-    public static final TextureRegion LINKRIGHT2;
+    public static final TextureRegion LINK_S1;
+    public static final TextureRegion LINK_S2;
+    public static final TextureRegion LINK_N1;
+    public static final TextureRegion LINK_N2;
+    public static final TextureRegion LINK_E1;
+    public static final TextureRegion LINK_E2;
+    public static final TextureRegion LINK_SW1;
+    public static final TextureRegion LINK_SW2;
+    public static final TextureRegion LINK_NE1;
+    public static final TextureRegion LINK_NE2;
     public static final TextureRegion OCTODOWN1;
     public static final TextureRegion OCTODOWN2;
     public static final TextureRegion OCTOLEFT1;
@@ -36,10 +38,12 @@ public final class Tiles {
     public static final TextureRegion ROCK;
     public static final TextureRegion SWORDRIGHT;
     public static final TextureRegion SENSOR;
-    private static final Texture textureSource;
+    private static final Texture textureSource8bit;
+    private static final Texture textureSource16bit;
 
     static {
-        textureSource = new Texture("Tiles.png");
+        textureSource8bit = new Texture("Tiles.png");
+        textureSource16bit = new Texture("Tiles16.png");
 //        tempTextureSource = new Texture("Dude.png");
 //
 //        PLAYER_S = new TextureRegion(tempTextureSource, 0, 0, 32, 32);
@@ -51,33 +55,36 @@ public final class Tiles {
 //        PLAYER_W = new TextureRegion(tempTextureSource, 192, 0, 32, 32);
 //        PLAYER_SW = new TextureRegion(tempTextureSource, 224, 0, 32, 32);
 
-        LINKDOWN1 = new TextureRegion(textureSource, 0, 0, 16, 16);
-        LINKDOWN2 = new TextureRegion(textureSource, 0, 30, 16, 16);
-        LINKLEFT1 = new TextureRegion(textureSource, 30, 0, 16, 16);
-        LINKLEFT2 = new TextureRegion(textureSource, 30, 30, 16, 16);
-        LINKUP1 = new TextureRegion(textureSource, 60, 0, 16, 16);
-        LINKUP2 = new TextureRegion(textureSource, 60, 30, 16, 16);
-        LINKRIGHT1 = new TextureRegion(textureSource, 90, 30, 16, 16);
-        LINKRIGHT2 = new TextureRegion(textureSource, 90, 0, 16, 16);
-        OCTODOWN1 = new TextureRegion(textureSource, 150, 0, 16, 16);
-        OCTODOWN2 = new TextureRegion(textureSource, 150, 30, 16, 16);
-        OCTOLEFT1 = new TextureRegion(textureSource, 180, 0, 16, 16);
-        OCTOLEFT2 = new TextureRegion(textureSource, 180, 30, 16, 16);
-        OCTOUP1 = new TextureRegion(textureSource, 210, 0, 16, 16);
-        OCTOUP2 = new TextureRegion(textureSource, 210, 30, 16, 16);
-        OCTORIGHT1 = new TextureRegion(textureSource, 240, 30, 16, 16);
-        OCTORIGHT2 = new TextureRegion(textureSource, 240, 0, 16, 16);
+        LINK_S1 = new TextureRegion(textureSource16bit, 0, 0, 16, 24);
+        LINK_S2 = new TextureRegion(textureSource16bit, 16, 0, 16, 24);
+        LINK_E1 = new TextureRegion(textureSource16bit, 0, 24, 16, 24);
+        LINK_E2 = new TextureRegion(textureSource16bit, 32, 24, 16, 24);
+        LINK_N1 = new TextureRegion(textureSource16bit, 0, 48, 16, 24);
+        LINK_N2 = new TextureRegion(textureSource16bit, 16, 48, 16, 24);
+        LINK_SW1 = new TextureRegion(textureSource16bit, 0, 72, 16, 24);
+        LINK_SW2 = new TextureRegion(textureSource16bit, 16, 72, 16, 24);
+        LINK_NE1 = new TextureRegion(textureSource16bit, 0, 96, 16, 24);
+        LINK_NE2 = new TextureRegion(textureSource16bit, 16, 96, 16, 24);
 
-        BOULDER = new TextureRegion(textureSource, 120, 0, 16, 16);
-        ROCK = new TextureRegion(textureSource, 120, 30, 8, 10);
-        SWORDRIGHT = new TextureRegion(textureSource, 120, 60, 12, 7);
-        SENSOR = new TextureRegion(textureSource, 151, 61, 15, 15);
+        OCTODOWN1 = new TextureRegion(textureSource8bit, 150, 0, 16, 16);
+        OCTODOWN2 = new TextureRegion(textureSource8bit, 150, 30, 16, 16);
+        OCTOLEFT1 = new TextureRegion(textureSource8bit, 180, 0, 16, 16);
+        OCTOLEFT2 = new TextureRegion(textureSource8bit, 180, 30, 16, 16);
+        OCTOUP1 = new TextureRegion(textureSource8bit, 210, 0, 16, 16);
+        OCTOUP2 = new TextureRegion(textureSource8bit, 210, 30, 16, 16);
+        OCTORIGHT1 = new TextureRegion(textureSource8bit, 240, 30, 16, 16);
+        OCTORIGHT2 = new TextureRegion(textureSource8bit, 240, 0, 16, 16);
+
+        BOULDER = new TextureRegion(textureSource8bit, 120, 0, 16, 16);
+        ROCK = new TextureRegion(textureSource8bit, 120, 30, 8, 10);
+        SWORDRIGHT = new TextureRegion(textureSource8bit, 120, 60, 12, 7);
+        SENSOR = new TextureRegion(textureSource8bit, 151, 61, 15, 15);
     }
 
     public static void dispose() {
         // TODO: Use asset manager instead
-        textureSource.dispose();
-//        tempTextureSource.dispose();
+        textureSource8bit.dispose();
+        textureSource16bit.dispose();
     }
 
     private Tiles() { } // Disabled constructor

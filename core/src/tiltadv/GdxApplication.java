@@ -7,7 +7,6 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -20,7 +19,6 @@ import dhcoder.libgdx.entity.EntityManager;
 import dhcoder.libgdx.render.RenderSystem;
 import dhcoder.support.math.Angle;
 import dhcoder.support.memory.Pool;
-import dhcoder.support.memory.ReflectionUtils;
 import dhcoder.support.time.Duration;
 import tiltadv.components.behavior.OctoBehaviorComponent;
 import tiltadv.components.behavior.OscillationBehaviorComponent;
@@ -93,13 +91,6 @@ public final class GdxApplication extends ApplicationAdapter {
             shapeRenderer = new ShapeRenderer();
 
             Pool.RUN_SANITY_CHECKS = true;
-            ReflectionUtils.registerEqualityTester(Sprite.class, new ReflectionUtils.EqualityTester<Sprite>() {
-                @Override
-                public boolean areSame(final Sprite sprite1, final Sprite sprite2) {
-                    // Simplify sprite comparison for now, making sure we set the sprites to null on reset
-                    return sprite1.getTexture() == null && sprite2.getTexture() == null;
-                }
-            });
         }
         font = new BitmapFont();
 
@@ -173,7 +164,7 @@ public final class GdxApplication extends ApplicationAdapter {
         entities = new EntityManager(ENTITY_COUNT);
 
         octoBounds = new Circle(Tiles.OCTOUP1.getRegionWidth() / 2f);
-        playerBounds = new Circle(Tiles.LINKUP1.getRegionWidth() / 2f);
+        playerBounds = new Circle((Tiles.LINK_N1.getRegionWidth() / 2f) * 0.8f);
         playerSensorBounds = new Circle(Tiles.SENSOR.getRegionWidth() / 2f);
         playerSwordBounds = new Circle(5f);
         octoRockBounds = new Circle(Tiles.ROCK.getRegionWidth() / 2f);
@@ -190,7 +181,9 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(KnockbackComponent.class);
                 entity.addComponent(DefenseComponent.class);
                 entity.addComponent(PositionComponent.class);
-                entity.addComponent(SpriteComponent.class);
+                Vector2 offset = Pools.vector2s.grabNew().set(0f, 5f);
+                entity.addComponent(SpriteComponent.class).setOffset(offset);
+                Pools.vector2s.freeCount(1);
                 entity.addComponent(HeadingComponent.class);
                 entity.addComponent(MotionComponent.class);
                 entity.addComponent(TiltComponent.class);
@@ -199,7 +192,8 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(PlayerBehaviorComponent.class);
                 entity.addComponent(HealthComponent.class).setHealth(10);
                 entity.addComponent(CharacterDisplayComponent.class)
-                    .set(Animations.PLAYER_S, Animations.PLAYER_E, Animations.PLAYER_N, Animations.PLAYER_W);
+                    .set(Animations.PLAYER_S, Animations.PLAYER_E, Animations.PLAYER_N, Animations.PLAYER_SW,
+                        Animations.PLAYER_NE);
                 entity.addComponent(PlayerCollisionComponent.class).setShape(playerBounds);
                 //entity.addComponent(PlayerSensorCollisionComponent.class).setShape(playerSensorBounds);
             }
@@ -243,7 +237,7 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(HealthComponent.class).setHealth(3)
                     .setInvicibilityDuration(ENEMY_INVINCIBILITY_DURATION);
                 entity.addComponent(CharacterDisplayComponent.class)
-                    .set(Animations.OCTODOWN, Animations.OCTORIGHT, Animations.OCTOUP, Animations.OCTOLEFT);
+                    .set(Animations.OCTODOWN, Animations.OCTORIGHT, Animations.OCTOUP);
                 entity.addComponent(EnemyCollisionComponent.class).setShape(octoBounds);
             }
         });

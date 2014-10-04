@@ -22,19 +22,17 @@ public final class CharacterDisplayComponent extends AbstractComponent {
     private static final Angle HEADING_MARGIN = Angle.fromDegrees(2.5f);
 
     private Animation animS;
-    private Animation animSE;
     private Animation animE;
-    private Animation animNE;
     private Animation animN;
-    private Animation animNW;
-    private Animation animW;
     private Animation animSW;
+    private Animation animNE;
 
     private float elapsedSoFar;
     private Animation activeAnim;
 
     private CompassDirection activeCompassDirection;
     private CardinalDirection activeCardinalDirection;
+    private boolean activeFlipX;
     private boolean isCardinal;
 
     private MotionComponent motionComponent;
@@ -45,15 +43,13 @@ public final class CharacterDisplayComponent extends AbstractComponent {
         reset();
     }
 
-    public CharacterDisplayComponent set(final Animation animS, final Animation animE, final Animation animN,
-        final Animation animW) {
-        return set(animS, null, animE, null, animN, null, animW, null, true);
+    public CharacterDisplayComponent set(final Animation animS, final Animation animE, final Animation animN) {
+        return set(animS, animE, animN, null, null, true);
     }
 
-    public CharacterDisplayComponent set(final Animation animS, final Animation animSE, final Animation animE,
-        final Animation animNE, final Animation animN, final Animation animNW, final Animation animW,
-        final Animation animSW) {
-        return set(animS, animSE, animE, animNE, animN, animNW, animW, animSW, false);
+    public CharacterDisplayComponent set(final Animation animS, final Animation animE,
+        final Animation animN, final Animation animSW, final Animation animNE) {
+        return set(animS, animE, animN, animSW, animNE, false);
     }
 
     @Override
@@ -81,27 +77,29 @@ public final class CharacterDisplayComponent extends AbstractComponent {
             if (!activeCardinalDirection.isFacing(angle, HEADING_MARGIN)) {
                 activeCardinalDirection = CardinalDirection.getForAngle(angle);
                 activeAnim = getAnimationForDirection(activeCardinalDirection);
+
+                activeFlipX = useFlippedSprite(activeCardinalDirection);
             }
         }
         else {
             if (!activeCompassDirection.isFacing(angle, HEADING_MARGIN)) {
                 activeCompassDirection = CompassDirection.getForAngle(angle);
                 activeAnim = getAnimationForDirection(activeCompassDirection);
+
+                activeFlipX = useFlippedSprite(activeCompassDirection);
             }
         }
 
         spriteComponent.setTextureRegion(activeAnim.getKeyFrame(elapsedSoFar));
+        spriteComponent.setFlip(activeFlipX, false);
     }
 
     @Override
     public void reset() {
         animS = null;
-        animSE = null;
         animE = null;
         animNE = null;
         animN = null;
-        animNW = null;
-        animW = null;
         animSW = null;
 
         elapsedSoFar = 0f;
@@ -110,24 +108,21 @@ public final class CharacterDisplayComponent extends AbstractComponent {
         isCardinal = false;
         activeCardinalDirection = CardinalDirection.S;
         activeCompassDirection = CompassDirection.S;
+        activeFlipX = false;
 
         motionComponent = null;
         headingComponent = null;
         spriteComponent = null;
     }
 
-    private CharacterDisplayComponent set(final Animation animS, final Animation animSE, final Animation animE,
-        final Animation animNE, final Animation animN, final Animation animNW, final Animation animW,
-        final Animation animSW, final boolean isCardinal) {
+    private CharacterDisplayComponent set(final Animation animS, final Animation animE,
+        final Animation animN, final Animation animSW, final Animation animNE, final boolean isCardinal) {
 
         this.animS = animS;
-        this.animSE = animSE;
         this.animE = animE;
-        this.animNE = animNE;
         this.animN = animN;
-        this.animNW = animNW;
-        this.animW = animW;
         this.animSW = animSW;
+        this.animNE = animNE;
         this.isCardinal = isCardinal;
 
         activeAnim = isCardinal ? getAnimationForDirection(activeCardinalDirection) :
@@ -145,15 +140,15 @@ public final class CharacterDisplayComponent extends AbstractComponent {
             case N:
                 return animN;
             case NW:
-                return animNW;
+                return animNE;
             case W:
-                return animW;
+                return animE;
             case SW:
                 return animSW;
             case S:
                 return animS;
             case SE:
-                return animSE;
+                return animSW;
             default:
                 return animS;
         }
@@ -166,7 +161,7 @@ public final class CharacterDisplayComponent extends AbstractComponent {
             case N:
                 return animN;
             case W:
-                return animW;
+                return animE;
             case S:
                 return animS;
             default:
@@ -174,4 +169,23 @@ public final class CharacterDisplayComponent extends AbstractComponent {
         }
     }
 
+    private boolean useFlippedSprite(final CompassDirection direction) {
+        switch (direction) {
+            case NW:
+            case W:
+            case SE:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private boolean useFlippedSprite(final CardinalDirection direction) {
+        switch (direction) {
+            case W:
+                return true;
+            default:
+                return false;
+        }
+    }
 }
