@@ -23,7 +23,7 @@ public final class DevSettings {
     /**
      * Slow-mo multiplier. Setting to {@code 4f} means 4x slowdown.
      */
-    public static float SLOW_MO_FACTOR = 1f;
+    public static float SLOW_MO_FACTOR = 3f;
 
     private DevSettings() {}
 
