@@ -11,7 +11,6 @@ import tiltadv.components.body.HeadingComponent;
 import tiltadv.components.body.MotionComponent;
 import tiltadv.components.body.TiltComponent;
 import tiltadv.components.combat.HealthComponent;
-import tiltadv.components.hierarchy.children.PlayerChildrenComponent;
 import tiltadv.globals.Services;
 import tiltadv.input.Vibrator;
 import tiltadv.memory.Pools;
@@ -56,9 +55,6 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
         motionComponent = owner.requireComponent(MotionComponent.class);
         tiltComponent = owner.requireComponent(TiltComponent.class);
         owner.requireComponent(HealthComponent.class).setListener(this);
-
-        PlayerChildrenComponent children = owner.requireComponent(PlayerChildrenComponent.class);
-//        owner.requireComponent(PlayerSensorCollisionComponent.class).setSwordEntity(children.getSwordEntity());
     }
 
     @Override

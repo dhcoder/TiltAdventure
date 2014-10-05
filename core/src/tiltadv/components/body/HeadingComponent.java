@@ -14,21 +14,34 @@ import dhcoder.support.math.Angle;
 public final class HeadingComponent extends AbstractComponent {
 
     private final Angle heading = Angle.fromDegrees(0f);
+    private int lockCount;
 
     public Angle getHeading() { return heading; }
 
     public HeadingComponent setHeading(final Angle heading) {
+        if (lockCount > 0) {
+            return this;
+        }
         this.heading.setFrom(heading);
         return this;
     }
 
     public HeadingComponent setHeadingFrom(final Vector2 vector) {
+        if (lockCount > 0) {
+            return this;
+        }
         this.heading.setDegrees(vector.angle());
+        return this;
+    }
+
+    public HeadingComponent setLocked(boolean locked) {
+        lockCount += (locked ? 1 : -1);
         return this;
     }
 
     @Override
     public void reset() {
         heading.setDegrees(0f);
+        lockCount = 0;
     }
 }

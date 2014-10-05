@@ -15,12 +15,14 @@ public abstract class LerpComponent extends AbstractComponent {
     private final Duration duration = Duration.zero();
     private final Duration accumulated = Duration.zero();
     private Interpolation interpolator;
+    private boolean isActive;
     private boolean onReturnTrip;
     private boolean shouldLoop;
 
     public LerpComponent() {
         handleConstruction();
-        reset(); }
+        reset();
+    }
 
     public final void setInterpolator(final Interpolation interpolator) {
         this.interpolator = interpolator;
@@ -36,17 +38,23 @@ public abstract class LerpComponent extends AbstractComponent {
 
     @Override
     public final void initialize(final Entity owner) {
-        requireTrue(!duration.isZero(), "Duration should be set!");
+        requireTrue(!duration.isZero(), "Lerp duration should be set!");
         handleInitialize(owner);
     }
 
     @Override
     public final void update(final Duration elapsedTime) {
-        accumulated.add(elapsedTime);
+        if (!isActive) {
+            return;
+        }
+
         if (accumulated.getSeconds() > duration.getSeconds()) {
             if (!shouldLoop) {
+                handleLerp(1f);
+                setActive(false);
                 return;
             }
+
             accumulated.subtract(duration);
             onReturnTrip = !onReturnTrip;
         }
@@ -57,16 +65,34 @@ public abstract class LerpComponent extends AbstractComponent {
             percent = 1f - percent;
         }
         handleLerp(percent);
+
+        accumulated.add(elapsedTime);
     }
 
     @Override
     public final void reset() {
+        isActive = false;
+
         duration.setZero();
         accumulated.setZero();
         onReturnTrip = false;
         shouldLoop = false;
         interpolator = Interpolation.sine;
         handleReset();
+    }
+
+    protected boolean isActive() {
+        return isActive;
+    }
+
+    protected void setActive(final boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    protected void lerpFromStart() {
+        accumulated.setZero();
+        onReturnTrip = false;
+        setActive(true);
     }
 
     /**
@@ -78,6 +104,8 @@ public abstract class LerpComponent extends AbstractComponent {
     // Hack needed because constructor calls reset -> handleReset, which calls into base class before base class
     // fields are initialized...
     protected abstract void handleConstruction();
+
     protected void handleInitialize(final Entity owner) {}
+
     protected void handleReset() {}
 }

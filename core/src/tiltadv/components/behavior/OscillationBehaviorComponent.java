@@ -19,6 +19,7 @@ public final class OscillationBehaviorComponent extends LerpComponent {
     public OscillationBehaviorComponent() {
         super();
         setShouldLoop(true);
+        setActive(true);
     }
 
     @Override

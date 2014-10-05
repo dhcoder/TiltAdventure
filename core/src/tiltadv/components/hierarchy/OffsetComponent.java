@@ -33,6 +33,7 @@ public final class OffsetComponent extends AbstractComponent {
 
     public OffsetComponent setOffset(final Vector2 offset) {
         this.offset.set(offset);
+        syncChildToParent();
         return this;
     }
 
