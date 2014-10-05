@@ -130,4 +130,9 @@ public final class Duration implements Poolable {
     public void reset() {
         setZero();
     }
+
+    @Override
+    public String toString() {
+        return format("{0}s", seconds);
+    }
 }

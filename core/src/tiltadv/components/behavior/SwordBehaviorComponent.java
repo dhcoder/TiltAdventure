@@ -40,7 +40,7 @@ public final class SwordBehaviorComponent extends AbstractComponent {
             return; // Ignore call to swing while swinging
         }
 
-        gotSwingRequest = true; // Handle
+        gotSwingRequest = true; // Delegate to update to handle
     }
 
     @Override

@@ -9,7 +9,7 @@ import dhcoder.support.event.Event;
  */
 public final class PositionComponent extends AbstractComponent {
 
-    public final Event onTranslateChanged = new Event();
+    public final Event onChanged = new Event();
 
     private final Vector2 position = new Vector2();
 
@@ -20,17 +20,17 @@ public final class PositionComponent extends AbstractComponent {
     }
 
     public PositionComponent setPosition(final Vector2 position) {
-        return setTranslate(position, true);
+        return setPosition(position, true);
     }
 
-    public PositionComponent setTranslate(final Vector2 translate, final boolean sendUpdate) {
+    public PositionComponent setPosition(final Vector2 translate, final boolean sendUpdate) {
         if (this.position.equals(translate)) {
             return this;
         }
 
         this.position.set(translate);
         if (sendUpdate) {
-            onTranslateChanged.fire(this);
+            onChanged.fire(this);
         }
         return this;
     }

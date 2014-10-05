@@ -202,7 +202,8 @@ public final class GdxApplication extends ApplicationAdapter {
         entities.registerTemplate(EntityId.PLAYER_SWORD, new EntityManager.EntityCreator() {
             @Override
             public void initialize(final Entity entity) {
-                entity.addComponent(ParentComponent.class); // Child to Player Entity
+                entity.addComponent(ParentComponent.class); // Child of Player Entity
+                entity.addComponent(OffsetComponent.class);
                 entity.addComponent(SwordCollisionComponent.class).setShape(playerSwordBounds);
                 entity.addComponent(SwordBehaviorComponent.class);
                 entity.addComponent(AttackComponent.class);
@@ -214,7 +215,7 @@ public final class GdxApplication extends ApplicationAdapter {
         entities.registerTemplate(EntityId.PLAYER_SENSOR, new EntityManager.EntityCreator() {
             @Override
             public void initialize(final Entity entity) {
-                entity.addComponent(ParentComponent.class);  // Child to Player Entity
+                entity.addComponent(ParentComponent.class);  // Child of Player Entity
                 entity.addComponent(PositionComponent.class);
                 entity.addComponent(OffsetComponent.class);
                 entity.addComponent(PlayerSensorCollisionComponent.class).setShape(playerSensorBounds);

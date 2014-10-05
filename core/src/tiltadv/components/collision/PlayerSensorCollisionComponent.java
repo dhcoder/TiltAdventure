@@ -3,7 +3,10 @@ package tiltadv.components.collision;
 import dhcoder.libgdx.collision.Collision;
 import dhcoder.libgdx.collision.CollisionSystem;
 import dhcoder.libgdx.entity.Entity;
+import tiltadv.components.behavior.SwordBehaviorComponent;
 import tiltadv.components.combat.HealthComponent;
+import tiltadv.components.hierarchy.ParentComponent;
+import tiltadv.components.hierarchy.children.PlayerChildrenComponent;
 import tiltadv.globals.Group;
 import tiltadv.globals.Services;
 
@@ -16,11 +19,17 @@ public final class PlayerSensorCollisionComponent extends CollisionComponent {
         CollisionSystem collisionSystem = Services.get(CollisionSystem.class);
         collisionSystem.registerCollidesWith(Group.PLAYER_SENSOR, Group.ENEMY);
     }
-
-//    private SwordBehaviorComponent swordBehaviorComponent;
+    private SwordBehaviorComponent swordBehaviorComponent;
 
     public PlayerSensorCollisionComponent() {
         super(Group.PLAYER_SENSOR);
+    }
+
+    @Override
+    protected void handleInitialize(final Entity owner) {
+        Entity playerEntity = owner.requireComponent(ParentComponent.class).getParent();
+        Entity swordEntity = playerEntity.requireComponent(PlayerChildrenComponent.class).getSwordEntity();
+        swordBehaviorComponent = swordEntity.requireComponent(SwordBehaviorComponent.class);
     }
 
     @Override
@@ -37,11 +46,16 @@ public final class PlayerSensorCollisionComponent extends CollisionComponent {
         }
     }
 
+    @Override
+    protected void handleReset() {
+        swordBehaviorComponent = null;
+    }
+
     private void handleEnemyCollision(final Collision collision) {
         Entity enemyEntity = (Entity)collision.getTarget().getTag().getValue();
         final HealthComponent healthComponent = enemyEntity.requireComponent(HealthComponent.class);
         if (healthComponent.canTakeDamage()) {
-//            swordBehaviorComponent.swing();
+            swordBehaviorComponent.swing();
         }
     }
 }

@@ -43,8 +43,8 @@ public final class OffsetComponent extends AbstractComponent {
         Entity parent = owner.requireComponent(ParentComponent.class).getParent();
         parentPositionComponent = parent.requireComponent(PositionComponent.class);
 
-        positionComponent.onTranslateChanged.addListener(handleTranslateChanged);
-        parentPositionComponent.onTranslateChanged.addListener(handleTranslateChanged);
+        positionComponent.onChanged.addListener(handleTranslateChanged);
+        parentPositionComponent.onChanged.addListener(handleTranslateChanged);
     }
 
     @Override
@@ -52,8 +52,8 @@ public final class OffsetComponent extends AbstractComponent {
         offset.setZero();
         isSyncing = false;
 
-        positionComponent.onTranslateChanged.removeListener(handleTranslateChanged);
-        parentPositionComponent.onTranslateChanged.removeListener(handleTranslateChanged);
+        positionComponent.onChanged.removeListener(handleTranslateChanged);
+        parentPositionComponent.onChanged.removeListener(handleTranslateChanged);
 
         positionComponent = null;
         parentPositionComponent = null;
@@ -69,7 +69,7 @@ public final class OffsetComponent extends AbstractComponent {
         int mark = Pools.vector2s.mark();
         final Vector2 translate = Pools.vector2s.grabNew().set(parentPositionComponent.getPosition());
         translate.add(offset);
-        positionComponent.setTranslate(translate, false);
+        positionComponent.setPosition(translate, false);
         Pools.vector2s.freeToMark(mark);
         isSyncing = false;
     }
@@ -79,7 +79,7 @@ public final class OffsetComponent extends AbstractComponent {
         int mark = Pools.vector2s.mark();
         final Vector2 translate = Pools.vector2s.grabNew().set(positionComponent.getPosition());
         translate.sub(offset);
-        parentPositionComponent.setTranslate(translate, false);
+        parentPositionComponent.setPosition(translate, false);
         Pools.vector2s.freeToMark(mark);
         isSyncing = false;
     }
