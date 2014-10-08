@@ -51,7 +51,7 @@ import tiltadv.components.input.KeyboardInputComponent;
 import tiltadv.globals.Animations;
 import tiltadv.globals.DevSettings;
 import tiltadv.globals.EntityId;
-import tiltadv.globals.Events;
+import tiltadv.globals.events.Events;
 import tiltadv.globals.Services;
 import tiltadv.globals.Tiles;
 import tiltadv.input.Vibrator;
@@ -103,7 +103,7 @@ public final class GdxApplication extends ApplicationAdapter {
             @Override
             public boolean touchDown(final int screenX, final int screenY, final int pointer, final int button) {
                 if (numFingersDown == 0) {
-                    Events.onScreenTouchDown.fire(Gdx.input);
+                    Events.onTouchDown.fire(Gdx.input);
                 }
                 ++numFingersDown;
                 return false;
@@ -113,7 +113,7 @@ public final class GdxApplication extends ApplicationAdapter {
             public boolean touchUp(final int screenX, final int screenY, final int pointer, final int button) {
                 --numFingersDown;
                 if (numFingersDown == 0) {
-                    Events.onScreenTouchUp.fire(Gdx.input);
+                    Events.onTouchUp.fire(Gdx.input);
                 }
                 return false;
             }
