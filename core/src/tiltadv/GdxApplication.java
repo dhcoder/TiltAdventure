@@ -17,6 +17,7 @@ import dhcoder.libgdx.collision.shape.Shape;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.libgdx.entity.EntityManager;
 import dhcoder.libgdx.render.RenderSystem;
+import dhcoder.libgdx.render.TouchSystem;
 import dhcoder.support.math.Angle;
 import dhcoder.support.memory.Pool;
 import dhcoder.support.time.Duration;
@@ -51,7 +52,6 @@ import tiltadv.components.input.KeyboardInputComponent;
 import tiltadv.globals.Animations;
 import tiltadv.globals.DevSettings;
 import tiltadv.globals.EntityId;
-import tiltadv.globals.events.Events;
 import tiltadv.globals.Services;
 import tiltadv.globals.Tiles;
 import tiltadv.input.Vibrator;
@@ -83,6 +83,7 @@ public final class GdxApplication extends ApplicationAdapter {
     private Shape playerSwordBounds;
     private Shape octoRockBounds;
     private Shape boulderBounds;
+    private TouchSystem touchSystem;
 
     public void create() {
         camera = new OrthographicCamera(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
@@ -103,19 +104,16 @@ public final class GdxApplication extends ApplicationAdapter {
             @Override
             public boolean touchDown(final int screenX, final int screenY, final int pointer, final int button) {
                 if (numFingersDown == 0) {
-                    Events.onTouchDown.fire(Gdx.input);
+                    touchSystem.handleTouch(screenX, screenY);
                 }
                 ++numFingersDown;
-                return false;
+                return true;
             }
 
             @Override
             public boolean touchUp(final int screenX, final int screenY, final int pointer, final int button) {
                 --numFingersDown;
-                if (numFingersDown == 0) {
-                    Events.onTouchUp.fire(Gdx.input);
-                }
-                return false;
+                return true;
             }
         });
     }
@@ -155,6 +153,9 @@ public final class GdxApplication extends ApplicationAdapter {
 
         renderSystem = new RenderSystem(ENTITY_COUNT);
         Services.register(RenderSystem.class, renderSystem);
+
+        touchSystem = new TouchSystem(ENTITY_COUNT / 2);
+        Services.register(TouchSystem.class, touchSystem);
 
         Services.register(Vibrator.class, new Vibrator());
     }

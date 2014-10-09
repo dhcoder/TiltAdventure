@@ -9,23 +9,41 @@ import tiltadv.components.body.PositionComponent;
 /**
  * A component to attach to an entity that can be
  */
-public final class TouchableComponent extends AbstractComponent {
+public abstract class TouchableComponent extends AbstractComponent {
 
     private static final Circle TOUCH_AREA = new Circle(10.0f);
+    private Entity owner;
     private PositionComponent positionComponent;
 
-    public boolean isTouched(final Vector2 touchPosition) {
+    protected Entity getOwner() {
+        return owner;
+    }
+
+    public final boolean handleIfTouched(final Vector2 touchPosition) {
         Vector2 position = positionComponent.getPosition();
-        return TOUCH_AREA.containsPoint(touchPosition.x - position.x, touchPosition.y - position.y);
+        if (!TOUCH_AREA.containsPoint(touchPosition.x - position.x, touchPosition.y - position.y)) {
+            return false;
+        }
+
+        handleTouched();
+        return true;
     }
 
     @Override
-    public void initialize(final Entity owner) {
+    public final void initialize(final Entity owner) {
+        this.owner = owner;
         positionComponent = owner.requireComponent(PositionComponent.class);
     }
 
     @Override
-    public void reset() {
+    public final void reset() {
+        owner = null;
         positionComponent = null;
     }
+
+    protected abstract void handleTouched();
+
+    protected void handleInitialize() {}
+
+    protected void handleReset() {}
 }
