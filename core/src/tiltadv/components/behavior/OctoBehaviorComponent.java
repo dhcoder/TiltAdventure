@@ -56,7 +56,8 @@ public final class OctoBehaviorComponent extends AbstractComponent implements He
 
     @Override
     public void onDied() {
-        owner.getManager().freeEntity(owner);
+        // TEMP! THIS NEEDS TO BE FIXED AFTER WE FIGURE OUT HOW TO CLEAR TARGETTING ON FREED ENTITY
+//        owner.getManager().freeEntity(owner);
     }
 
     @Override

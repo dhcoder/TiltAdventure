@@ -1,9 +1,7 @@
-package dhcoder.libgdx.render;
+package tiltadv.input;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import dhcoder.libgdx.entity.Entity;
-import dhcoder.support.opt.Opt;
 import tiltadv.components.input.TouchableComponent;
 import tiltadv.memory.Pools;
 
