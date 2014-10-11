@@ -40,11 +40,18 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
 
     private final StateMachine<State, Evt> playerState;
     private final Duration frozenDuration = Duration.zero();
-    private final Opt<Entity> targettedEntityOpt = Opt.withNoValue();
-    private final EventListener handleTargetted = new EventListener() {
+    private final Opt<Entity> selectedTargetOpt = Opt.withNoValue();
+    private final EventListener handleTargetSelected = new EventListener() {
         @Override
         public void run(final Object sender) {
-            targettedEntityOpt.set((Entity)sender);
+            selectedTargetOpt.set((Entity)sender);
+        }
+    };
+
+    private final EventListener handleTargetCleared = new EventListener() {
+        @Override
+        public void run(final Object sender) {
+            selectedTargetOpt.clear();
         }
     };
 
@@ -68,15 +75,16 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
         tiltComponent = owner.requireComponent(TiltComponent.class);
         owner.requireComponent(HealthComponent.class).setListener(this);
 
-        Events.onTargetted.addListener(handleTargetted);
+        Events.onTargetSelected.addListener(handleTargetSelected);
+        Events.onTargetCleared.addListener(handleTargetCleared);
     }
 
     @Override
     public void update(final Duration elapsedTime) {
         playerState.handleEvent(Evt.UPDATE, elapsedTime);
 
-        if (targettedEntityOpt.hasValue()) {
-            final Entity target = targettedEntityOpt.getValue();
+        if (selectedTargetOpt.hasValue()) {
+            final Entity target = selectedTargetOpt.getValue();
             final Vector2 targetPos = target.requireComponent(PositionComponent.class).getPosition();
             final Vector2 vectorToTarget = Pools.vector2s.grabNew();
             vectorToTarget.set(targetPos).sub(positionComponent.getPosition());
@@ -91,7 +99,8 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
     @Override
     public void reset() {
         owner.getManager().freeEntity(swordEntity);
-        Events.onTargetted.removeListener(handleTargetted);
+        Events.onTargetSelected.removeListener(handleTargetSelected);
+        Events.onTargetCleared.removeListener(handleTargetSelected);
 
         swordEntity = null;
         owner = null;
@@ -104,7 +113,7 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
         motionComponent = null;
         tiltComponent = null;
 
-        targettedEntityOpt.clear();
+        selectedTargetOpt.clear();
     }
 
     @Override

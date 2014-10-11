@@ -15,15 +15,24 @@ public abstract class TouchableComponent extends AbstractComponent {
 
     private static final Circle TOUCH_AREA = new Circle(10.0f);
     private PositionComponent positionComponent;
+    private boolean selected;
 
-    public final boolean handleIfTouched(final Vector2 touchPosition) {
+    public final boolean select(final Vector2 touchPosition) {
         Vector2 position = positionComponent.getPosition();
         if (!TOUCH_AREA.containsPoint(touchPosition.x - position.x, touchPosition.y - position.y)) {
             return false;
         }
 
-        handleTouched();
+        handleSelected();
+        selected = true;
         return true;
+    }
+
+    public void deselect() {
+        if (selected) {
+            handleDeselected();
+            selected = false;
+        }
     }
 
     @Override
@@ -38,13 +47,18 @@ public abstract class TouchableComponent extends AbstractComponent {
 
     @Override
     public final void reset() {
+        handleDeselected();
+
         final TouchSystem touchSystem = Services.get(TouchSystem.class);
         touchSystem.remove(this);
 
         positionComponent = null;
+
+        handleReset();
     }
 
-    protected abstract void handleTouched();
+    protected abstract void handleSelected();
+    protected abstract void handleDeselected();
 
     protected void handleInitialized(final Entity owner) {}
 

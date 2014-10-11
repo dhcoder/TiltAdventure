@@ -8,11 +8,10 @@ import dhcoder.support.opt.Opt;
 import dhcoder.support.state.StateMachine;
 import dhcoder.support.state.StateTransitionHandler;
 import dhcoder.support.time.Duration;
-import tiltadv.components.combat.HealthComponent;
 import tiltadv.components.body.HeadingComponent;
 import tiltadv.components.body.MotionComponent;
 import tiltadv.components.body.PositionComponent;
-import tiltadv.globals.EntityId;
+import tiltadv.components.combat.HealthComponent;
 import tiltadv.memory.Pools;
 
 import java.util.Random;
@@ -56,8 +55,7 @@ public final class OctoBehaviorComponent extends AbstractComponent implements He
 
     @Override
     public void onDied() {
-        // TEMP! THIS NEEDS TO BE FIXED AFTER WE FIGURE OUT HOW TO CLEAR TARGETTING ON FREED ENTITY
-//        owner.getManager().freeEntity(owner);
+        owner.getManager().freeEntity(owner);
     }
 
     @Override
@@ -116,17 +114,17 @@ public final class OctoBehaviorComponent extends AbstractComponent implements He
         fsm.registerEvent(State.WAITING, Evt.SHOOT, new StateTransitionHandler<State, Evt>() {
             @Override
             public State run(final State fromState, final Evt withEvent, final Opt eventData) {
-                final Entity rock = owner.getManager().newEntityFromTemplate(EntityId.OCTO_ROCK);
-                final MotionComponent rockMotion = rock.requireComponent(MotionComponent.class);
-                final PositionComponent rockPosition = rock.requireComponent(PositionComponent.class);
-                rockPosition.setPosition(positionComponent.getPosition());
-
-                CardinalDirection direction = CardinalDirection.getForAngle(headingComponent.getHeading());
-                Vector2 rockVelocity = Pools.vector2s.grabNew();
-                rockVelocity.set(PROJECTILE_SPEED, 0f);
-                rockVelocity.rotate(direction.getAngle().getDegrees());
-                rockMotion.setVelocity(rockVelocity);
-                Pools.vector2s.free(rockVelocity);
+//                final Entity rock = owner.getManager().newEntityFromTemplate(EntityId.OCTO_ROCK);
+//                final MotionComponent rockMotion = rock.requireComponent(MotionComponent.class);
+//                final PositionComponent rockPosition = rock.requireComponent(PositionComponent.class);
+//                rockPosition.setPosition(positionComponent.getPosition());
+//
+//                CardinalDirection direction = CardinalDirection.getForAngle(headingComponent.getHeading());
+//                Vector2 rockVelocity = Pools.vector2s.grabNew();
+//                rockVelocity.set(PROJECTILE_SPEED, 0f);
+//                rockVelocity.rotate(direction.getAngle().getDegrees());
+//                rockMotion.setVelocity(rockVelocity);
+//                Pools.vector2s.free(rockVelocity);
 
                 followupEvent = Evt.MOVE;
                 return State.WAITING;
