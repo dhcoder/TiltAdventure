@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import dhcoder.libgdx.collision.CollisionSystem;
 import dhcoder.libgdx.collision.shape.Circle;
 import dhcoder.libgdx.collision.shape.Rectangle;
@@ -48,12 +49,13 @@ import tiltadv.components.hierarchy.ParentComponent;
 import tiltadv.components.hierarchy.children.PlayerChildrenComponent;
 import tiltadv.components.input.AccelerometerInputComponent;
 import tiltadv.components.input.KeyboardInputComponent;
+import tiltadv.components.input.touchables.TargetTouchableComponent;
 import tiltadv.globals.Animations;
 import tiltadv.globals.DevSettings;
 import tiltadv.globals.EntityId;
-import tiltadv.globals.Events;
 import tiltadv.globals.Services;
 import tiltadv.globals.Tiles;
+import tiltadv.input.TouchSystem;
 import tiltadv.input.Vibrator;
 import tiltadv.memory.Pools;
 
@@ -83,6 +85,7 @@ public final class GdxApplication extends ApplicationAdapter {
     private Shape playerSwordBounds;
     private Shape octoRockBounds;
     private Shape boulderBounds;
+    private TouchSystem touchSystem;
 
     public void create() {
         camera = new OrthographicCamera(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
@@ -103,19 +106,22 @@ public final class GdxApplication extends ApplicationAdapter {
             @Override
             public boolean touchDown(final int screenX, final int screenY, final int pointer, final int button) {
                 if (numFingersDown == 0) {
-                    Events.onScreenTouchDown.fire(Gdx.input);
+                    final Vector3 localPosition = Pools.vector3s.grabNew();
+                    localPosition.set(screenX, screenY, 0);
+                    camera.unproject(localPosition);
+
+                    touchSystem.handleTouch(localPosition.x, localPosition.y);
+
+                    Pools.vector3s.freeCount(1);
                 }
                 ++numFingersDown;
-                return false;
+                return true;
             }
 
             @Override
             public boolean touchUp(final int screenX, final int screenY, final int pointer, final int button) {
                 --numFingersDown;
-                if (numFingersDown == 0) {
-                    Events.onScreenTouchUp.fire(Gdx.input);
-                }
-                return false;
+                return true;
             }
         });
     }
@@ -155,6 +161,9 @@ public final class GdxApplication extends ApplicationAdapter {
 
         renderSystem = new RenderSystem(ENTITY_COUNT);
         Services.register(RenderSystem.class, renderSystem);
+
+        touchSystem = new TouchSystem(ENTITY_COUNT / 2);
+        Services.register(TouchSystem.class, touchSystem);
 
         Services.register(Vibrator.class, new Vibrator());
     }
@@ -234,6 +243,7 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(SpriteComponent.class);
                 entity.addComponent(HeadingComponent.class);
                 entity.addComponent(MotionComponent.class);
+                entity.addComponent(TargetTouchableComponent.class);
                 entity.addComponent(OctoBehaviorComponent.class);
                 entity.addComponent(HealthComponent.class).setHealth(3)
                     .setInvicibilityDuration(ENEMY_INVINCIBILITY_DURATION);

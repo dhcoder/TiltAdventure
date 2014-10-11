@@ -9,6 +9,8 @@ public final class StringUtils {
         PARSING_INDEX, // We're in between braces, parsing a format index
     }
 
+    private static final String NULL_STR = "(null)";
+
     /**
      * Format a string using C# style formatting, i.e. using {0} instead of %0$s.
      * <p/>
@@ -67,7 +69,7 @@ public final class StringUtils {
                         }
                         else {
                             state = FormatState.CONSUME_TEXT;
-                            builder.append(args[formatIndex].toString());
+                            builder.append(args[formatIndex] != null ? args[formatIndex].toString() : NULL_STR);
                         }
                     }
                     else {
