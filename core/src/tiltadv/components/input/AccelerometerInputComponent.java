@@ -18,7 +18,7 @@ public final class AccelerometerInputComponent extends AbstractComponent {
     // If the tilt vector is smaller than the following value, we consider the amount of tilt too weak to count, and
     // instead just treat it as no tilt at all
     private static final float TILT_THRESHOLD = 0.1f;
-    private static final float ANGLE_TO_TILT = -0.07f;
+    private static final float ANGLE_TO_TILT = -0.1f;
     // Default screen position is slightly tilted toward the player, about 10° from flat
     // TODO: Allow multiple configuration, maybe? (Flat, upside-down, configurable?)
     private final Vector3 referenceVector = new Vector3(.4f, 0f, 1f).nor();
@@ -65,7 +65,7 @@ public final class AccelerometerInputComponent extends AbstractComponent {
         tiltComponent = null;
     }
 
-    // Given an input angle between 0 and 180, return
+    // Given an angle, convert it to proper values to put into a vector that represents tilt magnitude
     private float angleToTilt(final float angleDeg) {
         return angleDeg * ANGLE_TO_TILT;
     }
