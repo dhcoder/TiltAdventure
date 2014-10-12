@@ -149,20 +149,23 @@ public final class CollisionSystem {
         int numColliders = colliders.size();
         for (int i = 0; i < numColliders; i++) {
             Collider collider = colliders.get(i);
+            if (!collider.isActive()) {
+                continue;
+            }
             Vector2 pos = collider.getCurrPosition();
             collider.getShape().render(renderer, pos.x, pos.y);
         }
 
-        final List<CollisionRegion> regions = regionPool.getItemsInUse();
-        int numRegions = regions.size();
-        for (int i = 0; i < numRegions; i++) {
-            CollisionRegion region = regions.get(i);
-            final IntCoord coords = region.getCoordinates();
-            float x = (coords.getX() * REGION_SIZE) - REGION_SIZE / 2f;
-            float y = (coords.getY() * REGION_SIZE) - REGION_SIZE / 2f;
-            renderer.rect(x + REGION_MARGIN, y + REGION_MARGIN, REGION_SIZE - REGION_MARGIN * 2,
-                REGION_SIZE - REGION_MARGIN * 2);
-        }
+//        final List<CollisionRegion> regions = regionPool.getItemsInUse();
+//        int numRegions = regions.size();
+//        for (int i = 0; i < numRegions; i++) {
+//            CollisionRegion region = regions.get(i);
+//            final IntCoord coords = region.getCoordinates();
+//            float x = (coords.getX() * REGION_SIZE) - REGION_SIZE / 2f;
+//            float y = (coords.getY() * REGION_SIZE) - REGION_SIZE / 2f;
+//            renderer.rect(x + REGION_MARGIN, y + REGION_MARGIN, REGION_SIZE - REGION_MARGIN * 2,
+//                REGION_SIZE - REGION_MARGIN * 2);
+//        }
     }
 
     void addColliderIntoRegions(final Collider collider) {
