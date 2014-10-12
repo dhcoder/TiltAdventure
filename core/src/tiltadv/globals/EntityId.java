@@ -12,5 +12,9 @@ public enum EntityId {
     OCTO,
     OCTO_ROCK,
     BOULDER,
-    TARGET,
+    TARGET_INDICATOR,
+    BOUNDARY,
+
+    FPS_INDICATOR,
+    TILT_INDICATOR,
 }

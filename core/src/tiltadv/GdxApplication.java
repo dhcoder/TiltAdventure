@@ -74,6 +74,7 @@ public final class GdxApplication extends ApplicationAdapter {
     // logic from dealing with time steps that are too large (at which point, objects start going through walls, etc.)
     private static final float MAX_DELTA_TIME_SECS = 1f / 30f;
     private static final Duration ENEMY_INVINCIBILITY_DURATION = Duration.zero();
+    private static final Duration BOULDER_OSCILLATION_DURATION = Duration.fromSeconds(2f);
     private BitmapFont font;
     private OrthographicCamera camera;
     private SpriteBatch batch;
@@ -185,6 +186,14 @@ public final class GdxApplication extends ApplicationAdapter {
         entities.preallocate(MotionComponent.class, ENTITY_COUNT);
         entities.preallocate(SpriteComponent.class, ENTITY_COUNT);
 
+        entities.registerTemplate(EntityId.BOUNDARY, new EntityManager.EntityCreator() {
+            @Override
+            public void initialize(final Entity entity) {
+                entity.addComponent(PositionComponent.class);
+                entity.addComponent(ObstacleCollisionComponent.class);
+            }
+        });
+
         entities.registerTemplate(EntityId.PLAYER, new EntityManager.EntityCreator() {
             @Override
             public void initialize(final Entity entity) {
@@ -238,6 +247,17 @@ public final class GdxApplication extends ApplicationAdapter {
             }
         });
 
+        entities.registerTemplate(EntityId.BOULDER, new EntityManager.EntityCreator() {
+            @Override
+            public void initialize(final Entity entity) {
+                entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.BOULDER);
+                entity.addComponent(PositionComponent.class);
+                entity.addComponent(OscillationBehaviorComponent.class);
+                entity.addComponent(ObstacleCollisionComponent.class).setShape(boulderBounds);
+
+            }
+        });
+
         entities.registerTemplate(EntityId.OCTO, new EntityManager.EntityCreator() {
             @Override
             public void initialize(final Entity entity) {
@@ -270,7 +290,7 @@ public final class GdxApplication extends ApplicationAdapter {
             }
         });
 
-        entities.registerTemplate(EntityId.TARGET, new EntityManager.EntityCreator() {
+        entities.registerTemplate(EntityId.TARGET_INDICATOR, new EntityManager.EntityCreator() {
             @Override
             public void initialize(final Entity entity) {
                 entity.addComponent(PositionComponent.class);
@@ -280,7 +300,28 @@ public final class GdxApplication extends ApplicationAdapter {
             }
         });
 
-        addOctoEnemies();
+        entities.registerTemplate(EntityId.FPS_INDICATOR, new EntityManager.EntityCreator() {
+            @Override
+            public void initialize(final Entity entity) {
+                entity.addComponent(PositionComponent.class)
+                    .setPosition(new Vector2(-VIEWPORT_WIDTH / 2, -VIEWPORT_HEIGHT / 2 + font.getLineHeight()));
+                entity.addComponent(FpsDisplayComponent.class).set(font);
+            }
+        });
+
+        entities.registerTemplate(EntityId.TILT_INDICATOR, new EntityManager.EntityCreator() {
+                @Override
+                public void initialize(final Entity entity) {
+                    final float MARGIN = 5f;
+                    entity.addComponent(PositionComponent.class).setPosition(
+                        new Vector2(VIEWPORT_WIDTH / 2 - Tiles.SWORDRIGHT.getRegionWidth() - MARGIN,
+                            VIEWPORT_HEIGHT / 2 - Tiles.SWORDRIGHT.getRegionHeight() - MARGIN));
+                    entity.addComponent(SpriteComponent.class);
+                    entity.addComponent(TiltDisplayComponent.class).setTextureRegion(Tiles.SWORDRIGHT);
+                }
+            });
+
+            addOctoEnemies();
 
         Entity playerEntity = addPlayerEntity();
         addMovingBoulderEntities();
@@ -318,30 +359,30 @@ public final class GdxApplication extends ApplicationAdapter {
         float left = -halfScreenW - halfWallSize;
         float right = halfScreenW + halfWallSize;
 
-        Entity wallLeft = entities.newEntity();
-        Entity wallRight = entities.newEntity();
-        Entity wallBottom = entities.newEntity();
-        Entity wallTop = entities.newEntity();
+        Entity wallLeft = entities.newEntityFromTemplate(EntityId.BOUNDARY);
+        Entity wallRight = entities.newEntityFromTemplate(EntityId.BOUNDARY);
+        Entity wallBottom = entities.newEntityFromTemplate(EntityId.BOUNDARY);
+        Entity wallTop = entities.newEntityFromTemplate(EntityId.BOUNDARY);
 
         Vector2 wallPos = Pools.vector2s.grabNew();
         final Shape verticalWall = new Rectangle(halfWallSize, halfScreenH);
         final Shape horizontalWall = new Rectangle(halfScreenW, halfWallSize);
 
         wallPos.set(left, 0f);
-        wallLeft.addComponent(PositionComponent.class).setPosition(wallPos);
-        wallLeft.addComponent(ObstacleCollisionComponent.class).setShape(verticalWall);
+        wallLeft.requireComponent(PositionComponent.class).setPosition(wallPos);
+        wallLeft.requireComponent(ObstacleCollisionComponent.class).setShape(verticalWall);
 
         wallPos.set(right, 0f);
-        wallRight.addComponent(PositionComponent.class).setPosition(wallPos);
-        wallRight.addComponent(ObstacleCollisionComponent.class).setShape(verticalWall);
+        wallRight.requireComponent(PositionComponent.class).setPosition(wallPos);
+        wallRight.requireComponent(ObstacleCollisionComponent.class).setShape(verticalWall);
 
         wallPos.set(0f, bottom);
-        wallBottom.addComponent(PositionComponent.class).setPosition(wallPos);
-        wallBottom.addComponent(ObstacleCollisionComponent.class).setShape(horizontalWall);
+        wallBottom.requireComponent(PositionComponent.class).setPosition(wallPos);
+        wallBottom.requireComponent(ObstacleCollisionComponent.class).setShape(horizontalWall);
 
         wallPos.set(0f, top);
-        wallTop.addComponent(PositionComponent.class).setPosition(wallPos);
-        wallTop.addComponent(ObstacleCollisionComponent.class).setShape(horizontalWall);
+        wallTop.requireComponent(PositionComponent.class).setPosition(wallPos);
+        wallTop.requireComponent(ObstacleCollisionComponent.class).setShape(horizontalWall);
 
         Pools.vector2s.free(wallPos);
     }
@@ -395,33 +436,29 @@ public final class GdxApplication extends ApplicationAdapter {
 
     private void AddMovingBoulderEntity(final float xFrom, final float yFrom, final float xTo, final float yTo) {
 
-        Entity boulderEntity = entities.newEntity();
-        boulderEntity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.BOULDER);
-        boulderEntity.addComponent(PositionComponent.class);
-        boulderEntity.addComponent(OscillationBehaviorComponent.class)
-            .set(new Vector2(xFrom, yFrom), new Vector2(xTo, yTo), Duration.fromSeconds(2f));
-        boulderEntity.addComponent(ObstacleCollisionComponent.class).setShape(boulderBounds);
+
+        Entity boulderEntity = entities.newEntityFromTemplate(EntityId.BOULDER);
+
+        int mark = Pools.vector2s.mark();
+        Vector2 from = Pools.vector2s.grabNew().set(xFrom, yFrom);
+        Vector2 to = Pools.vector2s.grabNew().set(xTo, yTo);
+
+        boulderEntity.requireComponent(OscillationBehaviorComponent.class).setOscillation(from, to,
+            BOULDER_OSCILLATION_DURATION);
+
+        Pools.vector2s.freeToMark(mark);
     }
 
     private void addFpsEntity() {
-        Entity fpsEntity = entities.newEntity();
-        fpsEntity.addComponent(PositionComponent.class)
-            .setPosition(new Vector2(-VIEWPORT_WIDTH / 2, -VIEWPORT_HEIGHT / 2 + font.getLineHeight()));
-        fpsEntity.addComponent(FpsDisplayComponent.class).set(font);
+        entities.newEntityFromTemplate(EntityId.FPS_INDICATOR);
     }
 
     private void addTiltIndicatorEntity(final Entity playerEntity) {
-        Entity tiltIndicatorEntity = entities.newEntity();
-
-        final float MARGIN = 5f;
-        tiltIndicatorEntity.addComponent(PositionComponent.class).setPosition(
-            new Vector2(VIEWPORT_WIDTH / 2 - Tiles.SWORDRIGHT.getRegionWidth() - MARGIN,
-                VIEWPORT_HEIGHT / 2 - Tiles.SWORDRIGHT.getRegionHeight() - MARGIN));
-        tiltIndicatorEntity.addComponent(SpriteComponent.class);
-        tiltIndicatorEntity.addComponent(TiltDisplayComponent.class).set(Tiles.SWORDRIGHT, playerEntity);
+        Entity tiltIndicatorEntity = entities.newEntityFromTemplate(EntityId.TILT_INDICATOR);
+        tiltIndicatorEntity.requireComponent(TiltDisplayComponent.class).setTargetEntity(playerEntity);
     }
 
     private void addTargetEntity() {
-        entities.newEntityFromTemplate(EntityId.TARGET);
+        entities.newEntityFromTemplate(EntityId.TARGET_INDICATOR);
     }
 }

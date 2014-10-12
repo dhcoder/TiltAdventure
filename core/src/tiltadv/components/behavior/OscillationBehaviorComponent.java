@@ -28,7 +28,7 @@ public final class OscillationBehaviorComponent extends LerpComponent {
         to = new Vector2();
     }
 
-    public OscillationBehaviorComponent set(final Vector2 from, final Vector2 to, final Duration duration) {
+    public OscillationBehaviorComponent setOscillation(final Vector2 from, final Vector2 to, final Duration duration) {
         this.from.set(from);
         this.to.set(to);
         setDuration(duration);
