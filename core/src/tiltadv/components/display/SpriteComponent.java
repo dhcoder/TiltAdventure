@@ -23,6 +23,18 @@ import static dhcoder.libgdx.memory.LibgdxUtils.resetSprite;
  */
 public final class SpriteComponent extends AbstractComponent implements Renderable {
 
+    /**
+     * Convenience value to pass in to {@link #setZ(float)} so this sprite always appears below all other sprites.
+     * Additional adjustment may be required if you want to set multiple sprites to this value.
+     */
+    public static float ALWAYS_BELOW = -2000f;
+
+    /**
+     * Convenience value to pass in to {@link #setZ(float)} so this sprite always appears below all other sprites.
+     * Additional adjustment may be required if you want to set multiple sprites to this value.
+     */
+    public static float ALWAYS_ABOVE = 2000f;
+
     private final Sprite sprite = new Sprite();
     private final Vector2 offset = new Vector2();
     private final OptFloat zOpt = OptFloat.withNoValue();

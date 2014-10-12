@@ -12,6 +12,8 @@ import tiltadv.components.hierarchy.OffsetComponent;
 import tiltadv.components.hierarchy.ParentComponent;
 import tiltadv.memory.Pools;
 
+import static tiltadv.components.display.SpriteComponent.ALWAYS_BELOW;
+
 /**
  * Component that maintains the collision logic for the main player's avatar.
  */
@@ -31,7 +33,7 @@ public final class PlayerSensorBehaviorComponent extends AbstractComponent {
             owner.requireComponent(PlayerSensorCollisionComponent.class).getShape().getHalfWidth();
         x *= .8f;
 
-        owner.requireComponent(SpriteComponent.class).setZ(-1000f);
+        owner.requireComponent(SpriteComponent.class).setZ(ALWAYS_BELOW);
     }
 
     @Override
