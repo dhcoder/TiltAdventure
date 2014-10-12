@@ -216,7 +216,6 @@ public final class GdxApplication extends ApplicationAdapter {
 //                    .set(Animations.PLAYER_S, Animations.PLAYER_E, Animations.PLAYER_N, Animations.PLAYER_SW,
 //                        Animations.PLAYER_NE);
                 entity.addComponent(PlayerCollisionComponent.class).setShape(playerBounds);
-                //entity.addComponent(PlayerSensorCollisionComponent.class).setShape(playerSensorBounds);
             }
         });
 
