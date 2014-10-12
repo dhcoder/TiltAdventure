@@ -13,7 +13,7 @@ import tiltadv.input.TouchSystem;
  */
 public abstract class TouchableComponent extends AbstractComponent {
 
-    private static final Circle TOUCH_AREA = new Circle(10.0f);
+    private static final Circle TOUCH_AREA = new Circle(20.0f);
     private PositionComponent positionComponent;
     private boolean selected;
 
