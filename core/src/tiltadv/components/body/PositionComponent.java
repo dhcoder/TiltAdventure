@@ -38,5 +38,6 @@ public final class PositionComponent extends AbstractComponent {
     @Override
     public void reset() {
         position.set(0f, 0f);
+        onChanged.clearListeners();
     }
 }
