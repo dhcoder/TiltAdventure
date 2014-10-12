@@ -21,7 +21,7 @@ public final class SwordBehaviorComponent extends LerpComponent {
     private final static Angle HALF_ARC = Angle.fromDegrees(ARC.getDegrees() / 2f);
     private final static Duration DURATION = Duration.fromMilliseconds(200f);
     private final static Vector2 SWORD_POS = new Vector2(12f, 0f);
-    private final static Vector2 SWORD_TIP_POS = new Vector2(-2f, 0f);
+    private final static Vector2 SWORD_TIP_POS = new Vector2(-10f, 0f);
 
     private Angle from;
 
