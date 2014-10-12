@@ -43,7 +43,9 @@ import tiltadv.components.combat.KnockbackComponent;
 import tiltadv.components.display.CharacterDisplayComponent;
 import tiltadv.components.display.FpsDisplayComponent;
 import tiltadv.components.display.SpriteComponent;
+import tiltadv.components.display.TargetDisplayComponent;
 import tiltadv.components.display.TiltDisplayComponent;
+import tiltadv.components.hierarchy.ChildOffsetComponent;
 import tiltadv.components.hierarchy.OffsetComponent;
 import tiltadv.components.hierarchy.ParentComponent;
 import tiltadv.components.hierarchy.children.PlayerChildrenComponent;
@@ -213,6 +215,7 @@ public final class GdxApplication extends ApplicationAdapter {
             public void initialize(final Entity entity) {
                 entity.addComponent(ParentComponent.class); // Child of Player Entity
                 entity.addComponent(OffsetComponent.class);
+                entity.addComponent(ChildOffsetComponent.class);
                 entity.addComponent(SwordCollisionComponent.class).setShape(playerSwordBounds);
                 entity.addComponent(SwordBehaviorComponent.class);
                 entity.addComponent(AttackComponent.class);
@@ -227,6 +230,7 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(ParentComponent.class);  // Child of Player Entity
                 entity.addComponent(PositionComponent.class);
                 entity.addComponent(OffsetComponent.class);
+                entity.addComponent(ChildOffsetComponent.class);
                 entity.addComponent(PlayerSensorCollisionComponent.class).setShape(playerSensorBounds);
                 entity.addComponent(PlayerSensorBehaviorComponent.class);
                 entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.SENSOR);
@@ -265,6 +269,16 @@ public final class GdxApplication extends ApplicationAdapter {
             }
         });
 
+        entities.registerTemplate(EntityId.TARGET, new EntityManager.EntityCreator() {
+            @Override
+            public void initialize(final Entity entity) {
+                entity.addComponent(PositionComponent.class);
+                entity.addComponent(SpriteComponent.class);
+                entity.addComponent(TargetDisplayComponent.class).setTextureRegion(Tiles.ROCK);
+                entity.addComponent(OffsetComponent.class);
+            }
+        });
+
         addOctoEnemies();
 
         Entity playerEntity = addPlayerEntity();
@@ -272,6 +286,7 @@ public final class GdxApplication extends ApplicationAdapter {
         addTiltIndicatorEntity(playerEntity);
         addFpsEntity();
         addBoundaryWalls();
+        addTargetEntity();
     }
 
     private void addOctoEnemies() {
@@ -403,5 +418,9 @@ public final class GdxApplication extends ApplicationAdapter {
                 VIEWPORT_HEIGHT / 2 - Tiles.SWORDRIGHT.getRegionHeight() - MARGIN));
         tiltIndicatorEntity.addComponent(SpriteComponent.class);
         tiltIndicatorEntity.addComponent(TiltDisplayComponent.class).set(Tiles.SWORDRIGHT, playerEntity);
+    }
+
+    private void addTargetEntity() {
+        entities.newEntityFromTemplate(EntityId.TARGET);
     }
 }

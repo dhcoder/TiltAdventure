@@ -35,6 +35,7 @@ public final class Angle implements Poolable {
      * Multiplying this to a value in radians converts it to degrees.
      */
     public static final float DEG_TO_RAD = PI / 180f;
+
     private static final float FULL_REVOLUTION_RAD = 2 * PI;
     private static final float FULL_REVOLUTION_DEG = 360f;
 

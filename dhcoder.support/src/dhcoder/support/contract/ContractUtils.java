@@ -10,6 +10,7 @@ public final class ContractUtils {
         }
     }
 
+
     public static void requireNonNull(final Object value, final String message) {
         if (value == null) {
             throw new ContractException(message);
@@ -30,6 +31,12 @@ public final class ContractUtils {
 
     public static void requireTrue(final boolean value, final String message) {
         if (value != true) {
+            throw new ContractException(message);
+        }
+    }
+
+    public static void requireFalse(final boolean value, final String message) {
+        if (value != false) {
             throw new ContractException(message);
         }
     }
