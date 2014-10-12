@@ -203,8 +203,9 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(PlayerBehaviorComponent.class);
                 entity.addComponent(HealthComponent.class).setHealth(10);
                 entity.addComponent(CharacterDisplayComponent.class)
-                    .set(Animations.PLAYER_S, Animations.PLAYER_E, Animations.PLAYER_N, Animations.PLAYER_SW,
-                        Animations.PLAYER_NE);
+                    .set(Animations.PLAYER_S, Animations.PLAYER_E, Animations.PLAYER_N);
+//                    .set(Animations.PLAYER_S, Animations.PLAYER_E, Animations.PLAYER_N, Animations.PLAYER_SW,
+//                        Animations.PLAYER_NE);
                 entity.addComponent(PlayerCollisionComponent.class).setShape(playerBounds);
                 //entity.addComponent(PlayerSensorCollisionComponent.class).setShape(playerSensorBounds);
             }

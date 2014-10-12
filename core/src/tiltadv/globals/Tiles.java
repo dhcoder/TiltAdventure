@@ -8,14 +8,15 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
  */
 public final class Tiles {
 
-//    public static final TextureRegion PLAYER_S;
-//    public static final TextureRegion PLAYER_SE;
-//    public static final TextureRegion PLAYER_E;
-//    public static final TextureRegion PLAYER_NE;
-//    public static final TextureRegion PLAYER_N;
-//    public static final TextureRegion PLAYER_NW;
-//    public static final TextureRegion PLAYER_W;
-//    public static final TextureRegion PLAYER_SW;
+    public static final TextureRegion PLAYER_S1;
+    public static final TextureRegion PLAYER_S2;
+    public static final TextureRegion PLAYER_S3;
+    public static final TextureRegion PLAYER_E1;
+    public static final TextureRegion PLAYER_E2;
+    public static final TextureRegion PLAYER_E3;
+    public static final TextureRegion PLAYER_N1;
+    public static final TextureRegion PLAYER_N2;
+    public static final TextureRegion PLAYER_N3;
     public static final TextureRegion LINK_S1;
     public static final TextureRegion LINK_S2;
     public static final TextureRegion LINK_S3;
@@ -57,20 +58,22 @@ public final class Tiles {
     public static final TextureRegion SENSOR;
     private static final Texture textureSource8bit;
     private static final Texture textureSource16bit;
+    private static final Texture textureDude;
 
     static {
         textureSource8bit = new Texture("Tiles.png");
         textureSource16bit = new Texture("Tiles16.png");
-//        tempTextureSource = new Texture("Dude.png");
-//
-//        PLAYER_S = new TextureRegion(tempTextureSource, 0, 0, 32, 32);
-//        PLAYER_SE = new TextureRegion(tempTextureSource, 32, 0, 32, 32);
-//        PLAYER_E = new TextureRegion(tempTextureSource, 64, 0, 32, 32);
-//        PLAYER_NE = new TextureRegion(tempTextureSource, 96, 0, 32, 32);
-//        PLAYER_N = new TextureRegion(tempTextureSource, 128, 0, 32, 32);
-//        PLAYER_NW = new TextureRegion(tempTextureSource, 160, 0, 32, 32);
-//        PLAYER_W = new TextureRegion(tempTextureSource, 192, 0, 32, 32);
-//        PLAYER_SW = new TextureRegion(tempTextureSource, 224, 0, 32, 32);
+        textureDude = new Texture("Dude.png");
+
+        PLAYER_S1 = new TextureRegion(textureDude, 0, 0, 16, 24);
+        PLAYER_S2 = new TextureRegion(textureDude, 16, 0, 16, 24);
+        PLAYER_S3 = new TextureRegion(textureDude, 48, 0, 16, 24);
+        PLAYER_E1 = new TextureRegion(textureDude, 0, 24, 16, 24);
+        PLAYER_E2 = new TextureRegion(textureDude, 16, 24, 16, 24);
+        PLAYER_E3 = new TextureRegion(textureDude, 48, 24, 16, 24);
+        PLAYER_N1 = new TextureRegion(textureDude, 0, 72, 16, 24);
+        PLAYER_N2 = new TextureRegion(textureDude, 16, 72, 16, 24);
+        PLAYER_N3 = new TextureRegion(textureDude, 48, 72, 16, 24);
 
         LINK_S1 = new TextureRegion(textureSource16bit, 0, 0, 16, 24);
         LINK_S2 = new TextureRegion(textureSource16bit, 16, 0, 16, 24);
@@ -119,6 +122,7 @@ public final class Tiles {
         // TODO: Use asset manager instead
         textureSource8bit.dispose();
         textureSource16bit.dispose();
+        textureDude.dispose();
     }
 
     private Tiles() { } // Disabled constructor
