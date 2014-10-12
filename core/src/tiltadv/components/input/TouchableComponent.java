@@ -47,7 +47,7 @@ public abstract class TouchableComponent extends AbstractComponent {
 
     @Override
     public final void reset() {
-        handleDeselected();
+        deselect();
 
         final TouchSystem touchSystem = Services.get(TouchSystem.class);
         touchSystem.remove(this);
