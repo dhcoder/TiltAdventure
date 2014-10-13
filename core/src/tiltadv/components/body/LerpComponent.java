@@ -16,6 +16,7 @@ public abstract class LerpComponent extends AbstractComponent {
     private final Duration accumulated = Duration.zero();
     private Interpolation interpolator;
     private boolean isActive;
+    private boolean firstLerp;
     private boolean onReturnTrip;
     private boolean shouldLoop;
 
@@ -48,9 +49,14 @@ public abstract class LerpComponent extends AbstractComponent {
             return;
         }
 
+        if (firstLerp) {
+            firstLerp = false;
+            handleLerpActivated();
+        }
+
+        accumulated.add(elapsedTime);
         if (accumulated.getSeconds() > duration.getSeconds()) {
             if (!shouldLoop) {
-                handleLerp(1f);
                 setActive(false);
                 return;
             }
@@ -65,13 +71,12 @@ public abstract class LerpComponent extends AbstractComponent {
             percent = 1f - percent;
         }
         handleLerp(percent);
-
-        accumulated.add(elapsedTime);
     }
 
     @Override
     public final void reset() {
         isActive = false;
+        firstLerp = true;
 
         duration.setZero();
         accumulated.setZero();
@@ -86,7 +91,16 @@ public abstract class LerpComponent extends AbstractComponent {
     }
 
     protected void setActive(final boolean isActive) {
-        this.isActive = isActive;
+        if (this.isActive != isActive) {
+            this.isActive = isActive;
+
+            if (isActive) {
+                firstLerp = true;
+            }
+            else {
+                handleLerpDeactivated();
+            }
+        }
     }
 
     protected void lerpFromStart() {
@@ -100,6 +114,9 @@ public abstract class LerpComponent extends AbstractComponent {
      * set their current position based on the percent passed in.
      */
     protected abstract void handleLerp(final float percent);
+
+    protected void handleLerpActivated() {}
+    protected void handleLerpDeactivated() {}
 
     // Hack needed because constructor calls reset -> handleReset, which calls into base class before base class
     // fields are initialized...

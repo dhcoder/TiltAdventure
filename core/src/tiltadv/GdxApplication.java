@@ -32,6 +32,7 @@ import tiltadv.components.body.PositionComponent;
 import tiltadv.components.body.TiltComponent;
 import tiltadv.components.collision.EnemyCollisionComponent;
 import tiltadv.components.collision.EnemyProjectileCollisionComponent;
+import tiltadv.components.collision.GravityWellCollisionComponent;
 import tiltadv.components.collision.ObstacleCollisionComponent;
 import tiltadv.components.collision.PlayerCollisionComponent;
 import tiltadv.components.collision.PlayerSensorCollisionComponent;
@@ -84,6 +85,7 @@ public final class GdxApplication extends ApplicationAdapter {
     private RenderSystem renderSystem;
     private Shape octoBounds;
     private Shape playerBounds;
+    private Shape gravityWellBounds;
     private Shape playerSensorBounds;
     private Shape playerSwordBounds;
     private Shape octoRockBounds;
@@ -95,8 +97,7 @@ public final class GdxApplication extends ApplicationAdapter {
         batch = new SpriteBatch();
         if (DevSettings.IN_DEV_MODE) {
             shapeRenderer = new ShapeRenderer();
-
-            Pool.RUN_SANITY_CHECKS = true;
+            Pool.RUN_SANITY_CHECKS = DevSettings.RUN_POOL_SANITY_CHECKS;
         }
         font = new BitmapFont();
 
@@ -134,6 +135,7 @@ public final class GdxApplication extends ApplicationAdapter {
         update();
 
         Gdx.gl.glClearColor(1f, .88f, .66f, 1f); // Desert-ish color, for testing!
+//        Gdx.gl.glClearColor(.22f, .22f, .22f, 1f); // Grey-ish color, for seeing collision shapes
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         batch.begin();
@@ -175,6 +177,7 @@ public final class GdxApplication extends ApplicationAdapter {
 
         entities = new EntityManager(ENTITY_COUNT);
 
+        gravityWellBounds = new Circle(8.0f);
         octoBounds = new Circle(Tiles.OCTOUP1.getRegionWidth() / 2f);
         playerBounds = new Circle((Tiles.LINK_N1.getRegionWidth() / 2f) * 0.8f);
         playerSensorBounds = new Circle(Tiles.SENSOR.getRegionWidth() / 2f);
@@ -191,6 +194,15 @@ public final class GdxApplication extends ApplicationAdapter {
             public void initialize(final Entity entity) {
                 entity.addComponent(PositionComponent.class);
                 entity.addComponent(ObstacleCollisionComponent.class);
+            }
+        });
+
+        entities.registerTemplate(EntityId.GRAVITY_WELL, new EntityManager.EntityCreator() {
+            @Override
+            public void initialize(final Entity entity) {
+                entity.addComponent(PositionComponent.class);
+                entity.addComponent(GravityWellCollisionComponent.class).setShape(gravityWellBounds);
+                entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.SENSOR);
             }
         });
 
@@ -212,9 +224,8 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(PlayerBehaviorComponent.class);
                 entity.addComponent(HealthComponent.class).setHealth(10);
                 entity.addComponent(CharacterDisplayComponent.class)
-                    .set(Animations.PLAYER_S, Animations.PLAYER_E, Animations.PLAYER_N);
-//                    .set(Animations.PLAYER_S, Animations.PLAYER_E, Animations.PLAYER_N, Animations.PLAYER_SW,
-//                        Animations.PLAYER_NE);
+                    .set(Animations.PLAYER_S, Animations.PLAYER_E, Animations.PLAYER_N, Animations.PLAYER_SE,
+                        Animations.PLAYER_NW);
                 entity.addComponent(PlayerCollisionComponent.class).setShape(playerBounds);
             }
         });
@@ -320,14 +331,30 @@ public final class GdxApplication extends ApplicationAdapter {
                 }
             });
 
-            addOctoEnemies();
 
+        Vector2 dummyVector = new Vector2();
         Entity playerEntity = addPlayerEntity();
+//        addPlayerEntity().requireComponent(PositionComponent.class).setPosition(dummyVector.set(30, 30));
+//        addPlayerEntity().requireComponent(PositionComponent.class).setPosition(dummyVector.set(-30, -30));
+//        addGravityWell(0, 0);
+//        addGravityWell(50, 20);
+//        addGravityWell(-30, 70);
+//        addGravityWell(-90, -30);
+        addOctoEnemies();
         addMovingBoulderEntities();
         addTiltIndicatorEntity(playerEntity);
         addFpsEntity();
         addBoundaryWalls();
         addTargetEntity();
+    }
+
+    private void addGravityWell(final float x, final float y) {
+        Entity gravityWellEntity = entities.newEntityFromTemplate(EntityId.GRAVITY_WELL);
+
+        Vector2 position = Pools.vector2s.grabNew().set(x, y);
+        gravityWellEntity.requireComponent(PositionComponent.class).setPosition(position);
+        Pools.vector2s.freeCount(1);
+
     }
 
     private void addOctoEnemies() {

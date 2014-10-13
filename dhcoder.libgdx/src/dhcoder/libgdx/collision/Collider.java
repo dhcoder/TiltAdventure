@@ -12,6 +12,7 @@ import static dhcoder.libgdx.collision.shape.ShapeUtils.testIntersection;
  */
 public final class Collider implements Poolable {
 
+    public boolean TEMP_IS_COLLIDING = false;
     private final Vector2 lastPosition = new Vector2();
     private final Vector2 currPosition = new Vector2();
     private final Opt tag = Opt.withNoValue(); // Extra data associated with this collider
@@ -45,6 +46,9 @@ public final class Collider implements Poolable {
 
     public void setEnabled(final boolean isEnabled) {
         this.isEnabled = isEnabled;
+        if (!isEnabled) {
+            isInitialized = false;
+        }
     }
 
     public Shape getShape() {
@@ -76,6 +80,8 @@ public final class Collider implements Poolable {
     }
 
     public void updatePosition(final float x, final float y) {
+        TEMP_IS_COLLIDING = false;
+
         if (isInitialized) {
             if (lastPosition.epsilonEquals(x, y, 0f)) {
                 return;
@@ -96,6 +102,7 @@ public final class Collider implements Poolable {
     // Should only be called by CollisionSystem
     @Override
     public void reset() {
+        TEMP_IS_COLLIDING = false;
         system = null;
         shape = null;
         groupId = -1;

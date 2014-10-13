@@ -13,17 +13,24 @@ public final class DevSettings {
      * <p/>
      * Add "-Dtiltadv.dev=true" to the VM options for the launcher of this application to put the app in dev mode.
      */
-    public static final boolean IN_DEV_MODE = Boolean.getBoolean("tiltadv.dev");
+//    public static final boolean IN_DEV_MODE = Boolean.getBoolean("tiltadv.dev");
+    public static final boolean IN_DEV_MODE = false;
 
     /**
      * If {@code true} and in dev mode, we should render shape overlays over all entities set up for collision.
      */
-    public static boolean SHOW_COLLISION_SHAPES = false;
+    public static boolean SHOW_COLLISION_SHAPES = true;
 
     /**
-     * Slow-mo multiplier. Setting to {@code 4f} means 4x slowdown.
+     * If {@code true} and in dev mode, we should run sanity checks that items we return to the pool are identical to
+     * items allocated into the pool.
      */
-    public static float SLOW_MO_FACTOR = 1f;
+    public static boolean RUN_POOL_SANITY_CHECKS = false;
+
+    /**
+     * If in dev mode, apply a slow-mo multiplier - setting to {@code 4f} means 4x slowdown.
+     */
+    public static float SLOW_MO_FACTOR = 6f;
 
     private DevSettings() {}
 

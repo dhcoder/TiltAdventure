@@ -81,15 +81,18 @@ public final class SwordBehaviorComponent extends LerpComponent {
 
         Pools.angles.freeCount(1);
         Pools.vector2s.freeToMark(vectorMark);
+    }
 
-        if (percent == 0f) {
-            headingComponent.setLocked(true);
-            enableCollision(true);
-        }
-        else if (percent == 1f) {
-            headingComponent.setLocked(false);
-            enableCollision(false);
-        }
+    @Override
+    protected void handleLerpActivated() {
+        headingComponent.setLocked(true);
+        enableCollision(true);
+    }
+
+    @Override
+    protected void handleLerpDeactivated() {
+        headingComponent.setLocked(false);
+        enableCollision(false);
     }
 
     @Override

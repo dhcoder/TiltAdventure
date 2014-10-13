@@ -25,11 +25,16 @@ public final class KeyboardInputComponent extends AbstractComponent {
     public void update(final Duration elapsedTime) {
         Vector2 tilt = Pools.vector2s.grabNew();
 
-        if (Gdx.input.isKeyPressed(Keys.A)) { tilt.x = -2f; }
-        else if (Gdx.input.isKeyPressed(Keys.D)) { tilt.x = 2f; }
+        float tiltMagnitude = 2f;
+        if (Gdx.input.isKeyPressed(Keys.CONTROL_RIGHT)) {
+            tiltMagnitude *= 0.25f;
+        }
 
-        if (Gdx.input.isKeyPressed(Keys.S)) { tilt.y = -2f; }
-        else if (Gdx.input.isKeyPressed(Keys.W)) { tilt.y = 2f; }
+        if (Gdx.input.isKeyPressed(Keys.A)) { tilt.x = -tiltMagnitude; }
+        else if (Gdx.input.isKeyPressed(Keys.D)) { tilt.x = tiltMagnitude; }
+
+        if (Gdx.input.isKeyPressed(Keys.S)) { tilt.y = -tiltMagnitude; }
+        else if (Gdx.input.isKeyPressed(Keys.W)) { tilt.y = tiltMagnitude; }
 
         tiltComponent.setTilt(tilt);
 

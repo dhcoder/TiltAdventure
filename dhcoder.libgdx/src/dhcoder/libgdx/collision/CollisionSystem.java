@@ -1,5 +1,6 @@
 package dhcoder.libgdx.collision;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.collision.shape.Shape;
@@ -152,6 +153,14 @@ public final class CollisionSystem {
             if (!collider.isActive()) {
                 continue;
             }
+
+            if (collider.TEMP_IS_COLLIDING) {
+                renderer.setColor(Color.RED);
+            }
+            else {
+                renderer.setColor(Color.WHITE);
+            }
+
             Vector2 pos = collider.getCurrPosition();
             collider.getShape().render(renderer, pos.x, pos.y);
         }
@@ -226,6 +235,8 @@ public final class CollisionSystem {
                 colliderKeyPool.free(key);
                 return;
             }
+
+            sourceCollider.TEMP_IS_COLLIDING = true;
 
             collidedThisFrame.put(key);
             if (!collisions.containsKey(key)) {

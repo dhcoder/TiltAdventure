@@ -24,8 +24,8 @@ public final class CharacterDisplayComponent extends AbstractComponent {
     private Animation animS;
     private Animation animE;
     private Animation animN;
-    private Animation animSW;
-    private Animation animNE;
+    private Animation animSE;
+    private Animation animNW;
 
     private float elapsedSoFar;
     private Animation activeAnim;
@@ -48,8 +48,8 @@ public final class CharacterDisplayComponent extends AbstractComponent {
     }
 
     public CharacterDisplayComponent set(final Animation animS, final Animation animE,
-        final Animation animN, final Animation animSW, final Animation animNE) {
-        return set(animS, animE, animN, animSW, animNE, false);
+        final Animation animN, final Animation animSE, final Animation animNW) {
+        return set(animS, animE, animN, animSE, animNW, false);
     }
 
     @Override
@@ -98,9 +98,9 @@ public final class CharacterDisplayComponent extends AbstractComponent {
     public void reset() {
         animS = null;
         animE = null;
-        animNE = null;
+        animNW = null;
         animN = null;
-        animSW = null;
+        animSE = null;
 
         elapsedSoFar = 0f;
         activeAnim = null;
@@ -116,13 +116,13 @@ public final class CharacterDisplayComponent extends AbstractComponent {
     }
 
     private CharacterDisplayComponent set(final Animation animS, final Animation animE,
-        final Animation animN, final Animation animSW, final Animation animNE, final boolean isCardinal) {
+        final Animation animN, final Animation animSE, final Animation animNW, final boolean isCardinal) {
 
         this.animS = animS;
         this.animE = animE;
         this.animN = animN;
-        this.animSW = animSW;
-        this.animNE = animNE;
+        this.animSE = animSE;
+        this.animNW = animNW;
         this.isCardinal = isCardinal;
 
         activeAnim = isCardinal ? getAnimationForDirection(activeCardinalDirection) :
@@ -136,19 +136,19 @@ public final class CharacterDisplayComponent extends AbstractComponent {
             case E:
                 return animE;
             case NE:
-                return animNE;
+                return animNW;
             case N:
                 return animN;
             case NW:
-                return animNE;
+                return animNW;
             case W:
                 return animE;
             case SW:
-                return animSW;
+                return animSE;
             case S:
                 return animS;
             case SE:
-                return animSW;
+                return animSE;
             default:
                 return animS;
         }
@@ -171,9 +171,9 @@ public final class CharacterDisplayComponent extends AbstractComponent {
 
     private boolean useFlippedSprite(final CompassDirection direction) {
         switch (direction) {
-            case NW:
+            case NE:
             case W:
-            case SE:
+            case SW:
                 return true;
             default:
                 return false;

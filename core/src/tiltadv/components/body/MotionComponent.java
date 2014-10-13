@@ -29,6 +29,11 @@ public final class MotionComponent extends AbstractComponent {
         return this;
     }
 
+    public MotionComponent adjustVelocity(final Vector2 adjustmentVelocity) {
+        this.velocity.add(adjustmentVelocity);
+        return this;
+    }
+
     // Set a velocity on this entity which starts decelerating immediately, emulating a sudden push.
     public MotionComponent setImpulse(final Vector2 impulse, final Duration time) {
         velocity.set(impulse);
