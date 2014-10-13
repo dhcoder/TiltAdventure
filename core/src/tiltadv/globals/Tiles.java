@@ -17,6 +17,12 @@ public final class Tiles {
     public static final TextureRegion PLAYER_N1;
     public static final TextureRegion PLAYER_N2;
     public static final TextureRegion PLAYER_N3;
+    public static final TextureRegion PLAYER_SE1;
+    public static final TextureRegion PLAYER_SE2;
+    public static final TextureRegion PLAYER_SE3;
+    public static final TextureRegion PLAYER_NW1;
+    public static final TextureRegion PLAYER_NW2;
+    public static final TextureRegion PLAYER_NW3;
     public static final TextureRegion LINK_S1;
     public static final TextureRegion LINK_S2;
     public static final TextureRegion LINK_S3;
@@ -74,6 +80,12 @@ public final class Tiles {
         PLAYER_N1 = new TextureRegion(textureDude, 0, 72, 16, 24);
         PLAYER_N2 = new TextureRegion(textureDude, 16, 72, 16, 24);
         PLAYER_N3 = new TextureRegion(textureDude, 48, 72, 16, 24);
+        PLAYER_SE1 = new TextureRegion(textureDude, 16, 96, 16, 24);
+        PLAYER_SE2 = new TextureRegion(textureDude, 0, 96, 16, 24);
+        PLAYER_SE3 = new TextureRegion(textureDude, 32, 96, 16, 24);
+        PLAYER_NW1 = new TextureRegion(textureDude, 16, 120, 16, 24);
+        PLAYER_NW2 = new TextureRegion(textureDude, 0, 120, 16, 24);
+        PLAYER_NW3 = new TextureRegion(textureDude, 32, 120, 16, 24);
 
         LINK_S1 = new TextureRegion(textureSource16bit, 0, 0, 16, 24);
         LINK_S2 = new TextureRegion(textureSource16bit, 16, 0, 16, 24);

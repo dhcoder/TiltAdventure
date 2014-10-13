@@ -9,9 +9,9 @@ public final class Animations {
 
     public static final Animation PLAYER_S;
     public static final Animation PLAYER_E;
-//    public static final Animation PLAYER_NE;
     public static final Animation PLAYER_N;
-//    public static final Animation PLAYER_SW;
+    public static final Animation PLAYER_SE;
+    public static final Animation PLAYER_NW;
     public static final Animation OCTOUP;
     public static final Animation OCTODOWN;
     public static final Animation OCTOLEFT;
@@ -24,6 +24,10 @@ public final class Animations {
         PLAYER_E.setPlayMode(Animation.PlayMode.LOOP);
         PLAYER_N = new Animation(0.1f, Tiles.PLAYER_N1, Tiles.PLAYER_N2, Tiles.PLAYER_N1, Tiles.PLAYER_N3);
         PLAYER_N.setPlayMode(Animation.PlayMode.LOOP);
+        PLAYER_SE = new Animation(0.1f, Tiles.PLAYER_SE1, Tiles.PLAYER_SE2, Tiles.PLAYER_SE1, Tiles.PLAYER_SE3);
+        PLAYER_SE.setPlayMode(Animation.PlayMode.LOOP);
+        PLAYER_NW = new Animation(0.1f, Tiles.PLAYER_NW1, Tiles.PLAYER_NW2, Tiles.PLAYER_NW1, Tiles.PLAYER_NW3);
+        PLAYER_NW.setPlayMode(Animation.PlayMode.LOOP);
 
 //        PLAYER_S = new Animation(0.05f, Tiles.LINK_S1, Tiles.LINK_S2, Tiles.LINK_S3, Tiles.LINK_S2, Tiles.LINK_S1,
 //            Tiles.LINK_S5, Tiles.LINK_S6, Tiles.LINK_S5);
