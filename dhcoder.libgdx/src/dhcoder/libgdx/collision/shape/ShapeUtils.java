@@ -6,6 +6,7 @@ import dhcoder.libgdx.collision.agent.CircleRectangleCollisionAgent;
 import dhcoder.libgdx.collision.agent.CollisionAgent;
 import dhcoder.libgdx.collision.agent.RectangleCollisionAgent;
 import dhcoder.support.collection.Key2;
+import dhcoder.support.math.BinarySearch;
 import dhcoder.support.memory.Pool;
 
 import java.util.HashMap;
@@ -14,6 +15,16 @@ import java.util.Map;
 import static dhcoder.support.text.StringUtils.format;
 
 public final class ShapeUtils {
+
+    /**
+     * If true, run extra sanity checks on the shapes we're testing against to make sure the inputs are always in a
+     * valid state.
+     */
+    public static boolean RUN_SANITY_CHECKS = false;
+
+    private static int COLLISION_SUBDIVISIONS = 10;
+
+    private static final BinarySearch binarySearch = new BinarySearch();
 
     private static final class ShapeKey extends Key2<Class<? extends Shape>, Class<? extends Shape>> {
         private ShapeKey() { /* used by Pool */ }
@@ -45,7 +56,46 @@ public final class ShapeUtils {
         final float toY2, final Vector2 outRepulsion) {
 
         CollisionAgent agent = getCollisionAgent(shape1, shape2);
-        agent.getRepulsion(shape1, fromX1, fromY1, toX1, toY1, shape2, fromX2, fromY2, toX2, toY2, outRepulsion);
+
+        if (RUN_SANITY_CHECKS) {
+            if (agent.testIntersection(shape1, fromX1, fromY1, shape2, fromX2, fromY2)) {
+                throw new IllegalStateException("getRepulsion test assumes shapes start uncollided.");
+            }
+
+            if (!agent.testIntersection(shape1, toX1, toY1, shape2, toX2, toY2)) {
+                throw new IllegalStateException("getRepulsion test assumes shapes end collided.");
+            }
+        }
+
+        final float deltaX1 = toX1 - fromX1;
+        final float deltaX2 = toX2 - fromX2;
+        final float deltaY1 = toY1 - fromY1;
+        final float deltaY2 = toY2 - fromY2;
+        binarySearch.initialize(COLLISION_SUBDIVISIONS);
+        float testX1, testY1, testX2, testY2;
+
+        while (!binarySearch.isFinished()) {
+            final int currentIndex = binarySearch.getCurrentIndex();
+            final float percent = (float)currentIndex / COLLISION_SUBDIVISIONS;
+            testX1 = fromX1 + deltaX1 * percent;
+            testY1 = fromY1 + deltaY1 * percent;
+            testX2 = fromX2 + deltaX2 * percent;
+            testY2 = fromY2 + deltaY2 * percent;
+
+            if (!agent.testIntersection(shape1, testX1, testY1, shape2, testX2, testY2)) {
+                binarySearch.rejectCurrentIndex();
+            }
+            else {
+                binarySearch.acceptCurrentIndex();
+            }
+        }
+
+        float finalX1, finalY1;
+        final float percent = (float)binarySearch.getAcceptedIndex() / COLLISION_SUBDIVISIONS;
+        finalX1 = fromX1 + deltaX1 * percent;
+        finalY1 = fromY1 + deltaY1 * percent;
+
+        outRepulsion.set(toX1 - finalX1, toY1 - finalY1);
     }
 
     private static CollisionAgent getCollisionAgent(final Shape shape1, final Shape shape2) {

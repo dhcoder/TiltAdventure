@@ -28,6 +28,12 @@ public final class DevSettings {
     public static boolean RUN_POOL_SANITY_CHECKS = false;
 
     /**
+     * If {@code true} and in dev mode, we should run sanity checks that our collision objects are always in valid
+     * initial states.
+     */
+    public static boolean RUN_COLLISION_SANITY_CHECKS = true;
+
+    /**
      * If in dev mode, apply a slow-mo multiplier - setting to {@code 4f} means 4x slowdown.
      */
     public static float SLOW_MO_FACTOR = 6f;

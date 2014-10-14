@@ -15,6 +15,7 @@ import dhcoder.libgdx.collision.CollisionSystem;
 import dhcoder.libgdx.collision.shape.Circle;
 import dhcoder.libgdx.collision.shape.Rectangle;
 import dhcoder.libgdx.collision.shape.Shape;
+import dhcoder.libgdx.collision.shape.ShapeUtils;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.libgdx.entity.EntityManager;
 import dhcoder.libgdx.render.RenderSystem;
@@ -98,6 +99,7 @@ public final class GdxApplication extends ApplicationAdapter {
         if (DevSettings.IN_DEV_MODE) {
             shapeRenderer = new ShapeRenderer();
             Pool.RUN_SANITY_CHECKS = DevSettings.RUN_POOL_SANITY_CHECKS;
+            ShapeUtils.RUN_SANITY_CHECKS = DevSettings.RUN_COLLISION_SANITY_CHECKS;
         }
         font = new BitmapFont();
 
