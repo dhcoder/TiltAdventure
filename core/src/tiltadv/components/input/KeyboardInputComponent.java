@@ -26,7 +26,7 @@ public final class KeyboardInputComponent extends AbstractComponent {
         Vector2 tilt = Pools.vector2s.grabNew();
 
         float tiltMagnitude = 2f;
-        if (Gdx.input.isKeyPressed(Keys.CONTROL_RIGHT)) {
+        if (Gdx.input.isKeyPressed(Keys.SHIFT_LEFT)) {
             tiltMagnitude *= 0.25f;
         }
 
