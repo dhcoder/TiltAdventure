@@ -68,8 +68,8 @@ public final class ShapeUtils {
         }
 
         final float deltaX1 = toX1 - fromX1;
-        final float deltaX2 = toX2 - fromX2;
         final float deltaY1 = toY1 - fromY1;
+        final float deltaX2 = toX2 - fromX2;
         final float deltaY2 = toY2 - fromY2;
         binarySearch.initialize(COLLISION_SUBDIVISIONS);
         float testX1, testY1, testX2, testY2;
@@ -82,7 +82,7 @@ public final class ShapeUtils {
             testX2 = fromX2 + deltaX2 * percent;
             testY2 = fromY2 + deltaY2 * percent;
 
-            if (!agent.testIntersection(shape1, testX1, testY1, shape2, testX2, testY2)) {
+            if (agent.testIntersection(shape1, testX1, testY1, shape2, testX2, testY2)) {
                 binarySearch.rejectCurrentIndex();
             }
             else {
@@ -95,7 +95,7 @@ public final class ShapeUtils {
         finalX1 = fromX1 + deltaX1 * percent;
         finalY1 = fromY1 + deltaY1 * percent;
 
-        outRepulsion.set(toX1 - finalX1, toY1 - finalY1);
+        outRepulsion.set(finalX1 - toX1, finalY1 - toY1);
     }
 
     private static CollisionAgent getCollisionAgent(final Shape shape1, final Shape shape2) {

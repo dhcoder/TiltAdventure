@@ -14,7 +14,7 @@ public final class DevSettings {
      * Add "-Dtiltadv.dev=true" to the VM options for the launcher of this application to put the app in dev mode.
      */
 //    public static final boolean IN_DEV_MODE = Boolean.getBoolean("tiltadv.dev");
-    public static final boolean IN_DEV_MODE = false;
+    public static final boolean IN_DEV_MODE = true;
 
     /**
      * If {@code true} and in dev mode, we should render shape overlays over all entities set up for collision.
@@ -36,7 +36,7 @@ public final class DevSettings {
     /**
      * If in dev mode, apply a slow-mo multiplier - setting to {@code 4f} means 4x slowdown.
      */
-    public static float SLOW_MO_FACTOR = 6f;
+    public static float SLOW_MO_FACTOR = 1f;
 
     private DevSettings() {}
 
