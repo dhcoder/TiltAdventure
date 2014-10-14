@@ -47,6 +47,7 @@ public final class Collider implements Poolable {
     public void setEnabled(final boolean isEnabled) {
         this.isEnabled = isEnabled;
         if (!isEnabled) {
+            system.removeColliderFromRegions(this);
             isInitialized = false;
         }
     }
@@ -82,8 +83,11 @@ public final class Collider implements Poolable {
     public void updatePosition(final float x, final float y) {
         TEMP_IS_COLLIDING = false;
 
+        if (!isEnabled)
+            return;
+
         if (isInitialized) {
-            if (lastPosition.epsilonEquals(x, y, 0f)) {
+            if (currPosition.epsilonEquals(x, y, 0f)) {
                 return;
             }
             system.removeColliderFromRegions(this);
