@@ -21,7 +21,7 @@ public final class HealthComponent extends AbstractComponent {
         void onDied();
     }
 
-    private static final float KNOCKBACK_MULTIPLIER = 150f;
+    private static final float KNOCKBACK_MAGNITUTDE = 150f;
     private static final Duration STOP_DURATION = Duration.fromSeconds(.3f);
     private static final Duration DEFAULT_INVINCIBLE_DURATION = Duration.fromSeconds(2f);
 
@@ -121,7 +121,7 @@ public final class HealthComponent extends AbstractComponent {
 
     private void knockback(final Vector2 direction) {
         Vector2 impulse =
-            Pools.vector2s.grabNew().set(direction).scl(KNOCKBACK_MULTIPLIER * knockbackComponent.getMultiplier());
+            Pools.vector2s.grabNew().set(direction).scl(KNOCKBACK_MAGNITUTDE * knockbackComponent.getMultiplier());
         motionComponent.setImpulse(impulse, STOP_DURATION);
         Pools.vector2s.free(impulse);
 
