@@ -5,6 +5,7 @@ import dhcoder.libgdx.collision.agent.CircleCollisionAgent;
 import dhcoder.libgdx.collision.agent.CircleRectangleCollisionAgent;
 import dhcoder.libgdx.collision.agent.CollisionAgent;
 import dhcoder.libgdx.collision.agent.RectangleCollisionAgent;
+import dhcoder.libgdx.pool.Vector2PoolBuilder;
 import dhcoder.support.collection.Key2;
 import dhcoder.support.math.BinarySearch;
 import dhcoder.support.memory.Pool;
@@ -22,9 +23,11 @@ public final class ShapeUtils {
      */
     public static boolean RUN_SANITY_CHECKS = false;
 
-    private static int COLLISION_SUBDIVISIONS = 10;
+    private static int COLLISION_SUBDIVISIONS = 8;
 
     private static final BinarySearch binarySearch = new BinarySearch();
+
+    private static final Pool<Vector2> vectorPool = Vector2PoolBuilder.build(2);
 
     private static final class ShapeKey extends Key2<Class<? extends Shape>, Class<? extends Shape>> {
         private ShapeKey() { /* used by Pool */ }
@@ -59,7 +62,7 @@ public final class ShapeUtils {
 
         if (RUN_SANITY_CHECKS) {
             if (agent.testIntersection(shape1, fromX1, fromY1, shape2, fromX2, fromY2)) {
-                throw new IllegalStateException("getRepulsion test assumes shapes start uncollided.");
+                throw new IllegalStateException("getRepulsion test assumes shapes start separated.");
             }
 
             if (!agent.testIntersection(shape1, toX1, toY1, shape2, toX2, toY2)) {
@@ -90,12 +93,33 @@ public final class ShapeUtils {
             }
         }
 
-        float finalX1, finalY1;
         final float percent = (float)binarySearch.getAcceptedIndex() / COLLISION_SUBDIVISIONS;
-        finalX1 = fromX1 + deltaX1 * percent;
-        finalY1 = fromY1 + deltaY1 * percent;
+        final float finalX1 = fromX1 + deltaX1 * percent;
+        final float finalY1 = fromY1 + deltaY1 * percent;
+        final float finalX2 = fromX2 + deltaX2 * percent;
+        final float finalY2 = fromY2 + deltaY2 * percent;
 
-        outRepulsion.set(finalX1 - toX1, finalY1 - toY1);
+        int mark = vectorPool.mark();
+        Vector2 normal = vectorPool.grabNew();
+        agent.getNormal(shape1, finalX1, finalY1, shape2, finalX2, finalY2, normal);
+        Vector2 relativeVel =
+            vectorPool.grabNew().set((toX2 - finalX2) + (toX1 - finalX1), (toY2 - finalY2) + (toY1 - finalY1));
+
+
+        /*
+          Rock(2) -> 5pixels/frame
+          Guy(1) -> 0pixels/frame
+
+          
+
+
+
+         */
+
+        normal.scl(relativeVel.len());
+        outRepulsion.set(normal);
+
+        vectorPool.freeToMark(mark);
     }
 
     private static CollisionAgent getCollisionAgent(final Shape shape1, final Shape shape2) {

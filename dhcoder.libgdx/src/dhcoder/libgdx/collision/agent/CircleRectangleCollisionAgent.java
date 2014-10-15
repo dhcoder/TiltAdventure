@@ -58,5 +58,17 @@ public final class CircleRectangleCollisionAgent implements CollisionAgent {
 
         vectorPool.free(circleToPointDistance);
     }
+
+    @Override
+    public void getNormal(final Shape shape1, final float x1, final float y1, final Shape shape2, final float x2,
+        final float y2, final Vector2 outNormal) {
+
+        Rectangle rect = (Rectangle)shape2;
+
+        float closestX = clamp(x1, rect.getLeft(x2), rect.getRight(x2));
+        float closestY = clamp(y1, rect.getBottom(y2), rect.getTop(y2));
+
+        outNormal.set(x1, y1).sub(closestX, closestY).nor();
+    }
 }
 

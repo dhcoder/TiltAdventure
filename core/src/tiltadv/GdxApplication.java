@@ -136,8 +136,8 @@ public final class GdxApplication extends ApplicationAdapter {
     public void render() {
         update();
 
-        Gdx.gl.glClearColor(1f, .88f, .66f, 1f); // Desert-ish color, for testing!
-//        Gdx.gl.glClearColor(.22f, .22f, .22f, 1f); // Grey-ish color, for seeing collision shapes
+//        Gdx.gl.glClearColor(1f, .88f, .66f, 1f); // Desert-ish color, for testing!
+        Gdx.gl.glClearColor(.22f, .22f, .22f, 1f); // Grey-ish color, for seeing collision shapes
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         batch.begin();
@@ -182,6 +182,7 @@ public final class GdxApplication extends ApplicationAdapter {
         gravityWellBounds = new Circle(8.0f);
         octoBounds = new Circle(Tiles.OCTOUP1.getRegionWidth() / 2f);
         playerBounds = new Circle((Tiles.LINK_N1.getRegionWidth() / 2f) * 0.8f);
+//        playerBounds = new Rectangle(8f, 8f);
         playerSensorBounds = new Circle(Tiles.SENSOR.getRegionWidth() / 2f);
         playerSwordBounds = new Circle(5f);
         octoRockBounds = new Circle(Tiles.ROCK.getRegionWidth() / 2f);
@@ -334,8 +335,8 @@ public final class GdxApplication extends ApplicationAdapter {
             });
 
 
-        Vector2 dummyVector = new Vector2();
         Entity playerEntity = addPlayerEntity();
+//        Vector2 dummyVector = new Vector2();
 //        addPlayerEntity().requireComponent(PositionComponent.class).setPosition(dummyVector.set(30, 30));
 //        addPlayerEntity().requireComponent(PositionComponent.class).setPosition(dummyVector.set(-30, -30));
 //        addGravityWell(0, 0);
@@ -343,7 +344,7 @@ public final class GdxApplication extends ApplicationAdapter {
 //        addGravityWell(-30, 70);
 //        addGravityWell(-90, -30);
 //        addOctoEnemies();
-//        addMovingBoulderEntities();
+        addMovingBoulderEntities();
         addTiltIndicatorEntity(playerEntity);
         addFpsEntity();
         addBoundaryWalls();

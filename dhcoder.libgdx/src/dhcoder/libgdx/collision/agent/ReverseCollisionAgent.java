@@ -29,4 +29,10 @@ public final class ReverseCollisionAgent implements CollisionAgent {
         wrappedAgent.getRepulsion(shape2, fromX2, fromY2, toX2, toY2, shape1, fromX1, fromY1, toX1, toY1, outRepulsion);
         outRepulsion.scl(-1f, -1f);
     }
+
+    @Override
+    public void getNormal(final Shape shape1, final float x1, final float y1, final Shape shape2, final float x2,
+        final float y2, final Vector2 outNormal) {
+        wrappedAgent.getNormal(shape2, x2, y2, shape1, x1, y1, outNormal);
+    }
 }
