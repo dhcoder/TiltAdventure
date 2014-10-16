@@ -108,18 +108,8 @@ public final class ShapeUtils {
         Vector2 redirected = vectorPool.grabNew();
         redirected.set(normal).scl(prevented.len() * MathUtils.cosDeg(angle));
 
-        outRepulsion.set(redirected).sub(prevented).scl(100.0f);
-
-        if (outRepulsion.y < 10f) {
-            int breakhere = 0;
-        }
-
-//        if (true) {
-//            if (agent
-//                .testIntersection(shape1, toX1_ + outRepulsion.x, toY1_ + outRepulsion.y, shape2, fromX2, fromY2)) {
-//                throw new IllegalStateException("getRepulsion expects shapes end separated.");
-//            }
-//        }
+        // Note: We add a bit of extra repulsion to prevent close collisions from getting stuck
+        outRepulsion.set(redirected).sub(prevented).scl(1.1f);
 
         vectorPool.freeToMark(mark);
     }
