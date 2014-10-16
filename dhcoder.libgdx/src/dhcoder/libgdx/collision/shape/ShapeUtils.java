@@ -1,5 +1,6 @@
 package dhcoder.libgdx.collision.shape;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.collision.agent.CircleCollisionAgent;
 import dhcoder.libgdx.collision.agent.CircleRectangleCollisionAgent;
@@ -27,7 +28,7 @@ public final class ShapeUtils {
 
     private static final BinarySearch binarySearch = new BinarySearch();
 
-    private static final Pool<Vector2> vectorPool = Vector2PoolBuilder.build(2);
+    private static final Pool<Vector2> vectorPool = Vector2PoolBuilder.build(4);
 
     private static final class ShapeKey extends Key2<Class<? extends Shape>, Class<? extends Shape>> {
         private ShapeKey() { /* used by Pool */ }
@@ -70,22 +71,23 @@ public final class ShapeUtils {
             }
         }
 
-        final float deltaX1 = toX1 - fromX1;
-        final float deltaY1 = toY1 - fromY1;
-        final float deltaX2 = toX2 - fromX2;
-        final float deltaY2 = toY2 - fromY2;
+        // Change the frame of reference so it looks like Shape2 is standing still. This makes the math work out easier
+        // later. We do this by applying shape2's velocity to shape1
+        final float toX1_ = toX1 - (toX2 - fromX2);
+        final float toY1_ = toY1 - (toY2 - fromY2);
+        // toX2_ = fromX2; toY2_ = fromY2;
+
+        final float deltaX1 = toX1_ - fromX1;
+        final float deltaY1 = toY1_ - fromY1;
         binarySearch.initialize(COLLISION_SUBDIVISIONS);
-        float testX1, testY1, testX2, testY2;
 
         while (!binarySearch.isFinished()) {
             final int currentIndex = binarySearch.getCurrentIndex();
             final float percent = (float)currentIndex / COLLISION_SUBDIVISIONS;
-            testX1 = fromX1 + deltaX1 * percent;
-            testY1 = fromY1 + deltaY1 * percent;
-            testX2 = fromX2 + deltaX2 * percent;
-            testY2 = fromY2 + deltaY2 * percent;
+            final float testX1 = fromX1 + deltaX1 * percent;
+            final float testY1 = fromY1 + deltaY1 * percent;
 
-            if (agent.testIntersection(shape1, testX1, testY1, shape2, testX2, testY2)) {
+            if (agent.testIntersection(shape1, testX1, testY1, shape2, fromX2, fromY2)) {
                 binarySearch.rejectCurrentIndex();
             }
             else {
@@ -96,28 +98,28 @@ public final class ShapeUtils {
         final float percent = (float)binarySearch.getAcceptedIndex() / COLLISION_SUBDIVISIONS;
         final float finalX1 = fromX1 + deltaX1 * percent;
         final float finalY1 = fromY1 + deltaY1 * percent;
-        final float finalX2 = fromX2 + deltaX2 * percent;
-        final float finalY2 = fromY2 + deltaY2 * percent;
 
         int mark = vectorPool.mark();
         Vector2 normal = vectorPool.grabNew();
-        agent.getNormal(shape1, finalX1, finalY1, shape2, finalX2, finalY2, normal);
-        Vector2 relativeVel =
-            vectorPool.grabNew().set((toX2 - finalX2) + (toX1 - finalX1), (toY2 - finalY2) + (toY1 - finalY1));
+        agent.getNormal(shape1, finalX1, finalY1, shape2, fromX2, fromY2, normal);
+        normal.rotate90(1);
+        Vector2 prevented = vectorPool.grabNew().set(toX1_, toY1_).sub(finalX1, finalY1);
+        float angle = prevented.angle(normal);
+        Vector2 redirected = vectorPool.grabNew();
+        redirected.set(normal).scl(prevented.len() * MathUtils.cosDeg(angle));
 
+        outRepulsion.set(redirected).sub(prevented).scl(100.0f);
 
-        /*
-          Rock(2) -> 5pixels/frame
-          Guy(1) -> 0pixels/frame
+        if (outRepulsion.y < 10f) {
+            int breakhere = 0;
+        }
 
-          
-
-
-
-         */
-
-        normal.scl(relativeVel.len());
-        outRepulsion.set(normal);
+//        if (true) {
+//            if (agent
+//                .testIntersection(shape1, toX1_ + outRepulsion.x, toY1_ + outRepulsion.y, shape2, fromX2, fromY2)) {
+//                throw new IllegalStateException("getRepulsion expects shapes end separated.");
+//            }
+//        }
 
         vectorPool.freeToMark(mark);
     }

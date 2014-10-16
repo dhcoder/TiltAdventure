@@ -53,6 +53,6 @@ public final class CircleCollisionAgent implements CollisionAgent {
     @Override
     public void getNormal(final Shape shape1, final float x1, final float y1, final Shape shape2, final float x2,
         final float y2, final Vector2 outNormal) {
-        outNormal.set(x2, y2).sub(x1, y1).nor();
+        outNormal.set(x1, y1).sub(x2, y2).nor();
     }
 }
