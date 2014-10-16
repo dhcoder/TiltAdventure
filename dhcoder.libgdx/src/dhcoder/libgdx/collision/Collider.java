@@ -88,6 +88,8 @@ public final class Collider implements Poolable {
 
         if (isInitialized) {
             if (currPosition.epsilonEquals(x, y, 0f)) {
+                // No need to update collider regions if we didn't move
+                lastPosition.set(currPosition);
                 return;
             }
             system.removeColliderFromRegions(this);

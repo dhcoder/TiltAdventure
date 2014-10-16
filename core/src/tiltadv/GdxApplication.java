@@ -181,13 +181,11 @@ public final class GdxApplication extends ApplicationAdapter {
 
         gravityWellBounds = new Circle(8.0f);
         octoBounds = new Circle(Tiles.OCTOUP1.getRegionWidth() / 2f);
-//        playerBounds = new Circle((Tiles.LINK_N1.getRegionWidth() / 2f) * 0.8f);
-        playerBounds = new Rectangle(8f, 8f);
+        playerBounds = new Circle((Tiles.LINK_N1.getRegionWidth() / 2f) * 0.8f);
         playerSensorBounds = new Circle(Tiles.SENSOR.getRegionWidth() / 2f);
         playerSwordBounds = new Circle(5f);
         octoRockBounds = new Circle(Tiles.ROCK.getRegionWidth() / 2f);
-//        boulderBounds = new Circle(Tiles.BOULDER.getRegionWidth() / 2f);
-        boulderBounds = new Rectangle(8f, 8f);
+        boulderBounds = new Circle(Tiles.BOULDER.getRegionWidth() / 2f);
 
         entities.preallocate(PositionComponent.class, ENTITY_COUNT);
         entities.preallocate(MotionComponent.class, ENTITY_COUNT);
@@ -344,7 +342,7 @@ public final class GdxApplication extends ApplicationAdapter {
 //        addGravityWell(50, 20);
 //        addGravityWell(-30, 70);
 //        addGravityWell(-90, -30);
-//        addOctoEnemies();
+        addOctoEnemies();
         addMovingBoulderEntities();
         addTiltIndicatorEntity(playerEntity);
         addFpsEntity();
