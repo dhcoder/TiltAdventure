@@ -223,28 +223,18 @@ public final class CollisionSystem {
         key.set(sourceCollider, targetCollider);
 
         if (sourceCollider.collidesWith(targetCollider)) {
-            if (collidedThisFrame.contains(key)) {
-                // We already tested this exact collision this loop. This can sometimes happen when two objects both
-                // stretch over multiple collision regions, so we see their collision twice. Ignore this one!
-                colliderKeyPool.free(key);
-                return;
-            }
-
             if (!collisions.containsKey(key)) {
                 Collision collision = collisionPool.grabNew();
                 collision.set(sourceCollider, targetCollider);
                 collisions.put(collision.getKey(), collision);
                 sourceCollider.fireCollision(collision);
+                collidedThisFrame.put(key);
             }
-            else {
+            else if (!collidedThisFrame.contains(key)) {
+                // Sometimes we get multiple collisions on the same objects per loop. This can sometime happen when
+                // the two objects both stretch over multiple collision regions.
                 Collision collision = collisions.get(key);
                 sourceCollider.fireOverlapping(collision);
-            }
-
-            if (collisions.containsKey(key)) {
-                // fireCollision or fireOverlapping handler may have undone the collision! Therefore, double check
-                // before marking this collision as handled.
-                collidedThisFrame.put(key);
             }
         }
         else if (collisions.containsKey(key)) {
