@@ -38,6 +38,7 @@ public final class TiltDisplayComponent extends AbstractComponent {
     public void initialize(final Entity owner) {
         spriteComponent = owner.requireComponent(SpriteComponent.class);
         spriteComponent.setTextureRegion(arrowSprite);
+        spriteComponent.setZ(SpriteComponent.ALWAYS_ABOVE);
     }
 
     @Override
