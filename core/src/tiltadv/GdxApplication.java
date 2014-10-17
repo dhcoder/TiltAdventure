@@ -282,7 +282,7 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(MotionComponent.class);
                 entity.addComponent(TargetTouchableComponent.class);
                 entity.addComponent(OctoBehaviorComponent.class);
-                entity.addComponent(HealthComponent.class).setHealth(3)
+                entity.addComponent(HealthComponent.class).setHealth(300)
                     .setInvicibilityDuration(ENEMY_INVINCIBILITY_DURATION);
                 entity.addComponent(CharacterDisplayComponent.class)
                     .set(Animations.OCTODOWN, Animations.OCTORIGHT, Animations.OCTOUP);
@@ -342,7 +342,7 @@ public final class GdxApplication extends ApplicationAdapter {
 //        addGravityWell(50, 20);
 //        addGravityWell(-30, 70);
 //        addGravityWell(-90, -30);
-        addOctoEnemies();
+//        addOctoEnemies();
         addMovingBoulderEntities();
         addTiltIndicatorEntity(playerEntity);
         addFpsEntity();
@@ -381,11 +381,11 @@ public final class GdxApplication extends ApplicationAdapter {
     private void addBoundaryWalls() {
         float halfScreenW = (float)VIEWPORT_WIDTH / 2f;
         float halfScreenH = (float)VIEWPORT_HEIGHT / 2f;
-        float halfWallSize = 20f;
-        float top = halfScreenH + halfWallSize;
-        float bottom = -halfScreenH - halfWallSize;
-        float left = -halfScreenW - halfWallSize;
-        float right = halfScreenW + halfWallSize;
+        float halfWallSize = 30f;
+        float top = halfScreenH + halfWallSize / 2f;
+        float bottom = -halfScreenH - halfWallSize / 2f;
+        float left = -halfScreenW - halfWallSize / 2f;
+        float right = halfScreenW + halfWallSize / 2f;
 
         Entity wallLeft = entities.newEntityFromTemplate(EntityId.BOUNDARY);
         Entity wallRight = entities.newEntityFromTemplate(EntityId.BOUNDARY);

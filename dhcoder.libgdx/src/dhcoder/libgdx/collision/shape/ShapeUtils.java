@@ -24,7 +24,7 @@ public final class ShapeUtils {
      */
     public static boolean RUN_SANITY_CHECKS = false;
 
-    private static int COLLISION_SUBDIVISIONS = 8;
+    private static final int COLLISION_SUBDIVISIONS = 10;
 
     private static final BinarySearch binarySearch = new BinarySearch();
 
