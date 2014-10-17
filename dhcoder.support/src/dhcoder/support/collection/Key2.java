@@ -45,8 +45,8 @@ public class Key2<T1, T2> implements Poolable {
 
         Key2 key2 = (Key2)o;
 
-        if (value1 != key2.value1) { return false; }
-        if (value2 != key2.value2) { return false; }
+        if (!value1.equals(key2.value1)) { return false; }
+        if (!value2.equals(key2.value2)) { return false; }
 
         return true;
     }

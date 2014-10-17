@@ -30,11 +30,17 @@ import static dhcoder.support.text.StringUtils.format;
  */
 public final class CollisionSystem {
 
-    public static final int REGION_MARGIN = 2;
+    /**
+     * If true, run extra sanity checks on the shapes we're testing against to make sure the inputs are always in a
+     * valid state.
+     */
+    public static boolean RUN_SANITY_CHECKS = false;
+    public static final int REGION_MARGIN = 1;
     private static final int NUM_GROUPS = 32; // One group per integer bit, so 32 bits means 32 groups.
-    private static final int REGION_SIZE = 40; // Divide the screen into NxN rectangles, and only do collision checks
+    // Divide the screen into NxN rectangles, and only do collision checks within those regions.
+    private static final int REGION_SIZE = 40;
     private static final int HALF_REGION_SIZE = REGION_SIZE / 2;
-    // within those regions.
+
     private final Pool<Collider> colliderPool;
     private final Pool<Collision> collisionPool;
     private final Pool<Vector2> vectorPool = Vector2PoolBuilder.build(2);
@@ -56,6 +62,7 @@ public final class CollisionSystem {
         int collisionCapacity = colliderCapacity * 2;
         collisionPool = Pool.of(Collision.class, collisionCapacity);
         collisions = new ArrayMap<ColliderKey, Collision>(collisionCapacity);
+//        collidedThisFrame = new ArraySet<ColliderKey>(20);
         collidedThisFrame = new ArraySet<ColliderKey>(20);
 
         collidesWith = new int[NUM_GROUPS];
@@ -223,17 +230,25 @@ public final class CollisionSystem {
         key.set(sourceCollider, targetCollider);
 
         if (sourceCollider.collidesWith(targetCollider)) {
+            if (collidedThisFrame.contains(key)) {
+                // We already tested this exact collision this loop. This can sometimes happen when two objects both
+                // stretch over multiple collision regions, so we see their collision twice. Ignore this one!
+                colliderKeyPool.free(key);
+                return;
+            }
+
             if (!collisions.containsKey(key)) {
                 Collision collision = collisionPool.grabNew();
                 collision.set(sourceCollider, targetCollider);
                 collisions.put(collision.getKey(), collision);
+
+                collidedThisFrame.put(collision.getKey());
                 sourceCollider.fireCollision(collision);
-                collidedThisFrame.put(key);
             }
-            else if (!collidedThisFrame.contains(key)) {
-                // Sometimes we get multiple collisions on the same objects per loop. This can sometime happen when
-                // the two objects both stretch over multiple collision regions.
+            else {
                 Collision collision = collisions.get(key);
+
+                collidedThisFrame.put(collision.getKey());
                 sourceCollider.fireOverlapping(collision);
             }
         }

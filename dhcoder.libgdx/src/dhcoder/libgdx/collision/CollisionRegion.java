@@ -20,8 +20,9 @@ import java.util.Stack;
  */
 public final class CollisionRegion implements Poolable {
 
-    private final ArrayList<Collider> colliders = new ArrayList<Collider>(4);
+    private final ArrayList<Collider> colliders = new ArrayList<Collider>(10);
     private final Stack<Collider> queuedForRemoval = new Stack<Collider>();
+    private final Stack<Collider> queuedForAddition = new Stack<Collider>();
     private final IntCoord coordinates = new IntCoord();
     private boolean isUpdating;
     private CollisionSystem system;
@@ -44,13 +45,29 @@ public final class CollisionRegion implements Poolable {
         return colliders.isEmpty();
     }
 
+    /**
+     * Add a collider into this region. It is a bug to add the same collider multiple times.
+     */
     public void addCollider(final Collider collider) {
+        if (isUpdating) {
+            if (!queuedForRemoval.remove(collider)) {
+                queuedForAddition.push(collider);
+            }
+            return;
+        }
+
+        if (CollisionSystem.RUN_SANITY_CHECKS && colliders.contains(collider)) {
+            throw new IllegalStateException("Multiple entries of the same collider is not allowed.");
+        }
+
         colliders.add(collider);
     }
 
     public void remove(final Collider collider) {
         if (isUpdating) {
-            queuedForRemoval.push(collider);
+            if (!queuedForAddition.remove(collider)) {
+                queuedForRemoval.push(collider);
+            }
             return;
         }
 
@@ -74,6 +91,9 @@ public final class CollisionRegion implements Poolable {
 
         while (!queuedForRemoval.empty()) {
             remove(queuedForRemoval.pop());
+        }
+        while (!queuedForAddition.empty()) {
+            addCollider(queuedForAddition.pop());
         }
     }
 

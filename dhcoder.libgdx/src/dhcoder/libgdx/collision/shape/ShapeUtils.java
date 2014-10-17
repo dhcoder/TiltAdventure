@@ -2,6 +2,7 @@ package dhcoder.libgdx.collision.shape;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import dhcoder.libgdx.collision.CollisionSystem;
 import dhcoder.libgdx.collision.agent.CircleCollisionAgent;
 import dhcoder.libgdx.collision.agent.CircleRectangleCollisionAgent;
 import dhcoder.libgdx.collision.agent.CollisionAgent;
@@ -17,12 +18,6 @@ import java.util.Map;
 import static dhcoder.support.text.StringUtils.format;
 
 public final class ShapeUtils {
-
-    /**
-     * If true, run extra sanity checks on the shapes we're testing against to make sure the inputs are always in a
-     * valid state.
-     */
-    public static boolean RUN_SANITY_CHECKS = false;
 
     private static final int COLLISION_SUBDIVISIONS = 10;
 
@@ -61,7 +56,7 @@ public final class ShapeUtils {
 
         CollisionAgent agent = getCollisionAgent(shape1, shape2);
 
-        if (RUN_SANITY_CHECKS) {
+        if (CollisionSystem.RUN_SANITY_CHECKS) {
             if (agent.testIntersection(shape1, fromX1, fromY1, shape2, fromX2, fromY2)) {
                 throw new IllegalStateException("getRepulsion test assumes shapes start separated.");
             }
