@@ -4,8 +4,6 @@ import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.collision.shape.Circle;
 import dhcoder.libgdx.collision.shape.Rectangle;
 import dhcoder.libgdx.collision.shape.Shape;
-import dhcoder.libgdx.pool.Vector2PoolBuilder;
-import dhcoder.support.memory.Pool;
 
 import static dhcoder.support.math.MathUtils.clamp;
 
@@ -17,8 +15,6 @@ public final class CircleRectangleCollisionAgent implements CollisionAgent {
     public static CollisionAgent reverse() {
         return new ReverseCollisionAgent(new CircleRectangleCollisionAgent());
     }
-
-    Pool<Vector2> vectorPool = Vector2PoolBuilder.build(1);
 
     @Override
     public boolean testIntersection(final Shape shape1, final float x1, final float y1, final Shape shape2,
@@ -37,26 +33,6 @@ public final class CircleRectangleCollisionAgent implements CollisionAgent {
         float radius = circle.getRadius();
 
         return (deltaX * deltaX + deltaY * deltaY) < (radius * radius);
-    }
-
-    @Override
-    public void getRepulsion(final Shape shape1, final float fromX1, final float fromY1, final float toX1,
-        final float toY1, final Shape shape2, final float fromX2, final float fromY2, final float toX2,
-        final float toY2, final Vector2 outRepulsion) {
-
-        Circle circle = (Circle)shape1;
-        Rectangle rect = (Rectangle)shape2;
-
-        float closestX = clamp(toX1, rect.getLeft(toX2), rect.getRight(toX2));
-        float closestY = clamp(toY1, rect.getBottom(toY2), rect.getTop(toY2));
-
-        Vector2 circleToPointDistance = vectorPool.grabNew();
-        circleToPointDistance.set(toX1 - closestX, toY1 - closestY); // Vector points from closest point to circle1
-
-        float penetration = circle.getRadius() - circleToPointDistance.len();
-        outRepulsion.set(circleToPointDistance).nor().scl(penetration);
-
-        vectorPool.free(circleToPointDistance);
     }
 
     @Override

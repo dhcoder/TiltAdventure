@@ -14,14 +14,8 @@ public interface CollisionAgent {
     boolean testIntersection(Shape shape1, float x1, float y1, Shape shape2, float x2, float y2);
 
     /**
-     * Given two shapes, return the repulsion force felt on the first shape.
-     */
-    void getRepulsion(Shape shape1, float fromX1, float fromY1, float toX1, float toY1, Shape shape2, float fromX2,
-        float fromY2, float toX2, float toY2, Vector2 outRepulsion);
-
-    /**
      * Given two shapes that are right next to each other, return the normal between the two of them. The vector will be
-     * of unit length. The normal will be associated with shape2.
+     * of unit length. The normal will be pointing away from Shape2 to Shape1.
      *
      * The fact that the two shapes should be next to each other lets us make some assumptions that help us make this
      * calculation quicker. If the two shapes are far apart, the normal value will be unreliable.
