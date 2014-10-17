@@ -1,6 +1,5 @@
 package dhcoder.libgdx.collision;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.collision.shape.Shape;
@@ -101,6 +100,7 @@ public final class CollisionSystem {
             if (region.isEmpty()) {
                 regionMap.remove(region.getCoordinates());
                 regionPool.free(region);
+                --i;
                 --numRegions;
             }
         }
@@ -112,6 +112,7 @@ public final class CollisionSystem {
             Collision collision = collisions.get(i);
             if (!collision.getSource().isActive() || !collision.getTarget().isActive()) {
                 freeCollision(collision);
+                --i;
                 --numCollisions;
             }
         }
@@ -152,13 +153,6 @@ public final class CollisionSystem {
             Collider collider = colliders.get(i);
             if (!collider.isActive()) {
                 continue;
-            }
-
-            if (collider.TEMP_IS_COLLIDING) {
-                renderer.setColor(Color.RED);
-            }
-            else {
-                renderer.setColor(Color.WHITE);
             }
 
             Vector2 pos = collider.getCurrPosition();
@@ -236,9 +230,6 @@ public final class CollisionSystem {
                 return;
             }
 
-            sourceCollider.TEMP_IS_COLLIDING = true;
-
-            collidedThisFrame.put(key);
             if (!collisions.containsKey(key)) {
                 Collision collision = collisionPool.grabNew();
                 collision.set(sourceCollider, targetCollider);
@@ -248,6 +239,12 @@ public final class CollisionSystem {
             else {
                 Collision collision = collisions.get(key);
                 sourceCollider.fireOverlapping(collision);
+            }
+
+            if (collisions.containsKey(key)) {
+                // fireCollision or fireOverlapping handler may have undone the collision! Therefore, double check
+                // before marking this collision as handled.
+                collidedThisFrame.put(key);
             }
         }
         else if (collisions.containsKey(key)) {
