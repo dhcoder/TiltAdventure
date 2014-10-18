@@ -18,6 +18,7 @@ import dhcoder.libgdx.collision.shape.Shape;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.libgdx.entity.EntityManager;
 import dhcoder.libgdx.render.RenderSystem;
+import dhcoder.support.collection.ArrayMap;
 import dhcoder.support.math.Angle;
 import dhcoder.support.memory.Pool;
 import dhcoder.support.time.Duration;
@@ -97,8 +98,9 @@ public final class GdxApplication extends ApplicationAdapter {
         batch = new SpriteBatch();
         if (DevSettings.IN_DEV_MODE) {
             shapeRenderer = new ShapeRenderer();
-            Pool.RUN_SANITY_CHECKS = DevSettings.RUN_POOL_SANITY_CHECKS;
-            CollisionSystem.RUN_SANITY_CHECKS = DevSettings.RUN_COLLISION_SANITY_CHECKS;
+            Pool.RUN_SANITY_CHECKS = DevSettings.RUN_SANITY_CHECKS;
+            CollisionSystem.RUN_SANITY_CHECKS = DevSettings.RUN_SANITY_CHECKS;
+            ArrayMap.RUN_SANITY_CHECKS = DevSettings.RUN_SANITY_CHECKS;
         }
         font = new BitmapFont();
 
@@ -333,7 +335,7 @@ public final class GdxApplication extends ApplicationAdapter {
             });
 
 
-//        Entity playerEntity = addPlayerEntity();
+        Entity playerEntity = addPlayerEntity();
 //        Vector2 dummyVector = new Vector2();
 //        addPlayerEntity().requireComponent(PositionComponent.class).setPosition(dummyVector.set(30, 30));
 //        addPlayerEntity().requireComponent(PositionComponent.class).setPosition(dummyVector.set(-30, -30));
@@ -342,7 +344,7 @@ public final class GdxApplication extends ApplicationAdapter {
 //        addGravityWell(-30, 70);
 //        addGravityWell(-90, -30);
         addOctoEnemies();
-//        addMovingBoulderEntities();
+        addMovingBoulderEntities();
 //        addTiltIndicatorEntity(playerEntity);
         addFpsEntity();
         addBoundaryWalls();
@@ -359,36 +361,32 @@ public final class GdxApplication extends ApplicationAdapter {
     }
 
     private void addOctoEnemies() {
-        for (int i = 0; i < 20; i++) {
-            addOctoEnemy(0, 0);
-        }
-//        addOctoEnemy(-80, 20);
-//        addOctoEnemy(-30, 20);
-//        addOctoEnemy(-80, 80);
-//        addOctoEnemy(-30, 80);
-//        addOctoEnemy(80, 20);
-//        addOctoEnemy(30, 20);
-//        addOctoEnemy(30, 80);
-//        addOctoEnemy(80, 80);
-//        addOctoEnemy(-80, -20);
-//        addOctoEnemy(-30, -20);
-//        addOctoEnemy(-80, -80);
-//        addOctoEnemy(-30, -80);
-//        addOctoEnemy(30, -80);
-//        addOctoEnemy(80, -80);
-//        addOctoEnemy(30, -20);
-//        addOctoEnemy(80, -20);
+        addOctoEnemy(-80, 20);
+        addOctoEnemy(-30, 20);
+        addOctoEnemy(-80, 80);
+        addOctoEnemy(-30, 80);
+        addOctoEnemy(80, 20);
+        addOctoEnemy(30, 20);
+        addOctoEnemy(30, 80);
+        addOctoEnemy(80, 80);
+        addOctoEnemy(-80, -20);
+        addOctoEnemy(-30, -20);
+        addOctoEnemy(-80, -80);
+        addOctoEnemy(-30, -80);
+        addOctoEnemy(30, -80);
+        addOctoEnemy(80, -80);
+        addOctoEnemy(30, -20);
+        addOctoEnemy(80, -20);
     }
 
     private void addBoundaryWalls() {
         float halfScreenW = (float)VIEWPORT_WIDTH / 2f;
         float halfScreenH = (float)VIEWPORT_HEIGHT / 2f;
-        float halfWallSize = 15f;
-        float FUDGE = 40;
-        float top = halfScreenH - FUDGE;
-        float bottom = -halfScreenH + FUDGE;
-        float left = -halfScreenW + FUDGE;
-        float right = halfScreenW - FUDGE;
+        float halfWallSize = 20f;
+        float top = halfScreenH + halfWallSize;
+        float bottom = -halfScreenH - halfWallSize;
+        float left = -halfScreenW - halfWallSize;
+        float right = halfScreenW + halfWallSize;
 
         Entity wallLeft = entities.newEntityFromTemplate(EntityId.BOUNDARY);
         Entity wallRight = entities.newEntityFromTemplate(EntityId.BOUNDARY);

@@ -15,6 +15,8 @@ import static dhcoder.support.text.StringUtils.format;
  */
 public final class ArrayMap<K, V> {
 
+    public static boolean RUN_SANITY_CHECKS = false;
+
     private enum IndexMethod {
         GET,
         PUT,
@@ -67,6 +69,7 @@ public final class ArrayMap<K, V> {
     }
 
     private final Pool<OptInt> indexPool = Pool.of(OptInt.class, 1);
+    private final Pool<Opt> optPool = Pool.of(Opt.class, 1);
     private final float loadFactor;
     private int size;
     private int resizeAtSize;
@@ -169,6 +172,16 @@ public final class ArrayMap<K, V> {
     }
 
     public void put(final K key, final V value) {
+
+        if (RUN_SANITY_CHECKS) {
+            for (int i = 0; i < keys.size(); i++) {
+                if (keys.get(i) == key) {
+                    throw new IllegalArgumentException(
+                        "Attempt to add the same key a second time. Are you re-using the same key accidentally?");
+                }
+            }
+        }
+
         OptInt indexOpt = indexPool.grabNew();
         getIndex(key, IndexMethod.PUT, indexOpt);
         int index = indexOpt.getValue();
@@ -185,12 +198,49 @@ public final class ArrayMap<K, V> {
         }
     }
 
+    /**
+     * Remove the value associated with the passed in key. The key MUST be in the map because this method needs to
+     * return a non-null value. If you are not sure if the key is in the map, you can instead use {@link #remove
+     * (Object, Opt)}, or if you don't care about the return value, you can use {@link #removeIf(Object)}.
+     *
+     * @throws IllegalArgumentException if the key is not found in the map.
+     */
     public V remove(final K key) {
+        Opt<V> valueOpt = optPool.grabNew();
+        remove(key, valueOpt);
+        if (!valueOpt.hasValue()) {
+            optPool.free(valueOpt);
+            throw new IllegalArgumentException(format("No value associated with key {0}", key));
+        }
+
+        V value = valueOpt.getValue();
+        optPool.free(valueOpt);
+        return value;
+    }
+
+    /**
+     * Remove method with a simpler interface because it doesn't care about the return value.
+     *
+     * @return {@code true} if the key was in the map.
+     */
+    public boolean removeIf(final K key) {
+        Opt<V> valueOpt = optPool.grabNew();
+        remove(key, valueOpt);
+        boolean removed = valueOpt.hasValue();
+        optPool.free(valueOpt);
+
+        return removed;
+    }
+
+    /**
+     * Like {@link #remove(Object)} but can handle the case of the key not being found in the map.
+     */
+    public void remove(final K key, final Opt<V> outValueOpt) {
         OptInt indexOpt = indexPool.grabNew();
         getIndex(key, IndexMethod.GET, indexOpt);
         if (!indexOpt.hasValue()) {
             indexPool.free(indexOpt);
-            throw new IllegalArgumentException(format("No value associated with key {0}", key));
+            return;
         }
         int index = indexOpt.getValue();
         indexPool.free(indexOpt);
@@ -202,7 +252,7 @@ public final class ArrayMap<K, V> {
 
         size--;
 
-        return value;
+        outValueOpt.set(value);
     }
 
     public void clear() {

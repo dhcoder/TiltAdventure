@@ -29,7 +29,14 @@ public final class ArraySet<E> {
 
     public void put(final E element) { internalMap.put(element, null); }
 
+    /**
+     * Remove the element, which MUST exist in the map. Use {@link #removeIf(Object)} if you don't need this
+     * requirement. This distinction can be useful to assert cases when you want to guarantee the element is in the set,
+     * and it also better mimics the related {@link ArrayMap} class.
+     */
     public void remove(final E element) { internalMap.remove(element); }
+
+    public void removeIf(final E element) { internalMap.removeIf(element); }
 
     public void clear() { internalMap.clear(); }
 }

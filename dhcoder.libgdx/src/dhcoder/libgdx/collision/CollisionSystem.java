@@ -8,6 +8,7 @@ import dhcoder.support.collection.ArrayMap;
 import dhcoder.support.collection.ArraySet;
 import dhcoder.support.math.IntCoord;
 import dhcoder.support.memory.Pool;
+import dhcoder.support.opt.Opt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,15 +45,16 @@ public final class CollisionSystem {
     private final Pool<Collider> colliderPool;
     private final Pool<Collision> collisionPool;
     private final Pool<Vector2> vectorPool = Vector2PoolBuilder.build(2);
-    private final Pool<ColliderKey> colliderKeyPool = Pool.of(ColliderKey.class, 1);
+    private final Pool<CollisionKey> colliderKeyPool = Pool.of(CollisionKey.class, 1);
     private final Pool<CollisionRegion> regionPool = Pool.of(CollisionRegion.class, 20).makeResizable(200);
     private final Pool<IntCoord> intCoordPool = Pool.of(IntCoord.class, 3);
+    private final Pool<Opt> optPool = Pool.of(Opt.class, 1);
 
     private final int[] collidesWith; // group -> bitmask of groups it collides with
     private final ArrayList<ArrayList<Collider>> groups;
 
-    private final ArrayMap<ColliderKey, Collision> collisions;
-    private final ArraySet<ColliderKey> collidedThisFrame;
+    private final ArrayMap<CollisionKey, Collision> collisions;
+    private final ArraySet<CollisionKey> collidedThisFrame;
     private final ArrayMap<IntCoord, CollisionRegion> regionMap;
 
     public CollisionSystem(final int colliderCapacity) {
@@ -61,9 +63,8 @@ public final class CollisionSystem {
         // subset of n² to save memory but we may adjust this when we see the number of collisionPool in the wild.
         int collisionCapacity = colliderCapacity * 2;
         collisionPool = Pool.of(Collision.class, collisionCapacity);
-        collisions = new ArrayMap<ColliderKey, Collision>(collisionCapacity);
-//        collidedThisFrame = new ArraySet<ColliderKey>(20);
-        collidedThisFrame = new ArraySet<ColliderKey>(20);
+        collisions = new ArrayMap<CollisionKey, Collision>(collisionCapacity);
+        collidedThisFrame = new ArraySet<CollisionKey>(20);
 
         collidesWith = new int[NUM_GROUPS];
         groups = new ArrayList<ArrayList<Collider>>(NUM_GROUPS);
@@ -226,7 +227,7 @@ public final class CollisionSystem {
             return;
         }
 
-        ColliderKey key = colliderKeyPool.grabNew();
+        CollisionKey key = colliderKeyPool.grabNew();
         key.set(sourceCollider, targetCollider);
 
         if (sourceCollider.collidesWith(targetCollider)) {
@@ -254,6 +255,7 @@ public final class CollisionSystem {
         }
         else if (collisions.containsKey(key)) {
             Collision collision = collisions.remove(key);
+            collidedThisFrame.removeIf(key);
             sourceCollider.fireSeparation(collision);
             collisionPool.free(collision);
         }
@@ -261,6 +263,7 @@ public final class CollisionSystem {
     }
 
     private void freeCollision(final Collision collision) {
+        collidedThisFrame.removeIf(collision.getKey());
         collisions.remove(collision.getKey());
         collisionPool.free(collision);
     }
