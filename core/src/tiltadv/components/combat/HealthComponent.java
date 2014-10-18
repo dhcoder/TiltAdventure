@@ -4,9 +4,8 @@ import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.time.Duration;
-import tiltadv.components.display.SpriteComponent;
 import tiltadv.components.body.MotionComponent;
-import tiltadv.memory.Pools;
+import tiltadv.components.display.SpriteComponent;
 
 import static dhcoder.support.contract.ContractUtils.requireNonNull;
 
@@ -21,8 +20,6 @@ public final class HealthComponent extends AbstractComponent {
         void onDied();
     }
 
-    private static final float KNOCKBACK_MAGNITUTDE = 150f;
-    private static final Duration STOP_DURATION = Duration.fromSeconds(.3f);
     private static final Duration DEFAULT_INVINCIBLE_DURATION = Duration.fromSeconds(2f);
 
     private final Duration invincibleDuration = Duration.zero();
@@ -95,7 +92,8 @@ public final class HealthComponent extends AbstractComponent {
             return false;
         }
 
-        knockback(damageVector);
+        knockbackComponent.knockback(damageVector);
+        setInvincible(true);
         health = Math.max(0, health - defenseComponent.reduceDamage(damage));
 
         if (health > 0) {
@@ -117,14 +115,5 @@ public final class HealthComponent extends AbstractComponent {
 
         spriteComponent.setAlpha(isInvincible ? .5f : 1f);
         this.isInvincible = isInvincible;
-    }
-
-    private void knockback(final Vector2 direction) {
-        Vector2 impulse =
-            Pools.vector2s.grabNew().set(direction).scl(KNOCKBACK_MAGNITUTDE * knockbackComponent.getMultiplier());
-        motionComponent.setImpulse(impulse, STOP_DURATION);
-        Pools.vector2s.free(impulse);
-
-        setInvincible(true);
     }
 }

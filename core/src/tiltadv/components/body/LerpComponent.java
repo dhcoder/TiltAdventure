@@ -46,6 +46,7 @@ public abstract class LerpComponent extends AbstractComponent {
     @Override
     public final void update(final Duration elapsedTime) {
         if (!isActive) {
+            handleUpdate(elapsedTime);
             return;
         }
 
@@ -71,6 +72,8 @@ public abstract class LerpComponent extends AbstractComponent {
             percent = 1f - percent;
         }
         handleLerp(percent);
+
+        handleUpdate(elapsedTime);
     }
 
     @Override
@@ -125,4 +128,7 @@ public abstract class LerpComponent extends AbstractComponent {
     protected void handleInitialize(final Entity owner) {}
 
     protected void handleReset() {}
+
+    protected void handleUpdate(final Duration elapsedTime) {}
+
 }

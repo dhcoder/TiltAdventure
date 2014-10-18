@@ -49,10 +49,7 @@ public final class Duration implements Poolable {
     }
 
     public Duration setSeconds(final float secs) {
-        if (secs < 0f) {
-            throw new IllegalArgumentException(format("Attempted to create a negative duration of {0} seconds", secs));
-        }
-        seconds = secs;
+        seconds = (secs > 0f) ? secs : 0f;
         return this;
     }
 

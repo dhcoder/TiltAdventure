@@ -4,8 +4,10 @@ import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.collision.Collision;
 import dhcoder.libgdx.collision.CollisionSystem;
 import dhcoder.libgdx.entity.Entity;
+import tiltadv.components.body.TiltComponent;
 import tiltadv.components.combat.AttackComponent;
 import tiltadv.components.combat.HealthComponent;
+import tiltadv.components.combat.KnockbackComponent;
 import tiltadv.components.hierarchy.ParentComponent;
 import tiltadv.components.body.PositionComponent;
 import tiltadv.globals.Group;
@@ -61,6 +63,14 @@ public final class SwordCollisionComponent extends CollisionComponent {
         collisionDirection.sub(parentEntity.requireComponent(PositionComponent.class).getPosition());
         collisionDirection.nor();
         healthComponent.takeDamage(collisionDirection, attackComponent.getStrength());
+
+        // Knock back the player a little in the opposite direction that the enemy is flung away
+        KnockbackComponent playerKnockback = parentEntity.requireComponent(KnockbackComponent.class);
+        TiltComponent playerTilt = parentEntity.requireComponent(TiltComponent.class);
+        playerTilt.setLocked(KnockbackComponent.DURATION);
+        playerKnockback.knockback(collisionDirection.scl(-1f, -1f), 0.3f);
+
         Pools.vector2s.free(collisionDirection);
+
     }
 }
