@@ -7,6 +7,7 @@ import dhcoder.support.time.Duration;
 import tiltadv.components.body.HeadingComponent;
 import tiltadv.components.body.LerpComponent;
 import tiltadv.components.collision.SwordCollisionComponent;
+import tiltadv.components.combat.KnockbackComponent;
 import tiltadv.components.display.SpriteComponent;
 import tiltadv.components.hierarchy.OffsetComponent;
 import tiltadv.components.hierarchy.ParentComponent;
@@ -24,7 +25,7 @@ public final class SwordBehaviorComponent extends LerpComponent {
     private final static Vector2 SWORD_TIP_POS = new Vector2(-10f, 0f);
 
     private Angle from;
-
+    private Duration restTimeRemaining;
     private HeadingComponent headingComponent;
     private OffsetComponent offsetComponent;
     private SwordCollisionComponent collisionComponent;
@@ -36,31 +37,13 @@ public final class SwordBehaviorComponent extends LerpComponent {
         setDuration(DURATION);
     }
 
-    @Override
-    protected void handleConstruction() {
-        from = Angle.fromDegrees(0);
-    }
-
-    public void swing(  ) {
-        if (isActive()) {
+    public void swing() {
+        if (isActive() || !restTimeRemaining.isZero()) {
             return; // Ignore call to swing while swinging
         }
 
         from.setFrom(headingComponent.getHeading()).sub(HALF_ARC);
         lerpFromStart();
-    }
-
-    @Override
-    public void handleInitialize(final Entity owner) {
-
-        Entity parentEntity = owner.requireComponent(ParentComponent.class).getParent();
-        headingComponent = parentEntity.requireComponent(HeadingComponent.class);
-
-        spriteComponent = owner.requireComponent(SpriteComponent.class);
-        offsetComponent = owner.requireComponent(OffsetComponent.class);
-        collisionComponent = owner.requireComponent(SwordCollisionComponent.class);
-
-        enableCollision(false);
     }
 
     @Override
@@ -93,11 +76,42 @@ public final class SwordBehaviorComponent extends LerpComponent {
     protected void handleLerpDeactivated() {
         headingComponent.setLocked(false);
         enableCollision(false);
+
+        // Using the sword incurs a knockback, so let's reuse that duration here as well, so we don't swing while
+        // being knocked back.
+        restTimeRemaining.setFrom(KnockbackComponent.DURATION);
+    }
+
+    @Override
+    protected void handleConstruction() {
+        restTimeRemaining = Duration.zero();
+        from = Angle.fromDegrees(0);
+    }
+
+    @Override
+    public void handleInitialize(final Entity owner) {
+
+        Entity parentEntity = owner.requireComponent(ParentComponent.class).getParent();
+        headingComponent = parentEntity.requireComponent(HeadingComponent.class);
+
+        spriteComponent = owner.requireComponent(SpriteComponent.class);
+        offsetComponent = owner.requireComponent(OffsetComponent.class);
+        collisionComponent = owner.requireComponent(SwordCollisionComponent.class);
+
+        enableCollision(false);
+    }
+
+    @Override
+    protected void handleUpdate(final Duration elapsedTime) {
+        if (!restTimeRemaining.isZero()) {
+            restTimeRemaining.subtract(elapsedTime);
+        }
     }
 
     @Override
     public void handleReset() {
         from.reset();
+        restTimeRemaining.setZero();
 
         headingComponent = null;
         spriteComponent = null;
