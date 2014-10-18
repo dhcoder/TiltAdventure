@@ -34,7 +34,7 @@ public final class HeadingComponent extends AbstractComponent {
         return this;
     }
 
-    public HeadingComponent setLocked(boolean locked) {
+    public HeadingComponent setLocked(final boolean locked) {
         lockCount += (locked ? 1 : -1);
         return this;
     }
