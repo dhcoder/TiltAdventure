@@ -5,7 +5,6 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -18,6 +17,7 @@ import dhcoder.libgdx.collision.shape.Shape;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.libgdx.entity.EntityManager;
 import dhcoder.libgdx.render.RenderSystem;
+import dhcoder.libgdx.render.Renderable;
 import dhcoder.support.collection.ArrayMap;
 import dhcoder.support.math.Angle;
 import dhcoder.support.memory.Pool;
@@ -57,6 +57,7 @@ import tiltadv.components.input.touchables.TargetTouchableComponent;
 import tiltadv.globals.Animations;
 import tiltadv.globals.DevSettings;
 import tiltadv.globals.EntityId;
+import tiltadv.globals.RenderLayers;
 import tiltadv.globals.Services;
 import tiltadv.globals.Tiles;
 import tiltadv.input.TouchSystem;
@@ -77,13 +78,14 @@ public final class GdxApplication extends ApplicationAdapter {
     private static final float MAX_DELTA_TIME_SECS = 1f / 30f;
     private static final Duration ENEMY_INVINCIBILITY_DURATION = Duration.zero();
     private static final Duration BOULDER_OSCILLATION_DURATION = Duration.fromSeconds(2f);
+    public static final int UI_ELEMENT_COUNT = 200;
     private BitmapFont font;
-    private OrthographicCamera camera;
     private SpriteBatch batch;
     private ShapeRenderer shapeRenderer;
     private EntityManager entities;
     private CollisionSystem collisionSystem;
-    private RenderSystem renderSystem;
+    private RenderSystem gameLayer;
+    private RenderSystem uiLayer;
     private Shape octoBounds;
     private Shape playerBounds;
     private Shape gravityWellBounds;
@@ -94,7 +96,6 @@ public final class GdxApplication extends ApplicationAdapter {
     private TouchSystem touchSystem;
 
     public void create() {
-        camera = new OrthographicCamera(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
         batch = new SpriteBatch();
         if (DevSettings.IN_DEV_MODE) {
             shapeRenderer = new ShapeRenderer();
@@ -115,7 +116,7 @@ public final class GdxApplication extends ApplicationAdapter {
                 if (numFingersDown == 0) {
                     final Vector3 localPosition = Pools.vector3s.grabNew();
                     localPosition.set(screenX, screenY, 0);
-                    camera.unproject(localPosition);
+                    renderSystem.getCamera().unproject(localPosition);
 
                     touchSystem.handleTouch(localPosition.x, localPosition.y);
 
@@ -167,8 +168,9 @@ public final class GdxApplication extends ApplicationAdapter {
         collisionSystem = new CollisionSystem(ENTITY_COUNT);
         Services.register(CollisionSystem.class, collisionSystem);
 
-        renderSystem = new RenderSystem(ENTITY_COUNT);
-        Services.register(RenderSystem.class, renderSystem);
+        gameLayer = new RenderSystem(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, ENTITY_COUNT);
+        uiLayer = new RenderSystem(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, UI_ELEMENT_COUNT);
+        Services.register(RenderLayers.class, new RenderLayers(gameLayer, uiLayer));
 
         touchSystem = new TouchSystem(ENTITY_COUNT / 2);
         Services.register(TouchSystem.class, touchSystem);
@@ -439,10 +441,9 @@ public final class GdxApplication extends ApplicationAdapter {
 
         collisionSystem.triggerCollisions();
 
-        camera.update();
-        batch.setProjectionMatrix(camera.combined);
+        renderSystem.update(batch);
         if (DevSettings.IN_DEV_MODE) {
-            shapeRenderer.setProjectionMatrix(camera.combined);
+            shapeRenderer.setProjectionMatrix(renderSystem.getCamera().combined);
         }
     }
 

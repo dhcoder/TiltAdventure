@@ -1,5 +1,6 @@
 package dhcoder.libgdx.render;
 
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.Array;
 
@@ -15,11 +16,16 @@ public final class RenderSystem {
             return Float.compare(r1.getZ(), r2.getZ());
         }
     };
-
+    private final OrthographicCamera camera;
     private final Array<Renderable> renderables;
 
-    public RenderSystem(final int capacity) {
+    public RenderSystem(final float viewportWidth, final float viewportHeight, final int capacity) {
+        camera = new OrthographicCamera(viewportWidth, viewportHeight);
         renderables = new Array<Renderable>(capacity);
+    }
+
+    public OrthographicCamera getCamera() {
+        return camera;
     }
 
     /**
@@ -29,8 +35,19 @@ public final class RenderSystem {
         renderables.add(renderable);
     }
 
+    /**
+     * Remove a renderable added by {@link #add(Renderable)}
+     */
     public void remove(final Renderable renderable) {
         renderables.removeValue(renderable, true);
+    }
+
+    /**
+     * Update this system - this should be called before calling render.
+     */
+    public void update(final Batch batch) {
+        camera.update();
+        batch.setProjectionMatrix(camera.combined);
     }
 
     /**
@@ -38,11 +55,19 @@ public final class RenderSystem {
      * of render requests will be cleared, and must be added again for the next frame.
      */
     public void render(final Batch batch) {
-        renderables.sort(RENDERABLE_COMPARATOR);
         int numSprites = renderables.size;
+        if (numSprites == 0) {
+            return;
+        }
+
+        batch.begin();
+
+        renderables.sort(RENDERABLE_COMPARATOR);
         for (int i = 0; i < numSprites; i++) {
             Renderable renderable = renderables.get(i);
             renderable.render(batch);
         }
+
+        batch.end();
     }
 }

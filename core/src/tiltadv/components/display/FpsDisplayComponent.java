@@ -10,6 +10,7 @@ import dhcoder.libgdx.render.RenderSystem;
 import dhcoder.libgdx.render.Renderable;
 import dhcoder.support.time.Duration;
 import tiltadv.components.body.PositionComponent;
+import tiltadv.globals.RenderLayers;
 import tiltadv.globals.Services;
 
 import static dhcoder.support.text.StringUtils.format;
@@ -42,7 +43,7 @@ public final class FpsDisplayComponent extends AbstractComponent implements Rend
     public void initialize(final Entity owner) {
         positionComponent = owner.requireComponent(PositionComponent.class);
 
-        RenderSystem renderSystem = Services.get(RenderSystem.class);
+        RenderSystem renderSystem = Services.get(RenderLayers.class).getUiRenderLayer();
         renderSystem.add(this);
     }
 
@@ -64,12 +65,7 @@ public final class FpsDisplayComponent extends AbstractComponent implements Rend
         fpsLabel = null;
         font = null;
 
-        RenderSystem renderSystem = Services.get(RenderSystem.class);
+        RenderSystem renderSystem = Services.get(RenderLayers.class).getGameRenderLayer();
         renderSystem.remove(this);
-    }
-
-    @Override
-    public float getZ() {
-        return 9999; // TODO: Temp value here to make sure FPS appears on top. This class will eventually get deleted.
     }
 }

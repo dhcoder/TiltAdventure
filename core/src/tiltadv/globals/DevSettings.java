@@ -18,7 +18,7 @@ public final class DevSettings {
     /**
      * If {@code true} and in dev mode, we should render shape overlays over all entities set up for collision.
      */
-    public static boolean SHOW_COLLISION_SHAPES = false;
+    public static boolean SHOW_COLLISION_SHAPES = true;
 
     /**
      * If {@code true} and in dev mode, we should run as many sanity checks as possible (verifying expected data but
@@ -29,7 +29,7 @@ public final class DevSettings {
     /**
      * If in dev mode, apply a slow-mo multiplier - setting to {@code 4f} means 4x slowdown.
      */
-    public static float SLOW_MO_FACTOR = 1f;
+    public static float SLOW_MO_FACTOR = 3f;
 
     private DevSettings() {}
 

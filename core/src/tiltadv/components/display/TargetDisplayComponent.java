@@ -14,7 +14,6 @@ import tiltadv.globals.Events;
 import tiltadv.memory.Pools;
 
 import static dhcoder.support.contract.ContractUtils.requireNonNull;
-import static tiltadv.components.display.SpriteComponent.ALWAYS_ABOVE;
 
 /**
  * Component that renders a character which can move in any of the cardinal directions.
@@ -63,7 +62,6 @@ public final class TargetDisplayComponent extends AbstractComponent {
         spriteComponent = owner.requireComponent(SpriteComponent.class);
         spriteComponent.setTextureRegion(textureRegion);
         spriteComponent.setHidden(true);
-        spriteComponent.setZ(ALWAYS_ABOVE);
 
         offsetComponent = owner.requireComponent(OffsetComponent.class);
 
