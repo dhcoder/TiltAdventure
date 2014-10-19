@@ -43,22 +43,17 @@ public final class MotionComponent extends AbstractComponent {
         return this;
     }
 
-    // Set a velocity on this entity which starts decelerating immediately, emulating a sudden push.
+    /**
+     * Emulates a push by setting a velocity on this {@link Entity} which starts decelerating immediately. The entity
+     * will not be able to adjust its motion until the impulse force has run its course.
+     */
     public MotionComponent setImpulse(final Vector2 impulse, final Duration time) {
         velocity.set(impulse);
-        lockDuration.setZero();
-        setLocked(time);
-        return this;
-    }
 
-    public MotionComponent setLocked(final Duration duration) {
-        if (lockDuration.isZero()) {
-            stopSmoothly(duration);
-        }
-
-        if (lockDuration.getSeconds() < duration.getSeconds()) {
-            lockDuration.setFrom(duration); // Longer lock wins
-        }
+        // Lock the velocity so that user calls can't override an impulse.
+        lockDuration.setZero(); // Overrule lock, just in case we're already locked
+        stopSmoothly(time);
+        lockDuration.setFrom(time);
 
         return this;
     }
