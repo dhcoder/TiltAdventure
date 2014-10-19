@@ -188,10 +188,6 @@ public final class GdxApplication extends ApplicationAdapter {
         octoRockBounds = new Circle(Tiles.ROCK.getRegionWidth() / 2f);
         boulderBounds = new Circle(Tiles.BOULDER.getRegionWidth() / 2f);
 
-        entities.preallocate(PositionComponent.class, ENTITY_COUNT);
-        entities.preallocate(MotionComponent.class, ENTITY_COUNT);
-        entities.preallocate(SpriteComponent.class, ENTITY_COUNT);
-
         entities.registerTemplate(EntityId.BOUNDARY, new EntityManager.EntityCreator() {
             @Override
             public void initialize(final Entity entity) {

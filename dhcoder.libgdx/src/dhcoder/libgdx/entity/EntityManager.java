@@ -2,6 +2,7 @@ package dhcoder.libgdx.entity;
 
 import dhcoder.support.collection.ArrayMap;
 import dhcoder.support.collection.IntKey;
+import dhcoder.support.memory.HeapPool;
 import dhcoder.support.memory.Pool;
 import dhcoder.support.opt.Opt;
 import dhcoder.support.time.Duration;
@@ -20,8 +21,8 @@ public final class EntityManager {
         void initialize(Entity entity);
     }
 
-    private final Pool<Entity> entityPool;
-    private final ArrayMap<Class, Pool> componentPools;
+    private final HeapPool<Entity> entityPool;
+    private final ArrayMap<Class, HeapPool> componentPools;
     private final ArrayMap<IntKey, EntityCreator> templates;
     private final Stack<Entity> queuedForRemoval;
     private final Pool<IntKey> keyPool = Pool.of(IntKey.class, 1);
@@ -29,7 +30,7 @@ public final class EntityManager {
 
     public EntityManager(final int maxEntityCount) {
         final EntityManager manager = this; // For assigning within a closure
-        entityPool = new Pool<Entity>(new Pool.AllocateMethod<Entity>() {
+        entityPool = new HeapPool<Entity>(new Pool.AllocateMethod<Entity>() {
             @Override
             public Entity run() {
                 return new Entity(manager);
@@ -42,7 +43,7 @@ public final class EntityManager {
         }, maxEntityCount);
         queuedForRemoval = new Stack<Entity>();
         queuedForRemoval.ensureCapacity(maxEntityCount / 10);
-        componentPools = new ArrayMap<Class, Pool>(32);
+        componentPools = new ArrayMap<Class, HeapPool>(32);
         templates = new ArrayMap<IntKey, EntityCreator>();
     }
 
@@ -55,19 +56,6 @@ public final class EntityManager {
         optPool.free(entityCreatorOpt);
 
         templates.put(new IntKey(id.ordinal()), entityCreator);
-    }
-
-    /**
-     * Using {@link #newComponent(Class)} will generate new components from a dynamically increasing pool, but if you
-     * know ahead of time how many components you'll need, you can preallocate them here.
-     */
-    public void preallocate(final Class<? extends Component> componentClass, final int maxCount) {
-        if (componentPools.containsKey(componentClass)) {
-            throw new IllegalArgumentException(
-                format("Duplicate request to preallocate component type {0}", componentClass));
-        }
-
-        componentPools.put(componentClass, Pool.of(componentClass, maxCount));
     }
 
     public Entity newEntityFromTemplate(final Enum id) {
@@ -93,7 +81,7 @@ public final class EntityManager {
     public <C extends Component> C newComponent(final Class<C> componentClass) {
         if (!componentPools.containsKey(componentClass)) {
             componentPools.put(componentClass,
-                Pool.of(componentClass, Pool.DEFAULT_CAPACITY).makeResizable(entityPool.getMaxCapacity()));
+                HeapPool.of(componentClass, Pool.DEFAULT_CAPACITY).makeResizable(entityPool.getMaxCapacity()));
         }
 
         return (C)componentPools.get(componentClass).grabNew();

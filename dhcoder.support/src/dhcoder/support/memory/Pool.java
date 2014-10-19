@@ -14,6 +14,10 @@ import static dhcoder.support.text.StringUtils.format;
  * A class which manages a pool of pre-allocated objects so you can avoid thrashing Android's garbage collector when you
  * want to make lots of small, temporary allocations.
  * <p/>
+ * Note: This class is appropriate for small pools or pools where you allocate temporaries which you then deallocate
+ * in reverse order (like a stack). Use {@link HeapPool} for larger pools especially when you want to allocate and
+ * return elements in random order.
+ * <p/>
  * Pools are constructed with two callbacks, one which allocates a new instance of a class, and one which clears an
  * instance of a class for re-use later. After that, just call {@link #grabNew()} and {@link #free(Object)}, and this
  * class will take care of the rest!
@@ -35,7 +39,7 @@ public final class Pool<T> {
     public static final int DEFAULT_CAPACITY = 10;
     /**
      * If true, run reflection sanity checks on the objects to make sure they were reset appropriately.
-     *
+     * <p/>
      * This is done using {@link ReflectionUtils#assertSame(Object, Object)}, so you may wish to register your own
      * equality testers using {@link ReflectionUtils#registerEqualityTester(Class, ReflectionUtils.EqualityTester)} in
      * case you need to specify a special-case equals method when the default equals method isn't cutting it (for
@@ -172,6 +176,11 @@ public final class Pool<T> {
 
     public void free(final T item) {
         swapToEndAndRemove(itemsInUse, item);
+        returnItemToPool(item);
+    }
+
+    public void free(final int itemIndex) {
+        T item = swapToEndAndRemove(itemsInUse, itemIndex);
         returnItemToPool(item);
     }
 

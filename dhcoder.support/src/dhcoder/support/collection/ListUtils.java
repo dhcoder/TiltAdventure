@@ -21,18 +21,26 @@ public final class ListUtils {
             }
         }
 
-        if (itemIndex < 0) {
+        swapToEndAndRemove(list, itemIndex);
+    }
+
+    /**
+     * Like {@link #swapToEndAndRemove(List, Object)} but where the list index is known.
+     */
+    public static <T> T swapToEndAndRemove(final List<T> list, final int itemIndex) {
+        final int listSize = list.size();
+        if (itemIndex < 0 || itemIndex >= listSize) {
             throw new IllegalArgumentException("Trying to remove an item that's not in the list");
         }
 
         // Swap item to the end before removing (since removing from the end avoids shifting elements)
         int lastIndex = listSize - 1;
-        if (lastIndex > 0 && itemIndex != lastIndex) {
+        if (itemIndex != lastIndex) {
             T temp = list.get(lastIndex);
             list.set(lastIndex, list.get(itemIndex));
             list.set(itemIndex, temp);
         }
 
-        list.remove(lastIndex);
+        return list.remove(lastIndex);
     }
 }

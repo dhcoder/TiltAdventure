@@ -15,8 +15,6 @@ import static dhcoder.support.text.StringUtils.format;
  */
 public final class ArrayMap<K, V> {
 
-    public static boolean RUN_SANITY_CHECKS = false;
-
     private enum IndexMethod {
         GET,
         PUT,
@@ -58,6 +56,7 @@ public final class ArrayMap<K, V> {
     };
     private static final int DEFAULT_EXPECTED_SIZE = 10;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    public static boolean RUN_SANITY_CHECKS = false;
 
     private static int getNextPrimeSize(final int requestedSize) {
         int log2 = log2(requestedSize);
@@ -308,8 +307,10 @@ public final class ArrayMap<K, V> {
         int index = initialIndex;
         int loopCount = 1;
         while ((keys.get(index) != null || keyIsDead[index]) && loopCount <= capacity) {
-            if (indexMethod == IndexMethod.PUT && keyIsDead[index]) {
-                outIndex.set(index); // This used to be a bucket for a key that got removed. Take it!
+            if (indexMethod == IndexMethod.PUT && keyIsDead[index] || keys.get(index) == key) {
+                // This used to be a bucket for a key that got removed, or we are overwriting the value for an
+                // existing key.
+                outIndex.set(index);
                 return;
             }
 
