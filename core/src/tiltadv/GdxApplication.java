@@ -6,7 +6,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -17,7 +16,6 @@ import dhcoder.libgdx.collision.shape.Shape;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.libgdx.entity.EntityManager;
 import dhcoder.libgdx.render.RenderSystem;
-import dhcoder.libgdx.render.Renderable;
 import dhcoder.support.collection.ArrayMap;
 import dhcoder.support.math.Angle;
 import dhcoder.support.memory.Pool;
@@ -57,7 +55,6 @@ import tiltadv.components.input.touchables.TargetTouchableComponent;
 import tiltadv.globals.Animations;
 import tiltadv.globals.DevSettings;
 import tiltadv.globals.EntityId;
-import tiltadv.globals.RenderLayers;
 import tiltadv.globals.Services;
 import tiltadv.globals.Tiles;
 import tiltadv.input.TouchSystem;
@@ -80,12 +77,10 @@ public final class GdxApplication extends ApplicationAdapter {
     private static final Duration BOULDER_OSCILLATION_DURATION = Duration.fromSeconds(2f);
     public static final int UI_ELEMENT_COUNT = 200;
     private BitmapFont font;
-    private SpriteBatch batch;
     private ShapeRenderer shapeRenderer;
     private EntityManager entities;
     private CollisionSystem collisionSystem;
-    private RenderSystem gameLayer;
-    private RenderSystem uiLayer;
+    private RenderSystem renderSystem;
     private Shape octoBounds;
     private Shape playerBounds;
     private Shape gravityWellBounds;
@@ -96,7 +91,6 @@ public final class GdxApplication extends ApplicationAdapter {
     private TouchSystem touchSystem;
 
     public void create() {
-        batch = new SpriteBatch();
         if (DevSettings.IN_DEV_MODE) {
             shapeRenderer = new ShapeRenderer();
             Pool.RUN_SANITY_CHECKS = DevSettings.RUN_SANITY_CHECKS;
@@ -142,9 +136,7 @@ public final class GdxApplication extends ApplicationAdapter {
 //        Gdx.gl.glClearColor(.22f, .22f, .22f, 1f); // Grey-ish color, for seeing collision shapes
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        batch.begin();
-        renderSystem.render(batch);
-        batch.end();
+        renderSystem.render();
 
         if (DevSettings.IN_DEV_MODE && DevSettings.SHOW_COLLISION_SHAPES) {
             shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
@@ -155,9 +147,9 @@ public final class GdxApplication extends ApplicationAdapter {
 
     @Override
     public void dispose() {
-        batch.dispose();
         font.dispose();
         Tiles.dispose();
+        renderSystem.dispose();
 
         if (DevSettings.IN_DEV_MODE) {
             shapeRenderer.dispose();
@@ -168,9 +160,13 @@ public final class GdxApplication extends ApplicationAdapter {
         collisionSystem = new CollisionSystem(ENTITY_COUNT);
         Services.register(CollisionSystem.class, collisionSystem);
 
-        gameLayer = new RenderSystem(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, ENTITY_COUNT);
-        uiLayer = new RenderSystem(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, UI_ELEMENT_COUNT);
-        Services.register(RenderLayers.class, new RenderLayers(gameLayer, uiLayer));
+        // TODO: Tune the application for the best batch size for render system
+        // https://github.com/libgdx/libgdx/wiki/Spritebatch,-Textureregions,-and-Sprites#performance-tuning
+        renderSystem = new RenderSystem(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, DevSettings.IN_DEV_MODE ? 1000 : 200);
+        renderSystem.addLayer(ENTITY_COUNT).setBlending(false).setSorted(false);
+        renderSystem.addLayer(ENTITY_COUNT);
+        renderSystem.addLayer(10).setAbsolute(true).setSorted(false);
+        Services.register(RenderSystem.class, renderSystem);
 
         touchSystem = new TouchSystem(ENTITY_COUNT / 2);
         Services.register(TouchSystem.class, touchSystem);
@@ -441,7 +437,7 @@ public final class GdxApplication extends ApplicationAdapter {
 
         collisionSystem.triggerCollisions();
 
-        renderSystem.update(batch);
+        renderSystem.update();
         if (DevSettings.IN_DEV_MODE) {
             shapeRenderer.setProjectionMatrix(renderSystem.getCamera().combined);
         }

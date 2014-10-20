@@ -8,6 +8,7 @@ import dhcoder.support.math.Angle;
 import dhcoder.support.opt.Opt;
 import dhcoder.support.time.Duration;
 import tiltadv.components.body.TiltComponent;
+import tiltadv.globals.RenderLayer;
 import tiltadv.memory.Pools;
 
 /**
@@ -37,8 +38,7 @@ public final class TiltDisplayComponent extends AbstractComponent {
     @Override
     public void initialize(final Entity owner) {
         spriteComponent = owner.requireComponent(SpriteComponent.class);
-        spriteComponent.setTextureRegion(arrowSprite);
-        spriteComponent.setZ(SpriteComponent.ALWAYS_ABOVE);
+        spriteComponent.setTextureRegion(arrowSprite).setRenderLayer(RenderLayer.Ui);
     }
 
     @Override

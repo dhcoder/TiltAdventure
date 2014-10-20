@@ -12,10 +12,12 @@ import dhcoder.libgdx.render.Renderable;
 import dhcoder.support.math.Angle;
 import dhcoder.support.opt.OptFloat;
 import tiltadv.components.body.PositionComponent;
+import tiltadv.globals.RenderLayer;
 import tiltadv.globals.Services;
 import tiltadv.memory.Pools;
 
 import static dhcoder.libgdx.memory.LibgdxUtils.resetSprite;
+import static dhcoder.support.contract.ContractUtils.requireTrue;
 
 /**
  * A component that encapsulates the logic of rendering a sprite.
@@ -32,6 +34,8 @@ public final class SpriteComponent extends AbstractComponent implements Renderab
     private final Sprite sprite = new Sprite();
     private final Vector2 offset = new Vector2();
     private final OptFloat zOpt = OptFloat.withNoValue();
+
+    private RenderLayer renderLayer = RenderLayer.Main;
     private boolean hidden;
 
     private PositionComponent positionComponent;
@@ -41,6 +45,12 @@ public final class SpriteComponent extends AbstractComponent implements Renderab
         sprite.setSize(textureRegion.getRegionWidth(), textureRegion.getRegionHeight());
         sprite.setOrigin(sprite.getWidth() / 2f, sprite.getHeight() / 2f);
 
+        return this;
+    }
+
+    public SpriteComponent setRenderLayer(final RenderLayer renderLayer) {
+        requireTrue(positionComponent == null, "Can't set render layer after sprite is initialized");
+        this.renderLayer = renderLayer;
         return this;
     }
 
@@ -79,7 +89,7 @@ public final class SpriteComponent extends AbstractComponent implements Renderab
         positionComponent = owner.requireComponent(PositionComponent.class);
 
         RenderSystem renderSystem = Services.get(RenderSystem.class);
-        renderSystem.add(this);
+        renderSystem.add(renderLayer, this);
     }
 
     @Override
@@ -112,14 +122,15 @@ public final class SpriteComponent extends AbstractComponent implements Renderab
 
     @Override
     public void reset() {
+        RenderSystem renderSystem = Services.get(RenderSystem.class);
+        renderSystem.remove(renderLayer, this);
+
         offset.setZero();
         resetSprite(sprite);
+        renderLayer = RenderLayer.Main;
         hidden = false;
         zOpt.reset();
 
         positionComponent = null;
-
-        RenderSystem renderSystem = Services.get(RenderSystem.class);
-        renderSystem.remove(this);
     }
 }

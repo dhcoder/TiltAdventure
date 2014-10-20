@@ -65,7 +65,7 @@ public final class SwordCollisionComponent extends CollisionComponent {
 
         // Knock back the player a little in the opposite direction that the enemy is flung away
         KnockbackComponent playerKnockback = parentEntity.requireComponent(KnockbackComponent.class);
-        playerKnockback.knockback(collisionDirection.scl(-1f, -1f), 3.3f);
+        playerKnockback.knockback(collisionDirection.scl(-1f, -1f), .3f);
 
         Pools.vector2s.free(collisionDirection);
 
