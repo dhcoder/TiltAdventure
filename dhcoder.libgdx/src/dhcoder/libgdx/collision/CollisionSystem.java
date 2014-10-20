@@ -3,6 +3,7 @@ package dhcoder.libgdx.collision;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.collision.shape.Shape;
+import dhcoder.libgdx.collision.shape.ShapeUtils;
 import dhcoder.libgdx.pool.Vector2PoolBuilder;
 import dhcoder.support.collection.ArrayMap;
 import dhcoder.support.collection.ArraySet;
@@ -133,14 +134,20 @@ public final class CollisionSystem {
     }
 
     /**
-     * Given a collision, change the location of the source collider to a new destination so that it no longer
+     * Given a collision that *just* happened, change the location of the source collider to a new destination so that it no longer
      * penetrates the target collider.
      */
     public void extractSourceCollider(final Collision collision) {
         Vector2 repulsion = vectorPool.grabNew();
-        collision.getRepulsionBetweenColliders(repulsion);
 
         Collider source = collision.getSource();
+        Collider target = collision.getTarget();
+        Vector2 sourceCurrPos = source.getCurrPosition();
+        Vector2 sourceLastPos = source.getLastPosition();
+        Vector2 targetCurrPos = target.getCurrPosition();
+        Vector2 targetLastPos = target.getLastPosition();
+        ShapeUtils.getRepulsion(source.getShape(), sourceLastPos.x, sourceLastPos.y, sourceCurrPos.x, sourceCurrPos.y,
+            target.getShape(), targetLastPos.x, targetLastPos.y, targetCurrPos.x, targetCurrPos.y, repulsion);
 
         Vector2 finalPosition = vectorPool.grabNew();
         finalPosition.set(source.getCurrPosition()).add(repulsion);
