@@ -7,14 +7,15 @@ import dhcoder.libgdx.entity.EntityManager;
  */
 public enum EntityId {
     // Game entities
-    BOUNDARY,
     BOULDER,
+    BOUNDARY,
+    CAMERA_ENTITY,
     GRAVITY_WELL,
-    PLAYER,
-    PLAYER_SWORD,
-    PLAYER_SENSOR,
     OCTO,
     OCTO_ROCK,
+    PLAYER,
+    PLAYER_SENSOR,
+    PLAYER_SWORD,
     TARGET_INDICATOR,
 
     // UI entities

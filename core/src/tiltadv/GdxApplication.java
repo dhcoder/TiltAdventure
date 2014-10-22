@@ -25,6 +25,7 @@ import tiltadv.components.behavior.OscillationBehaviorComponent;
 import tiltadv.components.behavior.PlayerBehaviorComponent;
 import tiltadv.components.behavior.PlayerSensorBehaviorComponent;
 import tiltadv.components.behavior.SwordBehaviorComponent;
+import tiltadv.components.body.FollowCameraComponent;
 import tiltadv.components.body.HeadingComponent;
 import tiltadv.components.body.MotionComponent;
 import tiltadv.components.body.PositionComponent;
@@ -194,6 +195,13 @@ public final class GdxApplication extends ApplicationAdapter {
             }
         });
 
+        entities.registerTemplate(EntityId.CAMERA_ENTITY, new EntityManager.EntityCreator() {
+            @Override
+            public void initialize(final Entity entity) {
+                entity.addComponent(FollowCameraComponent.class);
+            }
+        });
+
         entities.registerTemplate(EntityId.GRAVITY_WELL, new EntityManager.EntityCreator() {
             @Override
             public void initialize(final Entity entity) {
@@ -337,6 +345,7 @@ public final class GdxApplication extends ApplicationAdapter {
 //        addGravityWell(50, 20);
 //        addGravityWell(-30, 70);
 //        addGravityWell(-90, -30);
+        addMainCamera(playerEntity);
         addOctoEnemies();
         addMovingBoulderEntities();
         addTiltIndicatorEntity(playerEntity);
@@ -344,6 +353,9 @@ public final class GdxApplication extends ApplicationAdapter {
         addBoundaryWalls();
         addTargetEntity();
     }
+
+    private void addMainCamera(final Entity playerEntity) {entities.newEntityFromTemplate(
+        EntityId.CAMERA_ENTITY).requireComponent(FollowCameraComponent.class).setTargetEntity(playerEntity);}
 
     private void addGravityWell(final float x, final float y) {
         Entity gravityWellEntity = entities.newEntityFromTemplate(EntityId.GRAVITY_WELL);
@@ -425,10 +437,6 @@ public final class GdxApplication extends ApplicationAdapter {
         }
     }
 
-    private static final float SPIN_DURATION = 5f;
-    private static final float SPIN_MAGNITUDE = 20f;
-    private Duration elapsedSoFar = Duration.zero();
-    private Vector2 renderOffset = new Vector2();
     private void update() {
         int mark = Pools.durations.mark();
         Duration elapsedTime = Pools.durations.grabNew();
@@ -436,18 +444,11 @@ public final class GdxApplication extends ApplicationAdapter {
         if (DevSettings.IN_DEV_MODE) {
             elapsedTime.setSeconds(elapsedTime.getSeconds() / DevSettings.SLOW_MO_FACTOR);
         }
-        elapsedSoFar.add(elapsedTime);
-        if (elapsedSoFar.getSeconds() > SPIN_DURATION) {
-            elapsedSoFar.subtractSeconds(SPIN_DURATION);
-        }
+
         entities.update(elapsedTime);
         Pools.durations.freeToMark(mark);
 
         collisionSystem.triggerCollisions();
-
-        float ratio = elapsedSoFar.getSeconds() / SPIN_DURATION * Angle.TWO_PI;
-        renderOffset.set(SPIN_MAGNITUDE * cos(ratio), SPIN_MAGNITUDE * sin(ratio));
-        renderSystem.setOffset(renderOffset);
 
         renderSystem.update();
         if (DevSettings.IN_DEV_MODE) {
@@ -469,8 +470,6 @@ public final class GdxApplication extends ApplicationAdapter {
     }
 
     private void AddMovingBoulderEntity(final float xFrom, final float yFrom, final float xTo, final float yTo) {
-
-
         Entity boulderEntity = entities.newEntityFromTemplate(EntityId.BOULDER);
 
         int mark = Pools.vector2s.mark();
