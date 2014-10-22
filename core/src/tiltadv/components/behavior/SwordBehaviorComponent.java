@@ -26,7 +26,10 @@ public final class SwordBehaviorComponent extends LerpComponent {
 
     private Angle from;
     private Duration restTimeRemaining;
-    private HeadingComponent headingComponent;
+
+    private HeadingComponent parentHeadingComponent;
+    private SpriteComponent parentSpriteComponent;
+
     private OffsetComponent offsetComponent;
     private SwordCollisionComponent collisionComponent;
     private SpriteComponent spriteComponent;
@@ -42,7 +45,7 @@ public final class SwordBehaviorComponent extends LerpComponent {
             return; // Ignore call to swing while swinging
         }
 
-        from.setFrom(headingComponent.getHeading()).sub(HALF_ARC);
+        from.setFrom(parentHeadingComponent.getHeading()).sub(HALF_ARC);
         lerpFromStart();
     }
 
@@ -68,13 +71,13 @@ public final class SwordBehaviorComponent extends LerpComponent {
 
     @Override
     protected void handleLerpActivated() {
-        headingComponent.setLocked(true);
+        parentHeadingComponent.setLocked(true);
         enableCollision(true);
     }
 
     @Override
     protected void handleLerpDeactivated() {
-        headingComponent.setLocked(false);
+        parentHeadingComponent.setLocked(false);
         enableCollision(false);
 
         // Using the sword incurs a knockback, so let's reuse that duration here as well, so we don't swing while
@@ -92,7 +95,8 @@ public final class SwordBehaviorComponent extends LerpComponent {
     public void handleInitialize(final Entity owner) {
 
         Entity parentEntity = owner.requireComponent(ParentComponent.class).getParent();
-        headingComponent = parentEntity.requireComponent(HeadingComponent.class);
+        parentHeadingComponent = parentEntity.requireComponent(HeadingComponent.class);
+        parentSpriteComponent = parentEntity.requireComponent(SpriteComponent.class);
 
         spriteComponent = owner.requireComponent(SpriteComponent.class);
         offsetComponent = owner.requireComponent(OffsetComponent.class);
@@ -106,6 +110,9 @@ public final class SwordBehaviorComponent extends LerpComponent {
         if (!restTimeRemaining.isZero()) {
             restTimeRemaining.subtract(elapsedTime);
         }
+
+        // Sword should ALWAYS be below the player.
+        spriteComponent.setZ(parentSpriteComponent.getZ() - .1f);
     }
 
     @Override
@@ -113,7 +120,7 @@ public final class SwordBehaviorComponent extends LerpComponent {
         from.reset();
         restTimeRemaining.setZero();
 
-        headingComponent = null;
+        parentHeadingComponent = null;
         spriteComponent = null;
         offsetComponent = null;
         collisionComponent = null;
