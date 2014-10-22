@@ -2,8 +2,8 @@ package dhcoder.libgdx.render;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import dhcoder.libgdx.entity.Entity;
 
@@ -30,7 +30,7 @@ public final class RenderSystem {
 
         private boolean useBlending;
         private boolean isSorted;
-        private boolean isAbsolute;
+        private boolean isUiLayer;
 
         public Layer(final int capacity) {
             renderables = new Array<Renderable>(capacity);
@@ -53,8 +53,8 @@ public final class RenderSystem {
          * always renders to an absolute position regardless of how much the game world has translated. Defaults to
          * {@code false}.
          */
-        public Layer setAbsolute(final boolean isAbsolute) {
-            this.isAbsolute = isAbsolute;
+        public Layer setUiLayer(final boolean isUiLayer) {
+            this.isUiLayer = isUiLayer;
             return this;
         }
 
@@ -90,7 +90,7 @@ public final class RenderSystem {
                 spriteBatch.enableBlending();
             }
 
-            final Camera activeCamera = isAbsolute ? absoluteCamera : worldCamera;
+            final Camera activeCamera = isUiLayer ? uiCamera : worldCamera;
             spriteBatch.setProjectionMatrix(activeCamera.combined);
 
             spriteBatch.begin();
@@ -116,16 +116,19 @@ public final class RenderSystem {
     };
     private final SpriteBatch spriteBatch;
     private final OrthographicCamera worldCamera;
-    private final OrthographicCamera absoluteCamera;
+    private final OrthographicCamera uiCamera;
     private final Array<Layer> renderLayers;
+    private boolean cameraNeedsUpdate;
 
     public RenderSystem(final float viewportWidth, final float viewportHeight, int batchSize) {
         spriteBatch = new SpriteBatch(batchSize);
         worldCamera = new OrthographicCamera(viewportWidth, viewportHeight);
-        absoluteCamera = new OrthographicCamera(viewportWidth, viewportHeight);
+        uiCamera = new OrthographicCamera(viewportWidth, viewportHeight);
         renderLayers = new Array<Layer>(4);
 
-        absoluteCamera.update();
+        uiCamera.update();
+        worldCamera.update();
+        cameraNeedsUpdate = false;
     }
 
     public OrthographicCamera getCamera() {
@@ -139,7 +142,7 @@ public final class RenderSystem {
     }
 
     /**
-     * Add a renderable which will get drawn by {@link #render(Batch)}
+     * Add a renderable which will get drawn by {@link #render}
      */
     public void add(final Enum layer, final Renderable renderable) {
         renderLayers.get(layer.ordinal()).add(renderable);
@@ -153,11 +156,23 @@ public final class RenderSystem {
     }
 
     /**
+     * Offset the world camera, shifting any non-UI layer.
+     */
+    public void setOffset(final Vector2 offset) {
+        if (!worldCamera.position.epsilonEquals(offset.x, offset.y, 0f, 0f)) {
+            worldCamera.position.set(offset, 0f);
+            cameraNeedsUpdate = true;
+        }
+    }
+
+    /**
      * Prepare the render system. This should be called after all {@link Entity} objects have a chance to update but
      * before the {@link #render} is called.
      */
     public void update() {
-        worldCamera.update();
+        if (cameraNeedsUpdate) {
+            worldCamera.update();
+        }
     }
 
     /**

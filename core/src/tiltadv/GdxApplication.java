@@ -165,7 +165,7 @@ public final class GdxApplication extends ApplicationAdapter {
         renderSystem = new RenderSystem(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, DevSettings.IN_DEV_MODE ? 1000 : 200);
         renderSystem.addLayer(ENTITY_COUNT).setBlending(false).setSorted(false);
         renderSystem.addLayer(ENTITY_COUNT);
-        renderSystem.addLayer(10).setAbsolute(true).setSorted(false);
+        renderSystem.addLayer(10).setUiLayer(true).setSorted(false);
         Services.register(RenderSystem.class, renderSystem);
 
         touchSystem = new TouchSystem(ENTITY_COUNT / 2);
@@ -320,11 +320,11 @@ public final class GdxApplication extends ApplicationAdapter {
                 @Override
                 public void initialize(final Entity entity) {
                     final float MARGIN = 5f;
+                    entity.addComponent(TiltDisplayComponent.class).setTextureRegion(Tiles.SWORDRIGHT);
                     entity.addComponent(PositionComponent.class).setPosition(
                         new Vector2(VIEWPORT_WIDTH / 2 - Tiles.SWORDRIGHT.getRegionWidth() - MARGIN,
                             VIEWPORT_HEIGHT / 2 - Tiles.SWORDRIGHT.getRegionHeight() - MARGIN));
                     entity.addComponent(SpriteComponent.class);
-                    entity.addComponent(TiltDisplayComponent.class).setTextureRegion(Tiles.SWORDRIGHT);
                 }
             });
 
@@ -339,7 +339,7 @@ public final class GdxApplication extends ApplicationAdapter {
 //        addGravityWell(-90, -30);
         addOctoEnemies();
         addMovingBoulderEntities();
-//        addTiltIndicatorEntity(playerEntity);
+        addTiltIndicatorEntity(playerEntity);
         addFpsEntity();
         addBoundaryWalls();
         addTargetEntity();
@@ -425,6 +425,10 @@ public final class GdxApplication extends ApplicationAdapter {
         }
     }
 
+    private static final float SPIN_DURATION = 5f;
+    private static final float SPIN_MAGNITUDE = 20f;
+    private Duration elapsedSoFar = Duration.zero();
+    private Vector2 renderOffset = new Vector2();
     private void update() {
         int mark = Pools.durations.mark();
         Duration elapsedTime = Pools.durations.grabNew();
@@ -432,10 +436,18 @@ public final class GdxApplication extends ApplicationAdapter {
         if (DevSettings.IN_DEV_MODE) {
             elapsedTime.setSeconds(elapsedTime.getSeconds() / DevSettings.SLOW_MO_FACTOR);
         }
+        elapsedSoFar.add(elapsedTime);
+        if (elapsedSoFar.getSeconds() > SPIN_DURATION) {
+            elapsedSoFar.subtractSeconds(SPIN_DURATION);
+        }
         entities.update(elapsedTime);
         Pools.durations.freeToMark(mark);
 
         collisionSystem.triggerCollisions();
+
+        float ratio = elapsedSoFar.getSeconds() / SPIN_DURATION * Angle.TWO_PI;
+        renderOffset.set(SPIN_MAGNITUDE * cos(ratio), SPIN_MAGNITUDE * sin(ratio));
+        renderSystem.setOffset(renderOffset);
 
         renderSystem.update();
         if (DevSettings.IN_DEV_MODE) {
