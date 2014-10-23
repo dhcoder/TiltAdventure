@@ -62,6 +62,12 @@ public final class Tiles {
     public static final TextureRegion ROCK;
     public static final TextureRegion SWORDRIGHT;
     public static final TextureRegion SENSOR;
+
+    public static final TextureRegion GRASS;
+    public static final TextureRegion GRASS_ROCK;
+    public static final TextureRegion GRASS_FLOWER;
+
+    private static final Texture textureGround;
     private static final Texture textureSource8bit;
     private static final Texture textureSource16bit;
     private static final Texture textureDude;
@@ -70,6 +76,7 @@ public final class Tiles {
         textureSource8bit = new Texture("Tiles.png");
         textureSource16bit = new Texture("Tiles16.png");
         textureDude = new Texture("Dude.png");
+        textureGround = new Texture("Ground.png");
 
         PLAYER_S1 = new TextureRegion(textureDude, 0, 0, 16, 24);
         PLAYER_S2 = new TextureRegion(textureDude, 16, 0, 16, 24);
@@ -128,6 +135,10 @@ public final class Tiles {
         ROCK = new TextureRegion(textureSource8bit, 120, 30, 8, 10);
         SWORDRIGHT = new TextureRegion(textureSource8bit, 120, 60, 12, 7);
         SENSOR = new TextureRegion(textureSource8bit, 151, 61, 15, 15);
+
+        GRASS = new TextureRegion(textureGround, 0, 0, 16, 16);
+        GRASS_ROCK = new TextureRegion(textureGround, 16, 0, 16, 16);
+        GRASS_FLOWER = new TextureRegion(textureGround, 32, 0, 16, 16);
     }
 
     public static void dispose() {
@@ -135,6 +146,7 @@ public final class Tiles {
         textureSource8bit.dispose();
         textureSource16bit.dispose();
         textureDude.dispose();
+        textureGround.dispose();
     }
 
     private Tiles() { } // Disabled constructor
