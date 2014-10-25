@@ -1,0 +1,29 @@
+{
+	"tilesetPath": "data/tilesets/zelda.json",
+	"animations": [
+		{
+			"name": "idle_s",
+			"frames": [[1,0]]
+		},
+		{
+			"name": "idle_e",
+			"frames": [[4,0]]
+		},
+		{
+			"name": "idle_n",
+			"frames": [[3,0]]
+		},
+		{
+			"name": "walk_s",
+			"frames": [[1,0],[1,1]]
+		},
+		{
+			"name": "walk_e",
+			"frames": [[4,0],[4,1]]
+		},
+		{
+			"name": "walk_n",
+			"frames": [[3,0],[3,1]]
+		}
+	]
+}
