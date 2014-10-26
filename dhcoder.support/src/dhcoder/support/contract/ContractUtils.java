@@ -1,5 +1,7 @@
 package dhcoder.support.contract;
 
+import java.util.Iterator;
+
 /**
  * Simple collection of methods to assert expected values or else throw a {@link ContractException}.
  */
@@ -41,4 +43,10 @@ public final class ContractUtils {
         }
     }
 
+    public static void requireElements(final Iterable list, final String message) {
+        final Iterator iterator = list.iterator();
+        while (iterator.hasNext()) {
+            requireNonNull(iterator.next(), message);
+        }
+    }
 }

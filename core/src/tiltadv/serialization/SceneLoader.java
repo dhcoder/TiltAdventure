@@ -17,10 +17,10 @@ public final class SceneLoader {
 
     private final static class SceneData {
         public String tilesetPath;
-        public int sceneTileWidth;
-        public int sceneTileHeight;
-        public float centerX;
-        public float centerY;
+        public int numCols;
+        public int numRows;
+        public float offsetX;
+        public float offsetY;
         public int[] tiles;
     }
 
@@ -34,13 +34,12 @@ public final class SceneLoader {
         final String sceneName = fileHandle.nameWithoutExtension();
 
         Tileset tileset = tilesets.get(sceneData.tilesetPath);
-        Scene scene = new Scene(tileset, sceneData.sceneTileWidth, sceneData.sceneTileHeight, sceneData.centerX,
-            sceneData.centerY);
+        Scene scene = new Scene(tileset, sceneData.numCols, sceneData.numRows, sceneData.offsetX, sceneData.offsetY);
 
         for (int i = 0; i < sceneData.tiles.length; i++) {
             int tileIndex = sceneData.tiles[i];
             final TextureRegion tile = tileset.getTile(tileIndex);
-            scene.setTile(tileIndex, tile);
+            scene.setTile(i, tile);
         }
         scenes.add(sceneName, scene);
     }

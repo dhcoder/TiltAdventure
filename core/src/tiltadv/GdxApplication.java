@@ -24,6 +24,7 @@ import dhcoder.support.memory.Pool;
 import dhcoder.support.time.Duration;
 import tiltadv.assets.AnimationDatastore;
 import tiltadv.assets.ImageDatastore;
+import tiltadv.assets.Scene;
 import tiltadv.assets.SceneDatastore;
 import tiltadv.assets.TileDatastore;
 import tiltadv.assets.TilesetDatastore;
@@ -63,6 +64,7 @@ import tiltadv.components.input.touchables.TargetTouchableComponent;
 import tiltadv.globals.Animations;
 import tiltadv.globals.DevSettings;
 import tiltadv.globals.EntityId;
+import tiltadv.globals.RenderLayer;
 import tiltadv.globals.Services;
 import tiltadv.globals.Tiles;
 import tiltadv.input.TouchSystem;
@@ -79,8 +81,8 @@ import static com.badlogic.gdx.math.MathUtils.sin;
 public final class GdxApplication extends ApplicationAdapter {
 
     public static final int ENTITY_COUNT = 200;
-    private static final int VIEWPORT_HEIGHT = 240;
-    private static final int VIEWPORT_WIDTH = 320;
+    private static final int VIEWPORT_HEIGHT = 120;
+    private static final int VIEWPORT_WIDTH = 160;
     // When you hit a breakpoint while debugging an app, or if the phone you're using is just simply being slow, the
     // delta times between frames can be HUGE. Let's clamp to a reasonable max here. This also prevents physics update
     // logic from dealing with time steps that are too large (at which point, objects start going through walls, etc.)
@@ -108,6 +110,7 @@ public final class GdxApplication extends ApplicationAdapter {
             Pool.RUN_SANITY_CHECKS = DevSettings.RUN_SANITY_CHECKS;
             CollisionSystem.RUN_SANITY_CHECKS = DevSettings.RUN_SANITY_CHECKS;
             ArrayMap.RUN_SANITY_CHECKS = DevSettings.RUN_SANITY_CHECKS;
+            Scene.RUN_SANITY_CHECKS = DevSettings.RUN_SANITY_CHECKS;
         }
         font = new BitmapFont();
 
@@ -402,6 +405,9 @@ public final class GdxApplication extends ApplicationAdapter {
         addFpsEntity();
         addBoundaryWalls();
         addTargetEntity();
+
+        Scene demoScene = Services.get(SceneDatastore.class).get("demo");
+        renderSystem.add(RenderLayer.Ground, demoScene);
     }
 
     private void addMainCamera(final Entity playerEntity) {entities.newEntityFromTemplate(
@@ -436,8 +442,8 @@ public final class GdxApplication extends ApplicationAdapter {
     }
 
     private void addBoundaryWalls() {
-        float halfScreenW = (float)VIEWPORT_WIDTH / 2f;
-        float halfScreenH = (float)VIEWPORT_HEIGHT / 2f;
+        float halfScreenW = (float)320f / 2f;
+        float halfScreenH = (float)240f / 2f;
         float halfWallSize = 20f;
         float top = halfScreenH + halfWallSize;
         float bottom = -halfScreenH - halfWallSize;

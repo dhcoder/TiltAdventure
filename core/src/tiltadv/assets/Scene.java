@@ -1,34 +1,42 @@
 package tiltadv.assets;
 
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import dhcoder.libgdx.render.Renderable;
+import dhcoder.support.contract.ContractUtils;
 
 import static dhcoder.support.text.StringUtils.format;
 
 /**
  * Data that describes a scene, which is essentially a self-contained area full of ground tiles and entities.
  */
-public final class Scene {
+public final class Scene implements Renderable {
 
     public static boolean RUN_SANITY_CHECKS;
 
     // TODO: Allow multiple tilesets and animated tiles
     private final Tileset tileset;
     private final Array<TextureRegion> groundTiles;
-    private final int sceneTileWidth;
-    private final int sceneTileHeight;
-    private final Vector2 center = new Vector2();
+    private final int numCols;
+    private final int numRows;
+    private final Vector2 offset = new Vector2();
+    private boolean ranSanityChecks;
 
-    public Scene(final Tileset tileset, final int sceneTileWidth, final int sceneTileHeight, final float centerX,
-        final float centerY) {
+    public Scene(final Tileset tileset, final int numCols, final int numRows, final float offsetX,
+        final float offsetY) {
         this.tileset = tileset;
-        this.sceneTileWidth = sceneTileWidth;
-        this.sceneTileHeight = sceneTileHeight;
-        center.x = centerX;
-        center.y = centerY;
+        this.numCols = numCols;
+        this.numRows = numRows;
+        offset.x = offsetX;
+        offset.y = offsetY;
 
-        int numRegions = sceneTileWidth * sceneTileHeight;
+        if (numCols <= 0 || numRows <= 0) {
+            throw new IllegalArgumentException("Scene must have rows and cols set to 1 or more");
+        }
+
+        int numRegions = numCols * numRows;
         groundTiles = new Array<TextureRegion>(numRegions);
         for (int i = 0; i < numRegions; ++i) {
             groundTiles.add(null);
@@ -36,20 +44,55 @@ public final class Scene {
     }
 
     public void setTile(final int tileX, final int tileY, final TextureRegion tile) {
-        if (tileX >= sceneTileWidth || tileY >= sceneTileHeight) {
+        if (tileX >= numCols || tileY >= numRows) {
             throw new IllegalArgumentException(
-                format("Invalid tile coordinates {0}x{1} (scene is {2}x{3})", tileX, tileY, sceneTileWidth,
-                    sceneTileHeight));
+                format("Invalid tile coordinates {0}x{1} (scene is {2}x{3})", tileX, tileY, numCols, numRows));
         }
 
-        int index = tileY * sceneTileWidth + tileX;
+        int index = tileY * numCols + tileX;
         groundTiles.set(index, tile);
+
+        ranSanityChecks = false;
     }
 
     public void setTile(final int tileIndex, final TextureRegion tile) {
-        int tileX = tileIndex % sceneTileWidth;
-        int tileY = tileIndex / sceneTileHeight;
+        int tileX = tileIndex % numCols;
+        int tileY = tileIndex / numCols;
         setTile(tileX, tileY, tile);
     }
 
+    @Override
+    public void render(final Batch batch) {
+        if (RUN_SANITY_CHECKS && !ranSanityChecks) {
+            ContractUtils.requireElements(groundTiles, "All scene tiles must be set");
+            ranSanityChecks = true;
+        }
+
+        float tileWidth = tileset.getTileWidth();
+        float tileHeight = tileset.getTileHeight();
+        float sceneWidth = tileWidth * numCols;
+        float sceneHeight = tileHeight * numRows;
+        int tileX = 0;
+        float leftX = -sceneWidth / 2f + offset.x;
+        float topY = -sceneHeight / 2f + offset.y;
+        float renderAtX = leftX;
+        float renderAtY = topY;
+        for (int i = 0; i < groundTiles.size; i++) {
+            TextureRegion tile = groundTiles.get(i);
+            batch.draw(tile, renderAtX, renderAtY);
+
+            tileX++;
+            renderAtX += tileWidth;
+            if (tileX == numCols) {
+                tileX = 0;
+                renderAtX = leftX;
+                renderAtY += tileHeight;
+            }
+        }
+    }
+
+    @Override
+    public float getZ() {
+        return 0f;
+    }
 }
