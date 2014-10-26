@@ -120,7 +120,7 @@ public final class RenderSystem {
     private final Array<Layer> renderLayers;
     private boolean cameraNeedsUpdate;
 
-    public RenderSystem(final float viewportWidth, final float viewportHeight, int batchSize) {
+    public RenderSystem(final float viewportWidth, final float viewportHeight, final int batchSize) {
         spriteBatch = new SpriteBatch(batchSize);
         worldCamera = new OrthographicCamera(viewportWidth, viewportHeight);
         uiCamera = new OrthographicCamera(viewportWidth, viewportHeight);
