@@ -22,8 +22,10 @@ import dhcoder.support.collection.ArrayMap;
 import dhcoder.support.math.Angle;
 import dhcoder.support.memory.Pool;
 import dhcoder.support.time.Duration;
-import tiltadv.assets.ImageCollection;
-import tiltadv.assets.TilesetCollection;
+import tiltadv.assets.AnimationDatastore;
+import tiltadv.assets.ImageDatastore;
+import tiltadv.assets.TileDatastore;
+import tiltadv.assets.TilesetDatastore;
 import tiltadv.components.behavior.OctoBehaviorComponent;
 import tiltadv.components.behavior.OscillationBehaviorComponent;
 import tiltadv.components.behavior.PlayerBehaviorComponent;
@@ -65,7 +67,9 @@ import tiltadv.globals.Tiles;
 import tiltadv.input.TouchSystem;
 import tiltadv.input.Vibrator;
 import tiltadv.memory.Pools;
-import tiltadv.serialization.TilesetSerializer;
+import tiltadv.serialization.AnimationsLoader;
+import tiltadv.serialization.TilesLoader;
+import tiltadv.serialization.TilesetLoader;
 
 import static com.badlogic.gdx.math.MathUtils.cos;
 import static com.badlogic.gdx.math.MathUtils.sin;
@@ -155,7 +159,7 @@ public final class GdxApplication extends ApplicationAdapter {
     @Override
     public void dispose() {
         font.dispose();
-        Tiles.dispose();
+        Services.get(ImageDatastore.class).dispose();
         renderSystem.dispose();
 
         if (DevSettings.IN_DEV_MODE) {
@@ -164,8 +168,10 @@ public final class GdxApplication extends ApplicationAdapter {
     }
 
     private void initializeServices() {
-        Services.register(ImageCollection.class, new ImageCollection());
-        Services.register(TilesetCollection.class, new TilesetCollection());
+        Services.register(ImageDatastore.class, new ImageDatastore());
+        Services.register(TilesetDatastore.class, new TilesetDatastore());
+        Services.register(TileDatastore.class, new TileDatastore());
+        Services.register(AnimationDatastore.class, new AnimationDatastore());
         Services.register(Json.class, new Json());
 
         collisionSystem = new CollisionSystem(ENTITY_COUNT);
@@ -187,14 +193,25 @@ public final class GdxApplication extends ApplicationAdapter {
     }
 
     private void initializeAssets() {
-        final FileHandle[] tilesetFiles = Gdx.files.internal("data/tilesets").list();
-        for (int i = 0; i < tilesetFiles.length; ++i) {
-            TilesetSerializer.load(tilesetFiles[i].path());
+        {
+            final FileHandle[] tilesetFiles = Gdx.files.internal("data/tilesets").list();
+            for (int i = 0; i < tilesetFiles.length; ++i) {
+                TilesetLoader.load(tilesetFiles[i].path());
+            }
         }
 
-        final FileHandle[] animationFiles = Gdx.files.internal("data/animations").list();
-        for (int i = 0; i < tilesetFiles.length; ++i) {
-            TilesetSerializer.load(tilesetFiles[i].path());
+        {
+            final FileHandle[] tileFiles = Gdx.files.internal("data/tiles").list();
+            for (int i = 0; i < tileFiles.length; ++i) {
+                TilesLoader.load(tileFiles[i].path());
+            }
+        }
+
+        {
+            final FileHandle[] animationFiles = Gdx.files.internal("data/animations").list();
+            for (int i = 0; i < animationFiles.length; ++i) {
+                AnimationsLoader.load(animationFiles[i].path());
+            }
         }
     }
 
@@ -203,8 +220,8 @@ public final class GdxApplication extends ApplicationAdapter {
         entities = new EntityManager(ENTITY_COUNT);
 
         gravityWellBounds = new Circle(8.0f);
-        octoBounds = new Circle(Tiles.OCTOUP1.getRegionWidth() / 2f);
-        playerBounds = new Circle((Tiles.LINK_N1.getRegionWidth() / 2f) * 0.8f);
+        octoBounds = new Circle(8.0f);
+        playerBounds = new Circle(6.5f);
         playerSensorBounds = new Circle(Tiles.SENSOR.getRegionWidth() / 2f);
         playerSwordBounds = new Circle(5f);
         octoRockBounds = new Circle(Tiles.ROCK.getRegionWidth() / 2f);

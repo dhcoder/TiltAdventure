@@ -6,10 +6,12 @@ import dhcoder.support.collection.ArrayMap;
 import dhcoder.support.opt.Opt;
 import tiltadv.memory.Pools;
 
+import java.util.List;
+
 /**
- * A collection of all images loaded so far for this game.
+ * A named collection of all {@link Texture}s loaded so far for this game.
  */
-public final class ImageCollection {
+public final class ImageDatastore {
 
     ArrayMap<String, Texture> images = new ArrayMap<String, Texture>();
 
@@ -28,5 +30,14 @@ public final class ImageCollection {
         Pools.opts.freeCount(1);
 
         return texture;
+    }
+
+    public void dispose() {
+        final List<Texture> values = images.getValues();
+        final int numValues = values.size();
+        for (int i = 0; i < numValues; ++i) {
+            values.get(i).dispose();
+        }
+        images.clear();
     }
 }

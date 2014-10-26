@@ -31,6 +31,18 @@ public final class Tileset {
         }
     }
 
+    public Texture getTexture() {
+        return texture;
+    }
+
+    public int getTileWidth() {
+        return tileWidth;
+    }
+
+    public int getTileHeight() {
+        return tileHeight;
+    }
+
     public TextureRegion getTile(final int tileX, final int tileY) {
         if (tileX >= numCols || tileY >= numRows) {
             throw new IllegalArgumentException(

@@ -5,6 +5,7 @@ import dhcoder.support.opt.Opt;
 import dhcoder.support.opt.OptInt;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static dhcoder.support.math.MathUtils.log2;
 import static dhcoder.support.text.StringUtils.format;
@@ -127,6 +128,20 @@ public final class ArrayMap<K, V> {
 
     public boolean isEmpty() {
         return size == 0;
+    }
+
+    /**
+     * Note: This method allocates an array and should only be used in non-critical areas.
+     */
+    public List<V> getValues() {
+        ArrayList<V> compactValues = new ArrayList<V>(size);
+        for (int i = 0; i < size; ++i) {
+            final V value = values.get(i);
+            if (value != null) {
+                compactValues.add(value);
+            }
+        }
+        return compactValues;
     }
 
     public boolean containsKey(final K key) {

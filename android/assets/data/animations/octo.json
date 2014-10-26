@@ -15,14 +15,17 @@
 		},
 		{
 			"name": "walk_s",
+			"frameDuration": 0.1,
 			"frames": [[1,0],[1,1]]
 		},
 		{
 			"name": "walk_e",
+			"frameDuration": 0.1,
 			"frames": [[4,0],[4,1]]
 		},
 		{
 			"name": "walk_n",
+			"frameDuration": 0.1,
 			"frames": [[3,0],[3,1]]
 		}
 	]
