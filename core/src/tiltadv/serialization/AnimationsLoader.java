@@ -18,6 +18,17 @@ import java.util.ArrayList;
  */
 public final class AnimationsLoader {
 
+    private final static class AnimationGroupData {
+        public String tilesetPath;
+        public ArrayList<AnimationData> animations;
+    }
+
+    private final static class AnimationData {
+        public String name;
+        public float frameDuration;
+        public int[][] frames;
+    }
+
     public static void load(final String jsonPath) {
         final Json json = Services.get(Json.class);
         final TilesetDatastore tilesets = Services.get(TilesetDatastore.class);
@@ -44,17 +55,6 @@ public final class AnimationsLoader {
         }
 
         animations.add(groupName, animationGroup);
-    }
-
-    private final static class AnimationGroupData {
-        public String tilesetPath;
-        public ArrayList<AnimationData> animations;
-    }
-
-    private final static class AnimationData {
-        public String name;
-        public float frameDuration;
-        public int[][] frames;
     }
 
 }

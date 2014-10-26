@@ -12,6 +12,12 @@ import tiltadv.globals.Services;
  */
 public final class TilesetLoader {
 
+    private final static class TilesetData {
+        public String imagePath;
+        public int tileWidth;
+        public int tileHeight;
+    }
+
     public static void load(final String jsonPath) {
         final Json json = Services.get(Json.class);
         final ImageDatastore images = Services.get(ImageDatastore.class);
@@ -20,12 +26,6 @@ public final class TilesetLoader {
         TilesetData data = json.fromJson(TilesetData.class, Gdx.files.internal(jsonPath).readString());
 
         tilesets.add(jsonPath, new Tileset(images.get(data.imagePath), data.tileWidth, data.tileHeight));
-    }
-
-    private final static class TilesetData {
-        public String imagePath;
-        public int tileWidth;
-        public int tileHeight;
     }
 
 }

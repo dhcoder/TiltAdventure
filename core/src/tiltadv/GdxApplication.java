@@ -24,6 +24,7 @@ import dhcoder.support.memory.Pool;
 import dhcoder.support.time.Duration;
 import tiltadv.assets.AnimationDatastore;
 import tiltadv.assets.ImageDatastore;
+import tiltadv.assets.SceneDatastore;
 import tiltadv.assets.TileDatastore;
 import tiltadv.assets.TilesetDatastore;
 import tiltadv.components.behavior.OctoBehaviorComponent;
@@ -68,6 +69,7 @@ import tiltadv.input.TouchSystem;
 import tiltadv.input.Vibrator;
 import tiltadv.memory.Pools;
 import tiltadv.serialization.AnimationsLoader;
+import tiltadv.serialization.SceneLoader;
 import tiltadv.serialization.TilesLoader;
 import tiltadv.serialization.TilesetLoader;
 
@@ -172,6 +174,7 @@ public final class GdxApplication extends ApplicationAdapter {
         Services.register(TilesetDatastore.class, new TilesetDatastore());
         Services.register(TileDatastore.class, new TileDatastore());
         Services.register(AnimationDatastore.class, new AnimationDatastore());
+        Services.register(SceneDatastore.class, new SceneDatastore());
         Services.register(Json.class, new Json());
 
         collisionSystem = new CollisionSystem(ENTITY_COUNT);
@@ -211,6 +214,13 @@ public final class GdxApplication extends ApplicationAdapter {
             final FileHandle[] animationFiles = Gdx.files.internal("data/animations").list();
             for (int i = 0; i < animationFiles.length; ++i) {
                 AnimationsLoader.load(animationFiles[i].path());
+            }
+        }
+
+        {
+            final FileHandle[] sceneFiles = Gdx.files.internal("data/scenes").list();
+            for (int i = 0; i < sceneFiles.length; ++i) {
+                SceneLoader.load(sceneFiles[i].path());
             }
         }
     }

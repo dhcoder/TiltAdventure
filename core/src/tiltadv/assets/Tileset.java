@@ -59,4 +59,10 @@ public final class Tileset {
 
         return tile;
     }
+
+    public TextureRegion getTile(final int tileIndex) {
+        int tileX = tileIndex % numCols;
+        int tileY = tileIndex / numCols;
+        return getTile(tileX, tileY);
+    }
 }
