@@ -222,7 +222,7 @@ public final class GdxApplication extends ApplicationAdapter {
         gravityWellBounds = new Circle(8.0f);
         octoBounds = new Circle(8.0f);
         playerBounds = new Circle(6.5f);
-        playerSensorBounds = new Circle(Tiles.SENSOR.getRegionWidth() / 2f);
+        playerSensorBounds = new Circle(8.0f);
         playerSwordBounds = new Circle(5f);
         octoRockBounds = new Circle(Tiles.ROCK.getRegionWidth() / 2f);
         boulderBounds = new Circle(Tiles.BOULDER.getRegionWidth() / 2f);

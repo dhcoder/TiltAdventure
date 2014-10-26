@@ -20,7 +20,7 @@ public final class SwordBehaviorComponent extends LerpComponent {
 
     private final static Angle ARC = Angle.fromDegrees(100f);
     private final static Angle HALF_ARC = Angle.fromDegrees(ARC.getDegrees() / 2f);
-    private final static Duration DURATION = Duration.fromMilliseconds(200f);
+    private final static Duration SWING_DURATION = Duration.fromMilliseconds(150f);
     private final static Vector2 SWORD_POS = new Vector2(12f, 0f);
     private final static Vector2 SWORD_TIP_POS = new Vector2(-10f, 0f);
 
@@ -37,7 +37,7 @@ public final class SwordBehaviorComponent extends LerpComponent {
     public SwordBehaviorComponent() {
         super();
         reset();
-        setDuration(DURATION);
+        setDuration(SWING_DURATION);
     }
 
     public void swing() {
@@ -82,7 +82,7 @@ public final class SwordBehaviorComponent extends LerpComponent {
 
         // Using the sword incurs a knockback, so let's reuse that duration here as well, so we don't swing while
         // being knocked back.
-        restTimeRemaining.setFrom(KnockbackComponent.DURATION);
+        restTimeRemaining.setFrom(KnockbackComponent.DURATION).subtract(SWING_DURATION);
     }
 
     @Override
