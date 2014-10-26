@@ -188,7 +188,8 @@ public final class ArrayMap<K, V> {
     public void put(final K key, final V value) {
 
         if (RUN_SANITY_CHECKS) {
-            for (int i = 0; i < keys.size(); i++) {
+            int numKeys = keys.size();
+            for (int i = 0; i < numKeys; i++) {
                 if (keys.get(i) == key) {
                     throw new IllegalArgumentException(
                         "Attempt to add the same key a second time. Are you re-using the same key accidentally?");
