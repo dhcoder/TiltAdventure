@@ -43,6 +43,30 @@ public final class Scene implements Renderable {
         }
     }
 
+    public float getWidth() {
+        return numCols * tileset.getTileWidth();
+    }
+
+    public float getHeight() {
+        return numRows * tileset.getTileHeight();
+    }
+
+    public float getLeftX() {
+        return -(getWidth() / 2f) + offset.x;
+    }
+
+    public float getBottomY() {
+        return -(getHeight() / 2f) + offset.y;
+    }
+
+    public float getRightX() {
+        return getLeftX() + getWidth();
+    }
+
+    public float getTopY() {
+        return getBottomY() + getHeight();
+    }
+
     public void setTile(final int tileX, final int tileY, final TextureRegion tile) {
         if (tileX >= numCols || tileY >= numRows) {
             throw new IllegalArgumentException(
@@ -70,13 +94,11 @@ public final class Scene implements Renderable {
 
         float tileWidth = tileset.getTileWidth();
         float tileHeight = tileset.getTileHeight();
-        float sceneWidth = tileWidth * numCols;
-        float sceneHeight = tileHeight * numRows;
         int tileX = 0;
-        float leftX = -sceneWidth / 2f + offset.x;
-        float topY = -sceneHeight / 2f + offset.y;
+        float leftX = getLeftX();
+        float bottomY = getBottomY();
         float renderAtX = leftX;
-        float renderAtY = topY;
+        float renderAtY = bottomY;
         for (int i = 0; i < groundTiles.size; i++) {
             TextureRegion tile = groundTiles.get(i);
             batch.draw(tile, renderAtX, renderAtY);

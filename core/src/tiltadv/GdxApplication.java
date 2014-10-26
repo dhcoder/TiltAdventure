@@ -81,8 +81,11 @@ import static com.badlogic.gdx.math.MathUtils.sin;
 public final class GdxApplication extends ApplicationAdapter {
 
     public static final int ENTITY_COUNT = 200;
-    private static final int VIEWPORT_HEIGHT = 120;
-    private static final int VIEWPORT_WIDTH = 160;
+    public static final int GROUND_LAYER_COUNT = 1;
+    public static final int MAIN_LAYER_COUNT = 50;
+    public static final int UI_LAYER_COUNT = 10;
+    private static final int VIEWPORT_WIDTH = 320;
+    private static final int VIEWPORT_HEIGHT = 240;
     // When you hit a breakpoint while debugging an app, or if the phone you're using is just simply being slow, the
     // delta times between frames can be HUGE. Let's clamp to a reasonable max here. This also prevents physics update
     // logic from dealing with time steps that are too large (at which point, objects start going through walls, etc.)
@@ -185,10 +188,10 @@ public final class GdxApplication extends ApplicationAdapter {
 
         // TODO: Tune the application for the best batch size for render system
         // https://github.com/libgdx/libgdx/wiki/Spritebatch,-Textureregions,-and-Sprites#performance-tuning
-        renderSystem = new RenderSystem(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, DevSettings.IN_DEV_MODE ? 1000 : 200);
-        renderSystem.addLayer(ENTITY_COUNT).setBlending(false).setSorted(false);
-        renderSystem.addLayer(ENTITY_COUNT);
-        renderSystem.addLayer(10).setUiLayer(true).setSorted(false);
+        renderSystem = new RenderSystem(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, DevSettings.IN_DEV_MODE ? 1000 : 600);
+        renderSystem.addLayer(GROUND_LAYER_COUNT).setBlending(false).setSorted(false); // ground layer
+        renderSystem.addLayer(MAIN_LAYER_COUNT);
+        renderSystem.addLayer(UI_LAYER_COUNT).setUiLayer(true).setSorted(false);
         Services.register(RenderSystem.class, renderSystem);
 
         touchSystem = new TouchSystem(ENTITY_COUNT / 2);
@@ -442,13 +445,14 @@ public final class GdxApplication extends ApplicationAdapter {
     }
 
     private void addBoundaryWalls() {
-        float halfScreenW = (float)320f / 2f;
-        float halfScreenH = (float)240f / 2f;
-        float halfWallSize = 20f;
-        float top = halfScreenH + halfWallSize;
-        float bottom = -halfScreenH - halfWallSize;
-        float left = -halfScreenW - halfWallSize;
-        float right = halfScreenW + halfWallSize;
+        Scene scene = Services.get(SceneDatastore.class).get("demo");
+        float halfSceneW = scene.getWidth() / 2f;
+        float halfSceneH = scene.getHeight() / 2f;
+        float halfWallSize = 10f;
+        float top = halfSceneH + halfWallSize;
+        float bottom = -halfSceneH - halfWallSize;
+        float left = -halfSceneW - halfWallSize;
+        float right = halfSceneW + halfWallSize;
 
         Entity wallLeft = entities.newEntityFromTemplate(EntityId.BOUNDARY);
         Entity wallRight = entities.newEntityFromTemplate(EntityId.BOUNDARY);
@@ -456,8 +460,8 @@ public final class GdxApplication extends ApplicationAdapter {
         Entity wallTop = entities.newEntityFromTemplate(EntityId.BOUNDARY);
 
         Vector2 wallPos = Pools.vector2s.grabNew();
-        final Shape verticalWall = new Rectangle(halfWallSize, halfScreenH);
-        final Shape horizontalWall = new Rectangle(halfScreenW, halfWallSize);
+        final Shape verticalWall = new Rectangle(halfWallSize, halfSceneH);
+        final Shape horizontalWall = new Rectangle(halfSceneW, halfWallSize);
 
         wallPos.set(left, 0f);
         wallLeft.requireComponent(PositionComponent.class).setPosition(wallPos);
