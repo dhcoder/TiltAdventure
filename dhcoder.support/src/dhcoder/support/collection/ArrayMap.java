@@ -201,15 +201,27 @@ public final class ArrayMap<K, V> {
         int index = indexOpt.getValue();
         indexPool.free(indexOpt);
 
-        keys.set(index, key);
-        values.set(index, value);
-        keyIsDead[index] = false;
+        setInternal(index, key, value);
 
         size++;
 
         if (size == resizeAtSize) {
             increaseCapacity();
         }
+    }
+
+    /**
+     * Use if you know for sure the key is already in the map. This is a bit more efficient than using {@link #remove
+     * (Object)} followed by {@link #put(Object, Object)}
+     */
+    public void replace(final K key, final V value) {
+
+        OptInt indexOpt = indexPool.grabNew();
+        getIndex(key, IndexMethod.GET, indexOpt);
+        int index = indexOpt.getValue();
+        indexPool.free(indexOpt);
+
+        setInternal(index, key, value);
     }
 
     /**
@@ -279,6 +291,12 @@ public final class ArrayMap<K, V> {
         size = 0;
     }
 
+    private void setInternal(final int index, final K key, final V value) {
+        keys.set(index, key);
+        values.set(index, value);
+        keyIsDead[index] = false;
+    }
+
     private void increaseCapacity() {
         int oldCapacity = capacity;
         capacity = getNextPrimeSize(capacity + 1);
@@ -322,9 +340,8 @@ public final class ArrayMap<K, V> {
         int index = initialIndex;
         int loopCount = 1;
         while ((keys.get(index) != null || keyIsDead[index]) && loopCount <= capacity) {
-            if (indexMethod == IndexMethod.PUT && keyIsDead[index] || keys.get(index) == key) {
-                // This used to be a bucket for a key that got removed, or we are overwriting the value for an
-                // existing key.
+            if (indexMethod == IndexMethod.PUT && keyIsDead[index]) {
+                // This used to be a bucket for a key that got removed, so it's free for reuse!
                 outIndex.set(index);
                 return;
             }

@@ -68,8 +68,7 @@ public final class HeapPool<T> {
         final List<T> items = getItemsInUse();
         if (items.size() > index) {
             T movedItem = items.get(index); // An old item was moved to fill in the place of the removed item
-            itemIndices.remove(movedItem);
-            itemIndices.put(movedItem, IntegerCache.getFor(index));
+            itemIndices.replace(movedItem, IntegerCache.getFor(index));
         }
     }
 
