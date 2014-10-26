@@ -1,11 +1,12 @@
-package tiltadv.scene;
+package tiltadv.data;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import dhcoder.support.time.Duration;
+import tiltadv.assets.Tile;
 
 /**
- * A tile that never changes its image
- */
+* A tile that never changes its image
+*/
 public final class StaticTile implements Tile {
 
     private TextureRegion image;

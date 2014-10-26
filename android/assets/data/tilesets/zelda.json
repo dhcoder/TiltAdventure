@@ -1,5 +1,5 @@
 {
 	"imagePath": "images/tilesets/zelda.png",
-	"tileX": 16,
-	"tileY": 16
+	"tileWidth": 16,
+	"tileHeight": 16
 }

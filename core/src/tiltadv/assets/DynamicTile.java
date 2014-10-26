@@ -1,15 +1,16 @@
-package tiltadv.scene;
+package tiltadv.data;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import dhcoder.support.time.Duration;
+import tiltadv.assets.Tile;
 
 /**
- * A tile that animates over time
- */
+* A tile that animates over time
+*/
 public final class DynamicTile implements Tile {
 
-    private Animation animation;
+    private final Animation animation;
     private final Duration elapsedSoFar = Duration.zero();
 
     public DynamicTile(final Animation animation) {
@@ -27,4 +28,6 @@ public final class DynamicTile implements Tile {
     @Override
     public TextureRegion getImage() {
         return animation.getKeyFrame(elapsedSoFar.getSeconds());
+    }
 }
+

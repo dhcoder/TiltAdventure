@@ -1,5 +1,5 @@
 {
 	"imagePath": "images/tilesets/grass.png",
-	"tileX": 16,
-	"tileY": 16		
+	"tileWidth": 16,
+	"tileHeight": 16		
 }

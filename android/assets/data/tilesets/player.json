@@ -1,5 +1,5 @@
 {
 	"imagePath": "images/tilesets/player.png",
-	"tileX": 16,
-	"tileY": 24		
+	"tileWidth": 16,
+	"tileHeight": 24		
 }

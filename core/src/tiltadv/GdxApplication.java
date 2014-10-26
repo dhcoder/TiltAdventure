@@ -4,11 +4,13 @@ import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Json;
 import dhcoder.libgdx.collision.CollisionSystem;
 import dhcoder.libgdx.collision.shape.Circle;
 import dhcoder.libgdx.collision.shape.Rectangle;
@@ -20,6 +22,8 @@ import dhcoder.support.collection.ArrayMap;
 import dhcoder.support.math.Angle;
 import dhcoder.support.memory.Pool;
 import dhcoder.support.time.Duration;
+import tiltadv.assets.ImageCollection;
+import tiltadv.assets.TilesetCollection;
 import tiltadv.components.behavior.OctoBehaviorComponent;
 import tiltadv.components.behavior.OscillationBehaviorComponent;
 import tiltadv.components.behavior.PlayerBehaviorComponent;
@@ -61,6 +65,7 @@ import tiltadv.globals.Tiles;
 import tiltadv.input.TouchSystem;
 import tiltadv.input.Vibrator;
 import tiltadv.memory.Pools;
+import tiltadv.serialization.TilesetSerializer;
 
 import static com.badlogic.gdx.math.MathUtils.cos;
 import static com.badlogic.gdx.math.MathUtils.sin;
@@ -101,6 +106,7 @@ public final class GdxApplication extends ApplicationAdapter {
         font = new BitmapFont();
 
         initializeServices();
+        initializeAssets();
         initializeEntities();
 
         Gdx.input.setInputProcessor(new InputAdapter() {
@@ -158,6 +164,10 @@ public final class GdxApplication extends ApplicationAdapter {
     }
 
     private void initializeServices() {
+        Services.register(ImageCollection.class, new ImageCollection());
+        Services.register(TilesetCollection.class, new TilesetCollection());
+        Services.register(Json.class, new Json());
+
         collisionSystem = new CollisionSystem(ENTITY_COUNT);
         Services.register(CollisionSystem.class, collisionSystem);
 
@@ -173,6 +183,19 @@ public final class GdxApplication extends ApplicationAdapter {
         Services.register(TouchSystem.class, touchSystem);
 
         Services.register(Vibrator.class, new Vibrator());
+
+    }
+
+    private void initializeAssets() {
+        final FileHandle[] tilesetFiles = Gdx.files.internal("data/tilesets").list();
+        for (int i = 0; i < tilesetFiles.length; ++i) {
+            TilesetSerializer.load(tilesetFiles[i].path());
+        }
+
+        final FileHandle[] animationFiles = Gdx.files.internal("data/animations").list();
+        for (int i = 0; i < tilesetFiles.length; ++i) {
+            TilesetSerializer.load(tilesetFiles[i].path());
+        }
     }
 
     private void initializeEntities() {
