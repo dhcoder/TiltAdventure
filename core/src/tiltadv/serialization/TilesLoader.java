@@ -11,8 +11,6 @@ import tiltadv.assets.Tileset;
 import tiltadv.assets.TilesetDatastore;
 import tiltadv.globals.Services;
 
-import java.util.ArrayList;
-
 /**
  * Class that loads {@link TextureRegion}s into our {@link TileDatastore}.
  */
@@ -20,7 +18,7 @@ public final class TilesLoader {
 
     private final static class TileGroupData {
         public String tilesetPath;
-        public ArrayList<TileData> tiles;
+        public TileData[] tiles;
     }
 
     private final static class TileData {
@@ -43,9 +41,8 @@ public final class TilesLoader {
         String groupName = fileHandle.nameWithoutExtension();
 
         TileGroup tileGroup = new TileGroup();
-        final int numTiles = groupData.tiles.size();
-        for (int i = 0; i < numTiles; ++i) {
-            TileData tileData = groupData.tiles.get(i);
+        for (int i = 0; i < groupData.tiles.length; ++i) {
+            TileData tileData = groupData.tiles[i];
             tileGroup.add(tileData.name,
                 new TextureRegion(tileTexture, tileData.coord[0] * tileW, tileData.coord[1] * tileH, tileW, tileH));
         }

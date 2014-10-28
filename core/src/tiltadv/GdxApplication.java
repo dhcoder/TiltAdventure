@@ -92,7 +92,6 @@ public final class GdxApplication extends ApplicationAdapter {
     private static final float MAX_DELTA_TIME_SECS = 1f / 30f;
     private static final Duration ENEMY_INVINCIBILITY_DURATION = Duration.zero();
     private static final Duration BOULDER_OSCILLATION_DURATION = Duration.fromSeconds(2f);
-    public static final int UI_ELEMENT_COUNT = 200;
     private BitmapFont font;
     private ShapeRenderer shapeRenderer;
     private EntityManager entities;

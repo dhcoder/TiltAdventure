@@ -21,6 +21,7 @@ public final class SceneLoader {
         public int numRows;
         public float offsetX;
         public float offsetY;
+        public int[][] tilePalette;
         public int[] tiles;
     }
 
@@ -38,7 +39,8 @@ public final class SceneLoader {
 
         for (int i = 0; i < sceneData.tiles.length; i++) {
             int tileIndex = sceneData.tiles[i];
-            final TextureRegion tile = tileset.getTile(tileIndex);
+            int[] tileCoords = sceneData.tilePalette[tileIndex];
+            final TextureRegion tile = tileset.getTile(tileCoords[0], tileCoords[1]);
             scene.setTile(i, tile);
         }
         scenes.add(sceneName, scene);
