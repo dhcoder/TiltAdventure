@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.utils.Json;
 import dhcoder.libgdx.collision.CollisionSystem;
 import dhcoder.libgdx.collision.shape.Circle;
@@ -115,6 +116,8 @@ public final class GdxApplication extends ApplicationAdapter {
             Scene.RUN_SANITY_CHECKS = DevSettings.RUN_SANITY_CHECKS;
         }
         font = new BitmapFont();
+
+        Box2D.init();
 
         initializeServices();
         initializeAssets();
