@@ -53,8 +53,9 @@ public final class PhysicsSystem {
     private static final int POSITION_ITERATIONS = 2;
     private final World world;
     private final Opt<PostUpdateMethod> postUpdateMethodOpt = Opt.withNoValue();
-    private Box2DDebugRenderer collisionRenderer;
     private Array<Body> bodies;
+    private Box2DDebugRenderer collisionRenderer;
+    private Matrix4 debugRenderMatrix;
 
     public PhysicsSystem() {
         this.world = new World(new Vector2(0f, 0f), true);
@@ -84,12 +85,14 @@ public final class PhysicsSystem {
         }
     }
 
-    public void debugRender(final Matrix4 cameraMatrix) {
+    public void debugRender(final Matrix4 cameraMatrix, final float pixelsToMeters) {
         if (collisionRenderer == null) {
             collisionRenderer = new Box2DDebugRenderer();
+            debugRenderMatrix = new Matrix4();
         }
 
-        collisionRenderer.render(world, cameraMatrix);
+        debugRenderMatrix.set(cameraMatrix).scl(pixelsToMeters);
+        collisionRenderer.render(world, debugRenderMatrix);
     }
 
     public void dispose() {

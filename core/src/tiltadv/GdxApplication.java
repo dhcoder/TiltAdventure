@@ -47,6 +47,7 @@ import tiltadv.components.input.KeyboardInputComponent;
 import tiltadv.globals.Animations;
 import tiltadv.globals.DevSettings;
 import tiltadv.globals.EntityId;
+import tiltadv.globals.Physics;
 import tiltadv.globals.RenderLayer;
 import tiltadv.globals.Services;
 import tiltadv.globals.Tiles;
@@ -139,7 +140,7 @@ public final class GdxApplication extends ApplicationAdapter {
         renderSystem.render();
 
         if (DevSettings.IN_DEV_MODE && DevSettings.SHOW_COLLISION_SHAPES) {
-            physicsSystem.debugRender(renderSystem.getCamera().combined);
+            physicsSystem.debugRender(renderSystem.getCamera().combined, Physics.METERS_TO_PIXELS);
         }
     }
 
@@ -264,7 +265,7 @@ public final class GdxApplication extends ApplicationAdapter {
                 Pools.vector2s.freeCount(1);
                 entity.addComponent(HeadingComponent.class);
                 CircleShape circleShape = new CircleShape();
-                circleShape.setRadius(8f);
+                circleShape.setRadius(8f * Physics.PIXELS_TO_METERS);
                 entity.addComponent(BodyComponent.class).setBodyType(BodyDef.BodyType.DynamicBody)
                     .setShape(circleShape);
                 entity.addComponent(TiltComponent.class);
@@ -435,42 +436,35 @@ public final class GdxApplication extends ApplicationAdapter {
 
     private void addBoundaryWalls() {
         Scene scene = Services.get(SceneDatastore.class).get("demo");
-        float halfSceneW = scene.getWidth() / 2f;
-        float halfSceneH = scene.getHeight() / 2f;
-        float halfWallSize = 10f;
-        float top = halfSceneH + halfWallSize;
-        float bottom = -halfSceneH - halfWallSize;
-        float left = -halfSceneW - halfWallSize;
-        float right = halfSceneW + halfWallSize;
+        float halfSceneW = (scene.getWidth() / 2f) * Physics.PIXELS_TO_METERS;
+        float halfSceneH = (scene.getHeight() / 2f) * Physics.PIXELS_TO_METERS;
+        float halfWallSize = 10f * Physics.PIXELS_TO_METERS;
+        float top = (halfSceneH + halfWallSize) * Physics.PIXELS_TO_METERS;
+        float bottom = (-halfSceneH - halfWallSize) * Physics.PIXELS_TO_METERS;
+        float left = (-halfSceneW - halfWallSize) * Physics.PIXELS_TO_METERS;
+        float right = (halfSceneW + halfWallSize) * Physics.PIXELS_TO_METERS;
 
         Entity wallLeft = entities.newEntityFromTemplate(EntityId.BOUNDARY);
         Entity wallRight = entities.newEntityFromTemplate(EntityId.BOUNDARY);
         Entity wallBottom = entities.newEntityFromTemplate(EntityId.BOUNDARY);
         Entity wallTop = entities.newEntityFromTemplate(EntityId.BOUNDARY);
 
-        top = 10f;
-        bottom = -10f;
-        left = -10f;
-        right = 10f;
-
         final PolygonShape verticalWall = new PolygonShape();
-        verticalWall.setAsBox(1f, 5f);
-//        verticalWall.setAsBox(halfWallSize, halfSceneH);
+        verticalWall.setAsBox(halfWallSize, halfSceneH);
         final PolygonShape horizontalWall = new PolygonShape();
-        horizontalWall.setAsBox(5f, 1f);
-//        horizontalWall.setAsBox(halfSceneW, halfWallSize);
+        horizontalWall.setAsBox(halfSceneW, halfWallSize);
 
         Vector2 wallPos = Pools.vector2s.grabNew();
-        wallPos.set(left, 0f);
+        wallPos.set(left * Physics.METERS_TO_PIXELS, 0f);
         wallLeft.requireComponent(BodyComponent.class).setPosition(wallPos).setShape(verticalWall);
 
-        wallPos.set(right, 0f);
+        wallPos.set(right * Physics.METERS_TO_PIXELS, 0f);
         wallRight.requireComponent(BodyComponent.class).setPosition(wallPos).setShape(verticalWall);
 
-        wallPos.set(0f, bottom);
+        wallPos.set(0f, bottom * Physics.METERS_TO_PIXELS);
         wallBottom.requireComponent(BodyComponent.class).setPosition(wallPos).setShape(horizontalWall);
 
-        wallPos.set(0f, top);
+        wallPos.set(0f, top * Physics.METERS_TO_PIXELS);
         wallTop.requireComponent(BodyComponent.class).setPosition(wallPos).setShape(horizontalWall);
 
         Pools.vector2s.free(wallPos);
