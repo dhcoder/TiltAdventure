@@ -34,7 +34,7 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
         UPDATE,
     }
 
-    private static final float TILT_MULTIPLIER = 20f;
+    private static final float TILT_MULTIPLIER = 5f;
     private static final Duration STOP_DURATION = Duration.fromSeconds(.3f);
     private static final Duration FROZEN_DURATION = Duration.fromSeconds(.3f);
 
