@@ -1,11 +1,11 @@
 package tiltadv.globals;
 
-import dhcoder.libgdx.collision.CollisionSystem;
+import com.badlogic.gdx.physics.box2d.Filter;
 
 /**
- * Collection of collision groups. See also {@link CollisionSystem}.
+ * Collection of collision groups. Used with Box2D {@link Filter}s.
  */
-public final class Group {
+public final class Category {
     public static final int OBSTACLES = 1 << 0;
     public static final int PLAYER = 1 << 1;
     public static final int ENEMY = 1 << 2;

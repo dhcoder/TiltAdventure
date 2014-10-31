@@ -8,15 +8,13 @@ import dhcoder.support.event.EventListener;
 import dhcoder.support.math.Angle;
 import dhcoder.support.opt.Opt;
 import dhcoder.support.time.Duration;
-import tiltadv.components.body.PositionComponent;
-import tiltadv.components.hierarchy.OffsetComponent;
 import tiltadv.globals.Events;
 import tiltadv.memory.Pools;
 
 import static dhcoder.support.contract.ContractUtils.requireNonNull;
 
 /**
- * Component that renders a character which can move in any of the cardinal directions.
+ * Component that renders an effect which lets you see which Entity has been selected
  */
 public final class TargetDisplayComponent extends AbstractComponent {
 
@@ -32,12 +30,13 @@ public final class TargetDisplayComponent extends AbstractComponent {
 
     private Opt<Entity> targetEntityOpt = Opt.withNoValue();
 
-    private OffsetComponent offsetComponent;
+    // TODO: Use JointComponent instead
+//    private OffsetComponent offsetComponent;
     private final EventListener<Entity> onTargetSelected = new EventListener<Entity>() {
         @Override
         public void run(final Entity sender) {
             targetEntityOpt.set(sender);
-            offsetComponent.setSourcePosition(sender.requireComponent(PositionComponent.class));
+//            offsetComponent.setSourcePosition(sender.requireComponent(PositionComponent.class));
             spriteComponent.setHidden(false);
 
         }
@@ -46,7 +45,7 @@ public final class TargetDisplayComponent extends AbstractComponent {
         @Override
         public void run(final Entity sender) {
             targetEntityOpt.clear();
-            offsetComponent.clearSourcePosition();
+//            offsetComponent.clearSourcePosition();
             spriteComponent.setHidden(true);
         }
     };;
@@ -63,7 +62,7 @@ public final class TargetDisplayComponent extends AbstractComponent {
         spriteComponent.setTextureRegion(textureRegion);
         spriteComponent.setHidden(true);
 
-        offsetComponent = owner.requireComponent(OffsetComponent.class);
+//        offsetComponent = owner.requireComponent(OffsetComponent.class);
 
         Events.onTargetSelected.addListener(onTargetSelected);
         Events.onTargetCleared.addListener(onTargetCleared);
@@ -84,7 +83,7 @@ public final class TargetDisplayComponent extends AbstractComponent {
         angle.setDegrees(elapsedSoFar.getSeconds() / LOOP_DURATION.getSeconds() * 360f);
         Vector2 offset = Pools.vector2s.grabNew().set(TARGET_RADIUS, 0f);
         offset.rotate(angle.getDegrees());
-        offsetComponent.setOffset(offset);
+//        offsetComponent.setOffset(offset);
         Pools.vector2s.freeCount(1);
     }
 

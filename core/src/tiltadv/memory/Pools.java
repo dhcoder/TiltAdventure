@@ -22,9 +22,9 @@ import dhcoder.support.time.Duration;
 public final class Pools {
 
     public static final Pool<Angle> angles = Pool.of(Angle.class);
-    public static final Pool<BodyDef> bodyDefs = BodyDefBuilder.build();
+    public static final Pool<BodyDef> bodyDefs = BodyDefBuilder.build(1);
     public static final Pool<Duration> durations = Pool.of(Duration.class);
-    public static final Pool<FixtureDef> fixtureDefs = FixtureDefBuilder.build();
+    public static final Pool<FixtureDef> fixtureDefs = FixtureDefBuilder.build(1);
     public static final Pool<Opt> opts = Pool.of(Opt.class);
     public static final Pool<Quaternion> quaternions = QuaternionPoolBuilder.build();
     public static final Pool<Vector2> vector2s = Vector2PoolBuilder.build();

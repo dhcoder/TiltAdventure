@@ -2,7 +2,6 @@ package tiltadv.components.hierarchy.children;
 
 import dhcoder.libgdx.entity.Entity;
 import tiltadv.components.hierarchy.ChildrenComponent;
-import tiltadv.globals.EntityId;
 
 /**
  * Class that contains a list of children entities for this {@link Entity}.
@@ -21,11 +20,11 @@ public final class PlayerChildrenComponent extends ChildrenComponent {
 
     @Override
     protected void handleInitialize(final Entity owner) {
-        swordEntity = owner.getManager().newEntityFromTemplate(EntityId.PLAYER_SWORD);
-        add(swordEntity);
-
-        sensorEntity = owner.getManager().newEntityFromTemplate(EntityId.PLAYER_SENSOR);
-        add(sensorEntity);
+//        swordEntity = owner.getManager().newEntityFromTemplate(EntityId.PLAYER_SWORD);
+//        add(swordEntity);
+//
+//        sensorEntity = owner.getManager().newEntityFromTemplate(EntityId.PLAYER_SENSOR);
+//        add(sensorEntity);
 
 //        Entity testEntity = owner.getManager().newEntity();
 //        testEntity.addComponent(ParentComponent.class);

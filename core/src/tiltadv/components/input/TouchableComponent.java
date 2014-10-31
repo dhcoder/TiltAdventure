@@ -1,9 +1,9 @@
 package tiltadv.components.input;
 
 import com.badlogic.gdx.math.Vector2;
-import dhcoder.libgdx.collision.shape.Circle;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
+import dhcoder.support.shape.Circle;
 import tiltadv.components.body.PositionComponent;
 import tiltadv.globals.Services;
 import tiltadv.input.TouchSystem;
@@ -13,7 +13,7 @@ import tiltadv.input.TouchSystem;
  */
 public abstract class TouchableComponent extends AbstractComponent {
 
-    private static final Circle TOUCH_AREA = new Circle(20.0f);
+    private static final Circle TOUCH_AREA = new Circle(20f);
     private PositionComponent positionComponent;
     private boolean selected;
 

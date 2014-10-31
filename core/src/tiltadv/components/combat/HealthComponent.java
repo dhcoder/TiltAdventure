@@ -4,7 +4,6 @@ import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.time.Duration;
-import tiltadv.components.body.MotionComponent;
 import tiltadv.components.display.SpriteComponent;
 
 import static dhcoder.support.contract.ContractUtils.requireNonNull;
@@ -28,7 +27,6 @@ public final class HealthComponent extends AbstractComponent {
     private boolean isInvincible;
     private Listener listener;
     private DefenseComponent defenseComponent;
-    private MotionComponent motionComponent;
     private SpriteComponent spriteComponent;
     private KnockbackComponent knockbackComponent;
 
@@ -54,7 +52,6 @@ public final class HealthComponent extends AbstractComponent {
         requireNonNull(listener, "HealthComponent listener must be set");
 
         defenseComponent = owner.requireComponent(DefenseComponent.class);
-        motionComponent = owner.requireComponent(MotionComponent.class);
         spriteComponent = owner.requireComponent(SpriteComponent.class);
         knockbackComponent = owner.requireComponent(KnockbackComponent.class);
     }
@@ -78,7 +75,6 @@ public final class HealthComponent extends AbstractComponent {
         isInvincible = false;
         listener = null;
         defenseComponent = null;
-        motionComponent = null;
         spriteComponent = null;
         knockbackComponent = null;
     }

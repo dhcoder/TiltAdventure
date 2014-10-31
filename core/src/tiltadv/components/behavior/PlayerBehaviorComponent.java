@@ -9,9 +9,9 @@ import dhcoder.support.state.StateMachine;
 import dhcoder.support.state.StateTransitionHandler;
 import dhcoder.support.time.Duration;
 import tiltadv.components.body.HeadingComponent;
-import tiltadv.components.body.MotionComponent;
 import tiltadv.components.body.PositionComponent;
 import tiltadv.components.body.TiltComponent;
+import tiltadv.components.box2d.BodyComponent;
 import tiltadv.components.combat.HealthComponent;
 import tiltadv.globals.Events;
 import tiltadv.globals.Services;
@@ -34,7 +34,7 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
         UPDATE,
     }
 
-    private static final float TILT_MULTIPLIER = 70f;
+    private static final float TILT_MULTIPLIER = 20f;
     private static final Duration STOP_DURATION = Duration.fromSeconds(.3f);
     private static final Duration FROZEN_DURATION = Duration.fromSeconds(.3f);
 
@@ -59,7 +59,7 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
     private Entity swordEntity;
     private PositionComponent positionComponent;
     private HeadingComponent headingComponent;
-    private MotionComponent motionComponent;
+    private BodyComponent bodyComponent;
     private TiltComponent tiltComponent;
 
     public PlayerBehaviorComponent() {
@@ -71,7 +71,7 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
         this.owner = owner;
         positionComponent = owner.requireComponent(PositionComponent.class);
         headingComponent = owner.requireComponent(HeadingComponent.class);
-        motionComponent = owner.requireComponent(MotionComponent.class);
+        bodyComponent = owner.requireComponent(BodyComponent.class);
         tiltComponent = owner.requireComponent(TiltComponent.class);
         owner.requireComponent(HealthComponent.class).setListener(this);
 
@@ -110,7 +110,7 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
 
         positionComponent = null;
         headingComponent = null;
-        motionComponent = null;
+        bodyComponent = null;
         tiltComponent = null;
 
         selectedTargetOpt.clear();
@@ -146,12 +146,14 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
                 Vector2 tilt = tiltComponent.getTilt();
                 if (!tilt.isZero()) {
                     Vector2 velocity = Pools.vector2s.grabNew().set(tilt).scl(TILT_MULTIPLIER);
-                    motionComponent.setVelocity(velocity);
+                    bodyComponent.setVelocity(velocity);
                     Pools.vector2s.free(velocity);
                     return State.MOVING;
                 }
                 else {
-                    motionComponent.stopSmoothly(STOP_DURATION);
+                    Vector2 standstillVelocity = Pools.vector2s.grabNew();
+                    bodyComponent.setPosition(standstillVelocity);
+                    Pools.vector2s.freeCount(1);
                     return State.STANDING;
                 }
             }

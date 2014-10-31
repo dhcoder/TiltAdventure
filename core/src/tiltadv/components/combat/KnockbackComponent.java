@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.time.Duration;
-import tiltadv.components.body.MotionComponent;
+import tiltadv.components.box2d.BodyComponent;
 import tiltadv.memory.Pools;
 
 /**
@@ -16,7 +16,7 @@ public final class KnockbackComponent extends AbstractComponent {
     public static final Duration DURATION = Duration.fromSeconds(.3f);
 
     private float multiplier;
-    private MotionComponent motionComponent;
+    private BodyComponent bodyComponent;
 
     public KnockbackComponent() { reset(); }
 
@@ -27,13 +27,13 @@ public final class KnockbackComponent extends AbstractComponent {
 
     @Override
     public void initialize(final Entity owner) {
-        motionComponent = owner.requireComponent(MotionComponent.class);
+        bodyComponent = owner.requireComponent(BodyComponent.class);
     }
 
     @Override
     public void reset() {
         multiplier = 1;
-        motionComponent = null;
+        bodyComponent = null;
     }
 
     public void knockback(final Vector2 direction) {
@@ -43,7 +43,7 @@ public final class KnockbackComponent extends AbstractComponent {
     public void knockback(final Vector2 direction, final float additionalMultiplier) {
         Vector2 impulse =
             Pools.vector2s.grabNew().set(direction).scl(KNOCKBACK_MAGNITUTDE * multiplier * additionalMultiplier);
-        motionComponent.setImpulse(impulse, DURATION);
+        bodyComponent.applyImpulse(impulse);
         Pools.vector2s.freeCount(1);
     }
 

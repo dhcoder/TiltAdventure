@@ -9,7 +9,7 @@ import dhcoder.support.math.CardinalDirection;
 import dhcoder.support.math.CompassDirection;
 import dhcoder.support.time.Duration;
 import tiltadv.components.body.HeadingComponent;
-import tiltadv.components.body.MotionComponent;
+import tiltadv.components.box2d.BodyComponent;
 
 /**
  * Component that renders a character which can move in any of the cardinal directions.
@@ -35,7 +35,7 @@ public final class CharacterDisplayComponent extends AbstractComponent {
     private boolean activeFlipX;
     private boolean isCardinal;
 
-    private MotionComponent motionComponent;
+    private BodyComponent bodyComponent;
     private HeadingComponent headingComponent;
     private SpriteComponent spriteComponent;
 
@@ -55,7 +55,7 @@ public final class CharacterDisplayComponent extends AbstractComponent {
     @Override
     public void initialize(final Entity owner) {
         spriteComponent = owner.requireComponent(SpriteComponent.class);
-        motionComponent = owner.requireComponent(MotionComponent.class);
+        bodyComponent = owner.requireComponent(BodyComponent.class);
         headingComponent = owner.requireComponent(HeadingComponent.class);
 
         spriteComponent.setTextureRegion(activeAnim.getKeyFrame(0));
@@ -63,7 +63,7 @@ public final class CharacterDisplayComponent extends AbstractComponent {
 
     @Override
     public void update(final Duration elapsedTime) {
-        Vector2 velocity = motionComponent.getVelocity();
+        Vector2 velocity = bodyComponent.getVelocity();
 
         if (!velocity.isZero()) {
             elapsedSoFar += elapsedTime.getSeconds();
@@ -110,7 +110,7 @@ public final class CharacterDisplayComponent extends AbstractComponent {
         activeCompassDirection = CompassDirection.S;
         activeFlipX = false;
 
-        motionComponent = null;
+        bodyComponent = null;
         headingComponent = null;
         spriteComponent = null;
     }
