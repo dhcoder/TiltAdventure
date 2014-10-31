@@ -14,16 +14,11 @@ public abstract class LerpComponent extends AbstractComponent {
 
     private final Duration duration = Duration.zero();
     private final Duration accumulated = Duration.zero();
-    private Interpolation interpolator;
+    private Interpolation interpolator = Interpolation.sine;
     private boolean isActive;
-    private boolean firstLerp;
+    private boolean firstLerp = true;
     private boolean onReturnTrip;
     private boolean shouldLoop;
-
-    public LerpComponent() {
-        handleConstruction();
-        reset();
-    }
 
     public final void setInterpolator(final Interpolation interpolator) {
         this.interpolator = interpolator;
@@ -126,10 +121,6 @@ public abstract class LerpComponent extends AbstractComponent {
 
     protected void handleLerpActivated() {}
     protected void handleLerpDeactivated() {}
-
-    // Hack needed because constructor calls reset -> handleReset, which calls into base class before base class
-    // fields are initialized...
-    protected abstract void handleConstruction();
 
     protected void handleInitialize(final Entity owner) {}
 

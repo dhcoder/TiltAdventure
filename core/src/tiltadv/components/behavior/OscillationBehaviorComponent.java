@@ -12,20 +12,14 @@ import tiltadv.memory.Pools;
 */
 public final class OscillationBehaviorComponent extends LerpComponent {
 
-    private Vector2 from;
-    private Vector2 to;
+    private final Vector2 from = new Vector2();
+    private final Vector2 to = new Vector2();
     private BodyComponent bodyComponent;
 
     public OscillationBehaviorComponent() {
         super();
         setShouldLoop(true);
         setActive(true);
-    }
-
-    @Override
-    protected void handleConstruction() {
-        from = new Vector2();
-        to = new Vector2();
     }
 
     public OscillationBehaviorComponent setOscillation(final Vector2 from, final Vector2 to, final Duration duration) {
