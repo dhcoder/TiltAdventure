@@ -7,10 +7,8 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.utils.Json;
 import dhcoder.libgdx.collision.CollisionSystem;
 import dhcoder.libgdx.collision.shape.Circle;
@@ -65,6 +63,7 @@ import tiltadv.components.input.touchables.TargetTouchableComponent;
 import tiltadv.globals.Animations;
 import tiltadv.globals.DevSettings;
 import tiltadv.globals.EntityId;
+import dhcoder.libgdx.physics.PhysicsSystem;
 import tiltadv.globals.RenderLayer;
 import tiltadv.globals.Services;
 import tiltadv.globals.Tiles;
@@ -94,10 +93,9 @@ public final class GdxApplication extends ApplicationAdapter {
     private static final Duration ENEMY_INVINCIBILITY_DURATION = Duration.zero();
     private static final Duration BOULDER_OSCILLATION_DURATION = Duration.fromSeconds(2f);
     private BitmapFont font;
-    private ShapeRenderer shapeRenderer;
     private EntityManager entities;
-    private CollisionSystem collisionSystem;
     private RenderSystem renderSystem;
+
     private Shape octoBounds;
     private Shape playerBounds;
     private Shape gravityWellBounds;
@@ -106,18 +104,16 @@ public final class GdxApplication extends ApplicationAdapter {
     private Shape octoRockBounds;
     private Shape boulderBounds;
     private TouchSystem touchSystem;
+    private PhysicsSystem physicsSystem;
 
     public void create() {
         if (DevSettings.IN_DEV_MODE) {
-            shapeRenderer = new ShapeRenderer();
             Pool.RUN_SANITY_CHECKS = DevSettings.RUN_SANITY_CHECKS;
-            CollisionSystem.RUN_SANITY_CHECKS = DevSettings.RUN_SANITY_CHECKS;
             ArrayMap.RUN_SANITY_CHECKS = DevSettings.RUN_SANITY_CHECKS;
             Scene.RUN_SANITY_CHECKS = DevSettings.RUN_SANITY_CHECKS;
         }
         font = new BitmapFont();
 
-        Box2D.init();
 
         initializeServices();
         initializeAssets();
@@ -153,16 +149,18 @@ public final class GdxApplication extends ApplicationAdapter {
     public void render() {
         update();
 
-        Gdx.gl.glClearColor(1f, .88f, .66f, 1f); // Desert-ish color, for testing!
-//        Gdx.gl.glClearColor(.22f, .22f, .22f, 1f); // Grey-ish color, for seeing collision shapes
+        if (!DevSettings.IN_DEV_MODE) {
+            Gdx.gl.glClearColor(0f, 0f, 0f, 1f); // Desert-ish color, for testing!
+        }
+        else {
+            Gdx.gl.glClearColor(1f, 0f, 1f, 1f); // Nasty pink in debug mode
+        }
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         renderSystem.render();
 
         if (DevSettings.IN_DEV_MODE && DevSettings.SHOW_COLLISION_SHAPES) {
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-            collisionSystem.render(shapeRenderer);
-            shapeRenderer.end();
+            physicsSystem.debugRender(renderSystem.getCamera().combined);
         }
     }
 
@@ -171,10 +169,7 @@ public final class GdxApplication extends ApplicationAdapter {
         font.dispose();
         Services.get(ImageDatastore.class).dispose();
         renderSystem.dispose();
-
-        if (DevSettings.IN_DEV_MODE) {
-            shapeRenderer.dispose();
-        }
+        physicsSystem.dispose();
     }
 
     private void initializeServices() {
@@ -185,8 +180,8 @@ public final class GdxApplication extends ApplicationAdapter {
         Services.register(SceneDatastore.class, new SceneDatastore());
         Services.register(Json.class, new Json());
 
-        collisionSystem = new CollisionSystem(ENTITY_COUNT);
-        Services.register(CollisionSystem.class, collisionSystem);
+        physicsSystem = new PhysicsSystem();
+        Services.register(PhysicsSystem.class, physicsSystem);
 
         // TODO: Tune the application for the best batch size for render system
         // https://github.com/libgdx/libgdx/wiki/Spritebatch,-Textureregions,-and-Sprites#performance-tuning
@@ -500,23 +495,22 @@ public final class GdxApplication extends ApplicationAdapter {
     }
 
     private void update() {
-        int mark = Pools.durations.mark();
-        Duration elapsedTime = Pools.durations.grabNew();
-        elapsedTime.setSeconds(Math.min(Gdx.graphics.getRawDeltaTime(), MAX_DELTA_TIME_SECS));
-        if (DevSettings.IN_DEV_MODE) {
-            elapsedTime.setSeconds(elapsedTime.getSeconds() / DevSettings.SLOW_MO_FACTOR);
+        {
+            int mark = Pools.durations.mark();
+            Duration elapsedTime = Pools.durations.grabNew();
+            elapsedTime.setSeconds(Math.min(Gdx.graphics.getRawDeltaTime(), MAX_DELTA_TIME_SECS));
+            if (DevSettings.IN_DEV_MODE) {
+                elapsedTime.setSeconds(elapsedTime.getSeconds() / DevSettings.SLOW_MO_FACTOR);
+            }
+
+            entities.update(elapsedTime);
+            physicsSystem.update(elapsedTime);
+            Pools.durations.freeToMark(mark);
         }
-
-        entities.update(elapsedTime);
-        Pools.durations.freeToMark(mark);
-
-        collisionSystem.triggerCollisions();
 
         renderSystem.update();
-        if (DevSettings.IN_DEV_MODE) {
-            shapeRenderer.setProjectionMatrix(renderSystem.getCamera().combined);
-        }
     }
+
 
     private Entity addPlayerEntity() {
         return entities.newEntityFromTemplate(EntityId.PLAYER);
