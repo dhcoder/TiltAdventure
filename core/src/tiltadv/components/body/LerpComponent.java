@@ -41,6 +41,12 @@ public abstract class LerpComponent extends AbstractComponent {
     public final void initialize(final Entity owner) {
         requireTrue(!duration.isZero(), "Lerp duration should be set!");
         handleInitialize(owner);
+
+        if (isActive) {
+            firstLerp = false;
+            handleLerpActivated();
+            handleLerp(0f);
+        }
     }
 
     @Override

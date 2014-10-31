@@ -29,6 +29,7 @@ public final class BodyComponent extends PositionComponent {
     private Body body;
     private Shape shape;
     private boolean isFastMoving;
+    private boolean isDesiredPositionSet;
 
     @Override
     protected void handleConstruction() {
@@ -56,7 +57,8 @@ public final class BodyComponent extends PositionComponent {
      * scene's constraints.
      */
     public BodyComponent setPosition(final Vector2 position) {
-        desiredPosition.set(position);
+        desiredPosition.set(position).scl(Physics.PIXELS_TO_METERS);
+        isDesiredPositionSet = true;
         return this;
     }
 
@@ -87,6 +89,17 @@ public final class BodyComponent extends PositionComponent {
 
     @Override
     protected void handleUpdate(final Duration elapsedTime) {
+
+        if (isDesiredPositionSet) {
+            Vector2 deltaPosition = Pools.vector2s.grabNew();
+            deltaPosition.set(desiredPosition).sub(body.getPosition());
+            // We want to go this distance over the elapsed time... velocity = distance / time
+            velocity.set(deltaPosition).scl(1 / elapsedTime.getSeconds());
+            Pools.vector2s.freeCount(1);
+            body.setLinearVelocity(velocity);
+            isDesiredPositionSet = false;
+        }
+
         if (getVelocity().isZero(0.1f)) {
             velocity.setZero();
             setVelocity(velocity);
@@ -102,7 +115,10 @@ public final class BodyComponent extends PositionComponent {
             BodyDef bodyDef = Pools.bodyDefs.grabNew();
             bodyDef.type = bodyType;
             bodyDef.bullet = isFastMoving;
-            bodyDef.position.set(desiredPosition);
+            if (isDesiredPositionSet) {
+                bodyDef.position.set(desiredPosition);
+                isDesiredPositionSet = false;
+            }
             bodyDef.linearDamping = 10f;
             body = world.createBody(bodyDef);
             body.setUserData(this);
@@ -130,6 +146,7 @@ public final class BodyComponent extends PositionComponent {
 
         bodyType = BodyType.StaticBody;
         isFastMoving = false;
+        isDesiredPositionSet = false;
     }
 
     /**

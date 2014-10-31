@@ -84,7 +84,52 @@ public final class Entity implements Poolable {
             }
         }
 
-        throw new IllegalStateException(format("Entity doesn't have any instances of {0}", classType));
+        throw new IllegalStateException(format("Entity doesn't have any instances of {0}", classType.getSimpleName()));
+    }
+
+    /**
+     * Require that there be at least one instance of the specified {@link Component} on this entity, and that it exists
+     * earlier in the list than another component.
+     */
+    public <T extends Component> T requireComponentAfter(final Component otherComponent, final Class<T> classType)
+        throws IllegalStateException {
+        boolean isAfter = false;
+        int numComponets = components.size();
+        for (int i = 0; i < numComponets; i++) {
+            Component component = components.get(i);
+            if (component == otherComponent) {
+                isAfter = true;
+            }
+            if (classType.isInstance(component) && isAfter) {
+                return (T)component;
+            }
+        }
+
+        throw new IllegalStateException(
+            format("Entity doesn't have any instances of {0} after {1}", classType.getSimpleName(),
+                otherComponent.getClass().getSimpleName()));
+    }
+
+    /**
+     * Require that there be at least one instance of the specified {@link Component} on this entity, and that it exists
+     * before another component is found.
+     */
+    public <T extends Component> T requireComponentBefore(final Component otherComponent, final Class<T> classType)
+        throws IllegalStateException {
+        int numComponets = components.size();
+        for (int i = 0; i < numComponets; i++) {
+            Component component = components.get(i);
+            if (component == otherComponent) {
+                break;
+            }
+            if (classType.isInstance(component)) {
+                return (T)component;
+            }
+        }
+
+        throw new IllegalStateException(
+            format("Entity doesn't have any instances of {0} before {1}", classType.getSimpleName(),
+                otherComponent.getClass().getSimpleName()));
     }
 
     /**

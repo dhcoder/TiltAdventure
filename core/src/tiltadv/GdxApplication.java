@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Array;
@@ -20,6 +20,7 @@ import dhcoder.libgdx.entity.EntityManager;
 import dhcoder.libgdx.physics.PhysicsSystem;
 import dhcoder.libgdx.render.RenderSystem;
 import dhcoder.support.collection.ArrayMap;
+import dhcoder.support.math.Angle;
 import dhcoder.support.memory.Pool;
 import dhcoder.support.time.Duration;
 import tiltadv.assets.AnimationDatastore;
@@ -28,6 +29,7 @@ import tiltadv.assets.Scene;
 import tiltadv.assets.SceneDatastore;
 import tiltadv.assets.TileDatastore;
 import tiltadv.assets.TilesetDatastore;
+import tiltadv.components.behavior.OscillationBehaviorComponent;
 import tiltadv.components.behavior.PlayerBehaviorComponent;
 import tiltadv.components.body.FollowCameraComponent;
 import tiltadv.components.body.HeadingComponent;
@@ -59,6 +61,9 @@ import tiltadv.serialization.SceneLoader;
 import tiltadv.serialization.TilesLoader;
 import tiltadv.serialization.TilesetLoader;
 
+import static com.badlogic.gdx.math.MathUtils.cos;
+import static com.badlogic.gdx.math.MathUtils.sin;
+
 public final class GdxApplication extends ApplicationAdapter {
 
     public static final int ENTITY_COUNT = 200;
@@ -78,12 +83,12 @@ public final class GdxApplication extends ApplicationAdapter {
     private RenderSystem renderSystem;
 
     //    private Shape octoBounds;
-//    private Shape playerBounds;
-//    private Shape gravityWellBounds;
+    private CircleShape playerBounds;
+    //    private Shape gravityWellBounds;
 //    private Shape playerSensorBounds;
 //    private Shape playerSwordBounds;
 //    private Shape octoRockBounds;
-//    private Shape boulderBounds;
+    private CircleShape boulderBounds;
     private TouchSystem touchSystem;
     private PhysicsSystem physicsSystem;
 
@@ -225,11 +230,11 @@ public final class GdxApplication extends ApplicationAdapter {
 
 //        gravityWellBounds = new Circle(8.0f);
 //        octoBounds = new Circle(8.0f);
-//        playerBounds = new Circle(6.5f);
+        playerBounds = Physics.newCircle(6.5f);
 //        playerSensorBounds = new Circle(8.0f);
 //        playerSwordBounds = new Circle(5f);
 //        octoRockBounds = new Circle(Tiles.ROCK.getRegionWidth() / 2f);
-//        boulderBounds = new Circle(Tiles.BOULDER.getRegionWidth() / 2f);
+        boulderBounds = Physics.newCircle(8f);
 
         entities.registerTemplate(EntityId.BOUNDARY, new EntityManager.EntityCreator() {
             @Override
@@ -264,10 +269,7 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(SpriteComponent.class).setOffset(offset);
                 Pools.vector2s.freeCount(1);
                 entity.addComponent(HeadingComponent.class);
-                CircleShape circleShape = new CircleShape();
-                circleShape.setRadius(8f * Physics.PIXELS_TO_METERS);
-                entity.addComponent(BodyComponent.class).setBodyType(BodyDef.BodyType.DynamicBody)
-                    .setShape(circleShape);
+                entity.addComponent(BodyComponent.class).setBodyType(BodyType.DynamicBody).setShape(playerBounds);
                 entity.addComponent(TiltComponent.class);
                 entity.addComponent(Gdx.app.getType() == ApplicationType.Android ? AccelerometerInputComponent.class :
                     KeyboardInputComponent.class);
@@ -307,16 +309,14 @@ public final class GdxApplication extends ApplicationAdapter {
 //            }
 //        });
 
-//        entities.registerTemplate(EntityId.BOULDER, new EntityManager.EntityCreator() {
-//            @Override
-//            public void initialize(final Entity entity) {
-//                entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.BOULDER);
-//                entity.addComponent(PositionComponent.class);
-//                entity.addComponent(OscillationBehaviorComponent.class);
-//                entity.addComponent(ObstacleCollisionComponent.class).setShape(boulderBounds);
-//
-//            }
-//        });
+        entities.registerTemplate(EntityId.BOULDER, new EntityManager.EntityCreator() {
+            @Override
+            public void initialize(final Entity entity) {
+                entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.BOULDER);
+                entity.addComponent(OscillationBehaviorComponent.class);
+                entity.addComponent(BodyComponent.class).setShape(boulderBounds).setBodyType(BodyType.KinematicBody);
+            }
+        });
 
 //        entities.registerTemplate(EntityId.OCTO, new EntityManager.EntityCreator() {
 //            @Override
@@ -391,7 +391,7 @@ public final class GdxApplication extends ApplicationAdapter {
 //        addGravityWell(-90, -30);
         addMainCamera(playerEntity);
 //        addOctoEnemies();
-//        addMovingBoulderEntities();
+        addMovingBoulderEntities();
         addTiltIndicatorEntity(playerEntity);
         addFpsEntity();
         addBoundaryWalls();
@@ -436,54 +436,52 @@ public final class GdxApplication extends ApplicationAdapter {
 
     private void addBoundaryWalls() {
         Scene scene = Services.get(SceneDatastore.class).get("demo");
-        float halfSceneW = (scene.getWidth() / 2f) * Physics.PIXELS_TO_METERS;
-        float halfSceneH = (scene.getHeight() / 2f) * Physics.PIXELS_TO_METERS;
-        float halfWallSize = 10f * Physics.PIXELS_TO_METERS;
-        float top = (halfSceneH + halfWallSize) * Physics.PIXELS_TO_METERS;
-        float bottom = (-halfSceneH - halfWallSize) * Physics.PIXELS_TO_METERS;
-        float left = (-halfSceneW - halfWallSize) * Physics.PIXELS_TO_METERS;
-        float right = (halfSceneW + halfWallSize) * Physics.PIXELS_TO_METERS;
+        float halfSceneW = (scene.getWidth() / 2f);
+        float halfSceneH = (scene.getHeight() / 2f);
+        float halfWallSize = 10f;
+        float top = (halfSceneH + halfWallSize);
+        float bottom = (-halfSceneH - halfWallSize);
+        float left = (-halfSceneW - halfWallSize);
+        float right = (halfSceneW + halfWallSize);
 
         Entity wallLeft = entities.newEntityFromTemplate(EntityId.BOUNDARY);
         Entity wallRight = entities.newEntityFromTemplate(EntityId.BOUNDARY);
         Entity wallBottom = entities.newEntityFromTemplate(EntityId.BOUNDARY);
         Entity wallTop = entities.newEntityFromTemplate(EntityId.BOUNDARY);
 
-        final PolygonShape verticalWall = new PolygonShape();
-        verticalWall.setAsBox(halfWallSize, halfSceneH);
-        final PolygonShape horizontalWall = new PolygonShape();
-        horizontalWall.setAsBox(halfSceneW, halfWallSize);
+        final PolygonShape verticalWall = Physics.newRectangle(halfWallSize, halfSceneH);
+        final PolygonShape horizontalWall = Physics.newRectangle(halfSceneW, halfWallSize);
 
         Vector2 wallPos = Pools.vector2s.grabNew();
-        wallPos.set(left * Physics.METERS_TO_PIXELS, 0f);
+        wallPos.set(left, 0f);
         wallLeft.requireComponent(BodyComponent.class).setPosition(wallPos).setShape(verticalWall);
 
-        wallPos.set(right * Physics.METERS_TO_PIXELS, 0f);
+        wallPos.set(right, 0f);
         wallRight.requireComponent(BodyComponent.class).setPosition(wallPos).setShape(verticalWall);
 
-        wallPos.set(0f, bottom * Physics.METERS_TO_PIXELS);
+        wallPos.set(0f, bottom);
         wallBottom.requireComponent(BodyComponent.class).setPosition(wallPos).setShape(horizontalWall);
 
-        wallPos.set(0f, top * Physics.METERS_TO_PIXELS);
+        wallPos.set(0f, top);
         wallTop.requireComponent(BodyComponent.class).setPosition(wallPos).setShape(horizontalWall);
 
         Pools.vector2s.free(wallPos);
     }
 
-//    private void addMovingBoulderEntities() {
-//        final int numBoulders = 4;
-//        final float scaleX = 120;
-//        final float scaleY = 90;
-//        final float percent = .4f;
-//        for (int i = 0; i < numBoulders; ++i) {
-//            float circleDistance = (float)i / (float)numBoulders * Angle.TWO_PI;
-//            float xTo = scaleX * cos(circleDistance);
-//            float yTo = scaleY * sin(circleDistance);
-//            float xFrom = xTo * percent;
-//            float yFrom = yTo * percent;
-//            AddMovingBoulderEntity(xTo, yTo, xFrom, yFrom);
-//        }
-//    }
+    private void addMovingBoulderEntities() {
+        final int numBoulders = 100;
+        final float scaleX = 120;
+        final float scaleY = 90;
+        final float percent = .4f;
+        for (int i = 0; i < numBoulders; ++i) {
+            float circleDistance = (float)i / (float)numBoulders * Angle.TWO_PI;
+            float xTo = scaleX * cos(circleDistance);
+            float yTo = scaleY * sin(circleDistance);
+            float xFrom = xTo * percent;
+            float yFrom = yTo * percent;
+            AddMovingBoulderEntity(xTo, yTo, xFrom, yFrom);
+        }
+    }
 
     private void update() {
         {
@@ -515,18 +513,18 @@ public final class GdxApplication extends ApplicationAdapter {
 //        Pools.vector2s.free(position);
 //    }
 
-//    private void AddMovingBoulderEntity(final float xFrom, final float yFrom, final float xTo, final float yTo) {
-//        Entity boulderEntity = entities.newEntityFromTemplate(EntityId.BOULDER);
-//
-//        int mark = Pools.vector2s.mark();
-//        Vector2 from = Pools.vector2s.grabNew().set(xFrom, yFrom);
-//        Vector2 to = Pools.vector2s.grabNew().set(xTo, yTo);
-//
-//        boulderEntity.requireComponent(OscillationBehaviorComponent.class)
-//            .setOscillation(from, to, BOULDER_OSCILLATION_DURATION);
-//
-//        Pools.vector2s.freeToMark(mark);
-//    }
+    private void AddMovingBoulderEntity(final float xFrom, final float yFrom, final float xTo, final float yTo) {
+        Entity boulderEntity = entities.newEntityFromTemplate(EntityId.BOULDER);
+
+        int mark = Pools.vector2s.mark();
+        Vector2 from = Pools.vector2s.grabNew().set(xFrom, yFrom);
+        Vector2 to = Pools.vector2s.grabNew().set(xTo, yTo);
+
+        boulderEntity.requireComponent(OscillationBehaviorComponent.class)
+            .setOscillation(from, to, BOULDER_OSCILLATION_DURATION);
+
+        Pools.vector2s.freeToMark(mark);
+    }
 
     private void addFpsEntity() {
         entities.newEntityFromTemplate(EntityId.FPS_INDICATOR);

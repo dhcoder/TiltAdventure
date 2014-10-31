@@ -150,9 +150,6 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
                     return State.MOVING;
                 }
                 else {
-                    Vector2 standstillVelocity = Pools.vector2s.grabNew();
-                    bodyComponent.setPosition(standstillVelocity);
-                    Pools.vector2s.freeCount(1);
                     return State.STANDING;
                 }
             }
