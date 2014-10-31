@@ -9,6 +9,7 @@ import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.libgdx.physics.PhysicsSystem;
+import dhcoder.support.time.Duration;
 import tiltadv.components.body.PositionComponent;
 import tiltadv.globals.Physics;
 import tiltadv.globals.Services;
@@ -61,10 +62,6 @@ public final class BodyComponent extends PositionComponent {
 
     public BodyComponent setVelocity(final Vector2 velocity) {
 
-        if (!velocity.isZero()) {
-            int breakhere = 0;
-        }
-
         Vector2 physicsVelocity = Pools.vector2s.grabNew();
         physicsVelocity.set(velocity).scl(Physics.PIXELS_TO_METERS);
         body.setLinearVelocity(velocity);
@@ -89,6 +86,14 @@ public final class BodyComponent extends PositionComponent {
     }
 
     @Override
+    protected void handleUpdate(final Duration elapsedTime) {
+        if (getVelocity().isZero(0.1f)) {
+            velocity.setZero();
+            setVelocity(velocity);
+        }
+    }
+
+    @Override
     public void handleInitialize(final Entity owner) {
         requireNonNull(shape, "Body shape must be set");
 
@@ -98,7 +103,7 @@ public final class BodyComponent extends PositionComponent {
             bodyDef.type = bodyType;
             bodyDef.bullet = isFastMoving;
             bodyDef.position.set(desiredPosition);
-            bodyDef.linearDamping = 1f;
+            bodyDef.linearDamping = 10f;
             body = world.createBody(bodyDef);
             body.setUserData(this);
             Pools.bodyDefs.freeCount(1);
@@ -107,6 +112,7 @@ public final class BodyComponent extends PositionComponent {
         {
             FixtureDef fixtureDef = Pools.fixtureDefs.grabNew();
             fixtureDef.shape = shape;
+            fixtureDef.friction = 0f;
             body.createFixture(fixtureDef);
             Pools.fixtureDefs.freeCount(1);
             shape = null;
