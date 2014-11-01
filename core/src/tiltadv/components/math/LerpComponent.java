@@ -1,4 +1,4 @@
-package tiltadv.components.body;
+package tiltadv.components.math;
 
 import com.badlogic.gdx.math.Interpolation;
 import dhcoder.libgdx.entity.AbstractComponent;

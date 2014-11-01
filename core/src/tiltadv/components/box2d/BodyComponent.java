@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.joints.DistanceJointDef;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.libgdx.physics.PhysicsSystem;
 import dhcoder.support.math.Angle;
@@ -22,21 +23,22 @@ import static dhcoder.support.contract.ContractUtils.requireNonNull;
  * A component that encapsulates an entity's physical body - represented by a Box2D {@link Body}. This maintains the
  * knowledge of an entity's position, motion, and heading.
  */
-public final class BodyComponent extends PositionComponent {
+public final class BodyComponent extends PositionComponent<BodyComponent> {
 
-    private final Vector2 desiredPosition = new Vector2();
+    private final Vector2 gamePosition = new Vector2();
     private final Vector2 gameVelocity = new Vector2(); // Velocity in units of pixels per second
     private final Angle heading = Angle.fromRadians(0f);
     private BodyType bodyType = BodyType.StaticBody;
     private Body body;
     private Shape shape;
     private boolean isFastMoving;
-    private boolean isDesiredPositionSet;
+    private boolean syncPosition;
     private int headingLockedCount;
+    private boolean isSensor;
 
-    @Override
-    protected void handleConstruction() {
-        super.handleConstruction();
+    public BodyComponent setSensor(final boolean isSensor) {
+        this.isSensor = isSensor;
+        return this;
     }
 
     public BodyComponent setBodyType(final BodyType bodyType) {
@@ -59,10 +61,16 @@ public final class BodyComponent extends PositionComponent {
      * prevent this entity from getting there, at which point, this object should move as best as it can based on the
      * scene's constraints.
      */
+    @Override
     public BodyComponent setPosition(final Vector2 position) {
-        desiredPosition.set(position).scl(Physics.PIXELS_TO_METERS);
-        isDesiredPositionSet = true;
+        gamePosition.set(position);
+        syncPosition = true;
         return this;
+    }
+
+    @Override
+    public Vector2 getPosition() {
+        return gamePosition;
     }
 
     public BodyComponent setVelocity(final Vector2 velocity) {
@@ -105,6 +113,32 @@ public final class BodyComponent extends PositionComponent {
         headingLockedCount += (locked ? 1 : -1);
     }
 
+    public void joinTo(final BodyComponent target) {
+        if (target == this) {
+            throw new IllegalArgumentException("Can't join a body to itself");
+        }
+
+//        RevoluteJointDef revoluteJointDef = Pools.revoluteJointDefs.grabNew();
+//        revoluteJointDef.bodyA = this.body;
+//        revoluteJointDef.bodyB = target.body;
+//        revoluteJointDef.localAnchorA.set(this.body.getPosition());
+//        revoluteJointDef.localAnchorB.set(target.getPosition()).scl(-1f);
+//        revoluteJointDef.enableMotor = true;
+//        revoluteJointDef.motorSpeed = 50;
+
+        DistanceJointDef distanceJointDefs = Pools.distanceJointDefs.grabNew();
+        distanceJointDefs.bodyA = this.body;
+        distanceJointDefs.bodyB = target.body;
+        distanceJointDefs.localAnchorA.set(this.body.getPosition());
+        distanceJointDefs.localAnchorB.set(target.getPosition()).scl(-1f);
+
+        final World world = Services.get(PhysicsSystem.class).getWorld();
+//        world.createJoint(revoluteJointDef);
+        world.createJoint(distanceJointDefs);
+//        Pools.revoluteJointDefs.freeCount(1);
+        Pools.distanceJointDefs.freeCount(1);
+    }
+
     public BodyComponent applyImpulse(final Vector2 impulse) {
         Vector2 physicsImpulse = Pools.vector2s.grabNew();
         Vector2 bodyCenter = Pools.vector2s.grabNew();
@@ -123,16 +157,16 @@ public final class BodyComponent extends PositionComponent {
     @Override
     protected void handleUpdate(final Duration elapsedTime) {
 
-        if (isDesiredPositionSet) {
+        if (syncPosition) {
             final int mark = Pools.vector2s.mark();
             Vector2 velocity = Pools.vector2s.grabNew();
             Vector2 deltaPosition = Pools.vector2s.grabNew();
 
-            deltaPosition.set(desiredPosition).sub(body.getPosition());
+            deltaPosition.set(gamePosition).scl(Physics.PIXELS_TO_METERS).sub(body.getPosition());
             // We want to go this distance over the elapsed time... velocity = distance / time
             velocity.set(deltaPosition).scl(1 / elapsedTime.getSeconds());
             body.setLinearVelocity(velocity);
-            isDesiredPositionSet = false;
+            syncPosition = false;
 
             Pools.vector2s.freeToMark(mark);
         }
@@ -153,10 +187,9 @@ public final class BodyComponent extends PositionComponent {
             BodyDef bodyDef = Pools.bodyDefs.grabNew();
             bodyDef.type = bodyType;
             bodyDef.bullet = isFastMoving;
-            bodyDef.fixedRotation = true;
-            if (isDesiredPositionSet) {
-                bodyDef.position.set(desiredPosition);
-                isDesiredPositionSet = false;
+            if (syncPosition) {
+                bodyDef.position.set(gamePosition).scl(Physics.PIXELS_TO_METERS);
+                syncPosition = false;
             }
             bodyDef.linearDamping = 10f;
             body = world.createBody(bodyDef);
@@ -168,6 +201,9 @@ public final class BodyComponent extends PositionComponent {
         {
             FixtureDef fixtureDef = Pools.fixtureDefs.grabNew();
             fixtureDef.shape = shape;
+            fixtureDef.isSensor = isSensor;
+            fixtureDef.friction = 0f;
+            fixtureDef.density = 1f;
             body.createFixture(fixtureDef);
             Pools.fixtureDefs.freeCount(1);
             shape = null;
@@ -176,7 +212,7 @@ public final class BodyComponent extends PositionComponent {
 
     @Override
     public void handleReset() {
-        desiredPosition.setZero();
+        gamePosition.setZero();
         gameVelocity.setZero();
         heading.setRadians(0f);
         final World world = Services.get(PhysicsSystem.class).getWorld();
@@ -185,8 +221,9 @@ public final class BodyComponent extends PositionComponent {
         shape = null;
 
         bodyType = BodyType.StaticBody;
+        isSensor = false;
         isFastMoving = false;
-        isDesiredPositionSet = false;
+        syncPosition = false;
         headingLockedCount = 0;
     }
 
@@ -194,9 +231,6 @@ public final class BodyComponent extends PositionComponent {
      * Sync this component's physics location to an on-screen location.
      */
     public void sync() {
-        Vector2 worldPosition = Pools.vector2s.grabNew();
-        worldPosition.set(body.getPosition()).scl(Physics.METERS_TO_PIXELS);
-        setPositionInternal(worldPosition);
-        Pools.vector2s.freeCount(1);
+        gamePosition.set(body.getPosition()).scl(Physics.METERS_TO_PIXELS);
     }
 }

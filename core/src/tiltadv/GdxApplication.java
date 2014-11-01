@@ -31,6 +31,7 @@ import tiltadv.assets.TileDatastore;
 import tiltadv.assets.TilesetDatastore;
 import tiltadv.components.behavior.OscillationBehaviorComponent;
 import tiltadv.components.behavior.PlayerBehaviorComponent;
+import tiltadv.components.behavior.PlayerSensorBehaviorComponent;
 import tiltadv.components.body.FollowCameraComponent;
 import tiltadv.components.body.SimplePositionComponent;
 import tiltadv.components.body.TiltComponent;
@@ -42,6 +43,7 @@ import tiltadv.components.display.CharacterDisplayComponent;
 import tiltadv.components.display.FpsDisplayComponent;
 import tiltadv.components.display.SpriteComponent;
 import tiltadv.components.display.TiltDisplayComponent;
+import tiltadv.components.hierarchy.ParentComponent;
 import tiltadv.components.hierarchy.children.PlayerChildrenComponent;
 import tiltadv.components.input.AccelerometerInputComponent;
 import tiltadv.components.input.KeyboardInputComponent;
@@ -84,8 +86,8 @@ public final class GdxApplication extends ApplicationAdapter {
     //    private Shape octoBounds;
     private CircleShape playerBounds;
     //    private Shape gravityWellBounds;
-//    private Shape playerSensorBounds;
-//    private Shape playerSwordBounds;
+    private CircleShape playerSensorBounds;
+    //    private Shape playerSwordBounds;
 //    private Shape octoRockBounds;
     private CircleShape boulderBounds;
     private TouchSystem touchSystem;
@@ -230,7 +232,7 @@ public final class GdxApplication extends ApplicationAdapter {
 //        gravityWellBounds = new Circle(8.0f);
 //        octoBounds = new Circle(8.0f);
         playerBounds = Physics.newCircle(6.5f);
-//        playerSensorBounds = new Circle(8.0f);
+        playerSensorBounds = Physics.newCircle(8.0f);
 //        playerSwordBounds = new Circle(5f);
 //        octoRockBounds = new Circle(Tiles.ROCK.getRegionWidth() / 2f);
         boulderBounds = Physics.newCircle(8f);
@@ -294,18 +296,17 @@ public final class GdxApplication extends ApplicationAdapter {
 //            }
 //        });
 
-//        entities.registerTemplate(EntityId.PLAYER_SENSOR, new EntityManager.EntityCreator() {
-//            @Override
-//            public void initialize(final Entity entity) {
-//                entity.addComponent(ParentComponent.class);  // Child of Player Entity
-//                entity.addComponent(PositionComponent.class);
-//                entity.addComponent(OffsetComponent.class);
-//                entity.addComponent(ChildOffsetComponent.class);
+        entities.registerTemplate(EntityId.PLAYER_SENSOR, new EntityManager.EntityCreator() {
+            @Override
+            public void initialize(final Entity entity) {
+                entity.addComponent(ParentComponent.class);  // Child of Player Entity
+                entity.addComponent(BodyComponent.class).setShape(playerSensorBounds).setSensor(true)
+                    .setPosition(new Vector2(.6f, 0)).setBodyType(BodyType.DynamicBody);
 //                entity.addComponent(PlayerSensorCollisionComponent.class).setShape(playerSensorBounds);
-//                entity.addComponent(PlayerSensorBehaviorComponent.class);
-//                entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.SENSOR);
-//            }
-//        });
+                entity.addComponent(PlayerSensorBehaviorComponent.class);
+                entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.SENSOR);
+            }
+        });
 
         entities.registerTemplate(EntityId.BOULDER, new EntityManager.EntityCreator() {
             @Override
@@ -437,8 +438,8 @@ public final class GdxApplication extends ApplicationAdapter {
         float halfSceneW = (scene.getWidth() / 2f);
         float halfSceneH = (scene.getHeight() / 2f);
         float halfWallSize = 10f;
-        float top = (halfSceneH + halfWallSize);
         float bottom = (-halfSceneH - halfWallSize);
+        float top = (halfSceneH + halfWallSize);
         float left = (-halfSceneW - halfWallSize);
         float right = (halfSceneW + halfWallSize);
 
