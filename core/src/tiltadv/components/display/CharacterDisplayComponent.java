@@ -8,7 +8,6 @@ import dhcoder.support.math.Angle;
 import dhcoder.support.math.CardinalDirection;
 import dhcoder.support.math.CompassDirection;
 import dhcoder.support.time.Duration;
-import tiltadv.components.body.HeadingComponent;
 import tiltadv.components.box2d.BodyComponent;
 
 /**
@@ -36,7 +35,6 @@ public final class CharacterDisplayComponent extends AbstractComponent {
     private boolean isCardinal;
 
     private BodyComponent bodyComponent;
-    private HeadingComponent headingComponent;
     private SpriteComponent spriteComponent;
 
     CharacterDisplayComponent() {
@@ -56,7 +54,6 @@ public final class CharacterDisplayComponent extends AbstractComponent {
     public void initialize(final Entity owner) {
         spriteComponent = owner.requireComponent(SpriteComponent.class);
         bodyComponent = owner.requireComponent(BodyComponent.class);
-        headingComponent = owner.requireComponent(HeadingComponent.class);
 
         spriteComponent.setTextureRegion(activeAnim.getKeyFrame(0));
     }
@@ -72,7 +69,7 @@ public final class CharacterDisplayComponent extends AbstractComponent {
             elapsedSoFar = 0f;
         }
 
-        final Angle angle = headingComponent.getHeading();
+        final Angle angle = bodyComponent.getHeading();
         if (isCardinal) {
             if (!activeCardinalDirection.isFacing(angle, HEADING_MARGIN)) {
                 activeCardinalDirection = CardinalDirection.getForAngle(angle);
@@ -111,7 +108,6 @@ public final class CharacterDisplayComponent extends AbstractComponent {
         activeFlipX = false;
 
         bodyComponent = null;
-        headingComponent = null;
         spriteComponent = null;
     }
 

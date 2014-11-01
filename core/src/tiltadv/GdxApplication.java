@@ -32,7 +32,6 @@ import tiltadv.assets.TilesetDatastore;
 import tiltadv.components.behavior.OscillationBehaviorComponent;
 import tiltadv.components.behavior.PlayerBehaviorComponent;
 import tiltadv.components.body.FollowCameraComponent;
-import tiltadv.components.body.HeadingComponent;
 import tiltadv.components.body.SimplePositionComponent;
 import tiltadv.components.body.TiltComponent;
 import tiltadv.components.box2d.BodyComponent;
@@ -268,7 +267,6 @@ public final class GdxApplication extends ApplicationAdapter {
                 Vector2 offset = Pools.vector2s.grabNew().set(0f, 5f);
                 entity.addComponent(SpriteComponent.class).setOffset(offset);
                 Pools.vector2s.freeCount(1);
-                entity.addComponent(HeadingComponent.class);
                 entity.addComponent(BodyComponent.class).setBodyType(BodyType.DynamicBody).setShape(playerBounds);
                 entity.addComponent(TiltComponent.class);
                 entity.addComponent(Gdx.app.getType() == ApplicationType.Android ? AccelerometerInputComponent.class :

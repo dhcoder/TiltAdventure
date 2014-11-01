@@ -1,4 +1,4 @@
-package dhcoder.libgdx.pool;
+package dhcoder.libgdx.pool.box2d;
 
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import dhcoder.support.memory.Pool;

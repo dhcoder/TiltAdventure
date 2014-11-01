@@ -8,7 +8,6 @@ import dhcoder.support.opt.Opt;
 import dhcoder.support.state.StateMachine;
 import dhcoder.support.state.StateTransitionHandler;
 import dhcoder.support.time.Duration;
-import tiltadv.components.body.HeadingComponent;
 import tiltadv.components.body.PositionComponent;
 import tiltadv.components.body.TiltComponent;
 import tiltadv.components.box2d.BodyComponent;
@@ -57,7 +56,6 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
     private Entity owner;
     private Entity swordEntity;
     private PositionComponent positionComponent;
-    private HeadingComponent headingComponent;
     private BodyComponent bodyComponent;
     private TiltComponent tiltComponent;
 
@@ -69,7 +67,6 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
     public void initialize(final Entity owner) {
         this.owner = owner;
         positionComponent = owner.requireComponent(PositionComponent.class);
-        headingComponent = owner.requireComponent(HeadingComponent.class);
         bodyComponent = owner.requireComponent(BodyComponent.class);
         tiltComponent = owner.requireComponent(TiltComponent.class);
         owner.requireComponent(HealthComponent.class).setListener(this);
@@ -87,11 +84,11 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
             final Vector2 targetPos = target.requireComponent(PositionComponent.class).getPosition();
             final Vector2 vectorToTarget = Pools.vector2s.grabNew();
             vectorToTarget.set(targetPos).sub(positionComponent.getPosition());
-            headingComponent.setHeadingFrom(vectorToTarget);
+            bodyComponent.setHeadingFrom(vectorToTarget);
             Pools.vector2s.freeCount(1);
         }
         else if (playerState.getCurrentState() == State.MOVING) {
-            headingComponent.setHeadingFrom(tiltComponent.getTilt());
+            bodyComponent.setHeadingFrom(tiltComponent.getTilt());
         }
     }
 
@@ -108,8 +105,6 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
         frozenDuration.setZero();
 
         positionComponent = null;
-        headingComponent = null;
-        bodyComponent = null;
         tiltComponent = null;
 
         selectedTargetOpt.clear();
