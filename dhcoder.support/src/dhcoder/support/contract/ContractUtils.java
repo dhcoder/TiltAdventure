@@ -12,6 +12,11 @@ public final class ContractUtils {
         }
     }
 
+    public static void requireNull(final Object value, final String message) {
+        if (value != null) {
+            throw new ContractException(message);
+        }
+    }
 
     public static void requireNonNull(final Object value, final String message) {
         if (value == null) {

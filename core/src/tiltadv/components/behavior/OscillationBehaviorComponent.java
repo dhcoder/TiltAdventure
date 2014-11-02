@@ -34,7 +34,7 @@ public final class OscillationBehaviorComponent extends LerpComponent {
         Vector2 currPos = Pools.vector2s.grabNew();
         currPos.set(from);
         currPos.lerp(to, percent);
-        bodyComponent.setPosition(currPos);
+        bodyComponent.setDesiredPosition(currPos);
         Pools.vector2s.freeCount(1);
     }
 
