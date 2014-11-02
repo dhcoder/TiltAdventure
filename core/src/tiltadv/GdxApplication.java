@@ -9,11 +9,9 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.libgdx.entity.EntityManager;
@@ -167,19 +165,8 @@ public final class GdxApplication extends ApplicationAdapter {
         Services.register(SceneDatastore.class, new SceneDatastore());
         Services.register(Json.class, new Json());
 
-        physicsSystem = new PhysicsSystem();
+        physicsSystem = new PhysicsSystem(ENTITY_COUNT);
         Services.register(PhysicsSystem.class, physicsSystem);
-
-        physicsSystem.setPostUpdateMethod(new PhysicsSystem.PostUpdateMethod() {
-            @Override
-            public void postUpdate(final Array<Body> bodies) {
-                for (int i = 0; i < bodies.size; i++) {
-                    Body body = bodies.get(i);
-                    BodyComponent bodyComponent = (BodyComponent)body.getUserData();
-                    bodyComponent.sync();
-                }
-            }
-        });
 
         // TODO: Tune the application for the best batch size for render system
         // https://github.com/libgdx/libgdx/wiki/Spritebatch,-Textureregions,-and-Sprites#performance-tuning

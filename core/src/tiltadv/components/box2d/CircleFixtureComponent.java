@@ -6,8 +6,11 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import dhcoder.libgdx.entity.Entity;
+import dhcoder.libgdx.physics.PhysicsElement;
+import dhcoder.libgdx.physics.PhysicsSystem;
 import tiltadv.components.body.PositionComponent;
 import tiltadv.globals.Physics;
+import tiltadv.globals.Services;
 import tiltadv.memory.Pools;
 
 import static dhcoder.support.contract.ContractUtils.requireNonNull;
@@ -17,7 +20,7 @@ import static dhcoder.support.contract.ContractUtils.requireNonNull;
  * either specify the body explicitly, or else this fixture will assume there's a body component already attached to
  * this component's {@link Entity}
  */
-public final class CircleFixtureComponent extends PositionComponent<CircleFixtureComponent> {
+public final class CircleFixtureComponent extends PositionComponent<CircleFixtureComponent> implements PhysicsElement {
 
     private final Vector2 physicsPosition = new Vector2();
     private final Vector2 gamePosition = new Vector2();
@@ -58,8 +61,6 @@ public final class CircleFixtureComponent extends PositionComponent<CircleFixtur
 
     @Override
     public Vector2 getPosition() {
-        gamePosition.set(physicsPosition);
-        fixture.getBody().getTransform().mul(gamePosition).scl(Physics.METERS_TO_PIXELS);
         return gamePosition;
     }
 
@@ -85,6 +86,8 @@ public final class CircleFixtureComponent extends PositionComponent<CircleFixtur
             bodyComponent = null;
         }
 
+        Services.get(PhysicsSystem.class).addElement(this);
+
         isInitialized = true;
     }
 
@@ -100,5 +103,13 @@ public final class CircleFixtureComponent extends PositionComponent<CircleFixtur
         isInitialized = false;
 
         fixture = null;
+
+        Services.get(PhysicsSystem.class).removeElement(this);
+    }
+
+    @Override
+    public void syncWithPhysics() {
+        gamePosition.set(physicsPosition);
+        fixture.getBody().getTransform().mul(gamePosition).scl(Physics.METERS_TO_PIXELS);
     }
 }

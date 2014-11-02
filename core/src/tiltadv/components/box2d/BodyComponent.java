@@ -9,6 +9,7 @@ import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.DistanceJointDef;
 import dhcoder.libgdx.entity.Entity;
+import dhcoder.libgdx.physics.PhysicsElement;
 import dhcoder.libgdx.physics.PhysicsSystem;
 import dhcoder.support.math.Angle;
 import dhcoder.support.time.Duration;
@@ -23,7 +24,7 @@ import static dhcoder.support.contract.ContractUtils.requireNonNull;
  * A component that encapsulates an entity's physical body - represented by a Box2D {@link Body}. This maintains the
  * knowledge of an entity's position, motion, and heading.
  */
-public final class BodyComponent extends PositionComponent<BodyComponent> {
+public final class BodyComponent extends PositionComponent<BodyComponent> implements PhysicsElement {
 
     /**
      * Box2D objects take too long to come to rest, so just manually stop them ourselves past a certain epsilon
@@ -189,9 +190,9 @@ public final class BodyComponent extends PositionComponent<BodyComponent> {
     @Override
     public void handleInitialize(final Entity owner) {
         requireNonNull(shape, "Body shape must be set");
+        final PhysicsSystem physicsSystem = Services.get(PhysicsSystem.class);
 
         {
-            final World world = Services.get(PhysicsSystem.class).getWorld();
             BodyDef bodyDef = Pools.bodyDefs.grabNew();
             bodyDef.type = bodyType;
             bodyDef.bullet = isFastMoving;
@@ -200,7 +201,7 @@ public final class BodyComponent extends PositionComponent<BodyComponent> {
                 syncPosition = false;
             }
             bodyDef.linearDamping = 10f;
-            body = world.createBody(bodyDef);
+            body = physicsSystem.getWorld().createBody(bodyDef);
             body.setUserData(this);
             Pools.bodyDefs.freeCount(1);
         }
@@ -215,6 +216,8 @@ public final class BodyComponent extends PositionComponent<BodyComponent> {
             Pools.fixtureDefs.freeCount(1);
             shape = null;
         }
+
+        physicsSystem.addElement(this);
     }
 
     @Override
@@ -222,9 +225,12 @@ public final class BodyComponent extends PositionComponent<BodyComponent> {
         gamePosition.setZero();
         gameVelocity.setZero();
         heading.setRadians(0f);
-        final World world = Services.get(PhysicsSystem.class).getWorld();
-        world.destroyBody(body);
+
+        final PhysicsSystem physicsSystem = Services.get(PhysicsSystem.class);
+        physicsSystem.getWorld().destroyBody(body);
         body = null;
+        physicsSystem.removeElement(this);
+
         shape = null;
 
         bodyType = BodyType.StaticBody;
@@ -234,10 +240,8 @@ public final class BodyComponent extends PositionComponent<BodyComponent> {
         headingLockedCount = 0;
     }
 
-    /**
-     * Sync this component's physics location to an on-screen location.
-     */
-    public void sync() {
+    @Override
+    public void syncWithPhysics() {
         gamePosition.set(body.getPosition()).scl(Physics.METERS_TO_PIXELS);
     }
 }
