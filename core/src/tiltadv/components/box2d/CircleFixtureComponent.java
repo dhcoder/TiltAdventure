@@ -2,40 +2,44 @@ package tiltadv.components.box2d;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.Shape;
 import dhcoder.libgdx.entity.Entity;
 import tiltadv.components.body.PositionComponent;
+import tiltadv.globals.Physics;
 import tiltadv.memory.Pools;
 
 import static dhcoder.support.contract.ContractUtils.requireNonNull;
 
 /**
- * A component that encapsulates an entity's physical body - represented by a Box2D {@link Body}. This maintains the
- * knowledge of an entity's position, motion, and heading.
+ * A component that encapsulates a Box2D {@link Fixture} which should be attached to a Box2D {@link Body}. You can
+ * either specify the body explicitly, or else this fixture will assume there's a body component already attached to
+ * this component's {@link Entity}
  */
-public final class FixtureComponent extends PositionComponent<FixtureComponent> {
+public final class CircleFixtureComponent extends PositionComponent<CircleFixtureComponent> {
 
+    private final Vector2 physicsPosition = new Vector2();
     private final Vector2 gamePosition = new Vector2();
     private BodyComponent bodyComponent;
-    private Shape shape;
+    private CircleShape circleShape;
     private boolean isSensor;
     private boolean isInitialized;
     private Fixture fixture;
 
-    public FixtureComponent setBodyComponent(final BodyComponent bodyComponent) {
+    public CircleFixtureComponent setBodyComponent(final BodyComponent bodyComponent) {
         this.bodyComponent = bodyComponent;
         return this;
     }
 
-    public FixtureComponent setSensor(final boolean isSensor) {
+    public CircleFixtureComponent setSensor(final boolean isSensor) {
         this.isSensor = isSensor;
         return this;
     }
 
-    public FixtureComponent setShape(final Shape shape) {
-        this.shape = shape;
+    public CircleFixtureComponent setShape(final CircleShape shape) {
+        this.physicsPosition.set(shape.getPosition());
+        this.circleShape = shape;
         return this;
     }
 
@@ -45,23 +49,23 @@ public final class FixtureComponent extends PositionComponent<FixtureComponent> 
      * scene's constraints.
      */
     @Override
-    public FixtureComponent setPosition(final Vector2 position) {
+    public CircleFixtureComponent setPosition(final Vector2 position) {
         if (isInitialized) {
-            throw new IllegalStateException("Can't set a fixture's position post initialization.");
+            throw new IllegalStateException("Can't set a fixture's position directly; position the shape instead.");
         }
-        gamePosition.set(position);
         return this;
     }
 
     @Override
     public Vector2 getPosition() {
-//        gamePosition.set(fixture.getShape().get)
+        gamePosition.set(physicsPosition);
+        fixture.getBody().getTransform().mul(gamePosition).scl(Physics.METERS_TO_PIXELS);
         return gamePosition;
     }
 
     @Override
     public void handleInitialize(final Entity owner) {
-        requireNonNull(shape, "Body shape must be set");
+        requireNonNull(circleShape, "Body shape must be set");
 
         if (bodyComponent == null) {
             bodyComponent = owner.requireComponent(BodyComponent.class);
@@ -69,7 +73,7 @@ public final class FixtureComponent extends PositionComponent<FixtureComponent> 
 
         {
             FixtureDef fixtureDef = Pools.fixtureDefs.grabNew();
-            fixtureDef.shape = shape;
+            fixtureDef.shape = circleShape;
             fixtureDef.isSensor = isSensor;
             fixtureDef.friction = 0f;
             fixtureDef.density = 0f;
@@ -77,7 +81,7 @@ public final class FixtureComponent extends PositionComponent<FixtureComponent> 
             final Body body = bodyComponent.getBody();
             fixture = body.createFixture(fixtureDef);
             Pools.fixtureDefs.freeCount(1);
-            shape = null;
+            circleShape = null;
             bodyComponent = null;
         }
 
@@ -88,8 +92,9 @@ public final class FixtureComponent extends PositionComponent<FixtureComponent> 
     public void handleReset() {
         bodyComponent = null;
 
+        physicsPosition.setZero();
         gamePosition.setZero();
-        shape = null;
+        circleShape = null;
 
         isSensor = false;
         isInitialized = false;
