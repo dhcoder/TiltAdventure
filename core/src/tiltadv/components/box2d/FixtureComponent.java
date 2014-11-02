@@ -10,7 +10,7 @@ import dhcoder.libgdx.entity.Entity;
 import dhcoder.libgdx.physics.PhysicsElement;
 import dhcoder.libgdx.physics.PhysicsSystem;
 import dhcoder.support.opt.Opt;
-import tiltadv.components.body.PositionComponent;
+import tiltadv.components.dynamics.PositionComponent;
 import tiltadv.globals.Physics;
 import tiltadv.globals.Services;
 import tiltadv.memory.Pools;

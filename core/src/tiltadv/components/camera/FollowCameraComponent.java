@@ -1,6 +1,5 @@
 package tiltadv.components.body;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
@@ -8,6 +7,7 @@ import dhcoder.libgdx.render.RenderSystem;
 import dhcoder.support.time.Duration;
 import tiltadv.assets.Scene;
 import tiltadv.assets.SceneDatastore;
+import tiltadv.components.dynamics.PositionComponent;
 import tiltadv.globals.Services;
 import tiltadv.memory.Pools;
 

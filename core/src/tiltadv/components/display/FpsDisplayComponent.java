@@ -9,7 +9,7 @@ import dhcoder.libgdx.entity.Entity;
 import dhcoder.libgdx.render.RenderSystem;
 import dhcoder.libgdx.render.Renderable;
 import dhcoder.support.time.Duration;
-import tiltadv.components.body.PositionComponent;
+import tiltadv.components.dynamics.PositionComponent;
 import tiltadv.globals.RenderLayer;
 import tiltadv.globals.Services;
 

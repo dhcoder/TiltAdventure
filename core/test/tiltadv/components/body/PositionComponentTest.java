@@ -3,6 +3,7 @@ package tiltadv.components.body;
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.support.math.Angle;
 import org.junit.Test;
+import tiltadv.components.dynamics.PositionComponent;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;

@@ -11,7 +11,7 @@ import dhcoder.libgdx.render.RenderSystem;
 import dhcoder.libgdx.render.Renderable;
 import dhcoder.support.math.Angle;
 import dhcoder.support.opt.OptFloat;
-import tiltadv.components.body.PositionComponent;
+import tiltadv.components.dynamics.PositionComponent;
 import tiltadv.globals.RenderLayer;
 import tiltadv.globals.Services;
 import tiltadv.memory.Pools;

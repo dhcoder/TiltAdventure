@@ -1,4 +1,4 @@
-package tiltadv.components.body;
+package tiltadv.components.dynamics;
 
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.entity.AbstractComponent;
