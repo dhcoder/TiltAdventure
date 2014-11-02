@@ -172,7 +172,13 @@ public final class BodyComponent extends AbstractComponent implements PhysicsEle
             BodyDef bodyDef = Pools.bodyDefs.grabNew();
             bodyDef.type = bodyType;
             bodyDef.bullet = isFastMoving;
-            bodyDef.position.set(positionComponent.getPosition()).scl(Physics.PIXELS_TO_METERS);
+
+            if (syncPosition) {
+                bodyDef.position.set(targetPosition);
+            }
+            else {
+                bodyDef.position.set(positionComponent.getPosition()).scl(Physics.PIXELS_TO_METERS);
+            }
             bodyDef.linearDamping = damping;
             body = physicsSystem.getWorld().createBody(bodyDef);
             body.setUserData(this);
