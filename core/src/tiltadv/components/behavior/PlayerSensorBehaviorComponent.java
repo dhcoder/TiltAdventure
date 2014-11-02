@@ -3,6 +3,7 @@ package tiltadv.components.behavior;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
 import tiltadv.components.box2d.BodyComponent;
+import tiltadv.components.box2d.FixtureComponent;
 import tiltadv.components.display.SpriteComponent;
 import tiltadv.components.hierarchy.ParentComponent;
 
@@ -17,9 +18,9 @@ public final class PlayerSensorBehaviorComponent extends AbstractComponent {
     public void initialize(final Entity owner) {
         Entity player = owner.requireComponent(ParentComponent.class).getParent();
         BodyComponent playerBody = player.requireComponent(BodyComponent.class);
-        BodyComponent sensorBody = owner.requireComponentBefore(this, BodyComponent.class);
+        FixtureComponent sensorFixture = owner.requireComponentAfter(this, FixtureComponent.class);
 
-        playerBody.joinTo(sensorBody);
+        sensorFixture.setBodyComponent(playerBody);
 //        offsetComponent = owner.requireComponent(OffsetComponent.class);
 //
 //        x = player.requireComponent(PlayerCollisionComponent.class).getShape().getHalfWidth() +

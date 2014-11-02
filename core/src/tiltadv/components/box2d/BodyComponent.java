@@ -25,6 +25,10 @@ import static dhcoder.support.contract.ContractUtils.requireNonNull;
  */
 public final class BodyComponent extends PositionComponent<BodyComponent> {
 
+    /**
+     * Box2D objects take too long to come to rest, so just manually stop them ourselves past a certain epsilon
+     */
+    private static final float STOP_EPSILON = 10f;
     private final Vector2 gamePosition = new Vector2();
     private final Vector2 gameVelocity = new Vector2(); // Velocity in units of pixels per second
     private final Angle heading = Angle.fromRadians(0f);
@@ -71,6 +75,10 @@ public final class BodyComponent extends PositionComponent<BodyComponent> {
     @Override
     public Vector2 getPosition() {
         return gamePosition;
+    }
+
+    public Body getBody() {
+        return body;
     }
 
     public BodyComponent setVelocity(final Vector2 velocity) {
@@ -171,7 +179,7 @@ public final class BodyComponent extends PositionComponent<BodyComponent> {
             Pools.vector2s.freeToMark(mark);
         }
 
-        if (getVelocity().isZero(0.1f)) {
+        if (getVelocity().isZero(STOP_EPSILON)) {
             Vector2 velocity = Pools.vector2s.grabNew();
             setVelocity(velocity);
             Pools.vector2s.freeCount(1);
@@ -194,7 +202,6 @@ public final class BodyComponent extends PositionComponent<BodyComponent> {
             bodyDef.linearDamping = 10f;
             body = world.createBody(bodyDef);
             body.setUserData(this);
-            body.getAngle();
             Pools.bodyDefs.freeCount(1);
         }
 
@@ -203,7 +210,7 @@ public final class BodyComponent extends PositionComponent<BodyComponent> {
             fixtureDef.shape = shape;
             fixtureDef.isSensor = isSensor;
             fixtureDef.friction = 0f;
-            fixtureDef.density = 1f;
+            fixtureDef.density = 0f;
             body.createFixture(fixtureDef);
             Pools.fixtureDefs.freeCount(1);
             shape = null;

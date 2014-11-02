@@ -36,6 +36,7 @@ import tiltadv.components.body.FollowCameraComponent;
 import tiltadv.components.body.SimplePositionComponent;
 import tiltadv.components.body.TiltComponent;
 import tiltadv.components.box2d.BodyComponent;
+import tiltadv.components.box2d.FixtureComponent;
 import tiltadv.components.combat.DefenseComponent;
 import tiltadv.components.combat.HealthComponent;
 import tiltadv.components.combat.KnockbackComponent;
@@ -233,6 +234,7 @@ public final class GdxApplication extends ApplicationAdapter {
 //        octoBounds = new Circle(8.0f);
         playerBounds = Physics.newCircle(6.5f);
         playerSensorBounds = Physics.newCircle(8.0f);
+        playerSensorBounds.setPosition(new Vector2(0.5f, 0));
 //        playerSwordBounds = new Circle(5f);
 //        octoRockBounds = new Circle(Tiles.ROCK.getRegionWidth() / 2f);
         boulderBounds = Physics.newCircle(8f);
@@ -300,10 +302,10 @@ public final class GdxApplication extends ApplicationAdapter {
             @Override
             public void initialize(final Entity entity) {
                 entity.addComponent(ParentComponent.class);  // Child of Player Entity
-                entity.addComponent(BodyComponent.class).setShape(playerSensorBounds).setSensor(true)
-                    .setPosition(new Vector2(.6f, 0)).setBodyType(BodyType.DynamicBody);
 //                entity.addComponent(PlayerSensorCollisionComponent.class).setShape(playerSensorBounds);
                 entity.addComponent(PlayerSensorBehaviorComponent.class);
+                entity.addComponent(FixtureComponent.class).setShape(playerSensorBounds).setSensor(true)
+                    .setPosition(new Vector2(.6f, 0));
                 entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.SENSOR);
             }
         });
