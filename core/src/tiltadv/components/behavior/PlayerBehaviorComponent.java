@@ -10,7 +10,7 @@ import dhcoder.support.state.StateTransitionHandler;
 import dhcoder.support.time.Duration;
 import tiltadv.components.dynamics.PositionComponent;
 import tiltadv.components.dynamics.TiltComponent;
-import tiltadv.components.box2d.BodyComponent;
+import tiltadv.components.dynamics.box2d.BodyComponent;
 import tiltadv.components.combat.HealthComponent;
 import tiltadv.globals.Events;
 import tiltadv.globals.Services;

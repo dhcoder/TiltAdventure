@@ -8,7 +8,7 @@ import dhcoder.support.math.Angle;
 import dhcoder.support.math.CardinalDirection;
 import dhcoder.support.math.CompassDirection;
 import dhcoder.support.time.Duration;
-import tiltadv.components.box2d.BodyComponent;
+import tiltadv.components.dynamics.box2d.BodyComponent;
 
 /**
  * Component that renders a character which can move in any of the cardinal directions.

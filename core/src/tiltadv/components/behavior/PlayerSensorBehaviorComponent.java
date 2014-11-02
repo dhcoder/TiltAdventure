@@ -2,8 +2,8 @@ package tiltadv.components.behavior;
 
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
-import tiltadv.components.box2d.BodyComponent;
-import tiltadv.components.box2d.FixtureComponent;
+import tiltadv.components.dynamics.box2d.BodyComponent;
+import tiltadv.components.dynamics.box2d.FixtureComponent;
 import tiltadv.components.display.SpriteComponent;
 import tiltadv.components.hierarchy.ParentComponent;
 
