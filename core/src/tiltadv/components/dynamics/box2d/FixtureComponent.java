@@ -16,6 +16,7 @@ import tiltadv.globals.Services;
 import tiltadv.memory.Pools;
 
 import static dhcoder.support.contract.ContractUtils.requireNonNull;
+import static dhcoder.support.contract.ContractUtils.requireNull;
 
 /**
  * A component that encapsulates a Box2D {@link Fixture} which should be attached to a Box2D {@link Body}. You can
@@ -34,7 +35,8 @@ public final class FixtureComponent extends AbstractComponent implements Physics
     private Entity targetEntity;
     private Shape shape;
     private boolean isSensor;
-    private boolean isInitialized;
+    private short categoryBits = 0x1;
+    private short maskBits = -1;
     private Fixture fixture;
 
     public FixtureComponent setTargetEntity(final Entity targetEntity) {
@@ -43,17 +45,29 @@ public final class FixtureComponent extends AbstractComponent implements Physics
     }
 
     public FixtureComponent setSensor(final boolean isSensor) {
+        requireNull(fixture, "Can't change a fixture's sensor state after it is initialized");
         this.isSensor = isSensor;
         return this;
     }
 
     public FixtureComponent setShape(final Shape shape) {
+        requireNull(fixture, "Can't change a fixture's shape after it is initialized");
         this.shape = shape;
         return this;
     }
 
     public FixtureComponent setOffset(final Vector2 offset) {
+        requireNull(fixture, "Can't change a fixture's offset after it is initialized");
         this.offset.set(offset);
+        return this;
+    }
+
+    public FixtureComponent setFilter(final short categoryBits, final short maskBits) {
+        requireNull(fixture, "Can't change a fixture's filter settings after it is initialized");
+
+        this.categoryBits = categoryBits;
+        this.maskBits = maskBits;
+
         return this;
     }
 
@@ -78,28 +92,12 @@ public final class FixtureComponent extends AbstractComponent implements Physics
             fixtureDef.isSensor = isSensor;
             fixtureDef.friction = 0f;
             fixtureDef.density = 0f;
-
+            fixtureDef.filter.categoryBits = categoryBits;
+            fixtureDef.filter.maskBits = maskBits;
             final Body body = bodyComponent.getBody();
             fixture = body.createFixture(fixtureDef);
             Pools.fixtureDefs.freeCount(1);
         }
-
-        isInitialized = true;
-    }
-
-    @Override
-    public void reset() {
-        if (positionComponentOpt.hasValue()) {
-            Services.get(PhysicsSystem.class).removeElement(this);
-        }
-
-        offset.setZero();
-        positionComponentOpt.clear();
-        targetEntity = null;
-        shape = null;
-        isSensor = false;
-        isInitialized = false;
-        fixture = null;
     }
 
     @Override
@@ -115,5 +113,22 @@ public final class FixtureComponent extends AbstractComponent implements Physics
 
         Pools.vector2s.freeCount(1);
 
+    }
+
+    @Override
+    public void reset() {
+        if (positionComponentOpt.hasValue()) {
+            Services.get(PhysicsSystem.class).removeElement(this);
+        }
+
+        offset.setZero();
+        positionComponentOpt.clear();
+        targetEntity = null;
+        shape = null;
+        isSensor = false;
+        categoryBits = 0x1;
+        maskBits = -1;
+
+        fixture = null;
     }
 }
