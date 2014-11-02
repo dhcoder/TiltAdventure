@@ -20,11 +20,13 @@ import static dhcoder.support.contract.ContractUtils.requireNull;
 /**
  * A component that encapsulates an entity's physical body - represented by a Box2D {@link Body}. This maintains the
  * knowledge of an entity's position, motion, and heading.
- *
+ * <p/>
  * If a body is present on an entity, it expects the presence of a {@link PositionComponent} and will take over the role
  * of setting it.
  */
 public final class BodyComponent extends AbstractComponent implements PhysicsElement {
+
+    public static boolean RUN_SANITY_CHECKS = false;
 
     /**
      * Box2D objects take too long to come to rest, so just manually stop them ourselves past a certain epsilon
@@ -36,7 +38,7 @@ public final class BodyComponent extends AbstractComponent implements PhysicsEle
     private BodyType bodyType = BodyType.StaticBody;
     private Body body;
     private boolean isFastMoving;
-    private float damping = 10f;
+    private float initialDamping;
     private boolean syncPosition;
     private int headingLockedCount;
     private PositionComponent positionComponent;
@@ -49,14 +51,38 @@ public final class BodyComponent extends AbstractComponent implements PhysicsEle
     }
 
     /**
-     * Set a linear damping value, if you want the object to gradually come to a stop over time. The actual value used
-     * here probably requires tweaking to get the right effect, but setting it to 10f means the character will come to
-     * a stop after about a second.
+     * Set a linear damping value, if you want the object to gradually come to a stop over time.
+     *
+     * See the {@link Physics} namespace for useful values.
      */
     public BodyComponent setDamping(final float damping) {
-        requireNull(body, "Can't set damping value after entity is initialized");
+        if (body == null) {
+            initialDamping = damping;
+        }
+        else {
+            body.setLinearDamping(damping);
+        }
 
-        this.damping = damping;
+        return this;
+    }
+
+    public Vector2 getVelocity() {
+        return gameVelocity;
+    }
+
+    public BodyComponent setVelocity(final Vector2 velocity) {
+        if (body == null) {
+            gameVelocity.set(velocity); // Will be used to initialize this body
+        }
+        else {
+            assertNonStaticType();
+
+            Vector2 physicsVelocity = Pools.vector2s.grabNew();
+            physicsVelocity.set(velocity).scl(Physics.PIXELS_TO_METERS);
+            body.setLinearVelocity(velocity);
+            Pools.vector2s.freeCount(1);
+        }
+
         return this;
     }
 
@@ -68,9 +94,9 @@ public final class BodyComponent extends AbstractComponent implements PhysicsEle
     }
 
     /**
-     * Set the position we want to try to get to by the next frame. That position may be impossible because physics will
-     * prevent this entity from getting there, at which point, this object should move as best as it can based on the
-     * scene's constraints.
+     * Set this body's velocity to a value that will try and get this body to a certain position on the next frame.
+     * NOTE: This position may be impossible because physics can prevent this entity from getting there, at which point,
+     * this object should move as best as it can based on the scene's constraints.
      */
     public BodyComponent setDesiredPosition(final Vector2 position) {
         targetPosition.set(position).scl(Physics.PIXELS_TO_METERS);
@@ -80,24 +106,6 @@ public final class BodyComponent extends AbstractComponent implements PhysicsEle
 
     public Body getBody() {
         return body;
-    }
-
-    public BodyComponent setVelocity(final Vector2 velocity) {
-        Vector2 physicsVelocity = Pools.vector2s.grabNew();
-        physicsVelocity.set(velocity).scl(Physics.PIXELS_TO_METERS);
-        body.setLinearVelocity(velocity);
-        Pools.vector2s.freeCount(1);
-
-        return this;
-    }
-
-    public BodyComponent setHeading(final Angle heading) {
-        if (headingLockedCount > 0) {
-            return this;
-        }
-
-        body.setTransform(body.getPosition(), heading.getRadians());
-        return this;
     }
 
     public BodyComponent setHeadingFrom(final Vector2 target) {
@@ -118,6 +126,15 @@ public final class BodyComponent extends AbstractComponent implements PhysicsEle
         return heading;
     }
 
+    public BodyComponent setHeading(final Angle heading) {
+        if (headingLockedCount > 0) {
+            return this;
+        }
+
+        body.setTransform(body.getPosition(), heading.getRadians());
+        return this;
+    }
+
     public void lockHeading(final boolean locked) {
         headingLockedCount += (locked ? 1 : -1);
     }
@@ -132,13 +149,45 @@ public final class BodyComponent extends AbstractComponent implements PhysicsEle
         return this;
     }
 
-    public Vector2 getVelocity() {
-        gameVelocity.set(body.getLinearVelocity()).scl(Physics.METERS_TO_PIXELS);
-        return gameVelocity;
+    @Override
+    public void initialize(final Entity owner) {
+
+        positionComponent = owner.requireComponent(PositionComponent.class);
+
+        final PhysicsSystem physicsSystem = Services.get(PhysicsSystem.class);
+
+        {
+            BodyDef bodyDef = Pools.bodyDefs.grabNew();
+            bodyDef.type = bodyType;
+            bodyDef.bullet = isFastMoving;
+            if (!gameVelocity.isZero()) {
+                assertNonStaticType();
+                bodyDef.linearVelocity.set(gameVelocity).scl(Physics.PIXELS_TO_METERS);
+            }
+
+            if (syncPosition) {
+                bodyDef.position.set(targetPosition);
+                syncPosition = false;
+            }
+            else {
+                bodyDef.position.set(positionComponent.getPosition()).scl(Physics.PIXELS_TO_METERS);
+            }
+            bodyDef.linearDamping = initialDamping;
+            body = physicsSystem.getWorld().createBody(bodyDef);
+            Pools.bodyDefs.freeCount(1);
+        }
+
+        physicsSystem.addElement(this);
     }
 
     @Override
     public void update(final Duration elapsedTime) {
+
+        if (RUN_SANITY_CHECKS) {
+            if (body.getFixtureList().size == 0) {
+                throw new IllegalStateException("Invalid body created without at least one fixture");
+            }
+        }
 
         if (syncPosition) {
             final int mark = Pools.vector2s.mark();
@@ -154,38 +203,11 @@ public final class BodyComponent extends AbstractComponent implements PhysicsEle
             Pools.vector2s.freeToMark(mark);
         }
 
-        if (getVelocity().isZero(STOP_EPSILON)) {
+        if (!getVelocity().isZero() && getVelocity().isZero(STOP_EPSILON)) {
             Vector2 velocity = Pools.vector2s.grabNew(); // (0,0) velocity is exactly what we want
             setVelocity(velocity);
             Pools.vector2s.freeCount(1);
         }
-    }
-
-    @Override
-    public void initialize(final Entity owner) {
-
-        positionComponent = owner.requireComponent(PositionComponent.class);
-
-        final PhysicsSystem physicsSystem = Services.get(PhysicsSystem.class);
-
-        {
-            BodyDef bodyDef = Pools.bodyDefs.grabNew();
-            bodyDef.type = bodyType;
-            bodyDef.bullet = isFastMoving;
-
-            if (syncPosition) {
-                bodyDef.position.set(targetPosition);
-            }
-            else {
-                bodyDef.position.set(positionComponent.getPosition()).scl(Physics.PIXELS_TO_METERS);
-            }
-            bodyDef.linearDamping = damping;
-            body = physicsSystem.getWorld().createBody(bodyDef);
-            body.setUserData(this);
-            Pools.bodyDefs.freeCount(1);
-        }
-
-        physicsSystem.addElement(this);
     }
 
     @Override
@@ -203,7 +225,7 @@ public final class BodyComponent extends AbstractComponent implements PhysicsEle
 
         bodyType = BodyType.StaticBody;
         isFastMoving = false;
-        damping = 10f;
+        initialDamping = 0f;
         syncPosition = false;
         headingLockedCount = 0;
     }
@@ -214,5 +236,13 @@ public final class BodyComponent extends AbstractComponent implements PhysicsEle
         gamePosition.set(body.getPosition()).scl(Physics.METERS_TO_PIXELS);
         positionComponent.setPosition(gamePosition);
         Pools.vector2s.freeCount(1);
+
+        gameVelocity.set(body.getLinearVelocity()).scl(Physics.METERS_TO_PIXELS);
+    }
+
+    private void assertNonStaticType() {
+        if (RUN_SANITY_CHECKS && bodyType == BodyType.StaticBody) {
+            throw new IllegalArgumentException("Can't move a static body. Did you forget to set body type?");
+        }
     }
 }

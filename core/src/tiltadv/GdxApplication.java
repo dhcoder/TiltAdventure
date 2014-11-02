@@ -27,14 +27,12 @@ import tiltadv.assets.Scene;
 import tiltadv.assets.SceneDatastore;
 import tiltadv.assets.TileDatastore;
 import tiltadv.assets.TilesetDatastore;
+import tiltadv.components.behavior.OctoBehaviorComponent;
 import tiltadv.components.behavior.OscillationBehaviorComponent;
 import tiltadv.components.behavior.PlayerBehaviorComponent;
 import tiltadv.components.behavior.PlayerSensorBehaviorComponent;
 import tiltadv.components.body.FollowCameraComponent;
-import tiltadv.components.dynamics.PositionComponent;
-import tiltadv.components.dynamics.TiltComponent;
-import tiltadv.components.dynamics.box2d.BodyComponent;
-import tiltadv.components.dynamics.box2d.FixtureComponent;
+import tiltadv.components.combat.AttackComponent;
 import tiltadv.components.combat.DefenseComponent;
 import tiltadv.components.combat.HealthComponent;
 import tiltadv.components.combat.KnockbackComponent;
@@ -42,11 +40,17 @@ import tiltadv.components.display.CharacterDisplayComponent;
 import tiltadv.components.display.FpsDisplayComponent;
 import tiltadv.components.display.SpriteComponent;
 import tiltadv.components.display.TiltDisplayComponent;
+import tiltadv.components.dynamics.PositionComponent;
+import tiltadv.components.dynamics.TiltComponent;
+import tiltadv.components.dynamics.box2d.BodyComponent;
+import tiltadv.components.dynamics.box2d.FixtureComponent;
 import tiltadv.components.hierarchy.ParentComponent;
 import tiltadv.components.hierarchy.children.PlayerChildrenComponent;
 import tiltadv.components.input.AccelerometerInputComponent;
 import tiltadv.components.input.KeyboardInputComponent;
+import tiltadv.components.input.touchables.TargetTouchableComponent;
 import tiltadv.globals.Animations;
+import tiltadv.globals.Category;
 import tiltadv.globals.DevSettings;
 import tiltadv.globals.EntityId;
 import tiltadv.globals.Physics;
@@ -82,12 +86,12 @@ public final class GdxApplication extends ApplicationAdapter {
     private EntityManager entities;
     private RenderSystem renderSystem;
 
-    //    private Shape octoBounds;
     private CircleShape playerBounds;
     //    private Shape gravityWellBounds;
     private CircleShape playerSensorBounds;
     //    private Shape playerSwordBounds;
-//    private Shape octoRockBounds;
+    private CircleShape octoBounds;
+    private CircleShape octoRockBounds;
     private CircleShape boulderBounds;
     private TouchSystem touchSystem;
     private PhysicsSystem physicsSystem;
@@ -97,6 +101,7 @@ public final class GdxApplication extends ApplicationAdapter {
             Pool.RUN_SANITY_CHECKS = DevSettings.RUN_SANITY_CHECKS;
             ArrayMap.RUN_SANITY_CHECKS = DevSettings.RUN_SANITY_CHECKS;
             Scene.RUN_SANITY_CHECKS = DevSettings.RUN_SANITY_CHECKS;
+            BodyComponent.RUN_SANITY_CHECKS = DevSettings.RUN_SANITY_CHECKS;
         }
         font = new BitmapFont();
 
@@ -218,12 +223,12 @@ public final class GdxApplication extends ApplicationAdapter {
         entities = new EntityManager(ENTITY_COUNT);
 
 //        gravityWellBounds = new Circle(8.0f);
-//        octoBounds = new Circle(8.0f);
         playerBounds = Physics.newCircle(6.5f);
         playerSensorBounds = Physics.newCircle(8.0f);
         playerSensorBounds.setPosition(new Vector2(0.6f, 0));
 //        playerSwordBounds = new Circle(5f);
-//        octoRockBounds = new Circle(Tiles.ROCK.getRegionWidth() / 2f);
+        octoBounds = Physics.newCircle(8.0f);
+        octoRockBounds = Physics.newCircle(Tiles.ROCK.getRegionWidth() / 2f);
         boulderBounds = Physics.newCircle(8f);
 
         entities.registerTemplate(EntityId.BOUNDARY, new EntityManager.EntityCreator() {
@@ -262,7 +267,8 @@ public final class GdxApplication extends ApplicationAdapter {
                 Pools.vector2s.freeCount(1);
                 entity.addComponent(PositionComponent.class);
                 entity.addComponent(BodyComponent.class).setBodyType(BodyType.DynamicBody);
-                entity.addComponent(FixtureComponent.class).setShape(playerBounds);
+                entity.addComponent(FixtureComponent.class).setShape(playerBounds).setFilter(Category.PLAYER,
+                    (short)(Category.OBSTACLES | Category.ENEMY | Category.ENEMY_PROJECTILE));
                 entity.addComponent(TiltComponent.class);
                 entity.addComponent(Gdx.app.getType() == ApplicationType.Android ? AccelerometerInputComponent.class :
                     KeyboardInputComponent.class);
@@ -313,37 +319,41 @@ public final class GdxApplication extends ApplicationAdapter {
             }
         });
 
-//        entities.registerTemplate(EntityId.OCTO, new EntityManager.EntityCreator() {
-//            @Override
-//            public void initialize(final Entity entity) {
-//                entity.addComponent(KnockbackComponent.class).setMultiplier(2f);
-//                entity.addComponent(AttackComponent.class);
-//                entity.addComponent(DefenseComponent.class);
-//                entity.addComponent(PositionComponent.class);
-//                entity.addComponent(SpriteComponent.class);
-//                entity.addComponent(HeadingComponent.class);
-//                entity.addComponent(MotionComponent.class);
-//                entity.addComponent(TargetTouchableComponent.class);
-//                entity.addComponent(OctoBehaviorComponent.class);
-//                entity.addComponent(HealthComponent.class).setHealth(3)
-//                    .setInvicibilityDuration(ENEMY_INVINCIBILITY_DURATION);
-//                entity.addComponent(CharacterDisplayComponent.class)
-//                    .set(Animations.OCTODOWN, Animations.OCTORIGHT, Animations.OCTOUP);
+        entities.registerTemplate(EntityId.OCTO, new EntityManager.EntityCreator() {
+            @Override
+            public void initialize(final Entity entity) {
+                entity.addComponent(BodyComponent.class).setBodyType(BodyType.DynamicBody);
+                entity.addComponent(FixtureComponent.class).setShape(octoBounds)
+                    .setFilter(Category.ENEMY, (short)(Category.OBSTACLES | Category.PLAYER));
+                ;
+                entity.addComponent(KnockbackComponent.class).setMultiplier(2f);
+                entity.addComponent(AttackComponent.class);
+                entity.addComponent(DefenseComponent.class);
+                entity.addComponent(PositionComponent.class);
+                entity.addComponent(SpriteComponent.class);
+                entity.addComponent(TargetTouchableComponent.class);
+                entity.addComponent(OctoBehaviorComponent.class);
+                entity.addComponent(HealthComponent.class).setHealth(3)
+                    .setInvicibilityDuration(ENEMY_INVINCIBILITY_DURATION);
+                entity.addComponent(CharacterDisplayComponent.class)
+                    .set(Animations.OCTODOWN, Animations.OCTORIGHT, Animations.OCTOUP);
 //                entity.addComponent(EnemyCollisionComponent.class).setShape(octoBounds);
-//            }
-//        });
+            }
+        });
 
-//        entities.registerTemplate(EntityId.OCTO_ROCK, new EntityManager.EntityCreator() {
-//            @Override
-//            public void initialize(final Entity entity) {
-//                entity.addComponent(AttackComponent.class);
-//                entity.addComponent(PositionComponent.class);
-//                entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.ROCK);
-//                entity.addComponent(HeadingComponent.class);
-//                entity.addComponent(MotionComponent.class);
+        entities.registerTemplate(EntityId.OCTO_ROCK, new EntityManager.EntityCreator() {
+            @Override
+            public void initialize(final Entity entity) {
+                entity.addComponent(AttackComponent.class);
+                entity.addComponent(PositionComponent.class);
+                entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.ROCK);
+                entity.addComponent(BodyComponent.class).setBodyType(BodyType.DynamicBody).setFastMoving(true);
+                entity.addComponent(FixtureComponent.class).setShape(octoRockBounds).setFilter(Category.ENEMY_PROJECTILE,
+                    (short)(Category.OBSTACLES | Category.PLAYER));
+                ;
 //                entity.addComponent(EnemyProjectileCollisionComponent.class).setShape(octoRockBounds);
-//            }
-//        });
+            }
+        });
 
 //        entities.registerTemplate(EntityId.TARGET_INDICATOR, new EntityManager.EntityCreator() {
 //            @Override
@@ -385,9 +395,9 @@ public final class GdxApplication extends ApplicationAdapter {
 //        addGravityWell(-30, 70);
 //        addGravityWell(-90, -30);
         addMainCamera(playerEntity);
-//        addOctoEnemies();
+        addOctoEnemies();
         addMovingBoulderEntities();
-        addTiltIndicatorEntity(playerEntity);
+//        addTiltIndicatorEntity(playerEntity);
         addFpsEntity();
         addBoundaryWalls();
 //        addTargetEntity();
@@ -410,8 +420,8 @@ public final class GdxApplication extends ApplicationAdapter {
 //
 //    }
 
-//    private void addOctoEnemies() {
-//        addOctoEnemy(-80, 20);
+    private void addOctoEnemies() {
+        addOctoEnemy(-80, 20);
 //        addOctoEnemy(-30, 20);
 //        addOctoEnemy(-80, 80);
 //        addOctoEnemy(-30, 80);
@@ -427,7 +437,7 @@ public final class GdxApplication extends ApplicationAdapter {
 //        addOctoEnemy(80, -80);
 //        addOctoEnemy(30, -20);
 //        addOctoEnemy(80, -20);
-//    }
+    }
 
     private void addBoundaryWalls() {
         Scene scene = Services.get(SceneDatastore.class).get("demo");
@@ -468,7 +478,7 @@ public final class GdxApplication extends ApplicationAdapter {
     }
 
     private void addMovingBoulderEntities() {
-        final int numBoulders = 1;
+        final int numBoulders = 0;
         final float scaleX = 120;
         final float scaleY = 90;
         final float percent = .4f;
@@ -503,14 +513,14 @@ public final class GdxApplication extends ApplicationAdapter {
         return entities.newEntityFromTemplate(EntityId.PLAYER);
     }
 
-//    private void addOctoEnemy(final float x, final float y) {
-//        Entity octoEnemy = entities.newEntityFromTemplate(EntityId.OCTO);
-//        PositionComponent positionComponent = octoEnemy.requireComponent(PositionComponent.class);
-//
-//        Vector2 position = Pools.vector2s.grabNew().set(x, y);
-//        positionComponent.setPosition(position);
-//        Pools.vector2s.free(position);
-//    }
+    private void addOctoEnemy(final float x, final float y) {
+        Entity octoEnemy = entities.newEntityFromTemplate(EntityId.OCTO);
+        PositionComponent positionComponent = octoEnemy.requireComponent(PositionComponent.class);
+
+        Vector2 position = Pools.vector2s.grabNew().set(x, y);
+        positionComponent.setPosition(position);
+        Pools.vector2s.free(position);
+    }
 
     private void AddMovingBoulderEntity(final float xFrom, final float yFrom, final float xTo, final float yTo) {
         Entity boulderEntity = entities.newEntityFromTemplate(EntityId.BOULDER);
