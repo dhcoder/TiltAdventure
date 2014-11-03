@@ -12,14 +12,21 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import dhcoder.support.memory.HeapPool;
 import dhcoder.support.memory.Pool;
 import dhcoder.support.memory.Poolable;
 import dhcoder.support.time.Duration;
+
+import java.util.List;
 
 /**
  * Constants for our physics system
  */
 public final class PhysicsSystem {
+
+    private interface CollisionCallback {
+        public void run(CollisionCallbackData callbackData);
+    }
 
     private static final class CollisionHandlerEntry {
         int categoryBitsFirst;
@@ -43,7 +50,25 @@ public final class PhysicsSystem {
         }
     }
 
+    private static final class CollisionFixtures implements Poolable {
+        public Fixture fixtureA;
+        public Fixture fixtureB;
+
+        public boolean matches(final Fixture fixtureC, final Fixture fixtureD) {
+            return ((fixtureA == fixtureC && fixtureB == fixtureD) ||
+                (fixtureA == fixtureD && fixtureB == fixtureC));
+        }
+
+        @Override
+        public void reset() {
+            fixtureA = null;
+            fixtureB = null;
+        }
+    }
+
     private static final class CollisionCallbackData implements Poolable {
+        // Order matters with callbacks! Users expect one body to appear first and another
+        // to appear second (depending on how they registered their callback)
         public Body bodyFirst;
         public Body bodySecond;
         public CollisionHandler collisionHandler;
@@ -56,25 +81,7 @@ public final class PhysicsSystem {
         }
     }
 
-    private interface CollisionCallback {
-        public void run(CollisionCallbackData callbackData);
-    }
-
     private final class CollisionListener implements ContactListener {
-
-        private final CollisionCallback callCollidedHandler = new CollisionCallback() {
-            @Override
-            public void run(final CollisionCallbackData data) {
-                data.collisionHandler.onCollided(data.bodyFirst, data.bodySecond);
-            }
-        };
-
-        private final CollisionCallback callSeparatedHandler = new CollisionCallback() {
-            @Override
-            public void run(final CollisionCallbackData data) {
-                data.collisionHandler.onSeparated(data.bodyFirst, data.bodySecond);
-            }
-        };
 
         @Override
         public void beginContact(final Contact contact) {
@@ -82,12 +89,26 @@ public final class PhysicsSystem {
                 return;
             }
 
-            runCollisionHandlers(contact, callCollidedHandler);
+            if (runCollisionHandlers(contact, callCollidedHandler)) {
+                final CollisionFixtures collisionFixtures = collisionsPool.grabNew();
+                collisionFixtures.fixtureA = contact.getFixtureA();
+                collisionFixtures.fixtureB = contact.getFixtureB();
+            }
         }
 
         @Override
         public void endContact(final Contact contact) {
-            runCollisionHandlers(contact, callSeparatedHandler);
+            if (runCollisionHandlers(contact, callSeparatedHandler)) {
+                final List<CollisionFixtures> collisions = collisionsPool.getItemsInUse();
+                int numCollisions = collisions.size();
+                for (int i = 0; i < numCollisions; i++) {
+                    CollisionFixtures collisionFixtures = collisions.get(i);
+                    if (collisionFixtures.matches(contact.getFixtureA(), contact.getFixtureB())) {
+                        collisionsPool.free(collisionFixtures);
+                        break;
+                    }
+                }
+            }
         }
 
         @Override
@@ -100,59 +121,33 @@ public final class PhysicsSystem {
 
         @Override
         public void postSolve(final Contact contact, final ContactImpulse impulse) {}
-
-
-
-        private boolean hasCollisionHandlers(final Contact contact) {
-            Fixture fixtureA = contact.getFixtureA();
-            Fixture fixtureB = contact.getFixtureB();
-
-            for (int i = 0; i < collisionHandlers.size; i++) {
-                CollisionHandlerEntry entry = collisionHandlers.get(i);
-                if (entry.matches(fixtureA.getFilterData().categoryBits, fixtureB.getFilterData().categoryBits)) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-        /**
-         * Get the collision key associated with the various input parameters. Returns false if nothing was found
-         * (which means there's no collision handler registered for the two fixtures).
-         */
-        private void runCollisionHandlers(final Contact contact, final CollisionCallback collisionCallback) {
-            Fixture fixtureA = contact.getFixtureA();
-            Fixture fixtureB = contact.getFixtureB();
-
-            for (int i = 0; i < collisionHandlers.size; i++) {
-                CollisionHandlerEntry entry = collisionHandlers.get(i);
-                if (entry.matches(fixtureA.getFilterData().categoryBits, fixtureB.getFilterData().categoryBits)) {
-                    Body bodyA = fixtureA.getBody();
-                    Body bodyB = fixtureB.getBody();
-
-                    final CollisionCallbackData data = collisionDataPool.grabNew();
-                    if (entry.isFirstCategory(fixtureA.getFilterData().categoryBits)) {
-                        data.bodyFirst = bodyA;
-                        data.bodySecond = bodyB;
-                    }
-                    else {
-                        data.bodyFirst = bodyB;
-                        data.bodySecond = bodyA;
-                    }
-                    data.collisionHandler = entry.collisionHandler;
-                    collisionCallback.run(data);
-                    collisionDataPool.freeCount(1);
-                }
-            }
-        }
     }
 
     // Recommended values from Box2D manual
     private static final int VELOCITY_ITERATIONS = 6;
     private static final int POSITION_ITERATIONS = 2;
+    private final CollisionCallback callCollidedHandler = new CollisionCallback() {
+        @Override
+        public void run(final CollisionCallbackData data) {
+            data.collisionHandler.onCollided(data.bodyFirst, data.bodySecond);
+        }
+    };
+    private final CollisionCallback callOverlappingHandler = new CollisionCallback() {
+        @Override
+        public void run(final CollisionCallbackData data) {
+            data.collisionHandler.onOverlapping(data.bodyFirst, data.bodySecond);
+        }
+    };
+    private final CollisionCallback callSeparatedHandler = new CollisionCallback() {
+        @Override
+        public void run(final CollisionCallbackData data) {
+            data.collisionHandler.onSeparated(data.bodyFirst, data.bodySecond);
+        }
+    };
     private final World world;
     private final Array<PhysicsElement> physicsElements;
     private final Array<CollisionHandlerEntry> collisionHandlers;
+    private final HeapPool<CollisionFixtures> collisionsPool;
     private final Pool<CollisionCallbackData> collisionDataPool = Pool.of(CollisionCallbackData.class, 1);
     private Box2DDebugRenderer collisionRenderer;
     private Matrix4 debugRenderMatrix;
@@ -167,6 +162,7 @@ public final class PhysicsSystem {
 
         physicsElements = new Array<PhysicsElement>(false, capacity);
         collisionHandlers = new Array<CollisionHandlerEntry>();
+        collisionsPool = HeapPool.of(CollisionFixtures.class, capacity);
     }
 
     public World getWorld() {
@@ -195,9 +191,16 @@ public final class PhysicsSystem {
     }
 
     public void update(final Duration elapsedTime) {
+
         // Variable time step is not recommended, but we'll be careful... We can change this later if it causes
         // trouble, but otherwise, it would be nice to have 1:1 entity::update and physics::update steps.
         world.step(elapsedTime.getSeconds(), VELOCITY_ITERATIONS, POSITION_ITERATIONS);
+
+        int numCollisionFixtures = collisionsPool.getItemsInUse().size();
+        for (int i = 0; i < numCollisionFixtures; i++) {
+            CollisionFixtures collisionFixtures = collisionsPool.getItemsInUse().get(i);
+            runCollisionHandlers(collisionFixtures.fixtureA, collisionFixtures.fixtureB, callOverlappingHandler);
+        }
 
         for (int i = 0; i < physicsElements.size; i++) {
             PhysicsElement physicsElement = physicsElements.get(i);
@@ -220,5 +223,61 @@ public final class PhysicsSystem {
             collisionRenderer.dispose();
         }
         world.dispose();
+    }
+
+    private boolean hasCollisionHandlers(final Contact contact) {
+        Fixture fixtureA = contact.getFixtureA();
+        Fixture fixtureB = contact.getFixtureB();
+
+        for (int i = 0; i < collisionHandlers.size; i++) {
+            CollisionHandlerEntry entry = collisionHandlers.get(i);
+            if (entry.matches(fixtureA.getFilterData().categoryBits, fixtureB.getFilterData().categoryBits)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean runCollisionHandlers(final Contact contact, final CollisionCallback collisionCallback) {
+        Fixture fixtureA = contact.getFixtureA();
+        Fixture fixtureB = contact.getFixtureB();
+
+        return runCollisionHandlers(fixtureA, fixtureB, collisionCallback);
+    }
+
+    /**
+     * Given two fixtures that are colliding, call any collision handlers that may have been registered to handle it.
+     *
+     * Returns true if a callback was registered (and therefore called).
+     */
+    private boolean runCollisionHandlers(final Fixture fixtureA, final Fixture fixtureB,
+        final CollisionCallback collisionCallback) {
+
+        boolean triggeredCallback = false;
+
+        for (int i = 0; i < collisionHandlers.size; i++) {
+            CollisionHandlerEntry entry = collisionHandlers.get(i);
+            if (entry.matches(fixtureA.getFilterData().categoryBits, fixtureB.getFilterData().categoryBits)) {
+                Body bodyA = fixtureA.getBody();
+                Body bodyB = fixtureB.getBody();
+
+                final CollisionCallbackData data = collisionDataPool.grabNew();
+                if (entry.isFirstCategory(fixtureA.getFilterData().categoryBits)) {
+                    data.bodyFirst = bodyA;
+                    data.bodySecond = bodyB;
+                }
+                else {
+                    data.bodyFirst = bodyB;
+                    data.bodySecond = bodyA;
+                }
+                data.collisionHandler = entry.collisionHandler;
+                collisionCallback.run(data);
+                collisionDataPool.freeCount(1);
+                triggeredCallback = true;
+            }
+        }
+
+        return triggeredCallback;
     }
 }

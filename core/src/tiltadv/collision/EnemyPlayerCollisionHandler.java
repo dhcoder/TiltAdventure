@@ -15,6 +15,15 @@ import tiltadv.memory.Pools;
 public final class EnemyPlayerCollisionHandler extends AbstractCollisionHandler {
     @Override
     public void onCollided(final Body bodyA, final Body bodyB) {
+        handleCollision(bodyA, bodyB);
+    }
+
+    @Override
+    public void onOverlapping(final Body bodyA, final Body bodyB) {
+        handleCollision(bodyA, bodyB);
+    }
+
+    public void handleCollision(final Body bodyA, final Body bodyB) {
         Entity playerEntity = (Entity)bodyB.getUserData();
         HealthComponent healthComponent = playerEntity.requireComponent(HealthComponent.class);
         if (!healthComponent.canTakeDamage()) {

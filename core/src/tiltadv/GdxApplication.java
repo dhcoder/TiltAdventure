@@ -27,6 +27,7 @@ import tiltadv.assets.Scene;
 import tiltadv.assets.SceneDatastore;
 import tiltadv.assets.TileDatastore;
 import tiltadv.assets.TilesetDatastore;
+import tiltadv.collision.EnemyPlayerCollisionHandler;
 import tiltadv.collision.EnemyProjectileDieOnCollisionHandler;
 import tiltadv.collision.EnemyProjectilePlayerCollisionHandler;
 import tiltadv.components.behavior.OctoBehaviorComponent;
@@ -179,7 +180,7 @@ public final class GdxApplication extends ApplicationAdapter {
             new EnemyProjectilePlayerCollisionHandler());
         physicsSystem.addCollisionHandler(Category.ENEMY_PROJECTILE, Category.PLAYER | Category.OBSTACLES,
             new EnemyProjectileDieOnCollisionHandler());
-        physicsSystem.addCollisionHandler(Category.ENEMY, Category.PLAYER, new EnemyProjectilePlayerCollisionHandler());
+        physicsSystem.addCollisionHandler(Category.ENEMY, Category.PLAYER, new EnemyPlayerCollisionHandler());
 
 //        physicsSystem.addCollisionHandler(Category.);
 
@@ -326,7 +327,7 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(PositionComponent.class);
                 entity.addComponent(BodyComponent.class).setBodyType(BodyType.KinematicBody);
                 entity.addComponent(FixtureComponent.class).setShape(boulderBounds)
-                    .setCategory(Category.PLAYER_SENSOR, Category.ENEMY);
+                    .setCategory(Category.OBSTACLES);
             }
         });
 
@@ -407,7 +408,7 @@ public final class GdxApplication extends ApplicationAdapter {
 //        addGravityWell(-90, -30);
         addMainCamera(playerEntity);
         addOctoEnemies();
-//        addMovingBoulderEntities();
+        addMovingBoulderEntities();
 //        addTiltIndicatorEntity(playerEntity);
         addFpsEntity();
         addBoundaryWalls();
@@ -489,7 +490,7 @@ public final class GdxApplication extends ApplicationAdapter {
     }
 
     private void addMovingBoulderEntities() {
-        final int numBoulders = 4;
+        final int numBoulders = 14;
         final float scaleX = 120;
         final float scaleY = 90;
         final float percent = .4f;

@@ -9,5 +9,6 @@ import com.badlogic.gdx.physics.box2d.Body;
  */
 public interface CollisionHandler {
     void onCollided(Body bodyA, Body bodyB);
+    void onOverlapping(Body bodyA, Body bodyB);
     void onSeparated(Body bodyA, Body bodyB);
 }

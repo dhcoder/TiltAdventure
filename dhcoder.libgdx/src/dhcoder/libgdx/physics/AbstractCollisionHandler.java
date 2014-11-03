@@ -10,5 +10,8 @@ public abstract class AbstractCollisionHandler implements CollisionHandler {
     public void onCollided(final Body bodyA, final Body bodyB) {}
 
     @Override
+    public void onOverlapping(final Body bodyA, final Body bodyB) {}
+
+    @Override
     public void onSeparated(final Body bodyA, final Body bodyB) {}
 }
