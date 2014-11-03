@@ -27,6 +27,7 @@ import tiltadv.assets.Scene;
 import tiltadv.assets.SceneDatastore;
 import tiltadv.assets.TileDatastore;
 import tiltadv.assets.TilesetDatastore;
+import tiltadv.collision.EnemyProjectileCollisionHandler;
 import tiltadv.components.behavior.OctoBehaviorComponent;
 import tiltadv.components.behavior.OscillationBehaviorComponent;
 import tiltadv.components.behavior.PlayerBehaviorComponent;
@@ -173,6 +174,9 @@ public final class GdxApplication extends ApplicationAdapter {
         physicsSystem = new PhysicsSystem(ENTITY_COUNT);
         Services.register(PhysicsSystem.class, physicsSystem);
 
+        physicsSystem
+            .addCollisionHandler(Category.ENEMY_PROJECTILE, Category.OBSTACLES, new EnemyProjectileCollisionHandler());
+
         // TODO: Tune the application for the best batch size for render system
         // https://github.com/libgdx/libgdx/wiki/Spritebatch,-Textureregions,-and-Sprites#performance-tuning
         renderSystem = new RenderSystem(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, DevSettings.IN_DEV_MODE ? 1000 : 600);
@@ -236,7 +240,7 @@ public final class GdxApplication extends ApplicationAdapter {
             public void initialize(final Entity entity) {
                 entity.addComponent(PositionComponent.class);
                 entity.addComponent(BodyComponent.class);
-                entity.addComponent(FixtureComponent.class);
+                entity.addComponent(FixtureComponent.class).setCategory(Category.OBSTACLES);
             }
         });
 
@@ -267,8 +271,8 @@ public final class GdxApplication extends ApplicationAdapter {
                 Pools.vector2s.freeCount(1);
                 entity.addComponent(PositionComponent.class);
                 entity.addComponent(BodyComponent.class).setBodyType(BodyType.DynamicBody);
-                entity.addComponent(FixtureComponent.class).setShape(playerBounds).setFilter(Category.PLAYER,
-                    Category.OBSTACLES | Category.ENEMY | Category.ENEMY_PROJECTILE);
+                entity.addComponent(FixtureComponent.class).setShape(playerBounds)
+                    .setCategory(Category.PLAYER, Category.OBSTACLES | Category.ENEMY | Category.ENEMY_PROJECTILE);
                 entity.addComponent(TiltComponent.class);
                 entity.addComponent(Gdx.app.getType() == ApplicationType.Android ? AccelerometerInputComponent.class :
                     KeyboardInputComponent.class);
@@ -303,7 +307,7 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(PlayerSensorBehaviorComponent.class);
                 entity.addComponent(PositionComponent.class);
                 entity.addComponent(FixtureComponent.class).setShape(playerSensorBounds).setSensor(true)
-                    .setOffset(new Vector2(10f, 0));
+                    .setOffset(new Vector2(10f, 0)).setCategory(Category.PLAYER_SENSOR);
                 entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.SENSOR);
             }
         });
@@ -315,7 +319,8 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(OscillationBehaviorComponent.class);
                 entity.addComponent(PositionComponent.class);
                 entity.addComponent(BodyComponent.class).setBodyType(BodyType.KinematicBody);
-                entity.addComponent(FixtureComponent.class).setShape(boulderBounds);
+                entity.addComponent(FixtureComponent.class).setShape(boulderBounds)
+                    .setCategory(Category.PLAYER_SENSOR, Category.ENEMY);
             }
         });
 
@@ -324,7 +329,7 @@ public final class GdxApplication extends ApplicationAdapter {
             public void initialize(final Entity entity) {
                 entity.addComponent(BodyComponent.class).setBodyType(BodyType.DynamicBody);
                 entity.addComponent(FixtureComponent.class).setShape(octoBounds)
-                    .setFilter(Category.ENEMY, Category.OBSTACLES | Category.PLAYER);
+                    .setCategory(Category.ENEMY, Category.OBSTACLES | Category.PLAYER);
                 ;
                 entity.addComponent(KnockbackComponent.class).setMultiplier(2f);
                 entity.addComponent(AttackComponent.class);
@@ -349,7 +354,7 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.ROCK);
                 entity.addComponent(BodyComponent.class).setBodyType(BodyType.DynamicBody).setFastMoving(true);
                 entity.addComponent(FixtureComponent.class).setShape(octoRockBounds)
-                    .setFilter(Category.ENEMY_PROJECTILE, Category.OBSTACLES | Category.PLAYER);
+                    .setCategory(Category.ENEMY_PROJECTILE, Category.OBSTACLES | Category.PLAYER);
                 ;
 //                entity.addComponent(EnemyProjectileCollisionComponent.class).setShape(octoRockBounds);
             }
@@ -396,7 +401,7 @@ public final class GdxApplication extends ApplicationAdapter {
 //        addGravityWell(-90, -30);
         addMainCamera(playerEntity);
         addOctoEnemies();
-        addMovingBoulderEntities();
+//        addMovingBoulderEntities();
 //        addTiltIndicatorEntity(playerEntity);
         addFpsEntity();
         addBoundaryWalls();

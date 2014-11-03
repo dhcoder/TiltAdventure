@@ -174,6 +174,7 @@ public final class BodyComponent extends AbstractComponent implements PhysicsEle
             }
             bodyDef.linearDamping = initialDamping;
             body = physicsSystem.getWorld().createBody(bodyDef);
+            body.setUserData(owner);
             Pools.bodyDefs.freeCount(1);
         }
 

@@ -17,6 +17,7 @@ import tiltadv.memory.Pools;
 
 import static dhcoder.support.contract.ContractUtils.requireNonNull;
 import static dhcoder.support.contract.ContractUtils.requireNull;
+import static dhcoder.support.contract.ContractUtils.requireTrue;
 
 /**
  * A component that encapsulates a Box2D {@link Fixture} which should be attached to a Box2D {@link Body}. You can
@@ -35,7 +36,7 @@ public final class FixtureComponent extends AbstractComponent implements Physics
     private Entity targetEntity;
     private Shape shape;
     private boolean isSensor;
-    private short categoryBits = 0x1;
+    private short categoryBits = 0;
     private short maskBits = -1;
     private Fixture fixture;
 
@@ -62,10 +63,16 @@ public final class FixtureComponent extends AbstractComponent implements Physics
         return this;
     }
 
-    public FixtureComponent setFilter(final int categoryBits, final int maskBits) {
+    public FixtureComponent setCategory(final int category) {
+        requireNull(fixture, "Can't change a fixture's filter settings after it is initialized");
+        this.categoryBits = (short)category;
+        return this;
+    }
+
+    public FixtureComponent setCategory(final int category, final int maskBits) {
         requireNull(fixture, "Can't change a fixture's filter settings after it is initialized");
 
-        this.categoryBits = (short)categoryBits;
+        this.categoryBits = (short)category;
         this.maskBits = (short)maskBits;
 
         return this;
@@ -73,7 +80,8 @@ public final class FixtureComponent extends AbstractComponent implements Physics
 
     @Override
     public void initialize(final Entity owner) {
-        requireNonNull(shape, "Body shape must be set");
+        requireNonNull(shape, "Fixture shape must be set");
+        requireTrue(categoryBits > 0, "Fixture category must be set");
 
         if (targetEntity == null) {
             targetEntity = owner;
@@ -126,7 +134,7 @@ public final class FixtureComponent extends AbstractComponent implements Physics
         targetEntity = null;
         shape = null;
         isSensor = false;
-        categoryBits = 0x1;
+        categoryBits = 0;
         maskBits = -1;
 
         fixture = null;
