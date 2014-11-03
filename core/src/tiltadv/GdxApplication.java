@@ -268,7 +268,7 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(PositionComponent.class);
                 entity.addComponent(BodyComponent.class).setBodyType(BodyType.DynamicBody);
                 entity.addComponent(FixtureComponent.class).setShape(playerBounds).setFilter(Category.PLAYER,
-                    (short)(Category.OBSTACLES | Category.ENEMY | Category.ENEMY_PROJECTILE));
+                    Category.OBSTACLES | Category.ENEMY | Category.ENEMY_PROJECTILE);
                 entity.addComponent(TiltComponent.class);
                 entity.addComponent(Gdx.app.getType() == ApplicationType.Android ? AccelerometerInputComponent.class :
                     KeyboardInputComponent.class);
@@ -324,7 +324,7 @@ public final class GdxApplication extends ApplicationAdapter {
             public void initialize(final Entity entity) {
                 entity.addComponent(BodyComponent.class).setBodyType(BodyType.DynamicBody);
                 entity.addComponent(FixtureComponent.class).setShape(octoBounds)
-                    .setFilter(Category.ENEMY, (short)(Category.OBSTACLES | Category.PLAYER));
+                    .setFilter(Category.ENEMY, Category.OBSTACLES | Category.PLAYER);
                 ;
                 entity.addComponent(KnockbackComponent.class).setMultiplier(2f);
                 entity.addComponent(AttackComponent.class);
@@ -348,8 +348,8 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(PositionComponent.class);
                 entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.ROCK);
                 entity.addComponent(BodyComponent.class).setBodyType(BodyType.DynamicBody).setFastMoving(true);
-                entity.addComponent(FixtureComponent.class).setShape(octoRockBounds).setFilter(Category.ENEMY_PROJECTILE,
-                    (short)(Category.OBSTACLES | Category.PLAYER));
+                entity.addComponent(FixtureComponent.class).setShape(octoRockBounds)
+                    .setFilter(Category.ENEMY_PROJECTILE, Category.OBSTACLES | Category.PLAYER);
                 ;
 //                entity.addComponent(EnemyProjectileCollisionComponent.class).setShape(octoRockBounds);
             }
