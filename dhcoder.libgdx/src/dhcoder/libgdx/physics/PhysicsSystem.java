@@ -16,36 +16,34 @@ import dhcoder.support.memory.Pool;
 import dhcoder.support.memory.Poolable;
 import dhcoder.support.time.Duration;
 
-import static dhcoder.support.text.StringUtils.format;
-
 /**
  * Constants for our physics system
  */
 public final class PhysicsSystem {
 
     private static final class CollisionHandlerEntry {
-        int categoryFirst;
-        int categorySecond;
+        int categoryBitsFirst;
+        int categoryBitsSecond;
         CollisionHandler collisionHandler;
 
-        public CollisionHandlerEntry(final int categoryFirst, final int categorySecond,
+        public CollisionHandlerEntry(final int categoryBitsFirst, final int categoryBitsSecond,
             final CollisionHandler collisionHandler) {
-            this.categoryFirst = categoryFirst;
-            this.categorySecond = categorySecond;
+            this.categoryBitsFirst = categoryBitsFirst;
+            this.categoryBitsSecond = categoryBitsSecond;
             this.collisionHandler = collisionHandler;
         }
 
         public boolean matches(final int categoryA, final int categoryB) {
-            return ((this.categoryFirst == categoryA && this.categorySecond == categoryB) ||
-                (this.categoryFirst == categoryB && this.categorySecond == categoryA));
+            return (((this.categoryBitsFirst & categoryA) != 0 && (this.categoryBitsSecond & categoryB) != 0) ||
+                ((this.categoryBitsFirst & categoryB) != 0 && (this.categoryBitsSecond & categoryA) != 0));
         }
 
-        public boolean isFirstCategory(final int categoryA) {
-            return categoryFirst == categoryA;
+        public boolean isFirstCategory(final int categoryBitsA) {
+            return categoryBitsFirst == categoryBitsA;
         }
     }
 
-    private static final class CollisionData implements Poolable {
+    private static final class CollisionCallbackData implements Poolable {
         public Body bodyFirst;
         public Body bodySecond;
         public CollisionHandler collisionHandler;
@@ -58,7 +56,25 @@ public final class PhysicsSystem {
         }
     }
 
+    private interface CollisionCallback {
+        public void run(CollisionCallbackData callbackData);
+    }
+
     private final class CollisionListener implements ContactListener {
+
+        private final CollisionCallback callCollidedHandler = new CollisionCallback() {
+            @Override
+            public void run(final CollisionCallbackData data) {
+                data.collisionHandler.onCollided(data.bodyFirst, data.bodySecond);
+            }
+        };
+
+        private final CollisionCallback callSeparatedHandler = new CollisionCallback() {
+            @Override
+            public void run(final CollisionCallbackData data) {
+                data.collisionHandler.onSeparated(data.bodyFirst, data.bodySecond);
+            }
+        };
 
         @Override
         public void beginContact(final Contact contact) {
@@ -66,39 +82,45 @@ public final class PhysicsSystem {
                 return;
             }
 
-            final CollisionData collisionData = collisionDataPool.grabNew();
-            if (getCollisionData(contact, collisionData)) {
-                collisionData.collisionHandler.onCollided(collisionData.bodyFirst, collisionData.bodySecond);
-            }
-            collisionDataPool.freeCount(1);
+            runCollisionHandlers(contact, callCollidedHandler);
         }
 
         @Override
         public void endContact(final Contact contact) {
-            final CollisionData collisionData = collisionDataPool.grabNew();
-            if (getCollisionData(contact, collisionData)) {
-                collisionData.collisionHandler.onSeparated(collisionData.bodyFirst, collisionData.bodySecond);
-            }
-            collisionDataPool.freeCount(1);
+            runCollisionHandlers(contact, callSeparatedHandler);
         }
 
         @Override
         public void preSolve(final Contact contact, final Manifold oldManifold) {
-            final CollisionData collisionData = collisionDataPool.grabNew();
-            if (getCollisionData(contact, collisionData)) {
-                collisionData.collisionHandler.onSeparated(collisionData.bodyFirst, collisionData.bodySecond);
+
+            if (hasCollisionHandlers(contact)) {
+                contact.setEnabled(false); // Collision will be handled externally, don't handle it via Box2D
             }
-            collisionDataPool.freeCount(1);
         }
 
         @Override
         public void postSolve(final Contact contact, final ContactImpulse impulse) {}
 
+
+
+        private boolean hasCollisionHandlers(final Contact contact) {
+            Fixture fixtureA = contact.getFixtureA();
+            Fixture fixtureB = contact.getFixtureB();
+
+            for (int i = 0; i < collisionHandlers.size; i++) {
+                CollisionHandlerEntry entry = collisionHandlers.get(i);
+                if (entry.matches(fixtureA.getFilterData().categoryBits, fixtureB.getFilterData().categoryBits)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
         /**
          * Get the collision key associated with the various input parameters. Returns false if nothing was found
          * (which means there's no collision handler registered for the two fixtures).
          */
-        private boolean getCollisionData(final Contact contact, final CollisionData outCollisionData) {
+        private void runCollisionHandlers(final Contact contact, final CollisionCallback collisionCallback) {
             Fixture fixtureA = contact.getFixtureA();
             Fixture fixtureB = contact.getFixtureB();
 
@@ -108,19 +130,20 @@ public final class PhysicsSystem {
                     Body bodyA = fixtureA.getBody();
                     Body bodyB = fixtureB.getBody();
 
+                    final CollisionCallbackData data = collisionDataPool.grabNew();
                     if (entry.isFirstCategory(fixtureA.getFilterData().categoryBits)) {
-                        outCollisionData.bodyFirst = bodyA;
-                        outCollisionData.bodySecond = bodyB;
+                        data.bodyFirst = bodyA;
+                        data.bodySecond = bodyB;
                     }
                     else {
-                        outCollisionData.bodyFirst = bodyB;
-                        outCollisionData.bodySecond = bodyA;
+                        data.bodyFirst = bodyB;
+                        data.bodySecond = bodyA;
                     }
-                    outCollisionData.collisionHandler = entry.collisionHandler;
-                    return true;
+                    data.collisionHandler = entry.collisionHandler;
+                    collisionCallback.run(data);
+                    collisionDataPool.freeCount(1);
                 }
             }
-            return false;
         }
     }
 
@@ -130,7 +153,7 @@ public final class PhysicsSystem {
     private final World world;
     private final Array<PhysicsElement> physicsElements;
     private final Array<CollisionHandlerEntry> collisionHandlers;
-    private final Pool<CollisionData> collisionDataPool = Pool.of(CollisionData.class, 1);
+    private final Pool<CollisionCallbackData> collisionDataPool = Pool.of(CollisionCallbackData.class, 1);
     private Box2DDebugRenderer collisionRenderer;
     private Matrix4 debugRenderMatrix;
 
@@ -158,16 +181,17 @@ public final class PhysicsSystem {
         return physicsElements.removeValue(physicsElement, true);
     }
 
-    public void addCollisionHandler(final int categoryA, final int categoryB, final CollisionHandler collisionHandler) {
-        for (int i = 0; i < collisionHandlers.size; i++) {
-            CollisionHandlerEntry collisionHandlerEntry = collisionHandlers.get(i);
-            if (collisionHandlerEntry.matches(categoryA, categoryB)) {
-                throw new IllegalArgumentException(
-                    format("Handler for categories {0} and {1} are already registered", categoryA, categoryB));
-            }
-        }
-
-        collisionHandlers.add(new CollisionHandlerEntry(categoryA, categoryB, collisionHandler));
+    /**
+     * Register a {@link CollisionHandler} with this physics system. Note this either a registered handler will handle
+     * a collision OR Box2D will handle it, but not both. The category order that a handler is registered with will
+     * be preserved when the handler is called.
+     * <p/>
+     * You can register multiple handlers for the same collision, which is useful if you have a default behavior you
+     * want to happen in multiple collision cases.
+     */
+    public void addCollisionHandler(final int categoryBitsA, final int categoryBitsB,
+        final CollisionHandler collisionHandler) {
+        collisionHandlers.add(new CollisionHandlerEntry(categoryBitsA, categoryBitsB, collisionHandler));
     }
 
     public void update(final Duration elapsedTime) {

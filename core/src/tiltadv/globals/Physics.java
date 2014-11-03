@@ -1,5 +1,6 @@
 package tiltadv.globals;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
@@ -21,6 +22,14 @@ public final class Physics {
 
     public static float toMeters(final float pixels) {
         return pixels * PIXELS_TO_METERS;
+    }
+
+    public static Vector2 toPixels(final Vector2 meters) {
+        return meters.scl(METERS_TO_PIXELS);
+    }
+
+    public static Vector2 toMeters(final Vector2 pixels) {
+        return pixels.scl(PIXELS_TO_METERS);
     }
 
     public static CircleShape newCircle(final float radiusPixels) {

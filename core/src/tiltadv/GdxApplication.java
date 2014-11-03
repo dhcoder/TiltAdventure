@@ -27,7 +27,8 @@ import tiltadv.assets.Scene;
 import tiltadv.assets.SceneDatastore;
 import tiltadv.assets.TileDatastore;
 import tiltadv.assets.TilesetDatastore;
-import tiltadv.collision.EnemyProjectileCollisionHandler;
+import tiltadv.collision.EnemyProjectileDieOnCollisionHandler;
+import tiltadv.collision.EnemyProjectilePlayerCollisionHandler;
 import tiltadv.components.behavior.OctoBehaviorComponent;
 import tiltadv.components.behavior.OscillationBehaviorComponent;
 import tiltadv.components.behavior.PlayerBehaviorComponent;
@@ -174,8 +175,13 @@ public final class GdxApplication extends ApplicationAdapter {
         physicsSystem = new PhysicsSystem(ENTITY_COUNT);
         Services.register(PhysicsSystem.class, physicsSystem);
 
-        physicsSystem
-            .addCollisionHandler(Category.ENEMY_PROJECTILE, Category.OBSTACLES, new EnemyProjectileCollisionHandler());
+        physicsSystem.addCollisionHandler(Category.ENEMY_PROJECTILE, Category.PLAYER,
+            new EnemyProjectilePlayerCollisionHandler());
+        physicsSystem.addCollisionHandler(Category.ENEMY_PROJECTILE, Category.PLAYER | Category.OBSTACLES,
+            new EnemyProjectileDieOnCollisionHandler());
+        physicsSystem.addCollisionHandler(Category.ENEMY, Category.PLAYER, new EnemyProjectilePlayerCollisionHandler());
+
+//        physicsSystem.addCollisionHandler(Category.);
 
         // TODO: Tune the application for the best batch size for render system
         // https://github.com/libgdx/libgdx/wiki/Spritebatch,-Textureregions,-and-Sprites#performance-tuning
@@ -427,12 +433,12 @@ public final class GdxApplication extends ApplicationAdapter {
 
     private void addOctoEnemies() {
         addOctoEnemy(-80, 20);
-//        addOctoEnemy(-30, 20);
-//        addOctoEnemy(-80, 80);
-//        addOctoEnemy(-30, 80);
-//        addOctoEnemy(80, 20);
-//        addOctoEnemy(30, 20);
-//        addOctoEnemy(30, 80);
+        addOctoEnemy(-30, 20);
+        addOctoEnemy(-80, 80);
+        addOctoEnemy(-30, 80);
+        addOctoEnemy(80, 20);
+        addOctoEnemy(30, 20);
+        addOctoEnemy(30, 80);
 //        addOctoEnemy(80, 80);
 //        addOctoEnemy(-80, -20);
 //        addOctoEnemy(-30, -20);
@@ -483,7 +489,7 @@ public final class GdxApplication extends ApplicationAdapter {
     }
 
     private void addMovingBoulderEntities() {
-        final int numBoulders = 0;
+        final int numBoulders = 4;
         final float scaleX = 120;
         final float scaleY = 90;
         final float percent = .4f;

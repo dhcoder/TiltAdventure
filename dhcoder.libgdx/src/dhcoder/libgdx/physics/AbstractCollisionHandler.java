@@ -7,11 +7,6 @@ import com.badlogic.gdx.physics.box2d.Body;
  */
 public abstract class AbstractCollisionHandler implements CollisionHandler {
     @Override
-    public boolean shouldSkipCollision(final Body bodyA, final Body bodyB) {
-        return false;
-    }
-
-    @Override
     public void onCollided(final Body bodyA, final Body bodyB) {}
 
     @Override

@@ -8,11 +8,6 @@ import com.badlogic.gdx.physics.box2d.Body;
  * Register your collision handlers via {@link PhysicsSystem#addCollisionHandler(int, int, CollisionHandler)}.
  */
 public interface CollisionHandler {
-    /**
-     * Return false if this collision should be skipped
-     */
-    boolean shouldSkipCollision(Body bodyA, Body bodyB);
-
     void onCollided(Body bodyA, Body bodyB);
     void onSeparated(Body bodyA, Body bodyB);
 }

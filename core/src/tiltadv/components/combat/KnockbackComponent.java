@@ -3,7 +3,6 @@ package tiltadv.components.combat;
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
-import dhcoder.support.time.Duration;
 import tiltadv.components.dynamics.box2d.BodyComponent;
 import tiltadv.memory.Pools;
 
@@ -12,8 +11,7 @@ import tiltadv.memory.Pools;
  */
 public final class KnockbackComponent extends AbstractComponent {
 
-    private static final float KNOCKBACK_MAGNITUTDE = 150f;
-    public static final Duration DURATION = Duration.fromSeconds(.3f);
+    private static final float KNOCKBACK_MAGNITUTDE = 500f;
 
     private float multiplier;
     private BodyComponent bodyComponent;

@@ -5,12 +5,11 @@ import dhcoder.libgdx.entity.Entity;
 import dhcoder.libgdx.physics.AbstractCollisionHandler;
 
 /**
- * TODO: HEADER COMMENT HERE.
+ * Default handler for an enemy projectile so it destroys itself on collision.
  */
-public final class EnemyProjectileCollisionHandler extends AbstractCollisionHandler {
+public final class EnemyProjectileDieOnCollisionHandler extends AbstractCollisionHandler {
     @Override
     public void onCollided(final Body bodyA, final Body bodyB) {
-        super.onCollided(bodyA, bodyB);
         Entity projectile = (Entity)bodyA.getUserData();
         projectile.getManager().freeEntity(projectile);
     }
