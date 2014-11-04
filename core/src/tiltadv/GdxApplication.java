@@ -359,10 +359,9 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(PositionComponent.class);
                 entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.ROCK);
                 entity.addComponent(BodyComponent.class).setBodyType(BodyType.DynamicBody).setFastMoving(true)
-                    .setDamping(0f);
+                    .setDamping(Physics.NO_DAMPING);
                 entity.addComponent(FixtureComponent.class).setShape(octoRockBounds)
                     .setCategory(Category.ENEMY_PROJECTILE, Category.OBSTACLES | Category.PLAYER);
-                ;
 //                entity.addComponent(EnemyProjectileCollisionComponent.class).setShape(octoRockBounds);
             }
         });

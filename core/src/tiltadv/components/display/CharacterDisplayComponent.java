@@ -1,7 +1,6 @@
 package tiltadv.components.display;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.math.Angle;
@@ -60,9 +59,7 @@ public final class CharacterDisplayComponent extends AbstractComponent {
 
     @Override
     public void update(final Duration elapsedTime) {
-        Vector2 velocity = bodyComponent.getVelocity();
-
-        if (!velocity.isZero()) {
+        if (!bodyComponent.getBody().getLinearVelocity().isZero()) {
             elapsedSoFar += elapsedTime.getSeconds();
         }
         else {

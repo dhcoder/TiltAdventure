@@ -12,6 +12,11 @@ public final class Physics {
     public static final float METERS_TO_PIXELS = 1 / PIXELS_TO_METERS;
 
     /**
+     * A damping value which, when set, means an entity will never come to rest.
+     */
+    public static final float NO_DAMPING = 0f;
+
+    /**
      * A damping value which, when set, means an entity will come to rest relatively quickly
      */
     public static final float DAMPING_FAST_STOP = 10f;

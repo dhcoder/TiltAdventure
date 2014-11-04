@@ -32,8 +32,8 @@ public final class OctoBehaviorComponent extends AbstractComponent implements He
         SHOOT,
     }
 
-    private static final float SPEED = 5f;
-    private static final float PROJECTILE_SPEED = SPEED * 30f;
+    private static final float SPEED = 30f;
+    private static final float PROJECTILE_SPEED = SPEED * 5f;
     private static final float SHOOTING_CHANCE = 1f;
     private static final Duration STOPPING_DURATION = Duration.fromSeconds(0.3f);
     private static final Random random = new Random();

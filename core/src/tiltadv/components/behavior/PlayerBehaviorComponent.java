@@ -8,12 +8,11 @@ import dhcoder.support.opt.Opt;
 import dhcoder.support.state.StateMachine;
 import dhcoder.support.state.StateTransitionHandler;
 import dhcoder.support.time.Duration;
+import tiltadv.components.combat.HealthComponent;
 import tiltadv.components.dynamics.PositionComponent;
 import tiltadv.components.dynamics.TiltComponent;
 import tiltadv.components.dynamics.box2d.BodyComponent;
-import tiltadv.components.combat.HealthComponent;
 import tiltadv.globals.Events;
-import tiltadv.globals.Physics;
 import tiltadv.globals.Services;
 import tiltadv.input.Vibrator;
 import tiltadv.memory.Pools;
@@ -34,7 +33,7 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
         UPDATE,
     }
 
-    private static final float TILT_MULTIPLIER = 6f;
+    private static final float TILT_MULTIPLIER = 70f;
     private static final Duration FROZEN_DURATION = Duration.fromSeconds(.3f);
 
     private final StateMachine<State, Evt> playerState;
@@ -71,8 +70,6 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
         bodyComponent = owner.requireComponent(BodyComponent.class);
         tiltComponent = owner.requireComponent(TiltComponent.class);
         owner.requireComponent(HealthComponent.class).setListener(this);
-
-        bodyComponent.setDamping(Physics.DAMPING_FAST_STOP);
 
         Events.onTargetSelected.addListener(handleTargetSelected);
         Events.onTargetCleared.addListener(handleTargetCleared);

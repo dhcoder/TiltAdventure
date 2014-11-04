@@ -31,10 +31,10 @@ public final class BodyComponent extends AbstractComponent implements PhysicsEle
     /**
      * Box2D objects take too long to come to rest, so just manually stop them ourselves past a certain epsilon
      */
-    private static final float STOP_EPSILON = .1f; // Units in meters per second
+    private static final float STOP_EPSILON = .01f; // How slow are moving in meters per second
+    private static final float REGAIN_CONTROL_EPSILON = 1000f; // Units in meters per second
     private final Vector2 targetPosition = new Vector2(); // Position in meters
-    private final Vector2 gameVelocity = new Vector2(); // Velocity in units of pixels per second
-    private final Vector2 force = new Vector2();
+    private final Vector2 targetVelocity = new Vector2(); // If set, apply a constant impulse to stay at this velocity
     private final Angle heading = Angle.fromRadians(0f);
     private BodyType bodyType = BodyType.StaticBody;
     private Body body;
@@ -68,28 +68,6 @@ public final class BodyComponent extends AbstractComponent implements PhysicsEle
         return this;
     }
 
-    public Vector2 getVelocity() {
-        return gameVelocity;
-    }
-
-    public BodyComponent setVelocity(final Vector2 velocity) {
-        if (body == null) {
-            gameVelocity.set(velocity); // Will be used to initialize this body
-        }
-        else {
-            assertNonStaticType();
-            // Force and velocity are the same in our case because mass is always 1.
-            force.set(velocity).scl(Physics.PIXELS_TO_METERS).scl(100f);
-        }
-
-        return this;
-    }
-
-    public BodyComponent stopSmoothly() {
-        force.setZero();
-        return this;
-    }
-
     /**
      * Set this to {@oode true} if you think this object will move so fast that the physics system should do more
      * intensive calculations to make sure it doesn't pass through walls.
@@ -98,6 +76,21 @@ public final class BodyComponent extends AbstractComponent implements PhysicsEle
         requireNull(body, "Can't set body to fast moving after entity is initialized");
 
         this.isFastMoving = isFastMoving;
+        return this;
+    }
+
+    public BodyComponent setVelocity(final Vector2 velocity) {
+        Physics.toMeters(targetVelocity.set(velocity));
+        if (body != null) {
+            assertNonStaticType();
+            targetVelocity.scl(body.getMass());
+        }
+
+        return this;
+    }
+
+    public BodyComponent stopSmoothly() {
+        targetVelocity.setZero();
         return this;
     }
 
@@ -148,11 +141,12 @@ public final class BodyComponent extends AbstractComponent implements PhysicsEle
     }
 
     public BodyComponent applyImpulse(final Vector2 impulse) {
+        targetVelocity.setZero();
+
         Vector2 physicsImpulse = Pools.vector2s.grabNew();
-        Vector2 bodyCenter = Pools.vector2s.grabNew();
         physicsImpulse.set(impulse).scl(Physics.PIXELS_TO_METERS);
-        body.applyLinearImpulse(physicsImpulse, bodyCenter, true);
-        Pools.vector2s.freeCount(2);
+        body.applyLinearImpulse(physicsImpulse, body.getWorldCenter(), true);
+        Pools.vector2s.freeCount(1);
 
         return this;
     }
@@ -168,9 +162,8 @@ public final class BodyComponent extends AbstractComponent implements PhysicsEle
             BodyDef bodyDef = Pools.bodyDefs.grabNew();
             bodyDef.type = bodyType;
             bodyDef.bullet = isFastMoving;
-            if (!gameVelocity.isZero()) {
-                assertNonStaticType();
-                bodyDef.linearVelocity.set(gameVelocity).scl(Physics.PIXELS_TO_METERS);
+            if (!targetVelocity.isZero()) {
+                bodyDef.linearVelocity.set(targetVelocity);
             }
 
             if (syncPosition) {
@@ -211,13 +204,16 @@ public final class BodyComponent extends AbstractComponent implements PhysicsEle
 
             Pools.vector2s.freeToMark(mark);
         }
-        else if (!force.isZero()) {
-            body.applyForceToCenter(force, true);
+        else if (!targetVelocity.isZero()) {
+            Vector2 targetVelocity = Pools.vector2s.grabNew().set(this.targetVelocity);
+            targetVelocity.sub(body.getLinearVelocity());
+            body.applyLinearImpulse(targetVelocity, body.getWorldCenter(), true);
+            Pools.vector2s.freeCount(1);
         }
 
         if (!body.getLinearVelocity().isZero() && body.getLinearVelocity().isZero(STOP_EPSILON)) {
-            force.setZero();
-            body.setLinearVelocity(force);
+            targetVelocity.setZero();
+            body.setLinearVelocity(targetVelocity);
         }
     }
 
@@ -226,8 +222,7 @@ public final class BodyComponent extends AbstractComponent implements PhysicsEle
         positionComponent = null;
 
         targetPosition.setZero();
-        gameVelocity.setZero();
-        force.setZero();
+        targetVelocity.setZero();
         heading.setRadians(0f);
 
         final PhysicsSystem physicsSystem = Services.get(PhysicsSystem.class);
@@ -248,8 +243,6 @@ public final class BodyComponent extends AbstractComponent implements PhysicsEle
         gamePosition.set(body.getPosition()).scl(Physics.METERS_TO_PIXELS);
         positionComponent.setPosition(gamePosition);
         Pools.vector2s.freeCount(1);
-
-        gameVelocity.set(body.getLinearVelocity()).scl(Physics.METERS_TO_PIXELS);
     }
 
     private void assertNonStaticType() {
