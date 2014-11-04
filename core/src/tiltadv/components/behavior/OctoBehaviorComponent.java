@@ -12,7 +12,6 @@ import tiltadv.components.combat.HealthComponent;
 import tiltadv.components.dynamics.PositionComponent;
 import tiltadv.components.dynamics.box2d.BodyComponent;
 import tiltadv.globals.EntityId;
-import tiltadv.globals.Physics;
 import tiltadv.memory.Pools;
 
 import java.util.Random;
@@ -96,8 +95,6 @@ public final class OctoBehaviorComponent extends AbstractComponent implements He
         fsm.registerEvent(State.WAITING, Evt.MOVE, new StateTransitionHandler<State, Evt>() {
             @Override
             public State run(final State fromState, final Evt withEvent, final Opt eventData) {
-                bodyComponent.setDamping(0f);
-
                 Vector2 velocity = Pools.vector2s.grabNew();
                 CardinalDirection nextDirection = CardinalDirection.getRandom();
                 bodyComponent.setHeading(nextDirection.getAngle());
@@ -132,7 +129,7 @@ public final class OctoBehaviorComponent extends AbstractComponent implements He
         fsm.registerEvent(State.MOVING, Evt.WAIT, new StateTransitionHandler<State, Evt>() {
             @Override
             public State run(final State fromState, final Evt withEvent, final Opt eventData) {
-                bodyComponent.setDamping(Physics.DAMPING_FAST_STOP);
+                bodyComponent.stopSmoothly();
                 remainingDuration.setFrom(STOPPING_DURATION);
                 return State.STOPPING;
             }

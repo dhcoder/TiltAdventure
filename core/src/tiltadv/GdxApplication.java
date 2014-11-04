@@ -326,8 +326,7 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(OscillationBehaviorComponent.class);
                 entity.addComponent(PositionComponent.class);
                 entity.addComponent(BodyComponent.class).setBodyType(BodyType.KinematicBody);
-                entity.addComponent(FixtureComponent.class).setShape(boulderBounds)
-                    .setCategory(Category.OBSTACLES);
+                entity.addComponent(FixtureComponent.class).setShape(boulderBounds).setCategory(Category.OBSTACLES);
             }
         });
 
@@ -359,7 +358,8 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(AttackComponent.class);
                 entity.addComponent(PositionComponent.class);
                 entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.ROCK);
-                entity.addComponent(BodyComponent.class).setBodyType(BodyType.DynamicBody).setFastMoving(true);
+                entity.addComponent(BodyComponent.class).setBodyType(BodyType.DynamicBody).setFastMoving(true)
+                    .setDamping(0f);
                 entity.addComponent(FixtureComponent.class).setShape(octoRockBounds)
                     .setCategory(Category.ENEMY_PROJECTILE, Category.OBSTACLES | Category.PLAYER);
                 ;
@@ -440,15 +440,15 @@ public final class GdxApplication extends ApplicationAdapter {
         addOctoEnemy(80, 20);
         addOctoEnemy(30, 20);
         addOctoEnemy(30, 80);
-//        addOctoEnemy(80, 80);
-//        addOctoEnemy(-80, -20);
-//        addOctoEnemy(-30, -20);
-//        addOctoEnemy(-80, -80);
-//        addOctoEnemy(-30, -80);
-//        addOctoEnemy(30, -80);
-//        addOctoEnemy(80, -80);
-//        addOctoEnemy(30, -20);
-//        addOctoEnemy(80, -20);
+        addOctoEnemy(80, 80);
+        addOctoEnemy(-80, -20);
+        addOctoEnemy(-30, -20);
+        addOctoEnemy(-80, -80);
+        addOctoEnemy(-30, -80);
+        addOctoEnemy(30, -80);
+        addOctoEnemy(80, -80);
+        addOctoEnemy(30, -20);
+        addOctoEnemy(80, -20);
     }
 
     private void addBoundaryWalls() {

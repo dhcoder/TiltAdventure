@@ -148,6 +148,7 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
                     return State.MOVING;
                 }
                 else {
+                    bodyComponent.stopSmoothly();
                     return State.STANDING;
                 }
             }

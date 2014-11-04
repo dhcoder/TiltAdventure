@@ -31,14 +31,15 @@ public final class BodyComponent extends AbstractComponent implements PhysicsEle
     /**
      * Box2D objects take too long to come to rest, so just manually stop them ourselves past a certain epsilon
      */
-    private static final float STOP_EPSILON = 10f;
+    private static final float STOP_EPSILON = .1f; // Units in meters per second
     private final Vector2 targetPosition = new Vector2(); // Position in meters
     private final Vector2 gameVelocity = new Vector2(); // Velocity in units of pixels per second
+    private final Vector2 force = new Vector2();
     private final Angle heading = Angle.fromRadians(0f);
     private BodyType bodyType = BodyType.StaticBody;
     private Body body;
     private boolean isFastMoving;
-    private float initialDamping;
+    private float initialDamping = Physics.DAMPING_FAST_STOP;
     private boolean syncPosition;
     private int headingLockedCount;
     private PositionComponent positionComponent;
@@ -51,7 +52,8 @@ public final class BodyComponent extends AbstractComponent implements PhysicsEle
     }
 
     /**
-     * Set a linear damping value, if you want the object to gradually come to a stop over time.
+     * Set a linear damping value, if you want the object to gradually come to a stop over time. By default, it's set so
+     * a body will stop relatively quickly, but you should set it to {@ocde 0f} if you want the object to go forever.
      *
      * See the {@link Physics} namespace for useful values.
      */
@@ -76,16 +78,22 @@ public final class BodyComponent extends AbstractComponent implements PhysicsEle
         }
         else {
             assertNonStaticType();
-
-            Vector2 physicsVelocity = Pools.vector2s.grabNew();
-            physicsVelocity.set(velocity).scl(Physics.PIXELS_TO_METERS);
-            body.setLinearVelocity(velocity);
-            Pools.vector2s.freeCount(1);
+            // Force and velocity are the same in our case because mass is always 1.
+            force.set(velocity).scl(Physics.PIXELS_TO_METERS).scl(100f);
         }
 
         return this;
     }
 
+    public BodyComponent stopSmoothly() {
+        force.setZero();
+        return this;
+    }
+
+    /**
+     * Set this to {@oode true} if you think this object will move so fast that the physics system should do more
+     * intensive calculations to make sure it doesn't pass through walls.
+     */
     public BodyComponent setFastMoving(final boolean isFastMoving) {
         requireNull(body, "Can't set body to fast moving after entity is initialized");
 
@@ -203,11 +211,13 @@ public final class BodyComponent extends AbstractComponent implements PhysicsEle
 
             Pools.vector2s.freeToMark(mark);
         }
+        else if (!force.isZero()) {
+            body.applyForceToCenter(force, true);
+        }
 
-        if (!getVelocity().isZero() && getVelocity().isZero(STOP_EPSILON)) {
-            Vector2 velocity = Pools.vector2s.grabNew(); // (0,0) velocity is exactly what we want
-            setVelocity(velocity);
-            Pools.vector2s.freeCount(1);
+        if (!body.getLinearVelocity().isZero() && body.getLinearVelocity().isZero(STOP_EPSILON)) {
+            force.setZero();
+            body.setLinearVelocity(force);
         }
     }
 
@@ -217,6 +227,7 @@ public final class BodyComponent extends AbstractComponent implements PhysicsEle
 
         targetPosition.setZero();
         gameVelocity.setZero();
+        force.setZero();
         heading.setRadians(0f);
 
         final PhysicsSystem physicsSystem = Services.get(PhysicsSystem.class);
@@ -226,7 +237,7 @@ public final class BodyComponent extends AbstractComponent implements PhysicsEle
 
         bodyType = BodyType.StaticBody;
         isFastMoving = false;
-        initialDamping = 0f;
+        initialDamping = Physics.DAMPING_FAST_STOP;
         syncPosition = false;
         headingLockedCount = 0;
     }
