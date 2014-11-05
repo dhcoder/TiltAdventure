@@ -2,7 +2,6 @@ package dhcoder.support.time;
 
 import org.junit.Test;
 
-import static dhcoder.test.TestUtils.assertException;
 import static dhcoder.test.matchers.IsCloseTo.closeTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -84,13 +83,8 @@ public final class DurationTest {
     }
 
     @Test
-    public void settingNegativeDurationThrowsException() {
-        assertException("Duration cannot be negative", IllegalArgumentException.class, new Runnable() {
-            @Override
-            public void run() {
-                Duration.fromSeconds(-5);
-            }
-        });
+    public void settingNegativeDurationBecomesZero() {
+        assertThat(Duration.fromSeconds(-5).getSeconds(), equalTo(0f));
     }
 
 }
