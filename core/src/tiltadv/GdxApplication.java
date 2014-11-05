@@ -34,6 +34,7 @@ import tiltadv.components.behavior.OctoBehaviorComponent;
 import tiltadv.components.behavior.OscillationBehaviorComponent;
 import tiltadv.components.behavior.PlayerBehaviorComponent;
 import tiltadv.components.behavior.PlayerSensorBehaviorComponent;
+import tiltadv.components.behavior.SwordBehaviorComponent;
 import tiltadv.components.body.FollowCameraComponent;
 import tiltadv.components.combat.AttackComponent;
 import tiltadv.components.combat.DefenseComponent;
@@ -47,6 +48,7 @@ import tiltadv.components.dynamics.PositionComponent;
 import tiltadv.components.dynamics.TiltComponent;
 import tiltadv.components.dynamics.box2d.BodyComponent;
 import tiltadv.components.dynamics.box2d.FixtureComponent;
+import tiltadv.components.dynamics.box2d.RevoluteJointComponent;
 import tiltadv.components.hierarchy.ParentComponent;
 import tiltadv.components.hierarchy.children.PlayerChildrenComponent;
 import tiltadv.components.input.AccelerometerInputComponent;
@@ -92,7 +94,7 @@ public final class GdxApplication extends ApplicationAdapter {
     private CircleShape playerBounds;
     //    private Shape gravityWellBounds;
     private CircleShape playerSensorBounds;
-    //    private Shape playerSwordBounds;
+    private PolygonShape swordBounds;
     private CircleShape octoBounds;
     private CircleShape octoRockBounds;
     private CircleShape boulderBounds;
@@ -173,14 +175,8 @@ public final class GdxApplication extends ApplicationAdapter {
         Services.register(SceneDatastore.class, new SceneDatastore());
         Services.register(Json.class, new Json());
 
-        physicsSystem = new PhysicsSystem(ENTITY_COUNT);
+        initializePhysics();
         Services.register(PhysicsSystem.class, physicsSystem);
-
-        physicsSystem.addCollisionHandler(Category.ENEMY_PROJECTILE, Category.PLAYER,
-            new EnemyProjectilePlayerCollisionHandler());
-        physicsSystem.addCollisionHandler(Category.ENEMY_PROJECTILE, Category.PLAYER | Category.OBSTACLES,
-            new EnemyProjectileDieOnCollisionHandler());
-        physicsSystem.addCollisionHandler(Category.ENEMY, Category.PLAYER, new EnemyPlayerCollisionHandler());
 
 //        physicsSystem.addCollisionHandler(Category.);
 
@@ -197,6 +193,20 @@ public final class GdxApplication extends ApplicationAdapter {
 
         Services.register(Vibrator.class, new Vibrator());
 
+    }
+
+    private void initializePhysics() {
+        physicsSystem = new PhysicsSystem(ENTITY_COUNT);
+
+        physicsSystem.registerCollidable(Category.ENEMY, Category.PLAYER | Category.SWORD | Category.OBSTACLES);
+        physicsSystem.registerCollidable(Category.ENEMY_PROJECTILE, Category.PLAYER | Category.OBSTACLES);
+        physicsSystem.registerCollidable(Category.PLAYER, Category.OBSTACLES);
+
+        physicsSystem.addCollisionHandler(Category.ENEMY_PROJECTILE, Category.PLAYER,
+            new EnemyProjectilePlayerCollisionHandler());
+        physicsSystem.addCollisionHandler(Category.ENEMY_PROJECTILE, Category.PLAYER | Category.OBSTACLES,
+            new EnemyProjectileDieOnCollisionHandler());
+        physicsSystem.addCollisionHandler(Category.ENEMY, Category.PLAYER, new EnemyPlayerCollisionHandler());
     }
 
     private void initializeAssets() {
@@ -237,7 +247,7 @@ public final class GdxApplication extends ApplicationAdapter {
         playerBounds = Physics.newCircle(6.5f);
         playerSensorBounds = Physics.newCircle(8.0f);
         playerSensorBounds.setPosition(new Vector2(0.6f, 0));
-//        playerSwordBounds = new Circle(5f);
+        swordBounds = Physics.newRectangle(5f, 1f);
         octoBounds = Physics.newCircle(8.0f);
         octoRockBounds = Physics.newCircle(Tiles.ROCK.getRegionWidth() / 2f);
         boulderBounds = Physics.newCircle(8f);
@@ -270,16 +280,15 @@ public final class GdxApplication extends ApplicationAdapter {
         entities.registerTemplate(EntityId.PLAYER, new EntityManager.EntityCreator() {
             @Override
             public void initialize(final Entity entity) {
+                entity.addComponent(PositionComponent.class);
+                entity.addComponent(BodyComponent.class).setBodyType(BodyType.DynamicBody);
+                entity.addComponent(FixtureComponent.class).setShape(playerBounds).setCategory(Category.PLAYER);
                 entity.addComponent(PlayerChildrenComponent.class);
                 entity.addComponent(KnockbackComponent.class);
                 entity.addComponent(DefenseComponent.class);
                 Vector2 offset = Pools.vector2s.grabNew().set(0f, 5f);
                 entity.addComponent(SpriteComponent.class).setOffset(offset);
                 Pools.vector2s.freeCount(1);
-                entity.addComponent(PositionComponent.class);
-                entity.addComponent(BodyComponent.class).setBodyType(BodyType.DynamicBody);
-                entity.addComponent(FixtureComponent.class).setShape(playerBounds)
-                    .setCategory(Category.PLAYER, Category.OBSTACLES | Category.ENEMY | Category.ENEMY_PROJECTILE);
                 entity.addComponent(TiltComponent.class);
                 entity.addComponent(Gdx.app.getType() == ApplicationType.Android ? AccelerometerInputComponent.class :
                     KeyboardInputComponent.class);
@@ -292,19 +301,19 @@ public final class GdxApplication extends ApplicationAdapter {
             }
         });
 
-//        entities.registerTemplate(EntityId.PLAYER_SWORD, new EntityManager.EntityCreator() {
-//            @Override
-//            public void initialize(final Entity entity) {
-//                entity.addComponent(ParentComponent.class); // Child of Player Entity
-//                entity.addComponent(OffsetComponent.class);
-//                entity.addComponent(ChildOffsetComponent.class);
-//                entity.addComponent(SwordCollisionComponent.class).setShape(playerSwordBounds);
-//                entity.addComponent(SwordBehaviorComponent.class);
-//                entity.addComponent(AttackComponent.class);
-//                entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.SWORDRIGHT);
-//                entity.addComponent(PositionComponent.class);
-//            }
-//        });
+        entities.registerTemplate(EntityId.PLAYER_SWORD, new EntityManager.EntityCreator() {
+            @Override
+            public void initialize(final Entity entity) {
+                entity.addComponent(PositionComponent.class);
+                entity.addComponent(ParentComponent.class); // Child of Player Entity
+                entity.addComponent(BodyComponent.class).setBodyType(BodyType.DynamicBody); // TODO: Try kinematic body?
+                entity.addComponent(FixtureComponent.class).setShape(swordBounds).setCategory(Category.SWORD);
+                entity.addComponent(RevoluteJointComponent.class);
+                entity.addComponent(SwordBehaviorComponent.class);
+                entity.addComponent(AttackComponent.class);
+                entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.SWORDRIGHT);
+            }
+        });
 
         entities.registerTemplate(EntityId.PLAYER_SENSOR, new EntityManager.EntityCreator() {
             @Override
@@ -334,9 +343,7 @@ public final class GdxApplication extends ApplicationAdapter {
             @Override
             public void initialize(final Entity entity) {
                 entity.addComponent(BodyComponent.class).setBodyType(BodyType.DynamicBody);
-                entity.addComponent(FixtureComponent.class).setShape(octoBounds)
-                    .setCategory(Category.ENEMY, Category.OBSTACLES | Category.PLAYER);
-                ;
+                entity.addComponent(FixtureComponent.class).setShape(octoBounds).setCategory(Category.ENEMY);
                 entity.addComponent(KnockbackComponent.class).setMultiplier(2f);
                 entity.addComponent(AttackComponent.class);
                 entity.addComponent(DefenseComponent.class);
@@ -361,7 +368,7 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(BodyComponent.class).setBodyType(BodyType.DynamicBody).setFastMoving(true)
                     .setDamping(Physics.NO_DAMPING);
                 entity.addComponent(FixtureComponent.class).setShape(octoRockBounds)
-                    .setCategory(Category.ENEMY_PROJECTILE, Category.OBSTACLES | Category.PLAYER);
+                    .setCategory(Category.ENEMY_PROJECTILE);
 //                entity.addComponent(EnemyProjectileCollisionComponent.class).setShape(octoRockBounds);
             }
         });
@@ -433,21 +440,21 @@ public final class GdxApplication extends ApplicationAdapter {
 
     private void addOctoEnemies() {
         addOctoEnemy(-80, 20);
-        addOctoEnemy(-30, 20);
-        addOctoEnemy(-80, 80);
-        addOctoEnemy(-30, 80);
-        addOctoEnemy(80, 20);
-        addOctoEnemy(30, 20);
-        addOctoEnemy(30, 80);
-        addOctoEnemy(80, 80);
-        addOctoEnemy(-80, -20);
-        addOctoEnemy(-30, -20);
-        addOctoEnemy(-80, -80);
-        addOctoEnemy(-30, -80);
-        addOctoEnemy(30, -80);
-        addOctoEnemy(80, -80);
-        addOctoEnemy(30, -20);
-        addOctoEnemy(80, -20);
+//        addOctoEnemy(-30, 20);
+//        addOctoEnemy(-80, 80);
+//        addOctoEnemy(-30, 80);
+//        addOctoEnemy(80, 20);
+//        addOctoEnemy(30, 20);
+//        addOctoEnemy(30, 80);
+//        addOctoEnemy(80, 80);
+//        addOctoEnemy(-80, -20);
+//        addOctoEnemy(-30, -20);
+//        addOctoEnemy(-80, -80);
+//        addOctoEnemy(-30, -80);
+//        addOctoEnemy(30, -80);
+//        addOctoEnemy(80, -80);
+//        addOctoEnemy(30, -20);
+//        addOctoEnemy(80, -20);
     }
 
     private void addBoundaryWalls() {
@@ -489,7 +496,7 @@ public final class GdxApplication extends ApplicationAdapter {
     }
 
     private void addMovingBoulderEntities() {
-        final int numBoulders = 14;
+        final int numBoulders = 0;
         final float scaleX = 120;
         final float scaleY = 90;
         final float percent = .4f;

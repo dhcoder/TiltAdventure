@@ -66,15 +66,7 @@ public final class FixtureComponent extends AbstractComponent implements Physics
     public FixtureComponent setCategory(final int category) {
         requireNull(fixture, "Can't change a fixture's filter settings after it is initialized");
         this.categoryBits = (short)category;
-        return this;
-    }
-
-    public FixtureComponent setCategory(final int category, final int maskBits) {
-        requireNull(fixture, "Can't change a fixture's filter settings after it is initialized");
-
-        this.categoryBits = (short)category;
-        this.maskBits = (short)maskBits;
-
+        this.maskBits = (short)Services.get(PhysicsSystem.class).getCategoryMask(category);
         return this;
     }
 

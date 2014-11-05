@@ -19,6 +19,9 @@ import dhcoder.support.time.Duration;
 
 import java.util.List;
 
+import static dhcoder.support.contract.ContractUtils.requireTrue;
+import static dhcoder.support.math.BitUtils.getBitIndex;
+
 /**
  * Constants for our physics system
  */
@@ -55,8 +58,7 @@ public final class PhysicsSystem {
         public Fixture fixtureB;
 
         public boolean matches(final Fixture fixtureC, final Fixture fixtureD) {
-            return ((fixtureA == fixtureC && fixtureB == fixtureD) ||
-                (fixtureA == fixtureD && fixtureB == fixtureC));
+            return ((fixtureA == fixtureC && fixtureB == fixtureD) || (fixtureA == fixtureD && fixtureB == fixtureC));
         }
 
         @Override
@@ -126,6 +128,10 @@ public final class PhysicsSystem {
     // Recommended values from Box2D manual
     private static final int VELOCITY_ITERATIONS = 6;
     private static final int POSITION_ITERATIONS = 2;
+    /**
+     * Box2D has a hard limit of 16 collision categories.
+     */
+    public static int MAX_NUM_CATEGORIES = 16;
     private final CollisionCallback callCollidedHandler = new CollisionCallback() {
         @Override
         public void run(final CollisionCallbackData data) {
@@ -149,6 +155,7 @@ public final class PhysicsSystem {
     private final Array<CollisionHandlerEntry> collisionHandlers;
     private final HeapPool<CollisionFixtures> collisionsPool;
     private final Pool<CollisionCallbackData> collisionDataPool = Pool.of(CollisionCallbackData.class, 1);
+    private int[] categoryMasks = new int[MAX_NUM_CATEGORIES];
     private Box2DDebugRenderer collisionRenderer;
     private Matrix4 debugRenderMatrix;
 
@@ -225,6 +232,24 @@ public final class PhysicsSystem {
         world.dispose();
     }
 
+    public void registerCollidable(final int categoriesA, final int categoriesB) {
+        for (int i = 0; i < MAX_NUM_CATEGORIES; i++) {
+            int bitMask = 1 << i;
+            if ((categoriesA & bitMask) != 0) {
+                categoryMasks[i] |= categoriesB;
+            }
+            if ((categoriesB & bitMask) != 0) {
+                categoryMasks[i] |= categoriesA;
+            }
+        }
+    }
+
+    public int getCategoryMask(final int category) {
+        final int bitIndex = getBitIndex(category);
+        requireTrue(bitIndex < MAX_NUM_CATEGORIES, "Requesting mask for invalid category");
+        return categoryMasks[bitIndex];
+    }
+
     private boolean hasCollisionHandlers(final Contact contact) {
         Fixture fixtureA = contact.getFixtureA();
         Fixture fixtureB = contact.getFixtureB();
@@ -248,7 +273,7 @@ public final class PhysicsSystem {
 
     /**
      * Given two fixtures that are colliding, call any collision handlers that may have been registered to handle it.
-     *
+     * <p/>
      * Returns true if a callback was registered (and therefore called).
      */
     private boolean runCollisionHandlers(final Fixture fixtureA, final Fixture fixtureB,
@@ -280,4 +305,5 @@ public final class PhysicsSystem {
 
         return triggeredCallback;
     }
+
 }

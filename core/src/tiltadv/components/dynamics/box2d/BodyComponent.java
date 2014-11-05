@@ -15,6 +15,7 @@ import tiltadv.globals.Physics;
 import tiltadv.globals.Services;
 import tiltadv.memory.Pools;
 
+import static dhcoder.support.contract.ContractUtils.requireNonNull;
 import static dhcoder.support.contract.ContractUtils.requireNull;
 
 /**
@@ -106,6 +107,7 @@ public final class BodyComponent extends AbstractComponent implements PhysicsEle
     }
 
     public Body getBody() {
+        requireNonNull(body, "Can't request a body before it is initialized.");
         return body;
     }
 

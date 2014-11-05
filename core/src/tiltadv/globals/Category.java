@@ -11,6 +11,6 @@ public final class Category {
     public static final int ENEMY = 1 << 2;
     public static final int ENEMY_PROJECTILE = 1 << 3;
     public static final int PLAYER_SENSOR = 1 << 4;
-    public static final int PLAYER_SWORD = 1 << 5;
+    public static final int SWORD = 1 << 5;
     public static final int GRAVITY_WELL = 1 << 6;
 }

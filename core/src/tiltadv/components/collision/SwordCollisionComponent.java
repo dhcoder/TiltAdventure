@@ -20,14 +20,14 @@
 //
 //    static {
 //        CollisionSystem collisionSystem = Services.get(CollisionSystem.class);
-//        collisionSystem.registerCollidesWith(Category.PLAYER_SWORD, Category.ENEMY);
+//        collisionSystem.registerCollidesWith(Category.SWORD, Category.ENEMY);
 //    }
 //
 //    private AttackComponent attackComponent;
 //    private Entity owner;
 //
 //    public SwordCollisionComponent() {
-//        super(Category.PLAYER_SWORD);
+//        super(Category.SWORD);
 //    }
 //
 //    @Override
