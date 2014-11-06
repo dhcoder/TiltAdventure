@@ -6,7 +6,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
-import dhcoder.libgdx.physics.PhysicsElement;
+import dhcoder.libgdx.physics.PhysicsUpdateListener;
 import dhcoder.libgdx.physics.PhysicsSystem;
 import dhcoder.support.math.Angle;
 import dhcoder.support.time.Duration;
@@ -25,7 +25,7 @@ import static dhcoder.support.contract.ContractUtils.requireNull;
  * If a body is present on an entity, it expects the presence of a {@link PositionComponent} and will take over the role
  * of setting it.
  */
-public final class BodyComponent extends AbstractComponent implements PhysicsElement {
+public final class BodyComponent extends AbstractComponent implements PhysicsUpdateListener {
 
     public static boolean RUN_SANITY_CHECKS = false;
 
@@ -181,7 +181,7 @@ public final class BodyComponent extends AbstractComponent implements PhysicsEle
             Pools.bodyDefs.freeCount(1);
         }
 
-        physicsSystem.addElement(this);
+        physicsSystem.addUpdateListener(this);
     }
 
     @Override
@@ -230,7 +230,7 @@ public final class BodyComponent extends AbstractComponent implements PhysicsEle
         final PhysicsSystem physicsSystem = Services.get(PhysicsSystem.class);
         physicsSystem.getWorld().destroyBody(body);
         body = null;
-        physicsSystem.removeElement(this);
+        physicsSystem.removeUpdateListener(this);
 
         bodyType = BodyType.StaticBody;
         isFastMoving = false;

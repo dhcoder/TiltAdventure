@@ -151,7 +151,7 @@ public final class PhysicsSystem {
         }
     };
     private final World world;
-    private final Array<PhysicsElement> physicsElements;
+    private final Array<PhysicsUpdateListener> physicsElements;
     private final Array<CollisionHandlerEntry> collisionHandlers;
     private final HeapPool<CollisionFixtures> collisionsPool;
     private final Pool<CollisionCallbackData> collisionDataPool = Pool.of(CollisionCallbackData.class, 1);
@@ -167,7 +167,7 @@ public final class PhysicsSystem {
         this.world = new World(new Vector2(0f, 0f), true);
         world.setContactListener(new CollisionListener());
 
-        physicsElements = new Array<PhysicsElement>(false, capacity);
+        physicsElements = new Array<PhysicsUpdateListener>(false, capacity);
         collisionHandlers = new Array<CollisionHandlerEntry>();
         collisionsPool = HeapPool.of(CollisionFixtures.class, capacity);
     }
@@ -176,12 +176,12 @@ public final class PhysicsSystem {
         return world;
     }
 
-    public void addElement(final PhysicsElement physicsElement) {
-        physicsElements.add(physicsElement);
+    public void addUpdateListener(final PhysicsUpdateListener physicsUpdateListener) {
+        physicsElements.add(physicsUpdateListener);
     }
 
-    public boolean removeElement(final PhysicsElement physicsElement) {
-        return physicsElements.removeValue(physicsElement, true);
+    public boolean removeUpdateListener(final PhysicsUpdateListener physicsUpdateListener) {
+        return physicsElements.removeValue(physicsUpdateListener, true);
     }
 
     /**
@@ -210,8 +210,8 @@ public final class PhysicsSystem {
         }
 
         for (int i = 0; i < physicsElements.size; i++) {
-            PhysicsElement physicsElement = physicsElements.get(i);
-            physicsElement.syncWithPhysics();
+            PhysicsUpdateListener physicsUpdateListener = physicsElements.get(i);
+            physicsUpdateListener.syncWithPhysics();
         }
     }
 

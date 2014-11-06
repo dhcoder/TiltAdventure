@@ -94,6 +94,7 @@ public final class GdxApplication extends ApplicationAdapter {
     private CircleShape playerBounds;
     //    private Shape gravityWellBounds;
     private CircleShape playerSensorBounds;
+    private CircleShape handleBounds;
     private PolygonShape swordBounds;
     private CircleShape octoBounds;
     private CircleShape octoRockBounds;
@@ -306,7 +307,7 @@ public final class GdxApplication extends ApplicationAdapter {
             public void initialize(final Entity entity) {
                 entity.addComponent(PositionComponent.class);
                 entity.addComponent(ParentComponent.class); // Child of Player Entity
-                entity.addComponent(BodyComponent.class).setBodyType(BodyType.DynamicBody); // TODO: Try kinematic body?
+                entity.addComponent(BodyComponent.class).setBodyType(BodyType.DynamicBody);
                 entity.addComponent(FixtureComponent.class).setShape(swordBounds).setCategory(Category.SWORD);
                 entity.addComponent(RevoluteJointComponent.class);
                 entity.addComponent(SwordBehaviorComponent.class);

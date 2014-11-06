@@ -7,7 +7,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Shape;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
-import dhcoder.libgdx.physics.PhysicsElement;
+import dhcoder.libgdx.physics.PhysicsUpdateListener;
 import dhcoder.libgdx.physics.PhysicsSystem;
 import dhcoder.support.opt.Opt;
 import tiltadv.components.dynamics.PositionComponent;
@@ -28,7 +28,7 @@ import static dhcoder.support.contract.ContractUtils.requireTrue;
  * some other entity's body. If this is the case, this fixture expects the presence of a {@link PositionComponent}
  * and will take over the role of setting it.
  */
-public final class FixtureComponent extends AbstractComponent implements PhysicsElement {
+public final class FixtureComponent extends AbstractComponent implements PhysicsUpdateListener {
 
     private final Vector2 offset = new Vector2();
     // The position component will only be set if it's our responsibility to set it
@@ -83,7 +83,7 @@ public final class FixtureComponent extends AbstractComponent implements Physics
         if (targetEntity != owner) {
             positionComponentOpt.set(owner.requireComponent(PositionComponent.class));
             // Only sync if it's our responsibility to maintain the position
-            Services.get(PhysicsSystem.class).addElement(this);
+            Services.get(PhysicsSystem.class).addUpdateListener(this);
         }
 
         {
@@ -91,7 +91,7 @@ public final class FixtureComponent extends AbstractComponent implements Physics
             fixtureDef.shape = shape;
             fixtureDef.isSensor = isSensor;
             fixtureDef.friction = 0f;
-            fixtureDef.density = 0f;
+            fixtureDef.density = isSensor ? 0f : 1f;
             fixtureDef.filter.categoryBits = categoryBits;
             fixtureDef.filter.maskBits = maskBits;
             final Body body = bodyComponent.getBody();
@@ -118,7 +118,7 @@ public final class FixtureComponent extends AbstractComponent implements Physics
     @Override
     public void reset() {
         if (positionComponentOpt.hasValue()) {
-            Services.get(PhysicsSystem.class).removeElement(this);
+            Services.get(PhysicsSystem.class).removeUpdateListener(this);
         }
 
         offset.setZero();

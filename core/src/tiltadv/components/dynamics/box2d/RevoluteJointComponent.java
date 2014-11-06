@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.Joint;
 import com.badlogic.gdx.physics.box2d.JointDef;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import dhcoder.libgdx.entity.Entity;
+import dhcoder.support.math.Angle;
 import tiltadv.memory.Pools;
 
 import static dhcoder.support.contract.ContractUtils.requireNonNull;
@@ -20,30 +21,29 @@ public final class RevoluteJointComponent extends JointComponent<RevoluteJointCo
     private final Vector2 localAnchorA = new Vector2();
     private final Vector2 localAnchorB = new Vector2();
 
-    public RevoluteJointComponent setTargetAnchor(final Vector2 anchor) {
+    public RevoluteJointComponent setAnchorA(final Vector2 anchor) {
         localAnchorA.set(anchor);
         return this;
     }
 
-    public RevoluteJointComponent setLocalAnchor(final Vector2 anchor) {
+    public RevoluteJointComponent setAnchorB(final Vector2 anchor) {
         localAnchorB.set(anchor);
         return this;
     }
 
     @Override
     protected JointDef createJointDef(final Body bodyA, final Body bodyB) {
-        localAnchorB.set(-1, 0);
+        localAnchorB.set(-.5f, 0);
         RevoluteJointDef revoluteJointDef = Pools.revoluteJointDefs.grabNew();
         revoluteJointDef.bodyA = bodyA;
         revoluteJointDef.bodyB = bodyB;
         revoluteJointDef.localAnchorA.set(localAnchorA);
         revoluteJointDef.localAnchorB.set(localAnchorB);
-        revoluteJointDef.referenceAngle = 2;
-        revoluteJointDef.enableMotor = true;
-        revoluteJointDef.lowerAngle = 0;
-        revoluteJointDef.upperAngle = 6;
         revoluteJointDef.enableLimit = true;
-        revoluteJointDef.motorSpeed = 1f;
+        revoluteJointDef.lowerAngle = -Angle.HALF_PI;
+        revoluteJointDef.upperAngle = Angle.HALF_PI;
+        revoluteJointDef.motorSpeed = Angle.PI * 100f;
+        revoluteJointDef.enableMotor = true;
 
         return revoluteJointDef;
     }
