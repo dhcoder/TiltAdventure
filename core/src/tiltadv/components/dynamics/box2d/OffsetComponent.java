@@ -7,7 +7,7 @@ import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.libgdx.physics.PhysicsSystem;
 import dhcoder.libgdx.physics.PhysicsUpdateListener;
-import dhcoder.support.time.Duration;
+import dhcoder.support.math.Angle;
 import tiltadv.globals.Physics;
 import tiltadv.globals.Services;
 import tiltadv.memory.Pools;
@@ -23,6 +23,7 @@ public final class OffsetComponent extends AbstractComponent implements PhysicsU
     private Body remoteBody;
     private Body localBody;
     private Vector2 offset = new Vector2();
+    private Angle angle = Angle.fromRadians(0f);
 
     public OffsetComponent setTargetBody(final Body body) {
         remoteBody = body;
@@ -31,6 +32,11 @@ public final class OffsetComponent extends AbstractComponent implements PhysicsU
 
     public OffsetComponent setOffset(final Vector2 offset) {
         Physics.toMeters(this.offset.set(offset));
+        return this;
+    }
+
+    public OffsetComponent setAngle(final Angle angle) {
+        this.angle.setFrom(angle);
         return this;
     }
 
@@ -45,11 +51,6 @@ public final class OffsetComponent extends AbstractComponent implements PhysicsU
     }
 
     @Override
-    public void update(final Duration elapsedTime) {
-        super.update(elapsedTime);
-    }
-
-    @Override
     public void reset() {
         Services.get(PhysicsSystem.class).removeUpdateListener(this);
         remoteBody = null;
@@ -59,9 +60,16 @@ public final class OffsetComponent extends AbstractComponent implements PhysicsU
 
     @Override
     public void onPhysicsUpdate() {
+        Angle finalAngle = Pools.angles.grabNew();
+        finalAngle.setRadians(remoteBody.getAngle()).add(angle);
+
         Vector2 transformedOffset = Pools.vector2s.grabNew().set(offset);
-        remoteBody.getTransform().mul(transformedOffset);
-        localBody.setTransform(transformedOffset, remoteBody.getAngle());
+        transformedOffset.rotateRad(finalAngle.getRadians());
+        transformedOffset.add(remoteBody.getPosition());
+
+        localBody.setTransform(transformedOffset, finalAngle.getRadians());
+
+        Pools.angles.freeCount(1);
         Pools.vector2s.freeCount(1);
     }
 }

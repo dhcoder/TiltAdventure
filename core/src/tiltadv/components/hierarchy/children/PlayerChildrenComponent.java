@@ -20,12 +20,12 @@ public final class PlayerChildrenComponent extends ChildrenComponent {
 
     @Override
     protected void handleInitialize(final Entity owner) {
-//        swordEntity = owner.getManager().newEntityFromTemplate(EntityId.PLAYER_SWORD);
-//        final BodyComponent bodyComponent = owner.requireComponentBefore(this, BodyComponent.class);
-//        swordEntity.requireComponent(RevoluteJointComponent.class).setTargetBody(bodyComponent.getBody());
-//        add(swordEntity);
-
         final BodyComponent bodyComponent = owner.requireComponentBefore(this, BodyComponent.class);
+
+        swordEntity = owner.getManager().newEntityFromTemplate(EntityId.PLAYER_SWORD);
+        swordEntity.requireComponent(OffsetComponent.class).setTargetBody(bodyComponent.getBody());
+        add(swordEntity);
+
         sensorEntity = owner.getManager().newEntityFromTemplate(EntityId.PLAYER_SENSOR);
         sensorEntity.requireComponent(OffsetComponent.class).setTargetBody(bodyComponent.getBody());
         add(sensorEntity);

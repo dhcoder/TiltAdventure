@@ -22,6 +22,11 @@ public final class Angle implements Poolable {
     public static final float HALF_PI = PI / 2f;
 
     /**
+     * Convenience constant for π/4
+     */
+    public static final float QUARTER_PI = PI / 4f;
+
+    /**
      * Convenience constant for 2π
      */
     public static final float TWO_PI = PI * 2f;

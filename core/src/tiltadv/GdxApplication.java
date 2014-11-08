@@ -306,8 +306,10 @@ public final class GdxApplication extends ApplicationAdapter {
             public void initialize(final Entity entity) {
                 entity.addComponent(PositionComponent.class);
                 entity.addComponent(ParentComponent.class); // Child of Player Entity
-                entity.addComponent(BodyComponent.class).setBodyType(BodyType.DynamicBody);
-                entity.addComponent(FixtureComponent.class).setShape(swordBounds).setCategory(Category.SWORD);
+                entity.addComponent(BodyComponent.class).setBodyType(BodyType.KinematicBody);
+                entity.addComponent(FixtureComponent.class).setShape(swordBounds).setCategory(Category.SWORD)
+                    .setSensor(true);
+                entity.addComponent(OffsetComponent.class).setOffset(new Vector2(10f, 0f));
                 entity.addComponent(SwordBehaviorComponent.class);
                 entity.addComponent(AttackComponent.class);
                 entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.SWORDRIGHT);
@@ -324,7 +326,7 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(BodyComponent.class).setBodyType(BodyType.KinematicBody);
                 entity.addComponent(FixtureComponent.class).setShape(playerSensorBounds).setSensor(true)
                     .setCategory(Category.PLAYER_SENSOR);
-                entity.addComponent(OffsetComponent.class).setOffset(new Vector2(10f, 0));
+                entity.addComponent(OffsetComponent.class).setOffset(new Vector2(9f, 0));
                 entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.SENSOR);
             }
         });
