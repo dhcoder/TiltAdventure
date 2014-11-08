@@ -185,6 +185,19 @@ public final class ArrayMap<K, V> {
         indexPool.free(indexOpt);
     }
 
+    /**
+     * Put the key in the map. For efficiency, it is an error to call this method with the same key twice (without first
+     * removing it) - this will not simply remove the existing key and replace its value. Use {@link #replace(Object,
+     * Object)} if that's the behavior you desire, or use {@link #putOrReplace(Object, Object)} if you're not sure if
+     * the key exists at all.
+     * <p/>
+     * This may seem like overly strict behavior for a put method, but the goal here is to allow users of the class to
+     * enforce expected behavior on how their map is being used - sometimes, it is simply an error to trounce one key's
+     * value with another, and doing so without realizing it leads to the sort of bug that is really hard to find later.
+     * <p/>
+     * NOTE: Although it is an error condition to use the same key twice in a row, for performance reasons, this method
+     * won't report it unless {@link #RUN_SANITY_CHECKS} is set to {@code true}.
+     */
     public void put(final K key, final V value) {
 
         if (RUN_SANITY_CHECKS) {
@@ -200,7 +213,7 @@ public final class ArrayMap<K, V> {
         OptInt indexOpt = indexPool.grabNew();
         getIndex(key, IndexMethod.PUT, indexOpt);
         int index = indexOpt.getValue();
-        indexPool.free(indexOpt);
+        indexPool.freeCount(1);
 
         setInternal(index, key, value);
 
@@ -220,15 +233,33 @@ public final class ArrayMap<K, V> {
         OptInt indexOpt = indexPool.grabNew();
         getIndex(key, IndexMethod.GET, indexOpt);
         int index = indexOpt.getValue();
-        indexPool.free(indexOpt);
+        indexPool.freeCount(1);
 
         setInternal(index, key, value);
     }
 
     /**
+     * Use this if you're not sure if the key is already in the map or not. This is less efficient than either using
+     * {@link #put(Object, Object)} or {@link #replace(Object, Object)} but is useful if you simply don't care.
+     */
+    public void putOrReplace(final K key, final V value) {
+        OptInt indexOpt = indexPool.grabNew();
+        getIndex(key, IndexMethod.GET, indexOpt);
+
+        if (indexOpt.hasValue()) {
+            setInternal(indexOpt.getValue(), key, value);
+            indexPool.freeCount(1);
+        }
+        else {
+            indexPool.freeCount(1);
+            put(key, value);
+        }
+    }
+
+    /**
      * Remove the value associated with the passed in key. The key MUST be in the map because this method needs to
-     * return a non-null value. If you are not sure if the key is in the map, you can instead use {@link #remove
-     * (Object, Opt)}, or if you don't care about the return value, you can use {@link #removeIf(Object)}.
+     * return a non-null value. If you are not sure if the key is in the map, you can instead use
+     * {@link #remove(Object, Opt)}, or if you don't care about the return value, you can use {@link #removeIf(Object)}.
      *
      * @throws IllegalArgumentException if the key is not found in the map.
      */

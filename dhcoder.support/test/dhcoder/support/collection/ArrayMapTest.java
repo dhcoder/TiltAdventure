@@ -3,6 +3,7 @@ package dhcoder.support.collection;
 import dhcoder.support.opt.Opt;
 import org.junit.Test;
 
+import static dhcoder.test.TestUtils.assertException;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 
@@ -247,8 +248,13 @@ public final class ArrayMapTest {
         }
     }
 
+    /**
+     * Removing elements leaves dead buckets behind. Make sure if we aggressively add and remove elements, these dead
+     * buckets still work fine.
+     */
     @Test
     public void removingElementsDoesntBreakGetQuery() {
+
         ArrayMap<Integer, Integer> numericMap = new ArrayMap<Integer, Integer>(10);
         int capactiy = numericMap.getCapacity();
 
@@ -266,5 +272,34 @@ public final class ArrayMapTest {
         // Checking the value of a key should loop around the whole table once, since the probing will keep encountering
         // dead spaces. The map should detect this and exit without running into an infinite loop.
         assertThat(numericMap.containsKey(1), equalTo(false));
+    }
+
+    @Test
+    public void replaceCanOnlyReplaceExistingKeys() {
+        final ArrayMap<Integer, String> numericStringMap = new ArrayMap<Integer, String>();
+        numericStringMap.put(1, "oone");
+
+        numericStringMap.replace(1, "one");
+        assertThat(numericStringMap.get(1), equalTo("one"));
+
+        assertException("Can only replace key if it is already in the map", IllegalStateException.class,
+            new Runnable() {
+                @Override
+                public void run() {
+                    numericStringMap.replace(2, "two");
+                }
+            });
+    }
+
+    @Test
+    public void putOrReplaceCanBothPutAndReplace() {
+        ArrayMap<Integer, String> numericStringMap = new ArrayMap<Integer, String>();
+        numericStringMap.put(1, "oone");
+
+        numericStringMap.putOrReplace(1, "one");
+        numericStringMap.putOrReplace(2, "two");
+
+        assertThat(numericStringMap.get(1), equalTo("one"));
+        assertThat(numericStringMap.get(2), equalTo("two"));
     }
 }
