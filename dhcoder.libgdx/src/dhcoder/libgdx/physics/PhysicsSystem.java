@@ -211,7 +211,7 @@ public final class PhysicsSystem {
 
         for (int i = 0; i < physicsElements.size; i++) {
             PhysicsUpdateListener physicsUpdateListener = physicsElements.get(i);
-            physicsUpdateListener.syncWithPhysics();
+            physicsUpdateListener.onPhysicsUpdate();
         }
     }
 

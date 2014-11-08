@@ -7,11 +7,8 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Shape;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
-import dhcoder.libgdx.physics.PhysicsUpdateListener;
 import dhcoder.libgdx.physics.PhysicsSystem;
-import dhcoder.support.opt.Opt;
 import tiltadv.components.dynamics.PositionComponent;
-import tiltadv.globals.Physics;
 import tiltadv.globals.Services;
 import tiltadv.memory.Pools;
 
@@ -28,22 +25,14 @@ import static dhcoder.support.contract.ContractUtils.requireTrue;
  * some other entity's body. If this is the case, this fixture expects the presence of a {@link PositionComponent}
  * and will take over the role of setting it.
  */
-public final class FixtureComponent extends AbstractComponent implements PhysicsUpdateListener {
+public final class FixtureComponent extends AbstractComponent {
 
     private final Vector2 offset = new Vector2();
-    // The position component will only be set if it's our responsibility to set it
-    private final Opt<PositionComponent> positionComponentOpt = Opt.withNoValue();
-    private Entity targetEntity;
     private Shape shape;
     private boolean isSensor;
     private short categoryBits = 0;
     private short maskBits = -1;
     private Fixture fixture;
-
-    public FixtureComponent setTargetEntity(final Entity targetEntity) {
-        this.targetEntity = targetEntity;
-        return this;
-    }
 
     public FixtureComponent setSensor(final boolean isSensor) {
         requireNull(fixture, "Can't change a fixture's sensor state after it is initialized");
@@ -75,16 +64,7 @@ public final class FixtureComponent extends AbstractComponent implements Physics
         requireNonNull(shape, "Fixture shape must be set");
         requireTrue(categoryBits > 0, "Fixture category must be set");
 
-        if (targetEntity == null) {
-            targetEntity = owner;
-        }
-
-        BodyComponent bodyComponent = targetEntity.requireComponent(BodyComponent.class);
-        if (targetEntity != owner) {
-            positionComponentOpt.set(owner.requireComponent(PositionComponent.class));
-            // Only sync if it's our responsibility to maintain the position
-            Services.get(PhysicsSystem.class).addUpdateListener(this);
-        }
+        BodyComponent bodyComponent = owner.requireComponent(BodyComponent.class);
 
         {
             FixtureDef fixtureDef = Pools.fixtureDefs.grabNew();
@@ -101,34 +81,12 @@ public final class FixtureComponent extends AbstractComponent implements Physics
     }
 
     @Override
-    public void syncWithPhysics() {
-        final Body body = fixture.getBody();
-
-        Vector2 transformedOffset = Pools.vector2s.grabNew();
-        transformedOffset.set(offset).scl(Physics.PIXELS_TO_METERS);
-        body.getTransform().mul(transformedOffset);
-        transformedOffset.scl(Physics.METERS_TO_PIXELS);
-
-        positionComponentOpt.getValue().setPosition(transformedOffset);
-
-        Pools.vector2s.freeCount(1);
-
-    }
-
-    @Override
     public void reset() {
-        if (positionComponentOpt.hasValue()) {
-            Services.get(PhysicsSystem.class).removeUpdateListener(this);
-        }
-
         offset.setZero();
-        positionComponentOpt.clear();
-        targetEntity = null;
         shape = null;
         isSensor = false;
         categoryBits = 0;
         maskBits = -1;
-
         fixture = null;
     }
 }

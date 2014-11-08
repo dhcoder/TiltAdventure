@@ -48,7 +48,7 @@ import tiltadv.components.dynamics.PositionComponent;
 import tiltadv.components.dynamics.TiltComponent;
 import tiltadv.components.dynamics.box2d.BodyComponent;
 import tiltadv.components.dynamics.box2d.FixtureComponent;
-import tiltadv.components.dynamics.box2d.RevoluteJointComponent;
+import tiltadv.components.dynamics.box2d.OffsetComponent;
 import tiltadv.components.hierarchy.ParentComponent;
 import tiltadv.components.hierarchy.children.PlayerChildrenComponent;
 import tiltadv.components.input.AccelerometerInputComponent;
@@ -247,7 +247,6 @@ public final class GdxApplication extends ApplicationAdapter {
 //        gravityWellBounds = new Circle(8.0f);
         playerBounds = Physics.newCircle(6.5f);
         playerSensorBounds = Physics.newCircle(8.0f);
-        playerSensorBounds.setPosition(new Vector2(0.6f, 0));
         swordBounds = Physics.newRectangle(5f, 1f);
         octoBounds = Physics.newCircle(8.0f);
         octoRockBounds = Physics.newCircle(Tiles.ROCK.getRegionWidth() / 2f);
@@ -309,7 +308,6 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(ParentComponent.class); // Child of Player Entity
                 entity.addComponent(BodyComponent.class).setBodyType(BodyType.DynamicBody);
                 entity.addComponent(FixtureComponent.class).setShape(swordBounds).setCategory(Category.SWORD);
-                entity.addComponent(RevoluteJointComponent.class);
                 entity.addComponent(SwordBehaviorComponent.class);
                 entity.addComponent(AttackComponent.class);
                 entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.SWORDRIGHT);
@@ -323,8 +321,10 @@ public final class GdxApplication extends ApplicationAdapter {
 //                entity.addComponent(PlayerSensorCollisionComponent.class).setShape(playerSensorBounds);
                 entity.addComponent(PlayerSensorBehaviorComponent.class);
                 entity.addComponent(PositionComponent.class);
+                entity.addComponent(BodyComponent.class).setBodyType(BodyType.KinematicBody);
                 entity.addComponent(FixtureComponent.class).setShape(playerSensorBounds).setSensor(true)
-                    .setOffset(new Vector2(10f, 0)).setCategory(Category.PLAYER_SENSOR);
+                    .setCategory(Category.PLAYER_SENSOR);
+                entity.addComponent(OffsetComponent.class).setOffset(new Vector2(10f, 0));
                 entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.SENSOR);
             }
         });

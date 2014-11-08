@@ -1,6 +1,8 @@
 package tiltadv.components.hierarchy.children;
 
 import dhcoder.libgdx.entity.Entity;
+import tiltadv.components.dynamics.box2d.BodyComponent;
+import tiltadv.components.dynamics.box2d.OffsetComponent;
 import tiltadv.components.hierarchy.ChildrenComponent;
 import tiltadv.globals.EntityId;
 
@@ -23,7 +25,9 @@ public final class PlayerChildrenComponent extends ChildrenComponent {
 //        swordEntity.requireComponent(RevoluteJointComponent.class).setTargetBody(bodyComponent.getBody());
 //        add(swordEntity);
 
+        final BodyComponent bodyComponent = owner.requireComponentBefore(this, BodyComponent.class);
         sensorEntity = owner.getManager().newEntityFromTemplate(EntityId.PLAYER_SENSOR);
+        sensorEntity.requireComponent(OffsetComponent.class).setTargetBody(bodyComponent.getBody());
         add(sensorEntity);
     }
 

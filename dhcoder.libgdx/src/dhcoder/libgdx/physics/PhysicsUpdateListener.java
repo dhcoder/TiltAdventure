@@ -5,7 +5,7 @@ package dhcoder.libgdx.physics;
  */
 public interface PhysicsUpdateListener {
     /**
-     * Method to call after the physics update step is complete.
+     * Method called after the physics update step is complete.
      */
-    void syncWithPhysics();
+    void onPhysicsUpdate();
 }

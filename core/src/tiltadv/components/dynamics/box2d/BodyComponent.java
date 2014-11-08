@@ -240,7 +240,7 @@ public final class BodyComponent extends AbstractComponent implements PhysicsUpd
     }
 
     @Override
-    public void syncWithPhysics() {
+    public void onPhysicsUpdate() {
         Vector2 gamePosition = Pools.vector2s.grabNew();
         gamePosition.set(body.getPosition()).scl(Physics.METERS_TO_PIXELS);
         positionComponent.setPosition(gamePosition);
