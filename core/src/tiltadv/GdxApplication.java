@@ -33,7 +33,7 @@ import tiltadv.collision.EnemyProjectilePlayerCollisionHandler;
 import tiltadv.collision.SensorEnemyCollisionHandler;
 import tiltadv.collision.SwordEnemyCollisionHandler;
 import tiltadv.components.behavior.OctoBehaviorComponent;
-import tiltadv.components.behavior.OscillationBehaviorComponent;
+import tiltadv.components.math.OscillationComponent;
 import tiltadv.components.behavior.PlayerBehaviorComponent;
 import tiltadv.components.behavior.SwordBehaviorComponent;
 import tiltadv.components.body.FollowCameraComponent;
@@ -339,7 +339,7 @@ public final class GdxApplication extends ApplicationAdapter {
             @Override
             public void initialize(final Entity entity) {
                 entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.BOULDER);
-                entity.addComponent(OscillationBehaviorComponent.class);
+                entity.addComponent(OscillationComponent.class);
                 entity.addComponent(PositionComponent.class);
                 entity.addComponent(BodyComponent.class).setBodyType(BodyType.KinematicBody);
                 entity.addComponent(FixtureComponent.class).setShape(boulderBounds).setCategory(Category.OBSTACLES);
@@ -551,7 +551,7 @@ public final class GdxApplication extends ApplicationAdapter {
         Vector2 from = Pools.vector2s.grabNew().set(xFrom, yFrom);
         Vector2 to = Pools.vector2s.grabNew().set(xTo, yTo);
 
-        boulderEntity.requireComponent(OscillationBehaviorComponent.class)
+        boulderEntity.requireComponent(OscillationComponent.class)
             .setOscillation(from, to, BOULDER_OSCILLATION_DURATION);
 
         Pools.vector2s.freeToMark(mark);

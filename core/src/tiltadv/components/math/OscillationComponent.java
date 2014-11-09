@@ -1,28 +1,27 @@
-package tiltadv.components.behavior;
+package tiltadv.components.math;
 
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.time.Duration;
-import tiltadv.components.math.LerpComponent;
 import tiltadv.components.dynamics.box2d.BodyComponent;
 import tiltadv.memory.Pools;
 
 /**
 * Class that oscillates an entity between two locations, both easing out of and into each location.
 */
-public final class OscillationBehaviorComponent extends LerpComponent {
+public final class OscillationComponent extends LerpComponent {
 
     private final Vector2 from = new Vector2();
     private final Vector2 to = new Vector2();
     private BodyComponent bodyComponent;
 
-    public OscillationBehaviorComponent() {
+    public OscillationComponent() {
         super();
         setShouldLoop(true);
         setActive(true);
     }
 
-    public OscillationBehaviorComponent setOscillation(final Vector2 from, final Vector2 to, final Duration duration) {
+    public OscillationComponent setOscillation(final Vector2 from, final Vector2 to, final Duration duration) {
         this.from.set(from);
         this.to.set(to);
         setDuration(duration);
