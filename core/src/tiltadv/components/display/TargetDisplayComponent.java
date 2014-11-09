@@ -4,11 +4,15 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
+import dhcoder.libgdx.physics.PhysicsSystem;
+import dhcoder.libgdx.physics.PhysicsUpdateListener;
 import dhcoder.support.event.EventListener;
 import dhcoder.support.math.Angle;
 import dhcoder.support.opt.Opt;
 import dhcoder.support.time.Duration;
+import tiltadv.components.dynamics.PositionComponent;
 import tiltadv.globals.Events;
+import tiltadv.globals.Services;
 import tiltadv.memory.Pools;
 
 import static dhcoder.support.contract.ContractUtils.requireNonNull;
@@ -16,40 +20,32 @@ import static dhcoder.support.contract.ContractUtils.requireNonNull;
 /**
  * Component that renders an effect which lets you see which Entity has been selected
  */
-public final class TargetDisplayComponent extends AbstractComponent {
-
-
+public final class TargetDisplayComponent extends AbstractComponent implements PhysicsUpdateListener {
     private final static Duration LOOP_DURATION = Duration.fromSeconds(.8f);
     private final static float TARGET_RADIUS = 15f;
 
     private final Angle angle = Angle.fromDegrees(0f);
-
-    private Duration elapsedSoFar = Duration.zero();
-
+    private final Duration elapsedSoFar = Duration.zero();
+    private final Opt<Entity> targetEntityOpt = Opt.withNoValue();
     private TextureRegion textureRegion;
+    private PositionComponent positionComponent;
+    private SpriteComponent spriteComponent;
 
-    private Opt<Entity> targetEntityOpt = Opt.withNoValue();
-
-    // TODO: Use JointComponent instead
-//    private OffsetComponent offsetComponent;
     private final EventListener<Entity> onTargetSelected = new EventListener<Entity>() {
         @Override
         public void run(final Entity sender) {
             targetEntityOpt.set(sender);
-//            offsetComponent.setSourcePosition(sender.requireComponent(PositionComponent.class));
             spriteComponent.setHidden(false);
-
         }
-    };;
+    };
+
     private final EventListener<Entity> onTargetCleared = new EventListener<Entity>() {
         @Override
         public void run(final Entity sender) {
             targetEntityOpt.clear();
-//            offsetComponent.clearSourcePosition();
             spriteComponent.setHidden(true);
         }
-    };;
-    private SpriteComponent spriteComponent;
+    };
 
     public void setTextureRegion(final TextureRegion textureRegion) {
         this.textureRegion = textureRegion;
@@ -58,15 +54,17 @@ public final class TargetDisplayComponent extends AbstractComponent {
     @Override
     public void initialize(final Entity owner) {
         requireNonNull(textureRegion, "Target texture must be set");
+        positionComponent = owner.requireComponentBefore(this, PositionComponent.class);
+
         spriteComponent = owner.requireComponent(SpriteComponent.class);
         spriteComponent.setTextureRegion(textureRegion);
         spriteComponent.setHidden(true);
 
-//        offsetComponent = owner.requireComponent(OffsetComponent.class);
-
         Events.onTargetSelected.addListener(onTargetSelected);
         Events.onTargetCleared.addListener(onTargetCleared);
+        Services.get(PhysicsSystem.class).addUpdateListener(this);
     }
+
 
     @Override
     public void update(final Duration elapsedTime) {
@@ -75,23 +73,36 @@ public final class TargetDisplayComponent extends AbstractComponent {
         while (elapsedSoFar.getSeconds() > LOOP_DURATION.getSeconds()) {
             elapsedSoFar.subtract(LOOP_DURATION);
         }
+    }
 
+    @Override
+    public void onPhysicsUpdate() {
         if (!targetEntityOpt.hasValue()) {
             return;
         }
 
         angle.setDegrees(elapsedSoFar.getSeconds() / LOOP_DURATION.getSeconds() * 360f);
-        Vector2 offset = Pools.vector2s.grabNew().set(TARGET_RADIUS, 0f);
-        offset.rotate(angle.getDegrees());
-//        offsetComponent.setOffset(offset);
+        Vector2 finalPosition = Pools.vector2s.grabNew().set(TARGET_RADIUS, 0f);
+        finalPosition.rotate(angle.getDegrees());
+        final Vector2 targetPosition =
+            targetEntityOpt.getValue().requireComponent(PositionComponent.class).getPosition();
+        finalPosition.add(targetPosition);
+        positionComponent.setPosition(finalPosition);
         Pools.vector2s.freeCount(1);
     }
 
     @Override
     public void reset() {
+        Services.get(PhysicsSystem.class).removeUpdateListener(this);
+        Events.onTargetSelected.removeListener(onTargetSelected);
+        Events.onTargetCleared.removeListener(onTargetCleared);
+
+        angle.setDegrees(0f);
         elapsedSoFar.setZero();
         targetEntityOpt.clear();
-        angle.setDegrees(0f);
+        textureRegion = null;
+        positionComponent = null;
+        spriteComponent = null;
     }
 
 }

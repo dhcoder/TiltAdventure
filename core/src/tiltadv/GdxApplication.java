@@ -44,6 +44,7 @@ import tiltadv.components.combat.KnockbackComponent;
 import tiltadv.components.display.CharacterDisplayComponent;
 import tiltadv.components.display.FpsDisplayComponent;
 import tiltadv.components.display.SpriteComponent;
+import tiltadv.components.display.TargetDisplayComponent;
 import tiltadv.components.display.TiltDisplayComponent;
 import tiltadv.components.dynamics.PositionComponent;
 import tiltadv.components.dynamics.TiltComponent;
@@ -278,7 +279,6 @@ public final class GdxApplication extends ApplicationAdapter {
 //            @Override
 //            public void initialize(final Entity entity) {
 //                entity.addComponent(PositionComponent.class);
-//                entity.addComponent(GravityWellCollisionComponent.class).setShape(gravityWellBounds);
 //                entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.SENSOR);
 //            }
 //        });
@@ -303,7 +303,6 @@ public final class GdxApplication extends ApplicationAdapter {
                 entity.addComponent(CharacterDisplayComponent.class)
                     .set(Animations.PLAYER_S, Animations.PLAYER_E, Animations.PLAYER_N, Animations.PLAYER_SE,
                         Animations.PLAYER_NW);
-//                entity.addComponent(PlayerCollisionComponent.class).setShape(playerBounds);
             }
         });
 
@@ -326,7 +325,6 @@ public final class GdxApplication extends ApplicationAdapter {
             @Override
             public void initialize(final Entity entity) {
                 entity.addComponent(ParentComponent.class);  // Child of Player Entity
-//                entity.addComponent(PlayerSensorCollisionComponent.class).setShape(playerSensorBounds);
                 entity.addComponent(PositionComponent.class);
                 entity.addComponent(BodyComponent.class).setBodyType(BodyType.KinematicBody);
                 entity.addComponent(FixtureComponent.class).setShape(playerSensorBounds).setSensor(true)
@@ -364,7 +362,6 @@ public final class GdxApplication extends ApplicationAdapter {
                     .setInvicibilityDuration(ENEMY_INVINCIBILITY_DURATION);
                 entity.addComponent(CharacterDisplayComponent.class)
                     .set(Animations.OCTODOWN, Animations.OCTORIGHT, Animations.OCTOUP);
-//                entity.addComponent(EnemyCollisionComponent.class).setShape(octoBounds);
             }
         });
 
@@ -378,19 +375,17 @@ public final class GdxApplication extends ApplicationAdapter {
                     .setDamping(Physics.NO_DAMPING);
                 entity.addComponent(FixtureComponent.class).setShape(octoRockBounds)
                     .setCategory(Category.ENEMY_PROJECTILE);
-//                entity.addComponent(EnemyProjectileCollisionComponent.class).setShape(octoRockBounds);
             }
         });
 
-//        entities.registerTemplate(EntityId.TARGET_INDICATOR, new EntityManager.EntityCreator() {
-//            @Override
-//            public void initialize(final Entity entity) {
-//                entity.addComponent(PositionComponent.class);
-//                entity.addComponent(SpriteComponent.class);
-//                entity.addComponent(TargetDisplayComponent.class).setTextureRegion(Tiles.ROCK);
-//                entity.addComponent(OffsetComponent.class);
-//            }
-//        });
+        entities.registerTemplate(EntityId.TARGET_INDICATOR, new EntityManager.EntityCreator() {
+            @Override
+            public void initialize(final Entity entity) {
+                entity.addComponent(PositionComponent.class);
+                entity.addComponent(SpriteComponent.class);
+                entity.addComponent(TargetDisplayComponent.class).setTextureRegion(Tiles.ROCK);
+            }
+        });
 
         entities.registerTemplate(EntityId.FPS_INDICATOR, new EntityManager.EntityCreator() {
             @Override
@@ -427,7 +422,7 @@ public final class GdxApplication extends ApplicationAdapter {
 //        addTiltIndicatorEntity(playerEntity);
         addFpsEntity();
         addBoundaryWalls();
-//        addTargetEntity();
+        addTargetEntity();
 
         Scene demoScene = Services.get(SceneDatastore.class).get("demo");
         renderSystem.add(RenderLayer.Ground, demoScene);
@@ -571,7 +566,7 @@ public final class GdxApplication extends ApplicationAdapter {
         tiltIndicatorEntity.requireComponent(TiltDisplayComponent.class).setTargetEntity(playerEntity);
     }
 
-//    private void addTargetEntity() {
-//        entities.newEntityFromTemplate(EntityId.TARGET_INDICATOR);
-//    }
+    private void addTargetEntity() {
+        entities.newEntityFromTemplate(EntityId.TARGET_INDICATOR);
+    }
 }
