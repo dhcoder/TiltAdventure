@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.MassData;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.libgdx.physics.PhysicsSystem;
@@ -151,6 +152,8 @@ public final class BodyComponent extends AbstractComponent implements PhysicsUpd
 
     public BodyComponent applyImpulse(final Vector2 impulse) {
         targetVelocity.setZero();
+        body.setLinearVelocity(targetVelocity);
+
         velocityLockedDuration.setFrom(IMPULSE_RECOVERY_TIME);
 
         Vector2 physicsImpulse = Pools.vector2s.grabNew();
@@ -186,6 +189,12 @@ public final class BodyComponent extends AbstractComponent implements PhysicsUpd
             bodyDef.linearDamping = initialDamping;
             body = physicsSystem.getWorld().createBody(bodyDef);
             body.setUserData(owner);
+            
+            MassData massData = Pools.massData.grabNew();
+            massData.mass = 1f;
+            body.setMassData(massData);
+
+            Pools.massData.freeCount(1);
             Pools.bodyDefs.freeCount(1);
         }
 

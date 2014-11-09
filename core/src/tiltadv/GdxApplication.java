@@ -252,7 +252,7 @@ public final class GdxApplication extends ApplicationAdapter {
         entities = new EntityManager(ENTITY_COUNT);
 
 //        gravityWellBounds = new Circle(8.0f);
-        playerBounds = Physics.newCircle(6.5f);
+        playerBounds = Physics.newCircle(5.5f);
         playerSensorBounds = Physics.newCircle(8.0f);
         swordBounds =
             Physics.newRectangle(Tiles.SWORDRIGHT.getRegionWidth() / 2f, Tiles.SWORDRIGHT.getRegionHeight() / 2f);

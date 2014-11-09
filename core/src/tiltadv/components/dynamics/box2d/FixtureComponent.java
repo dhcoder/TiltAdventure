@@ -71,7 +71,6 @@ public final class FixtureComponent extends AbstractComponent {
             fixtureDef.shape = shape;
             fixtureDef.isSensor = isSensor;
             fixtureDef.friction = 0f;
-            fixtureDef.density = isSensor ? 0f : 1f;
             fixtureDef.filter.categoryBits = categoryBits;
             fixtureDef.filter.maskBits = maskBits;
             final Body body = bodyComponent.getBody();
