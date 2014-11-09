@@ -1,17 +1,17 @@
 {
-	"tilesetPath": "data/tilesets/grass.json",
-	"tiles": [
-		{
-			"name": "plain",
-			"coord": [0,0]
-		},
-		{
-			"name": "rock",
-			"coord": [1,0]
-		},
-		{
-			"name": "flower",
-			"coord": [2,0]
-		}
-	]
+    "tilesetPath": "data/tilesets/grass.json",
+    "tiles": [
+        {
+            "name": "plain",
+            "coord": [0,0]
+        },
+        {
+            "name": "rock",
+            "coord": [1,0]
+        },
+        {
+            "name": "flower",
+            "coord": [2,0]
+        }
+    ]
 }

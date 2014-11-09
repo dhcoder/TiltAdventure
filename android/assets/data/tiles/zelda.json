@@ -1,21 +1,21 @@
 {
-	"tilesetPath": "data/tilesets/zelda.json",
-	"tiles": [
-		{
-			"name": "boulder",
-			"coord": [0,0]
-		},
-		{
-			"name": "rock",
-			"coord": [0,1]
-		},
-		{
-			"name": "sword",
-			"coord": [5,0]
-		},
-		{
-			"name": "player_sensor",
-			"coord": [5,1]
-		}
-	]
+    "tilesetPath": "data/tilesets/zelda.json",
+    "tiles": [
+        {
+            "name": "boulder",
+            "coord": [0,0]
+        },
+        {
+            "name": "rock",
+            "coord": [0,1]
+        },
+        {
+            "name": "sword",
+            "coord": [5,0]
+        },
+        {
+            "name": "player_sensor",
+            "coord": [5,1]
+        }
+    ]
 }

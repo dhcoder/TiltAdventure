@@ -1,50 +1,50 @@
 {
-	"tilesetPath": "data/tilesets/player.json",
-	"animations": [
-		{
-			"name": "idle_s",
-			"frames": [[0,0]]
-		},
-		{
-			"name": "idle_e",
-			"frames": [[0,1]]
-		},
-		{
-			"name": "idle_n",
-			"frames": [[0,3]]
-		},
-		{
-			"name": "idle_se",
-			"frames": [[1,4]]
-		},
-		{
-			"name": "idle_nw",
-			"frames": [[1,5]]
-		},
-		{
-			"name": "walk_s",
-			"frameDuration": 0.1,
-			"frames": [[1,0],[0,0],[3,0],[0,0]]
-		},
-		{
-			"name": "walk_e",
-			"frameDuration": 0.1,
-			"frames": [[1,1],[0,1],[3,1],[0,1]]
-		},
-		{
-			"name": "walk_n",
-			"frameDuration": 0.1,
-			"frames": [[1,3],[0,3],[3,3],[0,3]]
-		},
-		{
-			"name": "walk_se",
-			"frameDuration": 0.1,
-			"frames": [[0,4],[1,4],[2,4],[1,4]]
-		},
-		{
-			"name": "walk_nw",
-			"frameDuration": 0.1,
-			"frames": [[0,5],[1,5],[2,5],[1,5]]
-		}
-	]
+    "tilesetPath": "data/tilesets/player.json",
+    "animations": [
+        {
+            "name": "idle_s",
+            "frames": [[0,0]]
+        },
+        {
+            "name": "idle_e",
+            "frames": [[0,1]]
+        },
+        {
+            "name": "idle_n",
+            "frames": [[0,3]]
+        },
+        {
+            "name": "idle_se",
+            "frames": [[1,4]]
+        },
+        {
+            "name": "idle_nw",
+            "frames": [[1,5]]
+        },
+        {
+            "name": "walk_s",
+            "frameDuration": 0.1,
+            "frames": [[1,0],[0,0],[3,0],[0,0]]
+        },
+        {
+            "name": "walk_e",
+            "frameDuration": 0.1,
+            "frames": [[1,1],[0,1],[3,1],[0,1]]
+        },
+        {
+            "name": "walk_n",
+            "frameDuration": 0.1,
+            "frames": [[1,3],[0,3],[3,3],[0,3]]
+        },
+        {
+            "name": "walk_se",
+            "frameDuration": 0.1,
+            "frames": [[0,4],[1,4],[2,4],[1,4]]
+        },
+        {
+            "name": "walk_nw",
+            "frameDuration": 0.1,
+            "frames": [[0,5],[1,5],[2,5],[1,5]]
+        }
+    ]
 }
