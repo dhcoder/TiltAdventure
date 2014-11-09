@@ -245,9 +245,10 @@ public final class PhysicsSystem {
         // trouble, but otherwise, it would be nice to have 1:1 entity::update and physics::update steps.
         world.step(elapsedTime.getSeconds(), VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 
-        int numCollisionFixtures = activeCollisionsPool.getItemsInUse().size();
-        for (int i = 0; i < numCollisionFixtures; i++) {
-            ActiveCollision activeCollision = activeCollisionsPool.getItemsInUse().get(i);
+        final List<ActiveCollision> activeCollisions = activeCollisionsPool.getItemsInUse();
+        int numCollisions = activeCollisions.size();
+        for (int i = 0; i < numCollisions; i++) {
+            ActiveCollision activeCollision = activeCollisions.get(i);
 
             final Fixture fixtureA = activeCollision.fixtureA;
             final Fixture fixtureB = activeCollision.fixtureB;
@@ -308,7 +309,8 @@ public final class PhysicsSystem {
      * @see <a href="https://code.google.com/p/libgdx/issues/detail?id=484">Issue: LibGdx body listener</a>
      */
     public void destroyBody(final Body body) {
-        setActive(body, false);
+        setActive(body, false); // This forces active collisions to separate
+        inactiveBodies.remove(body); // setActive puts a body reference in inactiveBodies - remove it!
         removeActiveCollisions(body);
         body.getWorld().destroyBody(body);
     }
@@ -387,8 +389,8 @@ public final class PhysicsSystem {
     private void runCollisionHandlers(final Body body, final CollisionCallback collisionCallback) {
 
         final List<ActiveCollision> activeCollisions = activeCollisionsPool.getItemsInUse();
-        int numCollisionFixtures = activeCollisions.size();
-        for (int i = 0; i < numCollisionFixtures; i++) {
+        int numCollisions = activeCollisions.size();
+        for (int i = 0; i < numCollisions; i++) {
             ActiveCollision activeCollision = activeCollisions.get(i);
             if (activeCollision.ownsBody(body)) {
                 final Fixture fixtureA = activeCollision.fixtureA;
