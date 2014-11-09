@@ -67,7 +67,7 @@ public final class Opt<T> implements Poolable {
     /**
      * Clears the value of this optional.
      */
-    public void clear() { set(null); }
+    public void clear() { this.value = null; }
 
     /**
      * Returns the current value of this optional, or throws an exception otherwise. You may consider checking {@link
@@ -83,10 +83,15 @@ public final class Opt<T> implements Poolable {
     }
 
     /**
-     * Sets this optional to a new value. Setting this to null clears the optional, although you are encouraged to use
-     * {@link #clear()} if possible, for readability.
+     * Sets this optional to a new value. It is incorrect to set this with null. Use {@link #clear()} instead. This
+     * ensures users are clearing an optional intentionally, not by accident.
      */
-    public void set(final T value) { this.value = value; }
+    public void set(final T value) {
+        if (value == null) {
+            throw new IllegalArgumentException("Cannot set an optional to a null value. Use clear() instead");
+        }
+        this.value = value;
+    }
 
     /**
      * Set the value of this optional to the value held by another optional (or no value if the target optional is also

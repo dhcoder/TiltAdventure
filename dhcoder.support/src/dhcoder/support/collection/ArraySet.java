@@ -5,6 +5,8 @@ package dhcoder.support.collection;
  */
 public final class ArraySet<E> {
 
+    private static final Object DUMMY_OJBECT = new Object();
+
     private ArrayMap<E, Object> internalMap;
 
     public ArraySet() { internalMap = new ArrayMap<E, Object>(); }
@@ -31,15 +33,15 @@ public final class ArraySet<E> {
      * Add the element, which must NOT exist in the set. Use {@link #putIf(Object)} if you don't need this
      * requirement.
      */
-    public void put(final E element) { internalMap.put(element, null); }
+    public void put(final E element) { internalMap.put(element, DUMMY_OJBECT); }
 
     /**
      * Add the element, if it's not already in the set.
      *
-     * @return {@code true} if the element was newly added into the set.
+     * @return {@code true} if the element was only just now added into the set.
      */
     public boolean putIf(final E element) {
-        return internalMap.putOrReplace(element, null) == ArrayMap.InsertMethod.PUT;
+        return internalMap.putOrReplace(element, DUMMY_OJBECT) == ArrayMap.InsertMethod.PUT;
     }
 
     /**
