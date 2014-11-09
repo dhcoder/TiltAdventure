@@ -30,7 +30,7 @@ public final class DevSettings {
     /**
      * If in dev mode, apply a slow-mo multiplier - setting to {@code 4f} means 4x slowdown.
      */
-    public static float SLOW_MO_FACTOR = 1f;
+    public static float SLOW_MO_FACTOR = 4f;
 
     private DevSettings() {}
 

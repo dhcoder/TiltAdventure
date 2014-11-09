@@ -19,11 +19,17 @@ public final class TilesLoader {
     private final static class TileGroupData {
         public String tilesetPath;
         public TileData[] tiles;
+        public RegionData[] regions;
     }
 
     private final static class TileData {
         public String name;
         public int[] coord;
+    }
+
+    private final static class RegionData {
+        public String name;
+        public int[][] coords;
     }
 
     public static void load(final String jsonPath) {
@@ -45,6 +51,13 @@ public final class TilesLoader {
             TileData tileData = groupData.tiles[i];
             tileGroup.add(tileData.name,
                 new TextureRegion(tileTexture, tileData.coord[0] * tileW, tileData.coord[1] * tileH, tileW, tileH));
+        }
+
+        for (int i = 0; i < groupData.regions.length; ++i) {
+            RegionData regionData = groupData.regions[i];
+            tileGroup.add(regionData.name,
+                new TextureRegion(tileTexture, regionData.coords[0][0], regionData.coords[0][1],
+                    regionData.coords[1][0], regionData.coords[1][1]));
         }
 
         tiles.add(groupName, tileGroup);

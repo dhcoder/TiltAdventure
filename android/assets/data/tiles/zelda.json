@@ -6,16 +6,18 @@
             "coord": [0,0]
         },
         {
+            "name": "player_sensor",
+            "coord": [5,1]
+        }
+    ],
+    "regions": [
+        {
             "name": "rock",
-            "coord": [0,1]
+            "coords": [[4,19],[8,10]]
         },
         {
             "name": "sword",
-            "coord": [5,0]
-        },
-        {
-            "name": "player_sensor",
-            "coord": [5,1]
+            "coords": [[82,5],[12,7]]
         }
     ]
 }
