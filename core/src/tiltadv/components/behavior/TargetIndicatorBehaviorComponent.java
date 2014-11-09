@@ -21,7 +21,7 @@ import static dhcoder.support.contract.ContractUtils.requireNonNull;
 /**
  * Component that renders an effect which lets you see which Entity has been selected
  */
-public final class TargetBehaviorComponent extends AbstractComponent implements PhysicsUpdateListener {
+public final class TargetIndicatorBehaviorComponent extends AbstractComponent implements PhysicsUpdateListener {
     private final static Duration LOOP_DURATION = Duration.fromSeconds(.8f);
     private final static float TARGET_RADIUS = 15f;
 

@@ -44,8 +44,8 @@ import tiltadv.components.combat.KnockbackComponent;
 import tiltadv.components.display.CharacterDisplayComponent;
 import tiltadv.components.display.FpsDisplayComponent;
 import tiltadv.components.display.SpriteComponent;
-import tiltadv.components.behavior.TargetBehaviorComponent;
-import tiltadv.components.display.TiltDisplayComponent;
+import tiltadv.components.behavior.TargetIndicatorBehaviorComponent;
+import tiltadv.components.behavior.TiltIndicatorBehaviorComponent;
 import tiltadv.components.dynamics.PositionComponent;
 import tiltadv.components.dynamics.TiltComponent;
 import tiltadv.components.dynamics.box2d.BodyComponent;
@@ -383,7 +383,7 @@ public final class GdxApplication extends ApplicationAdapter {
             public void initialize(final Entity entity) {
                 entity.addComponent(PositionComponent.class);
                 entity.addComponent(SpriteComponent.class);
-                entity.addComponent(TargetBehaviorComponent.class).setTextureRegion(Tiles.ROCK);
+                entity.addComponent(TargetIndicatorBehaviorComponent.class).setTextureRegion(Tiles.ROCK);
             }
         });
 
@@ -400,7 +400,7 @@ public final class GdxApplication extends ApplicationAdapter {
             @Override
             public void initialize(final Entity entity) {
                 final float MARGIN = 5f;
-                entity.addComponent(TiltDisplayComponent.class).setTextureRegion(Tiles.SWORDRIGHT);
+                entity.addComponent(TiltIndicatorBehaviorComponent.class).setTextureRegion(Tiles.SWORDRIGHT);
                 entity.addComponent(PositionComponent.class).setPosition(
                     new Vector2(VIEWPORT_WIDTH / 2 - Tiles.SWORDRIGHT.getRegionWidth() - MARGIN,
                         VIEWPORT_HEIGHT / 2 - Tiles.SWORDRIGHT.getRegionHeight() - MARGIN));
@@ -563,7 +563,7 @@ public final class GdxApplication extends ApplicationAdapter {
 
     private void addTiltIndicatorEntity(final Entity playerEntity) {
         Entity tiltIndicatorEntity = entities.newEntityFromTemplate(EntityId.TILT_INDICATOR);
-        tiltIndicatorEntity.requireComponent(TiltDisplayComponent.class).setTargetEntity(playerEntity);
+        tiltIndicatorEntity.requireComponent(TiltIndicatorBehaviorComponent.class).setTargetEntity(playerEntity);
     }
 
     private void addTargetEntity() {

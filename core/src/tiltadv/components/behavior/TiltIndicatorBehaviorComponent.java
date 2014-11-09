@@ -1,4 +1,4 @@
-package tiltadv.components.display;
+package tiltadv.components.behavior;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -7,6 +7,7 @@ import dhcoder.libgdx.entity.Entity;
 import dhcoder.support.math.Angle;
 import dhcoder.support.opt.Opt;
 import dhcoder.support.time.Duration;
+import tiltadv.components.display.SpriteComponent;
 import tiltadv.components.dynamics.TiltComponent;
 import tiltadv.globals.RenderLayer;
 import tiltadv.memory.Pools;
@@ -14,7 +15,7 @@ import tiltadv.memory.Pools;
 /**
  * Component which sets the transform of an entity to match the direction of the hardware's tilt.
  */
-public final class TiltDisplayComponent extends AbstractComponent {
+public final class TiltIndicatorBehaviorComponent extends AbstractComponent {
 
     private TextureRegion arrowSprite;
 
@@ -25,12 +26,12 @@ public final class TiltDisplayComponent extends AbstractComponent {
      * Create a tilt indicator by passing in a sprite which represents an arrow facing straight right. This component
      * will rotate and render the arrow appropriately.
      */
-    public TiltDisplayComponent setTextureRegion(final TextureRegion arrowTexture) {
+    public TiltIndicatorBehaviorComponent setTextureRegion(final TextureRegion arrowTexture) {
         this.arrowSprite = arrowTexture;
         return this;
     }
 
-    public TiltDisplayComponent setTargetEntity(final Entity targetEntity) {
+    public TiltIndicatorBehaviorComponent setTargetEntity(final Entity targetEntity) {
         tiltComponentOpt.set(targetEntity.requireComponent(TiltComponent.class));
         return this;
     }
