@@ -1,4 +1,4 @@
-package tiltadv.components.display;
+package tiltadv.components.behavior;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -10,6 +10,7 @@ import dhcoder.support.event.EventListener;
 import dhcoder.support.math.Angle;
 import dhcoder.support.opt.Opt;
 import dhcoder.support.time.Duration;
+import tiltadv.components.display.SpriteComponent;
 import tiltadv.components.dynamics.PositionComponent;
 import tiltadv.globals.Events;
 import tiltadv.globals.Services;
@@ -20,7 +21,7 @@ import static dhcoder.support.contract.ContractUtils.requireNonNull;
 /**
  * Component that renders an effect which lets you see which Entity has been selected
  */
-public final class TargetDisplayComponent extends AbstractComponent implements PhysicsUpdateListener {
+public final class TargetBehaviorComponent extends AbstractComponent implements PhysicsUpdateListener {
     private final static Duration LOOP_DURATION = Duration.fromSeconds(.8f);
     private final static float TARGET_RADIUS = 15f;
 

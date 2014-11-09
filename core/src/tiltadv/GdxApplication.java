@@ -44,7 +44,7 @@ import tiltadv.components.combat.KnockbackComponent;
 import tiltadv.components.display.CharacterDisplayComponent;
 import tiltadv.components.display.FpsDisplayComponent;
 import tiltadv.components.display.SpriteComponent;
-import tiltadv.components.display.TargetDisplayComponent;
+import tiltadv.components.behavior.TargetBehaviorComponent;
 import tiltadv.components.display.TiltDisplayComponent;
 import tiltadv.components.dynamics.PositionComponent;
 import tiltadv.components.dynamics.TiltComponent;
@@ -383,7 +383,7 @@ public final class GdxApplication extends ApplicationAdapter {
             public void initialize(final Entity entity) {
                 entity.addComponent(PositionComponent.class);
                 entity.addComponent(SpriteComponent.class);
-                entity.addComponent(TargetDisplayComponent.class).setTextureRegion(Tiles.ROCK);
+                entity.addComponent(TargetBehaviorComponent.class).setTextureRegion(Tiles.ROCK);
             }
         });
 
