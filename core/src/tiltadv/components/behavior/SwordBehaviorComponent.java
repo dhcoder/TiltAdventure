@@ -21,6 +21,7 @@ public final class SwordBehaviorComponent extends LerpComponent implements Physi
     private final static Angle ARC = Angle.fromDegrees(100f);
     private final static Angle ARC_START = Angle.fromDegrees(-ARC.getDegrees() / 2f);
     private final static Duration SWING_DURATION = Duration.fromMilliseconds(150f);
+    private final static Duration SWING_RECOVERY_TIME = Duration.fromMilliseconds(200f);
 
     private Duration restTimeRemaining = Duration.zero();
 
@@ -71,7 +72,7 @@ public final class SwordBehaviorComponent extends LerpComponent implements Physi
         parentBodyComponent.lockHeading(false);
         enableCollision(false);
 
-        restTimeRemaining.setFrom(BodyComponent.IMPULSE_RECOVERY_TIME);
+        restTimeRemaining.setFrom(SWING_RECOVERY_TIME);
     }
 
     @Override
