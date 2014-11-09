@@ -163,7 +163,9 @@ public final class PhysicsSystem {
     private final Array<CollisionHandlerEntry> collisionHandlers;
     private final ArraySet<Body> inactiveBodies;
     private final HeapPool<ActiveCollision> activeCollisionsPool;
-    private final Pool<CollisionCallbackData> collisionDataPool = Pool.of(CollisionCallbackData.class, 1);
+    // Usually we only need 1 collision data item, but occasionally runCollisionHandlers triggers a callback which calls
+    // runCollisionHandlers again recursively, but this should never go very deep.
+    private final Pool<CollisionCallbackData> collisionDataPool = Pool.of(CollisionCallbackData.class, 4);
     private int[] categoryMasks = new int[MAX_NUM_CATEGORIES];
     private Box2DDebugRenderer collisionRenderer;
     private Matrix4 debugRenderMatrix;
