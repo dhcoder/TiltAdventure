@@ -53,8 +53,6 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
         }
     };
 
-    private Entity owner;
-    private Entity swordEntity;
     private PositionComponent positionComponent;
     private BodyComponent bodyComponent;
     private TiltComponent tiltComponent;
@@ -65,7 +63,6 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
 
     @Override
     public void initialize(final Entity owner) {
-        this.owner = owner;
         positionComponent = owner.requireComponent(PositionComponent.class);
         bodyComponent = owner.requireComponent(BodyComponent.class);
         tiltComponent = owner.requireComponent(TiltComponent.class);
@@ -94,12 +91,8 @@ public final class PlayerBehaviorComponent extends AbstractComponent implements 
 
     @Override
     public void reset() {
-        owner.getManager().freeEntity(swordEntity);
         Events.onTargetSelected.removeListener(handleTargetSelected);
         Events.onTargetCleared.removeListener(handleTargetSelected);
-
-        swordEntity = null;
-        owner = null;
 
         playerState.reset();
         frozenDuration.setZero();

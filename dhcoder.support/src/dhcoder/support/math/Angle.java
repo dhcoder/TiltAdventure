@@ -74,7 +74,7 @@ public final class Angle implements Poolable {
 
     public float getDegrees() {
         if (!degreesOpt.hasValue()) {
-            degreesOpt.set(radiansOpt.getValue() * RAD_TO_DEG);
+            setDegrees(radiansOpt.getValue() * RAD_TO_DEG);
         }
         return degreesOpt.getValue();
     }
@@ -93,7 +93,7 @@ public final class Angle implements Poolable {
 
     public float getRadians() {
         if (!radiansOpt.hasValue()) {
-            radiansOpt.set(degreesOpt.getValue() * DEG_TO_RAD);
+            setRadians(degreesOpt.getValue() * DEG_TO_RAD);
         }
         return radiansOpt.getValue();
     }

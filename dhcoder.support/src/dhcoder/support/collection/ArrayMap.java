@@ -16,6 +16,11 @@ import static dhcoder.support.text.StringUtils.format;
  */
 public final class ArrayMap<K, V> {
 
+    public enum InsertMethod {
+        PUT,
+        REPLACE,
+    }
+
     private enum IndexMethod {
         GET,
         PUT,
@@ -242,17 +247,19 @@ public final class ArrayMap<K, V> {
      * Use this if you're not sure if the key is already in the map or not. This is less efficient than either using
      * {@link #put(Object, Object)} or {@link #replace(Object, Object)} but is useful if you simply don't care.
      */
-    public void putOrReplace(final K key, final V value) {
+    public InsertMethod putOrReplace(final K key, final V value) {
         OptInt indexOpt = indexPool.grabNew();
         getIndex(key, IndexMethod.GET, indexOpt);
 
         if (indexOpt.hasValue()) {
             setInternal(indexOpt.getValue(), key, value);
             indexPool.freeCount(1);
+            return InsertMethod.REPLACE;
         }
         else {
             indexPool.freeCount(1);
             put(key, value);
+            return InsertMethod.PUT;
         }
     }
 

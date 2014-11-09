@@ -11,7 +11,7 @@ import tiltadv.memory.Pools;
  */
 public final class KnockbackComponent extends AbstractComponent {
 
-    private static final float KNOCKBACK_MAGNITUTDE = 400f;
+    private static final float KNOCKBACK_MAGNITUTDE = 80f;
 
     private float multiplier;
     private BodyComponent bodyComponent;

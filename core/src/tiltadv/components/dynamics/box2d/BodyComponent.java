@@ -6,8 +6,8 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
-import dhcoder.libgdx.physics.PhysicsUpdateListener;
 import dhcoder.libgdx.physics.PhysicsSystem;
+import dhcoder.libgdx.physics.PhysicsUpdateListener;
 import dhcoder.support.math.Angle;
 import dhcoder.support.time.Duration;
 import tiltadv.components.dynamics.PositionComponent;
@@ -27,20 +27,20 @@ import static dhcoder.support.contract.ContractUtils.requireNull;
  */
 public final class BodyComponent extends AbstractComponent implements PhysicsUpdateListener {
 
-    public static boolean RUN_SANITY_CHECKS = false;
-
+    public static final Duration IMPULSE_RECOVERY_TIME = Duration.fromMilliseconds(300f);
     /**
      * Box2D objects take too long to come to rest, so just manually stop them ourselves past a certain epsilon
      */
     private static final float STOP_EPSILON = .01f; // How slow are moving in meters per second
-    private static final float REGAIN_CONTROL_EPSILON = 1000f; // Units in meters per second
+    public static boolean RUN_SANITY_CHECKS = false;
     private final Vector2 targetPosition = new Vector2(); // Position in meters
     private final Vector2 targetVelocity = new Vector2(); // If set, apply a constant impulse to stay at this velocity
     private final Angle heading = Angle.fromRadians(0f);
+    private final Duration velocityLockedDuration = Duration.zero();
     private BodyType bodyType = BodyType.StaticBody;
     private Body body;
     private boolean isFastMoving;
-    private float initialDamping = Physics.DAMPING_FAST_STOP;
+    private float initialDamping = Physics.DAMPING_MEDIUM_STOP;
     private boolean syncPosition;
     private int headingLockedCount;
     private PositionComponent positionComponent;
@@ -55,7 +55,7 @@ public final class BodyComponent extends AbstractComponent implements PhysicsUpd
     /**
      * Set a linear damping value, if you want the object to gradually come to a stop over time. By default, it's set so
      * a body will stop relatively quickly, but you should set it to {@ocde 0f} if you want the object to go forever.
-     *
+     * <p/>
      * See the {@link Physics} namespace for useful values.
      */
     public BodyComponent setDamping(final float damping) {
@@ -81,6 +81,10 @@ public final class BodyComponent extends AbstractComponent implements PhysicsUpd
     }
 
     public BodyComponent setVelocity(final Vector2 velocity) {
+        if (velocityLockedDuration.getSeconds() > 0) {
+            return this;
+        }
+
         Physics.toMeters(targetVelocity.set(velocity));
         if (body != null) {
             assertNonStaticType();
@@ -91,6 +95,9 @@ public final class BodyComponent extends AbstractComponent implements PhysicsUpd
     }
 
     public BodyComponent stopSmoothly() {
+        if (velocityLockedDuration.getSeconds() > 0) {
+            return this;
+        }
         targetVelocity.setZero();
         return this;
     }
@@ -144,6 +151,7 @@ public final class BodyComponent extends AbstractComponent implements PhysicsUpd
 
     public BodyComponent applyImpulse(final Vector2 impulse) {
         targetVelocity.setZero();
+        velocityLockedDuration.setFrom(IMPULSE_RECOVERY_TIME);
 
         Vector2 physicsImpulse = Pools.vector2s.grabNew();
         physicsImpulse.set(impulse).scl(Physics.PIXELS_TO_METERS);
@@ -193,6 +201,8 @@ public final class BodyComponent extends AbstractComponent implements PhysicsUpd
             }
         }
 
+        velocityLockedDuration.subtract(elapsedTime);
+
         if (syncPosition) {
             final int mark = Pools.vector2s.mark();
             Vector2 velocity = Pools.vector2s.grabNew();
@@ -223,18 +233,19 @@ public final class BodyComponent extends AbstractComponent implements PhysicsUpd
     public void reset() {
         positionComponent = null;
 
+        velocityLockedDuration.setZero();
         targetPosition.setZero();
         targetVelocity.setZero();
         heading.setRadians(0f);
 
         final PhysicsSystem physicsSystem = Services.get(PhysicsSystem.class);
-        physicsSystem.getWorld().destroyBody(body);
+        physicsSystem.destroyBody(body);
         body = null;
         physicsSystem.removeUpdateListener(this);
 
         bodyType = BodyType.StaticBody;
         isFastMoving = false;
-        initialDamping = Physics.DAMPING_FAST_STOP;
+        initialDamping = Physics.DAMPING_MEDIUM_STOP;
         syncPosition = false;
         headingLockedCount = 0;
     }

@@ -16,7 +16,6 @@ public abstract class LerpComponent extends AbstractComponent {
     private final Duration accumulated = Duration.zero();
     private Interpolation interpolator = Interpolation.sine;
     private boolean isActive;
-    private boolean firstLerp = true;
     private boolean onReturnTrip;
     private boolean shouldLoop;
 
@@ -38,7 +37,6 @@ public abstract class LerpComponent extends AbstractComponent {
         handleInitialize(owner);
 
         if (isActive) {
-            firstLerp = false;
             handleLerpActivated();
             handleLerp(0f);
         }
@@ -49,11 +47,6 @@ public abstract class LerpComponent extends AbstractComponent {
         if (!isActive) {
             handleUpdate(elapsedTime);
             return;
-        }
-
-        if (firstLerp) {
-            firstLerp = false;
-            handleLerpActivated();
         }
 
         accumulated.add(elapsedTime);
@@ -80,7 +73,6 @@ public abstract class LerpComponent extends AbstractComponent {
     @Override
     public final void reset() {
         isActive = false;
-        firstLerp = true;
 
         duration.setZero();
         accumulated.setZero();
@@ -99,7 +91,7 @@ public abstract class LerpComponent extends AbstractComponent {
             this.isActive = isActive;
 
             if (isActive) {
-                firstLerp = true;
+                handleLerpActivated();
             }
             else {
                 handleLerpDeactivated();

@@ -12,6 +12,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import dhcoder.support.collection.ArraySet;
 import dhcoder.support.memory.HeapPool;
 import dhcoder.support.memory.Pool;
 import dhcoder.support.memory.Poolable;
@@ -21,6 +22,7 @@ import java.util.List;
 
 import static dhcoder.support.contract.ContractUtils.requireTrue;
 import static dhcoder.support.math.BitUtils.getBitIndex;
+import static dhcoder.support.text.StringUtils.format;
 
 /**
  * Constants for our physics system
@@ -32,39 +34,45 @@ public final class PhysicsSystem {
     }
 
     private static final class CollisionHandlerEntry {
-        int categoryBitsFirst;
-        int categoryBitsSecond;
+        int categoriesFirst;
+        int categoriesSecond;
         CollisionHandler collisionHandler;
 
-        public CollisionHandlerEntry(final int categoryBitsFirst, final int categoryBitsSecond,
+        public CollisionHandlerEntry(final int categoriesFirst, final int categoriesSecond,
             final CollisionHandler collisionHandler) {
-            this.categoryBitsFirst = categoryBitsFirst;
-            this.categoryBitsSecond = categoryBitsSecond;
+            this.categoriesFirst = categoriesFirst;
+            this.categoriesSecond = categoriesSecond;
             this.collisionHandler = collisionHandler;
         }
 
         public boolean matches(final int categoryA, final int categoryB) {
-            return (((this.categoryBitsFirst & categoryA) != 0 && (this.categoryBitsSecond & categoryB) != 0) ||
-                ((this.categoryBitsFirst & categoryB) != 0 && (this.categoryBitsSecond & categoryA) != 0));
+            return (((this.categoriesFirst & categoryA) != 0 && (this.categoriesSecond & categoryB) != 0) ||
+                ((this.categoriesFirst & categoryB) != 0 && (this.categoriesSecond & categoryA) != 0));
         }
 
         public boolean isFirstCategory(final int categoryBitsA) {
-            return categoryBitsFirst == categoryBitsA;
+            return categoriesFirst == categoryBitsA;
         }
     }
 
-    private static final class CollisionFixtures implements Poolable {
+    private static final class ActiveCollision implements Poolable {
         public Fixture fixtureA;
         public Fixture fixtureB;
+        public boolean justCollided = true;
 
         public boolean matches(final Fixture fixtureC, final Fixture fixtureD) {
             return ((fixtureA == fixtureC && fixtureB == fixtureD) || (fixtureA == fixtureD && fixtureB == fixtureC));
+        }
+
+        public boolean ownsBody(final Body body) {
+            return fixtureA.getBody() == body || fixtureB.getBody() == body;
         }
 
         @Override
         public void reset() {
             fixtureA = null;
             fixtureB = null;
+            justCollided = true;
         }
     }
 
@@ -91,33 +99,31 @@ public final class PhysicsSystem {
                 return;
             }
 
-            if (runCollisionHandlers(contact, callCollidedHandler)) {
-                final CollisionFixtures collisionFixtures = collisionsPool.grabNew();
-                collisionFixtures.fixtureA = contact.getFixtureA();
-                collisionFixtures.fixtureB = contact.getFixtureB();
+            if (hasCollisionHandlers(contact)) {
+                final ActiveCollision activeCollision = activeCollisionsPool.grabNew();
+                activeCollision.fixtureA = contact.getFixtureA();
+                activeCollision.fixtureB = contact.getFixtureB();
             }
         }
 
         @Override
         public void endContact(final Contact contact) {
-            if (runCollisionHandlers(contact, callSeparatedHandler)) {
-                final List<CollisionFixtures> collisions = collisionsPool.getItemsInUse();
-                int numCollisions = collisions.size();
-                for (int i = 0; i < numCollisions; i++) {
-                    CollisionFixtures collisionFixtures = collisions.get(i);
-                    if (collisionFixtures.matches(contact.getFixtureA(), contact.getFixtureB())) {
-                        collisionsPool.free(collisionFixtures);
-                        break;
-                    }
-                }
+            if (hasCollisionHandlers(contact)) {
+                Fixture fixtureA = contact.getFixtureA();
+                Fixture fixtureB = contact.getFixtureB();
+                removeActiveCollision(fixtureA, fixtureB);
             }
         }
 
         @Override
         public void preSolve(final Contact contact, final Manifold oldManifold) {
-
             if (hasCollisionHandlers(contact)) {
                 contact.setEnabled(false); // Collision will be handled externally, don't handle it via Box2D
+            }
+
+            if (inactiveBodies.contains(contact.getFixtureA().getBody()) ||
+                inactiveBodies.contains(contact.getFixtureB().getBody())) {
+                contact.setEnabled(false);
             }
         }
 
@@ -125,6 +131,8 @@ public final class PhysicsSystem {
         public void postSolve(final Contact contact, final ContactImpulse impulse) {}
     }
 
+    private static final int EXPECTED_COLLIDER_HANDLER_COUNT = 30;
+    private static final int EXPECTED_INACTIVE_BODY_COUNT = 10;
     // Recommended values from Box2D manual
     private static final int VELOCITY_ITERATIONS = 6;
     private static final int POSITION_ITERATIONS = 2;
@@ -132,19 +140,19 @@ public final class PhysicsSystem {
      * Box2D has a hard limit of 16 collision categories.
      */
     public static int MAX_NUM_CATEGORIES = 16;
-    private final CollisionCallback callCollidedHandler = new CollisionCallback() {
+    private final CollisionCallback onCollidedDispatcher = new CollisionCallback() {
         @Override
         public void run(final CollisionCallbackData data) {
             data.collisionHandler.onCollided(data.bodyFirst, data.bodySecond);
         }
     };
-    private final CollisionCallback callOverlappingHandler = new CollisionCallback() {
+    private final CollisionCallback onOverlappingDispatcher = new CollisionCallback() {
         @Override
         public void run(final CollisionCallbackData data) {
             data.collisionHandler.onOverlapping(data.bodyFirst, data.bodySecond);
         }
     };
-    private final CollisionCallback callSeparatedHandler = new CollisionCallback() {
+    private final CollisionCallback onSeparatedDispatcher = new CollisionCallback() {
         @Override
         public void run(final CollisionCallbackData data) {
             data.collisionHandler.onSeparated(data.bodyFirst, data.bodySecond);
@@ -153,7 +161,8 @@ public final class PhysicsSystem {
     private final World world;
     private final Array<PhysicsUpdateListener> physicsElements;
     private final Array<CollisionHandlerEntry> collisionHandlers;
-    private final HeapPool<CollisionFixtures> collisionsPool;
+    private final ArraySet<Body> inactiveBodies;
+    private final HeapPool<ActiveCollision> activeCollisionsPool;
     private final Pool<CollisionCallbackData> collisionDataPool = Pool.of(CollisionCallbackData.class, 1);
     private int[] categoryMasks = new int[MAX_NUM_CATEGORIES];
     private Box2DDebugRenderer collisionRenderer;
@@ -168,8 +177,9 @@ public final class PhysicsSystem {
         world.setContactListener(new CollisionListener());
 
         physicsElements = new Array<PhysicsUpdateListener>(false, capacity);
-        collisionHandlers = new Array<CollisionHandlerEntry>();
-        collisionsPool = HeapPool.of(CollisionFixtures.class, capacity);
+        collisionHandlers = new Array<CollisionHandlerEntry>(false, EXPECTED_COLLIDER_HANDLER_COUNT);
+        inactiveBodies = new ArraySet<Body>(EXPECTED_INACTIVE_BODY_COUNT);
+        activeCollisionsPool = HeapPool.of(ActiveCollision.class, capacity);
     }
 
     public World getWorld() {
@@ -184,6 +194,29 @@ public final class PhysicsSystem {
         return physicsElements.removeValue(physicsUpdateListener, true);
     }
 
+    public void setActive(final Body body, final boolean active) {
+        if (active) {
+            if (inactiveBodies.removeIf(body)) {
+                runCollisionHandlers(body, onCollidedDispatcher);
+            }
+
+        }
+        else {
+            if (inactiveBodies.putIf(body)) {
+                runCollisionHandlers(body, onSeparatedDispatcher);
+
+                final List<ActiveCollision> activeCollisions = activeCollisionsPool.getItemsInUse();
+                int numCollisionFixtures = activeCollisions.size();
+                for (int i = 0; i < numCollisionFixtures; i++) {
+                    ActiveCollision activeCollision = activeCollisions.get(i);
+                    if (activeCollision.ownsBody(body)) {
+                        activeCollision.justCollided = true; // In case we become active again while still colliding
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Register a {@link CollisionHandler} with this physics system. Note this either a registered handler will handle
      * a collision OR Box2D will handle it, but not both. The category order that a handler is registered with will
@@ -192,9 +225,18 @@ public final class PhysicsSystem {
      * You can register multiple handlers for the same collision, which is useful if you have a default behavior you
      * want to happen in multiple collision cases.
      */
-    public void addCollisionHandler(final int categoryBitsA, final int categoryBitsB,
+    public void addCollisionHandler(final int categoriesA, final int categoriesB,
         final CollisionHandler collisionHandler) {
-        collisionHandlers.add(new CollisionHandlerEntry(categoryBitsA, categoryBitsB, collisionHandler));
+
+        for (int i = 0; i < MAX_NUM_CATEGORIES; i++) {
+            int bitMask = 1 << i;
+            if (((categoriesA & bitMask) != 0) && ((categoryMasks[i] & categoriesB) == 0)) {
+                throw new IllegalArgumentException(format(
+                    "Attempting to add handler for categories that don't collide ({0} and {1}). Did you forget to " +
+                        "call registerCollidable?", categoriesA, categoriesB));
+            }
+        }
+        collisionHandlers.add(new CollisionHandlerEntry(categoriesA, categoriesB, collisionHandler));
     }
 
     public void update(final Duration elapsedTime) {
@@ -203,10 +245,19 @@ public final class PhysicsSystem {
         // trouble, but otherwise, it would be nice to have 1:1 entity::update and physics::update steps.
         world.step(elapsedTime.getSeconds(), VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 
-        int numCollisionFixtures = collisionsPool.getItemsInUse().size();
+        int numCollisionFixtures = activeCollisionsPool.getItemsInUse().size();
         for (int i = 0; i < numCollisionFixtures; i++) {
-            CollisionFixtures collisionFixtures = collisionsPool.getItemsInUse().get(i);
-            runCollisionHandlers(collisionFixtures.fixtureA, collisionFixtures.fixtureB, callOverlappingHandler);
+            ActiveCollision activeCollision = activeCollisionsPool.getItemsInUse().get(i);
+
+            final Fixture fixtureA = activeCollision.fixtureA;
+            final Fixture fixtureB = activeCollision.fixtureB;
+            if (inactiveBodies.contains(fixtureA.getBody()) || inactiveBodies.contains(fixtureB.getBody())) {
+                continue;
+            }
+
+            runCollisionHandlers(fixtureA, fixtureB,
+                activeCollision.justCollided ? onCollidedDispatcher : onOverlappingDispatcher);
+            activeCollision.justCollided = false;
         }
 
         for (int i = 0; i < physicsElements.size; i++) {
@@ -250,6 +301,44 @@ public final class PhysicsSystem {
         return categoryMasks[bitIndex];
     }
 
+    /**
+     * Unfortunately, LibGdx does not have a way to tell us when a body is destroyed. Therefore, in order to not leak
+     * references, it is better to release bodies through the physics system instead of destroying them directly.
+     *
+     * @see <a href="https://code.google.com/p/libgdx/issues/detail?id=484">Issue: LibGdx body listener</a>
+     */
+    public void destroyBody(final Body body) {
+        setActive(body, false);
+        removeActiveCollisions(body);
+        body.getWorld().destroyBody(body);
+    }
+
+    private void removeActiveCollision(final Fixture fixtureA, final Fixture fixtureB) {
+        final List<ActiveCollision> collisions = activeCollisionsPool.getItemsInUse();
+        int numCollisions = collisions.size();
+        for (int i = 0; i < numCollisions; i++) {
+            ActiveCollision activeCollision = collisions.get(i);
+            if (activeCollision.matches(fixtureA, fixtureB)) {
+
+                activeCollisionsPool.free(activeCollision);
+                break;
+            }
+        }
+    }
+
+    private void removeActiveCollisions(final Body body) {
+        final List<ActiveCollision> collisions = activeCollisionsPool.getItemsInUse();
+        int numCollisions = collisions.size();
+        for (int i = 0; i < numCollisions; i++) {
+            ActiveCollision activeCollision = collisions.get(i);
+            if (activeCollision.ownsBody(body)) {
+                activeCollisionsPool.free(activeCollision);
+                i--;
+                numCollisions--;
+            }
+        }
+    }
+
     private boolean hasCollisionHandlers(final Contact contact) {
         Fixture fixtureA = contact.getFixtureA();
         Fixture fixtureB = contact.getFixtureB();
@@ -264,22 +353,11 @@ public final class PhysicsSystem {
         return false;
     }
 
-    private boolean runCollisionHandlers(final Contact contact, final CollisionCallback collisionCallback) {
-        Fixture fixtureA = contact.getFixtureA();
-        Fixture fixtureB = contact.getFixtureB();
-
-        return runCollisionHandlers(fixtureA, fixtureB, collisionCallback);
-    }
-
     /**
      * Given two fixtures that are colliding, call any collision handlers that may have been registered to handle it.
-     * <p/>
-     * Returns true if a callback was registered (and therefore called).
      */
-    private boolean runCollisionHandlers(final Fixture fixtureA, final Fixture fixtureB,
+    private void runCollisionHandlers(final Fixture fixtureA, final Fixture fixtureB,
         final CollisionCallback collisionCallback) {
-
-        boolean triggeredCallback = false;
 
         for (int i = 0; i < collisionHandlers.size; i++) {
             CollisionHandlerEntry entry = collisionHandlers.get(i);
@@ -299,11 +377,26 @@ public final class PhysicsSystem {
                 data.collisionHandler = entry.collisionHandler;
                 collisionCallback.run(data);
                 collisionDataPool.freeCount(1);
-                triggeredCallback = true;
             }
         }
+    }
 
-        return triggeredCallback;
+    /**
+     * Run all active collision handlers that reference the {@link Body} parameter.
+     */
+    private void runCollisionHandlers(final Body body, final CollisionCallback collisionCallback) {
+
+        final List<ActiveCollision> activeCollisions = activeCollisionsPool.getItemsInUse();
+        int numCollisionFixtures = activeCollisions.size();
+        for (int i = 0; i < numCollisionFixtures; i++) {
+            ActiveCollision activeCollision = activeCollisions.get(i);
+            if (activeCollision.ownsBody(body)) {
+                final Fixture fixtureA = activeCollision.fixtureA;
+                final Fixture fixtureB = activeCollision.fixtureB;
+
+                runCollisionHandlers(fixtureA, fixtureB, collisionCallback);
+            }
+        }
     }
 
 }

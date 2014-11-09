@@ -35,8 +35,12 @@ public final class ArraySet<E> {
 
     /**
      * Add the element, if it's not already in the set.
+     *
+     * @return {@code true} if the element was newly added into the set.
      */
-    public void putIf(final E element) { internalMap.putOrReplace(element, null); }
+    public boolean putIf(final E element) {
+        return internalMap.putOrReplace(element, null) == ArrayMap.InsertMethod.PUT;
+    }
 
     /**
      * Remove the element, which MUST exist in the set. Use {@link #removeIf(Object)} if you don't need this
@@ -48,10 +52,10 @@ public final class ArraySet<E> {
     /**
      * Remove the element, which may or may not exist in the set. Use {@link #remove(Object)} if you want to assert
      * existence of the element in the set.
+     *
+     * @return {@code true} if the element was in the set.
      */
-    public void removeIf(final E element) { internalMap.removeIf(element); }
-
-
+    public boolean removeIf(final E element) { return internalMap.removeIf(element); }
 
     public void clear() { internalMap.clear(); }
 }

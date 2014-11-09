@@ -30,10 +30,11 @@ import tiltadv.assets.TilesetDatastore;
 import tiltadv.collision.EnemyPlayerCollisionHandler;
 import tiltadv.collision.EnemyProjectileDieOnCollisionHandler;
 import tiltadv.collision.EnemyProjectilePlayerCollisionHandler;
+import tiltadv.collision.SensorEnemyCollisionHandler;
+import tiltadv.collision.SwordEnemyCollisionHandler;
 import tiltadv.components.behavior.OctoBehaviorComponent;
 import tiltadv.components.behavior.OscillationBehaviorComponent;
 import tiltadv.components.behavior.PlayerBehaviorComponent;
-import tiltadv.components.behavior.PlayerSensorBehaviorComponent;
 import tiltadv.components.behavior.SwordBehaviorComponent;
 import tiltadv.components.body.FollowCameraComponent;
 import tiltadv.components.combat.AttackComponent;
@@ -102,6 +103,7 @@ public final class GdxApplication extends ApplicationAdapter {
     private TouchSystem touchSystem;
     private PhysicsSystem physicsSystem;
 
+    @Override
     public void create() {
         if (DevSettings.IN_DEV_MODE) {
             Pool.RUN_SANITY_CHECKS = DevSettings.RUN_SANITY_CHECKS;
@@ -146,7 +148,7 @@ public final class GdxApplication extends ApplicationAdapter {
         update();
 
         if (!DevSettings.IN_DEV_MODE) {
-            Gdx.gl.glClearColor(0f, 0f, 0f, 1f); // Desert-ish color, for testing!
+            Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
         }
         else {
             Gdx.gl.glClearColor(1f, 0f, 1f, 1f); // Nasty pink in debug mode
@@ -199,15 +201,19 @@ public final class GdxApplication extends ApplicationAdapter {
     private void initializePhysics() {
         physicsSystem = new PhysicsSystem(ENTITY_COUNT);
 
-        physicsSystem.registerCollidable(Category.ENEMY, Category.PLAYER | Category.SWORD | Category.OBSTACLES);
+        physicsSystem.registerCollidable(Category.ENEMY, Category.PLAYER | Category.OBSTACLES);
         physicsSystem.registerCollidable(Category.ENEMY_PROJECTILE, Category.PLAYER | Category.OBSTACLES);
         physicsSystem.registerCollidable(Category.PLAYER, Category.OBSTACLES);
+        physicsSystem.registerCollidable(Category.PLAYER_SENSOR, Category.ENEMY);
+        physicsSystem.registerCollidable(Category.SWORD, Category.ENEMY);
 
         physicsSystem.addCollisionHandler(Category.ENEMY_PROJECTILE, Category.PLAYER,
             new EnemyProjectilePlayerCollisionHandler());
         physicsSystem.addCollisionHandler(Category.ENEMY_PROJECTILE, Category.PLAYER | Category.OBSTACLES,
             new EnemyProjectileDieOnCollisionHandler());
         physicsSystem.addCollisionHandler(Category.ENEMY, Category.PLAYER, new EnemyPlayerCollisionHandler());
+        physicsSystem.addCollisionHandler(Category.PLAYER_SENSOR, Category.ENEMY, new SensorEnemyCollisionHandler());
+        physicsSystem.addCollisionHandler(Category.SWORD, Category.ENEMY, new SwordEnemyCollisionHandler());
     }
 
     private void initializeAssets() {
@@ -247,7 +253,7 @@ public final class GdxApplication extends ApplicationAdapter {
 //        gravityWellBounds = new Circle(8.0f);
         playerBounds = Physics.newCircle(6.5f);
         playerSensorBounds = Physics.newCircle(8.0f);
-        swordBounds = Physics.newRectangle(5f, 1f);
+        swordBounds = Physics.newRectangle(6.5f, 2f);
         octoBounds = Physics.newCircle(8.0f);
         octoRockBounds = Physics.newCircle(Tiles.ROCK.getRegionWidth() / 2f);
         boulderBounds = Physics.newCircle(8f);
@@ -321,13 +327,13 @@ public final class GdxApplication extends ApplicationAdapter {
             public void initialize(final Entity entity) {
                 entity.addComponent(ParentComponent.class);  // Child of Player Entity
 //                entity.addComponent(PlayerSensorCollisionComponent.class).setShape(playerSensorBounds);
-                entity.addComponent(PlayerSensorBehaviorComponent.class);
                 entity.addComponent(PositionComponent.class);
                 entity.addComponent(BodyComponent.class).setBodyType(BodyType.KinematicBody);
                 entity.addComponent(FixtureComponent.class).setShape(playerSensorBounds).setSensor(true)
                     .setCategory(Category.PLAYER_SENSOR);
-                entity.addComponent(OffsetComponent.class).setOffset(new Vector2(9f, 0));
-                entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.SENSOR);
+                entity.addComponent(OffsetComponent.class).setOffset(new Vector2(10f, 0));
+                entity.addComponent(SpriteComponent.class).setTextureRegion(Tiles.SENSOR)
+                    .setZ(SpriteComponent.ALWAYS_BELOW);
             }
         });
 
@@ -443,21 +449,21 @@ public final class GdxApplication extends ApplicationAdapter {
 
     private void addOctoEnemies() {
         addOctoEnemy(-80, 20);
-//        addOctoEnemy(-30, 20);
-//        addOctoEnemy(-80, 80);
-//        addOctoEnemy(-30, 80);
-//        addOctoEnemy(80, 20);
-//        addOctoEnemy(30, 20);
-//        addOctoEnemy(30, 80);
-//        addOctoEnemy(80, 80);
-//        addOctoEnemy(-80, -20);
-//        addOctoEnemy(-30, -20);
-//        addOctoEnemy(-80, -80);
-//        addOctoEnemy(-30, -80);
-//        addOctoEnemy(30, -80);
-//        addOctoEnemy(80, -80);
-//        addOctoEnemy(30, -20);
-//        addOctoEnemy(80, -20);
+        addOctoEnemy(-30, 20);
+        addOctoEnemy(-80, 80);
+        addOctoEnemy(-30, 80);
+        addOctoEnemy(80, 20);
+        addOctoEnemy(30, 20);
+        addOctoEnemy(30, 80);
+        addOctoEnemy(80, 80);
+        addOctoEnemy(-80, -20);
+        addOctoEnemy(-30, -20);
+        addOctoEnemy(-80, -80);
+        addOctoEnemy(-30, -80);
+        addOctoEnemy(30, -80);
+        addOctoEnemy(80, -80);
+        addOctoEnemy(30, -20);
+        addOctoEnemy(80, -20);
     }
 
     private void addBoundaryWalls() {
@@ -499,7 +505,7 @@ public final class GdxApplication extends ApplicationAdapter {
     }
 
     private void addMovingBoulderEntities() {
-        final int numBoulders = 0;
+        final int numBoulders = 15;
         final float scaleX = 120;
         final float scaleY = 90;
         final float percent = .4f;
