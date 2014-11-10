@@ -1,4 +1,4 @@
-package tiltadv.assets;
+package dhcoder.libgdx.assets;
 
 /**
  * A collection of scenes.

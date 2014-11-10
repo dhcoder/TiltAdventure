@@ -5,9 +5,11 @@ import dhcoder.libgdx.entity.AbstractComponent;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.libgdx.render.RenderSystem;
 import dhcoder.support.time.Duration;
-import tiltadv.assets.Scene;
-import tiltadv.assets.SceneDatastore;
+import dhcoder.libgdx.assets.Scene;
+import dhcoder.libgdx.assets.SceneDatastore;
 import tiltadv.components.dynamics.PositionComponent;
+import tiltadv.globals.GameData;
+import tiltadv.globals.Scenes;
 import tiltadv.globals.Services;
 import tiltadv.memory.Pools;
 
@@ -38,7 +40,7 @@ public final class FollowCameraComponent extends AbstractComponent {
     }
 
     private void updateBounds() {
-        Scene scene = Services.get(SceneDatastore.class).get("demo");
+        Scene scene = Scenes.DEMO;
         RenderSystem renderSystem = Services.get(RenderSystem.class);
         final float halfScreenW = renderSystem.getCamera().viewportWidth / 2f;
         final float halfScreenH = renderSystem.getCamera().viewportHeight / 2f;

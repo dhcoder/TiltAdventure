@@ -1,10 +1,10 @@
-package tiltadv.assets;
+package dhcoder.libgdx.assets;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import dhcoder.support.collection.ArrayMap;
+import dhcoder.support.memory.Pool;
 import dhcoder.support.opt.Opt;
-import tiltadv.memory.Pools;
 
 import java.util.List;
 
@@ -14,9 +14,10 @@ import java.util.List;
 public final class ImageDatastore {
 
     ArrayMap<String, Texture> images = new ArrayMap<String, Texture>();
+    Pool<Opt> optPool = Pool.of(Opt.class, 1);
 
     public Texture get(final String path) {
-        final Opt<Texture> textureOpt = Pools.opts.grabNew();
+        final Opt<Texture> textureOpt = optPool.grabNew();
         images.get(path, textureOpt);
         Texture texture;
         if (!textureOpt.hasValue()) {
@@ -27,7 +28,7 @@ public final class ImageDatastore {
             texture = textureOpt.getValue();
         }
 
-        Pools.opts.freeCount(1);
+        optPool.freeCount(1);
 
         return texture;
     }

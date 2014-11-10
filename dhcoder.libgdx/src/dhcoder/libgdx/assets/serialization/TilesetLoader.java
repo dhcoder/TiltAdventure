@@ -1,11 +1,10 @@
-package tiltadv.serialization;
+package dhcoder.libgdx.assets.serialization;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Json;
-import tiltadv.assets.ImageDatastore;
-import tiltadv.assets.Tileset;
-import tiltadv.assets.TilesetDatastore;
-import tiltadv.globals.Services;
+import dhcoder.libgdx.assets.ImageDatastore;
+import dhcoder.libgdx.assets.Tileset;
+import dhcoder.libgdx.assets.TilesetDatastore;
 
 /**
  * Class that serializes / deserializes {@link Tileset}s
@@ -18,11 +17,8 @@ public final class TilesetLoader {
         public int tileHeight;
     }
 
-    public static void load(final String jsonPath) {
-        final Json json = Services.get(Json.class);
-        final ImageDatastore images = Services.get(ImageDatastore.class);
-        final TilesetDatastore tilesets = Services.get(TilesetDatastore.class);
-
+    public static void load(final Json json, final ImageDatastore images, final TilesetDatastore tilesets,
+        final String jsonPath) {
         TilesetData data = json.fromJson(TilesetData.class, Gdx.files.internal(jsonPath).readString());
 
         tilesets.add(jsonPath, new Tileset(images.get(data.imagePath), data.tileWidth, data.tileHeight));

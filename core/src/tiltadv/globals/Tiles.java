@@ -1,7 +1,7 @@
 package tiltadv.globals;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import tiltadv.assets.TileDatastore;
+import dhcoder.libgdx.assets.TileDatastore;
 
 /**
  * Static class which holds all tiles used by our game.
@@ -17,7 +17,7 @@ public final class Tiles {
     public static final TextureRegion GRASS_FLOWER;
 
     static {
-        final TileDatastore tiles = Services.get(TileDatastore.class);
+        final TileDatastore tiles = GameData.tiles;
 
         BOULDER = tiles.get("zelda", "boulder");
         ROCK = tiles.get("zelda", "rock");

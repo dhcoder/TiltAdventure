@@ -1,4 +1,4 @@
-package tiltadv.serialization;
+package dhcoder.libgdx.assets.serialization;
 
 /**
  * Exception to throw when there's an issue with serializing or deserializing a file.

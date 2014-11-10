@@ -1,15 +1,14 @@
-package tiltadv.serialization;
+package dhcoder.libgdx.assets.serialization;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Json;
-import tiltadv.assets.AnimationDatastore;
-import tiltadv.assets.AnimationGroup;
-import tiltadv.assets.Tileset;
-import tiltadv.assets.TilesetDatastore;
-import tiltadv.globals.Services;
+import dhcoder.libgdx.assets.AnimationDatastore;
+import dhcoder.libgdx.assets.AnimationGroup;
+import dhcoder.libgdx.assets.Tileset;
+import dhcoder.libgdx.assets.TilesetDatastore;
 
 /**
  * Class that loads {@link Animation}s into our {@link AnimationDatastore}.
@@ -27,10 +26,8 @@ public final class AnimationsLoader {
         public int[][] frames;
     }
 
-    public static void load(final String jsonPath) {
-        final Json json = Services.get(Json.class);
-        final TilesetDatastore tilesets = Services.get(TilesetDatastore.class);
-        final AnimationDatastore animations = Services.get(AnimationDatastore.class);
+    public static void load(final Json json, final TilesetDatastore tilesets, final AnimationDatastore animations,
+        final String jsonPath) {
 
         final FileHandle fileHandle = Gdx.files.internal(jsonPath);
         AnimationGroupData groupData = json.fromJson(AnimationGroupData.class, fileHandle.readString());

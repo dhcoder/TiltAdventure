@@ -13,6 +13,12 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Json;
+import dhcoder.libgdx.assets.ImageDatastore;
+import dhcoder.libgdx.assets.Scene;
+import dhcoder.libgdx.assets.serialization.AnimationsLoader;
+import dhcoder.libgdx.assets.serialization.SceneLoader;
+import dhcoder.libgdx.assets.serialization.TilesLoader;
+import dhcoder.libgdx.assets.serialization.TilesetLoader;
 import dhcoder.libgdx.entity.Entity;
 import dhcoder.libgdx.entity.EntityManager;
 import dhcoder.libgdx.physics.PhysicsSystem;
@@ -21,12 +27,6 @@ import dhcoder.support.collection.ArrayMap;
 import dhcoder.support.math.Angle;
 import dhcoder.support.memory.Pool;
 import dhcoder.support.time.Duration;
-import tiltadv.assets.AnimationDatastore;
-import tiltadv.assets.ImageDatastore;
-import tiltadv.assets.Scene;
-import tiltadv.assets.SceneDatastore;
-import tiltadv.assets.TileDatastore;
-import tiltadv.assets.TilesetDatastore;
 import tiltadv.collision.EnemyPlayerCollisionHandler;
 import tiltadv.collision.EnemyProjectileDieOnCollisionHandler;
 import tiltadv.collision.EnemyProjectilePlayerCollisionHandler;
@@ -60,17 +60,15 @@ import tiltadv.globals.Animations;
 import tiltadv.globals.Category;
 import tiltadv.globals.DevSettings;
 import tiltadv.globals.EntityId;
+import tiltadv.globals.GameData;
 import tiltadv.globals.Physics;
 import tiltadv.globals.RenderLayer;
+import tiltadv.globals.Scenes;
 import tiltadv.globals.Services;
 import tiltadv.globals.Tiles;
 import tiltadv.input.TouchSystem;
 import tiltadv.input.Vibrator;
 import tiltadv.memory.Pools;
-import tiltadv.serialization.AnimationsLoader;
-import tiltadv.serialization.SceneLoader;
-import tiltadv.serialization.TilesLoader;
-import tiltadv.serialization.TilesetLoader;
 
 import static com.badlogic.gdx.math.MathUtils.cos;
 import static com.badlogic.gdx.math.MathUtils.sin;
@@ -166,23 +164,14 @@ public final class GdxApplication extends ApplicationAdapter {
     @Override
     public void dispose() {
         font.dispose();
-        Services.get(ImageDatastore.class).dispose();
+        GameData.images.dispose();
         renderSystem.dispose();
         physicsSystem.dispose();
     }
 
     private void initializeServices() {
-        Services.register(ImageDatastore.class, new ImageDatastore());
-        Services.register(TilesetDatastore.class, new TilesetDatastore());
-        Services.register(TileDatastore.class, new TileDatastore());
-        Services.register(AnimationDatastore.class, new AnimationDatastore());
-        Services.register(SceneDatastore.class, new SceneDatastore());
-        Services.register(Json.class, new Json());
-
         initializePhysics();
         Services.register(PhysicsSystem.class, physicsSystem);
-
-//        physicsSystem.addCollisionHandler(Category.);
 
         // TODO: Tune the application for the best batch size for render system
         // https://github.com/libgdx/libgdx/wiki/Spritebatch,-Textureregions,-and-Sprites#performance-tuning
@@ -218,31 +207,34 @@ public final class GdxApplication extends ApplicationAdapter {
     }
 
     private void initializeAssets() {
+
+        Json json = new Json();
+
         {
             final FileHandle[] tilesetFiles = Gdx.files.internal("data/tilesets").list();
             for (int i = 0; i < tilesetFiles.length; ++i) {
-                TilesetLoader.load(tilesetFiles[i].path());
+                TilesetLoader.load(json, GameData.images, GameData.tilesets, tilesetFiles[i].path());
             }
         }
 
         {
             final FileHandle[] tileFiles = Gdx.files.internal("data/tiles").list();
             for (int i = 0; i < tileFiles.length; ++i) {
-                TilesLoader.load(tileFiles[i].path());
+                TilesLoader.load(json, GameData.tilesets, GameData.tiles, tileFiles[i].path());
             }
         }
 
         {
             final FileHandle[] animationFiles = Gdx.files.internal("data/animations").list();
             for (int i = 0; i < animationFiles.length; ++i) {
-                AnimationsLoader.load(animationFiles[i].path());
+                AnimationsLoader.load(json, GameData.tilesets, GameData.animations, animationFiles[i].path());
             }
         }
 
         {
             final FileHandle[] sceneFiles = Gdx.files.internal("data/scenes").list();
             for (int i = 0; i < sceneFiles.length; ++i) {
-                SceneLoader.load(sceneFiles[i].path());
+                SceneLoader.load(json, GameData.tilesets, GameData.scenes, sceneFiles[i].path());
             }
         }
     }
@@ -425,7 +417,7 @@ public final class GdxApplication extends ApplicationAdapter {
         addBoundaryWalls();
         addTargetEntity();
 
-        Scene demoScene = Services.get(SceneDatastore.class).get("demo");
+        Scene demoScene = Scenes.DEMO;
         renderSystem.add(RenderLayer.Ground, demoScene);
     }
 
@@ -463,7 +455,7 @@ public final class GdxApplication extends ApplicationAdapter {
     }
 
     private void addBoundaryWalls() {
-        Scene scene = Services.get(SceneDatastore.class).get("demo");
+        Scene scene = Scenes.DEMO;
         float halfSceneW = (scene.getWidth() / 2f);
         float halfSceneH = (scene.getHeight() / 2f);
         float halfWallSize = 10f;

@@ -1,4 +1,4 @@
-package tiltadv.assets;
+package dhcoder.libgdx.assets;
 
 import dhcoder.support.collection.ArrayMap;
 

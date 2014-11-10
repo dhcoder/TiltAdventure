@@ -1,14 +1,13 @@
-package tiltadv.serialization;
+package dhcoder.libgdx.assets.serialization;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Json;
-import tiltadv.assets.Scene;
-import tiltadv.assets.SceneDatastore;
-import tiltadv.assets.Tileset;
-import tiltadv.assets.TilesetDatastore;
-import tiltadv.globals.Services;
+import dhcoder.libgdx.assets.Scene;
+import dhcoder.libgdx.assets.SceneDatastore;
+import dhcoder.libgdx.assets.Tileset;
+import dhcoder.libgdx.assets.TilesetDatastore;
 
 import static dhcoder.support.text.StringUtils.format;
 
@@ -26,10 +25,8 @@ public final class SceneLoader {
         public int[] tiles;
     }
 
-    public static void load(final String jsonPath) {
-        final Json json = Services.get(Json.class);
-        final TilesetDatastore tilesets = Services.get(TilesetDatastore.class);
-        final SceneDatastore scenes = Services.get(SceneDatastore.class);
+    public static void load(final Json json, final TilesetDatastore tilesets, final SceneDatastore scenes,
+        final String jsonPath) {
 
         final FileHandle fileHandle = Gdx.files.internal(jsonPath);
         SceneData sceneData = json.fromJson(SceneData.class, fileHandle.readString());

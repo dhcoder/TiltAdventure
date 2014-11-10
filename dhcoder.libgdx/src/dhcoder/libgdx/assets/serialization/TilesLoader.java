@@ -1,15 +1,14 @@
-package tiltadv.serialization;
+package dhcoder.libgdx.assets.serialization;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Json;
-import tiltadv.assets.TileDatastore;
-import tiltadv.assets.TileGroup;
-import tiltadv.assets.Tileset;
-import tiltadv.assets.TilesetDatastore;
-import tiltadv.globals.Services;
+import dhcoder.libgdx.assets.TileDatastore;
+import dhcoder.libgdx.assets.TileGroup;
+import dhcoder.libgdx.assets.Tileset;
+import dhcoder.libgdx.assets.TilesetDatastore;
 
 /**
  * Class that loads {@link TextureRegion}s into our {@link TileDatastore}.
@@ -32,10 +31,8 @@ public final class TilesLoader {
         public int[][] coords;
     }
 
-    public static void load(final String jsonPath) {
-        final Json json = Services.get(Json.class);
-        final TilesetDatastore tilesets = Services.get(TilesetDatastore.class);
-        final TileDatastore tiles = Services.get(TileDatastore.class);
+    public static void load(final Json json, final TilesetDatastore tilesets, final TileDatastore tiles,
+        final String jsonPath) {
 
         final FileHandle fileHandle = Gdx.files.internal(jsonPath);
         TileGroupData groupData = json.fromJson(TileGroupData.class, fileHandle.readString());

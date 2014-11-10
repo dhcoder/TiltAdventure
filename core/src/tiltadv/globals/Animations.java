@@ -1,7 +1,7 @@
 package tiltadv.globals;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
-import tiltadv.assets.AnimationDatastore;
+import dhcoder.libgdx.assets.AnimationDatastore;
 
 /**
  * Static class which holds all animations used by our game.
@@ -18,7 +18,7 @@ public final class Animations {
     public static final Animation OCTORIGHT;
 
     static {
-        AnimationDatastore animations = Services.get(AnimationDatastore.class);
+        AnimationDatastore animations = GameData.animations;
 
         PLAYER_S = animations.get("player", "walk_s");
         PLAYER_E = animations.get("player", "walk_e");

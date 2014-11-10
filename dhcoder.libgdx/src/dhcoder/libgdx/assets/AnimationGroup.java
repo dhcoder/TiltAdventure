@@ -1,4 +1,4 @@
-package tiltadv.assets;
+package dhcoder.libgdx.assets;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
 
