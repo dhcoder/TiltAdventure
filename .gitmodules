@@ -1,0 +1,3 @@
+[submodule "thirdparty/tablelayout"]
+	path = thirdparty/tablelayout
+	url = https://github.com/EsotericSoftware/tablelayout.git
