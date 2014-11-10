@@ -96,9 +96,9 @@ public final class Scene implements Renderable {
         float tileHeight = tileset.getTileHeight();
         int tileX = 0;
         float leftX = getLeftX();
-        float bottomY = getBottomY();
+        float topY = getTopY();
         float renderAtX = leftX;
-        float renderAtY = bottomY;
+        float renderAtY = topY - tileHeight;
         for (int i = 0; i < groundTiles.size; i++) {
             TextureRegion tile = groundTiles.get(i);
             batch.draw(tile, renderAtX, renderAtY);
@@ -108,7 +108,7 @@ public final class Scene implements Renderable {
             if (tileX == numCols) {
                 tileX = 0;
                 renderAtX = leftX;
-                renderAtY += tileHeight;
+                renderAtY -= tileHeight;
             }
         }
     }

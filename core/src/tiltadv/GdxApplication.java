@@ -418,8 +418,8 @@ public final class GdxApplication extends ApplicationAdapter {
 //        addGravityWell(-30, 70);
 //        addGravityWell(-90, -30);
         addMainCamera(playerEntity);
-        addOctoEnemies();
-        addMovingBoulderEntities();
+//        addOctoEnemies();
+//        addMovingBoulderEntities();
 //        addTiltIndicatorEntity(playerEntity);
         addFpsEntity();
         addBoundaryWalls();
