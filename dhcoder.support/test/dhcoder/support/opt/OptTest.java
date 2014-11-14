@@ -24,13 +24,6 @@ public final class OptTest {
     }
 
     @Test
-    public void createOptionalWithNullValueWorks() {
-        String nullString = null;
-        Opt<String> emptyStringOpt = Opt.ofNullable(nullString);
-        assertThat(emptyStringOpt.hasValue(), equalTo(false));
-    }
-
-    @Test
     public void settingOptionalValueWorks() {
         Opt<String> stringOpt = Opt.withNoValue();
         Opt<String> emptyStringOpt = Opt.of("");
@@ -39,9 +32,6 @@ public final class OptTest {
         stringOpt.set(DUMMY_VALUE);
         assertThat(stringOpt.hasValue(), equalTo(true));
         assertThat(stringOpt.getValue(), equalTo(DUMMY_VALUE));
-
-        stringOpt.set(null);
-        assertThat(stringOpt.hasValue(), equalTo(false));
 
         stringOpt.setFrom(emptyStringOpt);
         assertThat(stringOpt.hasValue(), equalTo(true));
@@ -66,6 +56,17 @@ public final class OptTest {
         assertThat(stringOpt.equals(stringOptDuplicate), equalTo(true));
         assertThat(stringOpt.equals(emptyValue), equalTo(false));
         assertThat(stringOpt.hashCode(), equalTo(stringOptDuplicate.hashCode()));
+    }
+
+    @Test
+    public void setOptionalWithNullValueThrowsException() {
+        final Opt<String> stringOpt = Opt.of(DUMMY_VALUE);
+        assertException("Can't set an optional to null directly.", IllegalArgumentException.class, new Runnable() {
+            @Override
+            public void run() {
+                stringOpt.set(null);
+            }
+        });
     }
 
     @Test
