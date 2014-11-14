@@ -22,6 +22,10 @@ public final class History {
     private static class UndoGroup {
         public String description;
         public Stack<UndoItem> items = new Stack<UndoItem>();
+
+        public UndoGroup(final String description) {
+            this.description = description;
+        }
     }
 
     public static int DEFAULT_HISTORY_DEPTH = 30;
@@ -75,7 +79,7 @@ public final class History {
         }
 
         UndoGroup undoGroup = undoStack.pop();
-        UndoGroup redoGroup = new UndoGroup();
+        UndoGroup redoGroup = new UndoGroup(undoGroup.description);
 
         while (undoGroup.items.size() > 0) {
             UndoItem undoItem = undoGroup.items.pop();
@@ -99,7 +103,7 @@ public final class History {
         }
 
         UndoGroup redoGroup = redoStack.pop();
-        UndoGroup undoGroup = new UndoGroup();
+        UndoGroup undoGroup = new UndoGroup(redoGroup.description);
 
         while (redoGroup.items.size() > 0) {
             UndoItem redoItem = redoGroup.items.pop();
@@ -115,8 +119,7 @@ public final class History {
 
     public void startRecording(final String description) {
         if (isRecording == 0) {
-            final UndoGroup undoGroup = new UndoGroup();
-            undoGroup.description = description;
+            final UndoGroup undoGroup = new UndoGroup(description);
             undoStack.add(undoGroup);
         }
 

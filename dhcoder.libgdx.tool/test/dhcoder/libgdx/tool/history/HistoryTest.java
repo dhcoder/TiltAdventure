@@ -2,6 +2,7 @@ package dhcoder.libgdx.tool.history;
 
 import org.junit.Test;
 
+import static dhcoder.test.TestUtils.assertException;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 
@@ -22,6 +23,10 @@ public class HistoryTest {
         undoInt.setValue(3);
         history.stopRecording();
         assertThat(undoInt.getValue(), equalTo(3));
+
+        assertThat(history.getUndoDepth(), equalTo(2));
+        assertThat(history.getUndoDescription(0), equalTo("Set int 1 -> 2"));
+        assertThat(history.getUndoDescription(1), equalTo("Set int 2 -> 3"));
 
         history.undo();
         assertThat(undoInt.getValue(), equalTo(2));
@@ -49,12 +54,39 @@ public class HistoryTest {
         assertThat(undoInt.getValue(), equalTo(1));
 
         assertThat(history.getRedoDepth(), equalTo(2));
+        assertThat(history.getRedoDescription(1), equalTo("Set int 1 -> 2"));
+        assertThat(history.getRedoDescription(0), equalTo("Set int 2 -> 3"));
 
         history.redo();
         assertThat(undoInt.getValue(), equalTo(2));
 
         history.redo();
         assertThat(undoInt.getValue(), equalTo(3));
+    }
+
+    @Test
+    public void newRecordingDropsRedoStack() {
+        History history = new History();
+        UndoInt undoInt = new UndoInt(history, 1);
+
+        history.startRecording("1 -> 2");
+        undoInt.setValue(2);
+        history.stopRecording();
+
+        history.startRecording("2 -> 3");
+        undoInt.setValue(3);
+        history.stopRecording();
+
+        history.undo();
+        history.undo();
+
+        assertThat(history.getRedoDepth(), equalTo(2));
+        history.startRecording("1 -> 4");
+        undoInt.setValue(4);
+        history.stopRecording();
+
+        assertThat(history.canRedo(), equalTo(false));
+
     }
 
     @Test
@@ -108,4 +140,69 @@ public class HistoryTest {
         history.stopRecording();
         assertThat(history.canUndo(), equalTo(false)); // No undo recording to go back to
     }
+
+    @Test
+    public void undoThrowsExceptionIfNothingToUndo() {
+        final History history = new History();
+
+        assertException("Can't undo empty history", IllegalStateException.class, new Runnable() {
+            @Override
+            public void run() {
+                history.undo();
+            }
+        });
+    }
+
+    @Test
+    public void redoThrowsExceptionIfNothingToRedo() {
+        final History history = new History();
+
+        assertException("Can't redo empty history", IllegalStateException.class, new Runnable() {
+            @Override
+            public void run() {
+                history.redo();
+            }
+        });
+    }
+
+    @Test
+    public void undoThrowsExceptionIfRecording() {
+        final History history = new History();
+        final UndoInt undoInt = new UndoInt(history, 0);
+        history.startRecording("Initial recording");
+        undoInt.setValue(1);
+        history.stopRecording();
+
+        assertThat(history.canUndo(), equalTo(true));
+
+        history.startRecording("Interrupted recording");
+        assertException("Can't call undo while recording", IllegalStateException.class, new Runnable() {
+            @Override
+            public void run() {
+                history.undo();
+            }
+        });
+    }
+
+    @Test
+    public void redoThrowsExceptionIfRecording() {
+        final History history = new History();
+        final UndoInt undoInt = new UndoInt(history, 0);
+        history.startRecording("Initial recording");
+        undoInt.setValue(1);
+        history.stopRecording();
+
+        history.undo();
+        assertThat(history.canRedo(), equalTo(true));
+
+        history.startRecording("Interrupted recording");
+        assertException("Can't call redo while recording", IllegalStateException.class, new Runnable() {
+            @Override
+            public void run() {
+                history.redo();
+            }
+        });
+    }
+
+
 }
