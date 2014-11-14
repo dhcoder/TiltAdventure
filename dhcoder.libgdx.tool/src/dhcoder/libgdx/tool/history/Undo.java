@@ -1,0 +1,15 @@
+package dhcoder.libgdx.tool.history;
+
+/**
+ * A general undo/redo class, useful for any object type where equality means it's the same instance of the object.
+ */
+public final class Undo<T> extends UndoValue<T> {
+    public Undo(final History history, final T initialValue) {
+        super(history, initialValue);
+    }
+
+    @Override
+    protected boolean valueEquals(final T value1, final T value2) {
+        return value1 == value2;
+    }
+}
