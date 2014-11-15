@@ -1,5 +1,7 @@
 package dhcoder.libgdx.tool.history;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 import static dhcoder.support.text.StringUtils.format;
@@ -21,7 +23,7 @@ public final class History {
 
     private static class UndoGroup {
         public String description;
-        public Stack<UndoItem> items = new Stack<UndoItem>();
+        public List<UndoItem> items = new ArrayList<UndoItem>();
 
         public UndoGroup(final String description) {
             this.description = description;
@@ -79,18 +81,8 @@ public final class History {
         }
 
         UndoGroup undoGroup = undoStack.pop();
-        UndoGroup redoGroup = new UndoGroup(undoGroup.description);
-
-        while (undoGroup.items.size() > 0) {
-            UndoItem undoItem = undoGroup.items.pop();
-            Object currValue = undoItem.undoValue.getValue();
-            undoItem.undoValue.restoreValue(undoItem.oldValue);
-
-            undoItem.oldValue = currValue;
-            redoGroup.items.push(undoItem);
-        }
-
-        redoStack.push(redoGroup);
+        restoreAndReverse(undoGroup);
+        redoStack.push(undoGroup);
     }
 
     public void redo() {
@@ -103,18 +95,8 @@ public final class History {
         }
 
         UndoGroup redoGroup = redoStack.pop();
-        UndoGroup undoGroup = new UndoGroup(redoGroup.description);
-
-        while (redoGroup.items.size() > 0) {
-            UndoItem redoItem = redoGroup.items.pop();
-            Object currValue = redoItem.undoValue.getValue();
-            redoItem.undoValue.restoreValue(redoItem.oldValue);
-
-            redoItem.oldValue = currValue;
-            undoGroup.items.push(redoItem);
-        }
-
-        undoStack.push(undoGroup);
+        restoreAndReverse(redoGroup);
+        undoStack.push(redoGroup);
     }
 
     public void startRecording(final String description) {
@@ -164,6 +146,27 @@ public final class History {
             }
         }
 
-        undoGroup.items.push(new UndoItem(undoValue, value));
+        undoGroup.items.add(new UndoItem(undoValue, value));
+    }
+
+    /**
+     * This operation is useful in order to move a group from the undo stack to the redo stack or vice versa (the
+     * order of operations in one should be proceed in the opposite order in the other)
+     */
+    private void restoreAndReverse(final UndoGroup undoGroup) {
+        for (UndoItem undoItem : undoGroup.items) {
+            Object currValue = undoItem.undoValue.getValue();
+            undoItem.undoValue.restoreValue(undoItem.oldValue);
+            undoItem.oldValue = currValue;
+        }
+
+        // Ex. 1 2 3 4 -> *4 2 3 *1 -> 4 *3 *2 1
+        //     1 2 3 4 5 -> *5 2 3 4 *1 -> 5 *4 3 *2 1
+        for (int i = 0; i <= (undoGroup.items.size() / 2); i++) {
+            int mirrorIndex = undoGroup.items.size() - i - 1;
+            UndoItem temp = undoGroup.items.get(i);
+            undoGroup.items.set(i, undoGroup.items.get(mirrorIndex));
+            undoGroup.items.set(mirrorIndex, temp);
+        }
     }
 }
