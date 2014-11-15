@@ -204,5 +204,17 @@ public class HistoryTest {
         });
     }
 
+    @Test
+    public void nestedRecordingWorks() {
+        final History history = new History();
+        final UndoInt undoInt = new UndoInt(history, 0);
+        history.startRecording("Outer recording");
+        history.startRecording("Inner recording");
+        undoInt.setValue(1);
+        history.stopRecording();
+        history.stopRecording();
 
+        assertThat(history.getUndoDepth(), equalTo(1));
+        assertThat(history.getUndoDescription(0), equalTo("Outer recording"));
+    }
 }
