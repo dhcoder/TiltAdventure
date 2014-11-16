@@ -3,7 +3,12 @@ package dhcoder.libgdx.tool.command;
 import dhcoder.support.collection.ArrayMap;
 import dhcoder.support.opt.Opt;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import static dhcoder.support.text.StringUtils.format;
+import static java.util.regex.Pattern.CASE_INSENSITIVE;
 
 /**
  * A collection of {@link Command}s. Provides sanity checking, like ensuring there are not conflicts, and organization,
@@ -39,13 +44,38 @@ public final class Commands {
     public boolean handleInput(final Shortcut shortcut) {
         Opt<Command> commandOpt = Opt.withNoValue();
         shortcuts.get(shortcut, commandOpt);
-        if (commandOpt.hasValue()) {
-            if (commandOpt.getValue().run()) {
-                return true;
-            }
+        if (commandOpt.hasValue() && commandOpt.getValue().run()) {
+            return true;
         }
 
         return false;
     }
 
+    /**
+     * Given a query like "zya", find commands with matching names, like "fu*zz*ySe*arch", and place them into the
+     * passed in list.
+     */
+    public List<Command> fuzzySearch(final String query) {
+        if (query.length() == 0) {
+            return new ArrayList<Command>();
+        }
+
+        ArrayList<Command> matchingCommands = new ArrayList<Command>();
+        // Turn a query like "abc" into regex pattern ".*a.*b.*c.*"
+        StringBuilder patternBuilder = new StringBuilder(query.length() * 3 + 2);
+        patternBuilder.append(".*");
+        for (int i = 0; i < query.length(); i++) {
+            char letter = query.charAt(i);
+            patternBuilder.append(letter);
+            patternBuilder.append(".*");
+        }
+        Pattern queryPattern = Pattern.compile(patternBuilder.toString(), CASE_INSENSITIVE);
+        for (Command command : commandIds.getValues()) {
+            if (queryPattern.matcher(command.getName()).matches()) {
+                matchingCommands.add(command);
+            }
+        }
+
+        return matchingCommands;
+    }
 }
