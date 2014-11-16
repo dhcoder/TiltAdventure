@@ -16,8 +16,7 @@ import static java.util.regex.Pattern.CASE_INSENSITIVE;
  * activate commands, like keyboard shortcuts.
  */
 public final class Commands {
-    private static final int EXPECTED_COMMAND_COUNT = 100;
-    private static final int EXPECTED_SCOPE_COUNT = 10;
+    private static final int EXPECTED_COUNT = 100;
 
     /**
      * Given a query like "zya", return a pattern that matches values like "fu*zz*ySe*arch".
@@ -53,10 +52,9 @@ public final class Commands {
         return matchingCommands;
     }
 
-    private final ArrayMap<String, Command> commandIdsMap = new ArrayMap<String, Command>(EXPECTED_COMMAND_COUNT);
+    private final ArrayMap<String, Command> commandIdsMap = new ArrayMap<String, Command>(EXPECTED_COUNT);
     private final ArrayMap<CommandScope, ArrayList<Command>> scopedCommandsMap =
         new ArrayMap<CommandScope, ArrayList<Command>>();
-    private final ArrayMap<Shortcut, Command> shortcuts = new ArrayMap<Shortcut, Command>(EXPECTED_COMMAND_COUNT);
 
     public void registerCommand(final Command command) {
         if (commandIdsMap.containsKey(command.getId())) {
@@ -76,32 +74,11 @@ public final class Commands {
         }
     }
 
-    public void registerShortcut(final Shortcut shortcut, final Command targetCommand) {
-        if (shortcuts.containsKey(shortcut)) {
-            throw new IllegalArgumentException(
-                format("The shortcut {0} being registered for '{1}' is already assigned to '{2}'", shortcut,
-                    targetCommand, shortcuts.get(shortcut)));
-        }
-
-        shortcuts.put(shortcut, targetCommand);
-    }
-
-    public boolean handleInput(final Shortcut shortcut) {
-        Opt<Command> commandOpt = Opt.withNoValue();
-        shortcuts.get(shortcut, commandOpt);
-        if (commandOpt.hasValue() && commandOpt.getValue().run()) {
-            return true;
-        }
-
-        return false;
-    }
-
     public List<Command> all() {
         return commandIdsMap.getValues();
     }
 
     public List<Command> scoped(final CommandScope... scopes) {
-
         for (int i = 0; i < scopes.length; i++) {
             for (int j = i + 1; j < scopes.length; j++) {
                 if (scopes[i].isRelatedTo(scopes[j])) {
@@ -137,7 +114,7 @@ public final class Commands {
             scopedCommands = scopedCommandsOpt.getValue();
         }
         else {
-            scopedCommands = new ArrayList<Command>(EXPECTED_COMMAND_COUNT / EXPECTED_SCOPE_COUNT);
+            scopedCommands = new ArrayList<Command>(EXPECTED_COUNT / CommandScope.EXPECTED_SIZE);
             scopedCommandsMap.put(scope, scopedCommands);
         }
         scopedCommands.add(command);

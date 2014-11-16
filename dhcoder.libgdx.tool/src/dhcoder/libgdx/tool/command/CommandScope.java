@@ -1,20 +1,39 @@
 package dhcoder.libgdx.tool.command;
 
+import dhcoder.support.collection.ArrayMap;
 import dhcoder.support.opt.Opt;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static dhcoder.support.text.StringUtils.format;
 import static dhcoder.support.text.StringUtils.isWhitespace;
 
 /**
  * Scope for a command, which can be used to narrow down the available commands at any given time.
  */
 public final class CommandScope {
+    /**
+     * How many number of commands we expect to register to this scope. You can register more - this just determines
+     * initial preallocation sizes.
+     */
+    public static final int EXPECTED_SIZE = 10;
+
     private final Opt<CommandScope> parentOpt = Opt.withNoValue();
     private final List<CommandScope> children = new ArrayList<CommandScope>(0);
     private final String name;
     private final String fullName;
+    private final ArrayMap<Shortcut, Command> shortcuts = new ArrayMap<Shortcut, Command>(EXPECTED_SIZE);
+
+    public void registerShortcut(final Shortcut shortcut, final Command targetCommand) {
+        if (shortcuts.containsKey(shortcut)) {
+            throw new IllegalArgumentException(
+                format("The shortcut {0} being registered for '{1}' is already assigned to '{2}'", shortcut,
+                    targetCommand, shortcuts.get(shortcut)));
+        }
+
+        shortcuts.put(shortcut, targetCommand);
+    }
 
     public CommandScope() {
         this("");
@@ -74,6 +93,22 @@ public final class CommandScope {
 
     public String getFullName() {
         return fullName;
+    }
+
+    public boolean handleShortcut(final Shortcut shortcut) {
+        Opt<Command> commandOpt = Opt.withNoValue();
+        shortcuts.get(shortcut, commandOpt);
+        if (commandOpt.hasValue() && commandOpt.getValue().run()) {
+            return true;
+        }
+
+        for (CommandScope child : children) {
+            if (child.handleShortcut(shortcut)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
