@@ -1,28 +1,60 @@
 package dhcoder.libgdx.tool.command;
 
+import dhcoder.support.text.StringUtils;
+
 /**
  * A command, essentially a callback with some useful meta information like name and description.
  */
 public final class Command {
-    private final String id;
-    private final String name;
-    private final String description;
-    private final Runnable action;
-    private boolean enabled = true;
 
-    public Command(final String id, final String name, final String description, final Runnable action) {
+    public interface RunCallback {
+        void run();
+    }
+
+    public interface TestActiveCallback {
+        boolean isActive();
+    }
+
+    private static final TestActiveCallback ALWAYS_ACTIVE = new TestActiveCallback() {
+        @Override
+        public boolean isActive() {
+            return true;
+        }
+    };
+
+    private final String id;
+    private final CommandScope scope;
+    private final String name;
+    private final String fullName;
+    private final String description;
+    private final RunCallback runCallback;
+    private TestActiveCallback testActiveCallback = ALWAYS_ACTIVE;
+
+    public Command(final String id, final CommandScope scope, final String name, final String description,
+        final RunCallback runCallback) {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.action = action;
+        this.runCallback = runCallback;
+        this.fullName = StringUtils.format("{0}: {1}", scope.getFullName(), name);
+        this.scope = scope;
+    }
+
+    public CommandScope getScope() {
+        return scope;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public Command setTestActiveCallback(final TestActiveCallback testActiveCallback) {
+        this.testActiveCallback = testActiveCallback;
+        return this;
     }
 
     public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(final boolean enabled) {
-        this.enabled = enabled;
+        return testActiveCallback.isActive();
     }
 
     public String getDescription() {
@@ -42,7 +74,7 @@ public final class Command {
             return false;
         }
 
-        action.run();
+        runCallback.run();
         return true;
     }
 

@@ -97,6 +97,15 @@ public final class StringUtils {
         return builder.toString();
     }
 
+    public static boolean isWhitespace(final String string) {
+        for (int i = 0; i < string.length(); i++) {
+            if (!Character.isWhitespace(string.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private static void throwUnexpectedCharException(final String input, final char c) {
         throw new IllegalArgumentException(format("Unexpected char '{0}' parsing string \"{1}\"", c, input));
     }
