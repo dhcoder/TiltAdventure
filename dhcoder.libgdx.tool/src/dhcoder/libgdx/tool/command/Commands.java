@@ -66,16 +66,14 @@ public final class Commands {
 
         commandIdsMap.put(command.getId(), command);
 
-        ArrayList<Command> scopedCommands;
-        Opt<ArrayList<Command>> scopedCommandsOpt = Opt.withNoValue();
-        scopedCommandsMap.get(command.getScope(), scopedCommandsOpt);
-        if (scopedCommandsOpt.hasValue()) {
-            scopedCommands = scopedCommandsOpt.getValue();
+        CommandScope currentScope = command.getScope();
+        while (true) {
+            addCommandToScopeList(command, currentScope);
+            if (!currentScope.getParentOpt().hasValue()) {
+                break;
+            }
+            currentScope = currentScope.getParentOpt().getValue();
         }
-        else {
-            scopedCommands = new ArrayList<Command>(EXPECTED_COMMAND_COUNT / EXPECTED_SCOPE_COUNT);
-        }
-        scopedCommands.add(command);
     }
 
     public void registerShortcut(final Shortcut shortcut, final Command targetCommand) {
@@ -124,5 +122,24 @@ public final class Commands {
         }
 
         return scopedCommands;
+    }
+
+    private void addCommandToScopeList(final Command command, final CommandScope scope) {
+        if (!command.getScope().isDescendantOf(scope)) {
+            throw new IllegalArgumentException(
+                format("Command with scope {0} can't be associated with scope {1}", command.getScope(), scope));
+        }
+
+        ArrayList<Command> scopedCommands;
+        Opt<ArrayList<Command>> scopedCommandsOpt = Opt.withNoValue();
+        scopedCommandsMap.get(scope, scopedCommandsOpt);
+        if (scopedCommandsOpt.hasValue()) {
+            scopedCommands = scopedCommandsOpt.getValue();
+        }
+        else {
+            scopedCommands = new ArrayList<Command>(EXPECTED_COMMAND_COUNT / EXPECTED_SCOPE_COUNT);
+            scopedCommandsMap.put(scope, scopedCommands);
+        }
+        scopedCommands.add(command);
     }
 }

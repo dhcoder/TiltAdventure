@@ -37,6 +37,10 @@ public final class CommandScope {
         parentScope.children.add(this);
     }
 
+    public Opt<CommandScope> getParentOpt() {
+        return parentOpt;
+    }
+
     public List<CommandScope> getChildren() {
         return children;
     }
@@ -50,10 +54,14 @@ public final class CommandScope {
     }
 
     public boolean isDescendantOf(final CommandScope otherScope) {
-        CommandScope currentScope = otherScope;
+        if (this == otherScope) {
+            return true;
+        }
+
+        CommandScope currentScope = this;
         while (currentScope.parentOpt.hasValue()) {
             currentScope = currentScope.parentOpt.getValue();
-            if (currentScope == this) {
+            if (currentScope == otherScope) {
                 return true;
             }
         }

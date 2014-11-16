@@ -80,6 +80,6 @@ public final class Command {
 
     @Override
     public String toString() {
-        return name;
+        return StringUtils.format("{0} [{1}]", name, id);
     }
 }
