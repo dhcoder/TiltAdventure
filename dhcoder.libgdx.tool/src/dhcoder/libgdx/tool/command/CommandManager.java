@@ -15,7 +15,7 @@ import static java.util.regex.Pattern.CASE_INSENSITIVE;
  * A collection of {@link Command}s. Provides sanity checking, like ensuring there are not conflicts, and ways to
  * activate commands, like keyboard shortcuts.
  */
-public final class Commands {
+public final class CommandManager {
     private static final int EXPECTED_COUNT = 100;
 
     /**
@@ -74,11 +74,17 @@ public final class Commands {
         }
     }
 
-    public List<Command> all() {
+    /**
+     * Return all commands registered with this command manager.
+     */
+    public List<Command> allCommands() {
         return commandIdsMap.getValues();
     }
 
-    public List<Command> scoped(final CommandScope... scopes) {
+    /**
+     * Return all commands registered with this command manager that fall under the passed in scopes.
+     */
+    public List<Command> scopedCommands(final CommandScope... scopes) {
         for (int i = 0; i < scopes.length; i++) {
             for (int j = i + 1; j < scopes.length; j++) {
                 if (scopes[i].isRelatedTo(scopes[j])) {

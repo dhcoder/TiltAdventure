@@ -2,13 +2,13 @@ package dhcoder.libgdx.tool.command;
 
 import org.junit.Test;
 
-import static dhcoder.libgdx.tool.command.Commands.regexSearch;
-import static dhcoder.libgdx.tool.command.Commands.toFuzzySearch;
+import static dhcoder.libgdx.tool.command.CommandManager.regexSearch;
+import static dhcoder.libgdx.tool.command.CommandManager.toFuzzySearch;
 import static dhcoder.test.TestUtils.assertException;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 
-public class CommandsTest {
+public class CommandManagerTest {
 
     private static class NoopCallback implements Command.RunCallback {
         @Override
@@ -25,13 +25,13 @@ public class CommandsTest {
         Command command1 = new Command("test_id1", globalScope, "Test One", "Dummy desc 1", NOOP_CALLBACK);
         Command command2 = new Command("test_id2", globalScope, "Test Two", "Dummy desc 2", NOOP_CALLBACK);
 
-        Commands commands = new Commands();
-        commands.registerCommand(command1);
-        commands.registerCommand(command2);
+        CommandManager commandManager = new CommandManager();
+        commandManager.registerCommand(command1);
+        commandManager.registerCommand(command2);
 
-        assertThat(regexSearch(toFuzzySearch("Test One"), commands.all()), contains(command1));
-        assertThat(regexSearch(toFuzzySearch("Tw"), commands.all()), contains(command2));
-        assertThat(regexSearch(toFuzzySearch("so"), commands.all()), contains(command1, command2));
+        assertThat(regexSearch(toFuzzySearch("Test One"), commandManager.allCommands()), contains(command1));
+        assertThat(regexSearch(toFuzzySearch("Tw"), commandManager.allCommands()), contains(command2));
+        assertThat(regexSearch(toFuzzySearch("so"), commandManager.allCommands()), contains(command1, command2));
     }
 
     @Test
@@ -59,27 +59,28 @@ public class CommandsTest {
         final Command extra_3 = new Command("ex_3", extraScope, "dumb name", "dumb desc", NOOP_CALLBACK);
         final Command extra_4 = new Command("ex_4", extraScope, "dumb name", "dumb desc", NOOP_CALLBACK);
 
-        final Commands commands = new Commands();
-        commands.registerCommand(parent1_1);
-        commands.registerCommand(parent1_2);
-        commands.registerCommand(child11_1);
-        commands.registerCommand(child11_2);
-        commands.registerCommand(child12_1);
+        final CommandManager commandManager = new CommandManager();
+        commandManager.registerCommand(parent1_1);
+        commandManager.registerCommand(parent1_2);
+        commandManager.registerCommand(child11_1);
+        commandManager.registerCommand(child11_2);
+        commandManager.registerCommand(child12_1);
 
-        commands.registerCommand(parent2_1);
-        commands.registerCommand(child21_1);
-        commands.registerCommand(child21_2);
-        commands.registerCommand(child21_3);
+        commandManager.registerCommand(parent2_1);
+        commandManager.registerCommand(child21_1);
+        commandManager.registerCommand(child21_2);
+        commandManager.registerCommand(child21_3);
 
-        commands.registerCommand(extra_1);
-        commands.registerCommand(extra_2);
-        commands.registerCommand(extra_3);
-        commands.registerCommand(extra_4);
+        commandManager.registerCommand(extra_1);
+        commandManager.registerCommand(extra_2);
+        commandManager.registerCommand(extra_3);
+        commandManager.registerCommand(extra_4);
 
-        assertThat(commands.scoped(parent1Scope), contains(parent1_1, parent1_2, child11_1, child11_2, child12_1));
-        assertThat(commands.scoped(child21Scope), contains(child21_1, child21_2, child21_3));
-        assertThat(commands.scoped(extraScope), contains(extra_1, extra_2, extra_3, extra_4));
-        assertThat(commands.scoped(parent1Scope, child21Scope, extraScope),
+        assertThat(commandManager.scopedCommands(parent1Scope),
+            contains(parent1_1, parent1_2, child11_1, child11_2, child12_1));
+        assertThat(commandManager.scopedCommands(child21Scope), contains(child21_1, child21_2, child21_3));
+        assertThat(commandManager.scopedCommands(extraScope), contains(extra_1, extra_2, extra_3, extra_4));
+        assertThat(commandManager.scopedCommands(parent1Scope, child21Scope, extraScope),
             contains(parent1_1, parent1_2, child11_1, child11_2, child12_1, child21_1, child21_2, child21_3, extra_1,
                 extra_2, extra_3, extra_4));
     }
@@ -88,12 +89,12 @@ public class CommandsTest {
     public void redudantScopesThrowsException() {
         final CommandScope parentScope = new CommandScope("Parent");
         final CommandScope childScope = new CommandScope("Child", parentScope);
-        final Commands commands = new Commands();
+        final CommandManager commandManager = new CommandManager();
 
         assertException("Redundant scope request throws exception", IllegalArgumentException.class, new Runnable() {
             @Override
             public void run() {
-                commands.scoped(parentScope, childScope);
+                commandManager.scopedCommands(parentScope, childScope);
             }
         });
     }

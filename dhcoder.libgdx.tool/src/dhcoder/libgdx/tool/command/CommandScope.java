@@ -2,6 +2,7 @@ package dhcoder.libgdx.tool.command;
 
 import dhcoder.support.collection.ArrayMap;
 import dhcoder.support.opt.Opt;
+import dhcoder.support.text.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,17 +24,8 @@ public final class CommandScope {
     private final List<CommandScope> children = new ArrayList<CommandScope>(0);
     private final String name;
     private final String fullName;
-    private final ArrayMap<Shortcut, Command> shortcuts = new ArrayMap<Shortcut, Command>(EXPECTED_SIZE);
-
-    public void registerShortcut(final Shortcut shortcut, final Command targetCommand) {
-        if (shortcuts.containsKey(shortcut)) {
-            throw new IllegalArgumentException(
-                format("The shortcut {0} being registered for '{1}' is already assigned to '{2}'", shortcut,
-                    targetCommand, shortcuts.get(shortcut)));
-        }
-
-        shortcuts.put(shortcut, targetCommand);
-    }
+    private final ArrayMap<Shortcut, Command> shortcutsCommandMap = new ArrayMap<Shortcut, Command>(EXPECTED_SIZE);
+    private final ArrayMap<String, Shortcut> idShortcutsMap = new ArrayMap<String, Shortcut>(EXPECTED_SIZE);
 
     public CommandScope() {
         this("");
@@ -97,7 +89,7 @@ public final class CommandScope {
 
     public boolean handleShortcut(final Shortcut shortcut) {
         Opt<Command> commandOpt = Opt.withNoValue();
-        shortcuts.get(shortcut, commandOpt);
+        shortcutsCommandMap.get(shortcut, commandOpt);
         if (commandOpt.hasValue() && commandOpt.getValue().run()) {
             return true;
         }
@@ -114,6 +106,35 @@ public final class CommandScope {
     @Override
     public String toString() {
         return (!fullName.isEmpty() ? fullName : "<ROOT>");
+    }
+
+    void setShortcut(final Shortcut shortcut, final Command command) {
+        assertValidCommand(command);
+        if (shortcutsCommandMap.containsKey(shortcut)) {
+            throw new IllegalArgumentException(
+                format("The shortcut {0} being registered for '{1}' is already assigned to '{2}'", shortcut, command,
+                    shortcutsCommandMap.get(shortcut)));
+        }
+
+        shortcutsCommandMap.put(shortcut, command);
+        idShortcutsMap.put(command.getId(), shortcut);
+    }
+
+    /**
+     * Get the shortcut registered with the target command (if any)
+     */
+    Opt<Shortcut> getShortcutOpt(final Command command) {
+        assertValidCommand(command);
+        Opt<Shortcut> shortcutOpt = Opt.withNoValue();
+        idShortcutsMap.get(command.getId(), shortcutOpt);
+        return shortcutOpt;
+    }
+
+    private void assertValidCommand(final Command command) {
+        if (command.getScope() != this) {
+            throw new IllegalArgumentException(StringUtils
+                .format("Unexpected command {0} passed into scope {1}", command.getFullName(), this.getFullName()));
+        }
     }
 
     private String buildFullName() {

@@ -12,6 +12,32 @@ public final class Shortcut {
     private final boolean shift;
     private final int key;
 
+    public static Shortcut noModifier(final int key) {
+        return new Shortcut(false, false, false, key);
+    }
+
+    public static Shortcut ctrl(final int key) {
+        return new Shortcut(true, false, false, key);
+    }
+    public static Shortcut alt(final int key) {
+        return new Shortcut(false, true, false, key);
+    }
+    public static Shortcut shift(final int key) {
+        return new Shortcut(false, false, true, key);
+    }
+    public static Shortcut ctrlAlt(final int key) {
+        return new Shortcut(true, true, false, key);
+    }
+    public static Shortcut ctrlShift(final int key) {
+        return new Shortcut(true, false, true, key);
+    }
+    public static Shortcut altShift(final int key) {
+        return new Shortcut(false, true, true, key);
+    }
+    public static Shortcut ctrlAltShift(final int key) {
+        return new Shortcut(true, true, true, key);
+    }
+
     /**
      * @param key Set to a value in {@link Input.Keys}
      */
@@ -48,7 +74,7 @@ public final class Shortcut {
 
     @Override
     public String toString() {
-        return StringUtils.format("{0}{1}{2}{3}", ctrl ? "ctrl+" : "", alt ? "alt+" : "", shift ? "shift+" : "",
+        return StringUtils.format("{0}{1}{2}{3}", ctrl ? "Ctrl+" : "", alt ? "Alt+" : "", shift ? "Shift+" : "",
             Input.Keys.toString(key));
     }
 }

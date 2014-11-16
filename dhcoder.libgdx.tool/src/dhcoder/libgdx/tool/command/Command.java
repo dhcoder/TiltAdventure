@@ -1,5 +1,6 @@
 package dhcoder.libgdx.tool.command;
 
+import dhcoder.support.opt.Opt;
 import dhcoder.support.text.StringUtils;
 
 /**
@@ -38,6 +39,14 @@ public final class Command {
         this.runCallback = runCallback;
         this.fullName = StringUtils.format("{0}: {1}", scope.getFullName(), name);
         this.scope = scope;
+    }
+
+    public void setShortcut(final Shortcut shortcut) {
+        scope.setShortcut(shortcut, this);
+    }
+
+    public Opt<Shortcut> getShortcutOpt() {
+        return scope.getShortcutOpt(this);
     }
 
     public CommandScope getScope() {
