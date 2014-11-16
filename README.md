@@ -20,18 +20,29 @@ This project is based on [libdgx](http://libgdx.badlogicgames.com/) and, as such
 * desktop/
 * core/
 
-Most of the game logic is under core/, whereas the target-specific folders exist only to publish the game to their
+Most of the game logic is under core/, whereas the platform-specific folders exist only to publish the game to their
 proper format.
+
+There are also some tools in this project. They will always be targeted for the desktop.
+
+* tools.scene/
+
+The Scene Tool is an editor which lets you create and edit scenes - essentially an area consisting of tiles, entities,
+and logic. A game is essentially a collection of connected scenes.
 
 There are also some utility modules:
 
 * dhcoder.support/
 * dhcoder.libgdx/
+* dhcoder.libgdx.tool/
 * dhcoder.test/
 
-dhcoder.test is a small set of utility classes that help me out in my unit tests. dhcoder.support is a growing set of
-general utility classes that I could, in theory, port over to any other Java application. dhcoder.libgdx, in contrast,
-is a set of utility classes that build on top of libgdx itself.
+*dhcoder.test* is a small set of utility classes that help me out in my unit tests.
+*dhcoder.support* is a growing set of general utility classes that I could potentially port over to any other Java
+application.
+*dhcoder.libgdx* is a set of utility classes that build on top of libgdx itself.
+*dhcoder.libgdx.tool* is a further refinement, providing classes useful for making desktop tools but not for the game
+itself.
 
 ## JDK / ADK
 
