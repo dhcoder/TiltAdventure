@@ -140,7 +140,7 @@ public final class ArrayMap<K, V> {
      */
     public List<V> getValues() {
         ArrayList<V> compactValues = new ArrayList<V>(size);
-        for (int i = 0; i < size; ++i) {
+        for (int i = 0; i < capacity; ++i) {
             final V value = values.get(i);
             if (value != null) {
                 compactValues.add(value);

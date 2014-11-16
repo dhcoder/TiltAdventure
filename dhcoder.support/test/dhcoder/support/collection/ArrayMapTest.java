@@ -3,8 +3,11 @@ package dhcoder.support.collection;
 import dhcoder.support.opt.Opt;
 import org.junit.Test;
 
+import java.util.List;
+
 import static dhcoder.test.TestUtils.assertException;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 public final class ArrayMapTest {
@@ -302,4 +305,16 @@ public final class ArrayMapTest {
         assertThat(numericStringMap.get(1), equalTo("one"));
         assertThat(numericStringMap.get(2), equalTo("two"));
     }
+
+    @Test
+    public void getValuesReturnsCompactListOfValues() {
+        ArrayMap<Integer, String> numericStringMap = new ArrayMap<Integer, String>(100);
+        numericStringMap.put(1, "one");
+        numericStringMap.put(2, "two");
+        numericStringMap.put(3, "three");
+
+        final List<String> values = numericStringMap.getValues();
+        assertThat(values.size(), equalTo(3));
+        assertThat(values, contains("one", "two", "three"));
+   }
 }
