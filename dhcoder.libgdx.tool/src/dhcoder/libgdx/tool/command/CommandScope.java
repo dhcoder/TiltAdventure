@@ -45,10 +45,14 @@ public final class CommandScope {
         return (otherScope.isDescendantOf(this));
     }
 
+    public boolean isRelatedTo(final CommandScope otherScope) {
+        return (this.isAncestorOf(otherScope) || this.isDescendantOf(otherScope));
+    }
+
     public boolean isDescendantOf(final CommandScope otherScope) {
         CommandScope currentScope = otherScope;
         while (currentScope.parentOpt.hasValue()) {
-            currentScope = parentOpt.getValue();
+            currentScope = currentScope.parentOpt.getValue();
             if (currentScope == this) {
                 return true;
             }
@@ -62,6 +66,11 @@ public final class CommandScope {
 
     public String getFullName() {
         return fullName;
+    }
+
+    @Override
+    public String toString() {
+        return (!fullName.isEmpty() ? fullName : "<ROOT>");
     }
 
     private String buildFullName() {

@@ -103,6 +103,16 @@ public final class Commands {
     }
 
     public List<Command> scoped(final CommandScope... scopes) {
+
+        for (int i = 0; i < scopes.length; i++) {
+            for (int j = i + 1; j < scopes.length; j++) {
+                if (scopes[i].isRelatedTo(scopes[j])) {
+                    throw new IllegalArgumentException(
+                        format("Redundant scopes {0} and {1} requested", scopes[i], scopes[j]));
+                }
+            }
+        }
+
         ArrayList<Command> scopedCommands = new ArrayList<Command>();
 
         Opt<ArrayList<Command>> scopedCommandsOpt = Opt.withNoValue();
