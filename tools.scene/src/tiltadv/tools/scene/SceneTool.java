@@ -1,13 +1,20 @@
 package tiltadv.tools.scene;
 
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import tiltadv.GdxApplication;
+import com.badlogic.gdx.ApplicationAdapter;
 
-public final class SceneTool {
-    public static void main(String[] arg) {
+public final class SceneTool extends ApplicationAdapter {
+    @Override
+    public void create() {
 
-        LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-        new LwjglApplication(new GdxApplication(), config);
+    }
+
+    @Override
+    public void render() {
+
+    }
+
+    @Override
+    public void dispose() {
+
     }
 }

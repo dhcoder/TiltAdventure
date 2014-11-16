@@ -2,6 +2,7 @@ apply plugin: "java"
 
 dependencies {
     compile project(":dhcoder.libgdx")
+    compile project(":dhcoder.libgdx.tool")
     compile "com.badlogicgames.gdx:gdx:$gdxVersion"
     compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
     compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
@@ -11,7 +12,7 @@ dependencies {
 sourceCompatibility = 1.6
 sourceSets.main.java.srcDirs = ["src/"]
 
-project.ext.mainClassName = "tiltadv.tools.scene.SceneTool"
+project.ext.mainClassName = "tiltadv.tools.scene.Main"
 project.ext.assetsDir = new File("../android/assets");
 
 task run(dependsOn: classes, type: JavaExec) {
