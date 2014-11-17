@@ -38,6 +38,14 @@ public final class Actions {
             }
         });
 
+    public static final Action Exit =
+        new Action("exit", Scopes.File, "Exit", "Exits the application", new Action.RunCallback() {
+            @Override
+            public void run() {
+
+            }
+        })
+
     public static final Action Undo =
         new Action("undo", Scopes.Edit, "Undo", "Undo your last action", new Action.RunCallback() {
             @Override

@@ -115,6 +115,19 @@ public final class ActionManager {
         return scopedActions;
     }
 
+    public boolean handle(final Shortcut shortcut) {
+        List<ActionScope> scopes = scopedActionsMap.getKeys();
+        for (ActionScope scope : scopes) {
+            if (scope.isTopLevel()) {
+                if (scope.handle(shortcut)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     private void addActionToScopeList(final Action action, final ActionScope scope) {
         if (!action.getScope().isDescendantOf(scope)) {
             throw new IllegalArgumentException(

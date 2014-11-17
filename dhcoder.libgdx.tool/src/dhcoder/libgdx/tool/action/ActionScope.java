@@ -48,6 +48,10 @@ public final class ActionScope {
         parentScope.children.add(this);
     }
 
+    public boolean isTopLevel() {
+        return !parentOpt.hasValue();
+    }
+
     public Opt<ActionScope> getParentOpt() {
         return parentOpt;
     }
@@ -87,7 +91,7 @@ public final class ActionScope {
         return fullName;
     }
 
-    public boolean handleShortcut(final Shortcut shortcut) {
+    public boolean handle(final Shortcut shortcut) {
         Opt<Action> actionOpt = Opt.withNoValue();
         shortcutActionsMap.get(shortcut, actionOpt);
         if (actionOpt.hasValue() && actionOpt.getValue().run()) {
@@ -95,7 +99,7 @@ public final class ActionScope {
         }
 
         for (ActionScope child : children) {
-            if (child.handleShortcut(shortcut)) {
+            if (child.handle(shortcut)) {
                 return true;
             }
         }

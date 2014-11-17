@@ -138,6 +138,20 @@ public final class ArrayMap<K, V> {
     /**
      * Note: This method allocates an array and should only be used in non-critical areas.
      */
+    public List<K> getKeys() {
+        ArrayList<K> compactKeys = new ArrayList<K>(size);
+        for (int i = 0; i < capacity; ++i) {
+            final K key = keys.get(i);
+            if (key != null) {
+                compactKeys.add(key);
+            }
+        }
+        return compactKeys;
+    }
+
+    /**
+     * Note: This method allocates an array and should only be used in non-critical areas.
+     */
     public List<V> getValues() {
         ArrayList<V> compactValues = new ArrayList<V>(size);
         for (int i = 0; i < capacity; ++i) {
