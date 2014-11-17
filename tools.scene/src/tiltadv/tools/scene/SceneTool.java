@@ -35,7 +35,7 @@ public final class SceneTool extends ApplicationAdapter {
         skin = new Skin(Gdx.files.internal("ui/skin.json"), skinAtlas);
 
         Label firstRunLabel =
-            new Label(format("Press {0} to open the action window", Commands.RunAction.getShortcutOpt().getValue()),
+            new Label(format("Press {0} to open the action window", Commands.ShowActionWindow.getShortcutOpt().getValue()),
                 skin);
 
         table.add(firstRunLabel);
@@ -52,6 +52,8 @@ public final class SceneTool extends ApplicationAdapter {
 
     @Override
     public void render() {
+
+        Gdx.gl.glClearColor(.18f, .18f, .18f, 1f); // Classy dark gray background
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();

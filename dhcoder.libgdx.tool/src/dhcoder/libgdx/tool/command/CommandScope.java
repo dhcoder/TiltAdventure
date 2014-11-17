@@ -36,11 +36,11 @@ public final class CommandScope {
         fullName = name;
     }
 
-    public CommandScope(final String name, final CommandScope parentScope) {
-        if (isWhitespace(name)) {
-            throw new IllegalArgumentException("Can't specify an empty name for a non-root command scope");
-        }
+    public CommandScope(final CommandScope parentScope) {
+        this("", parentScope);
+    }
 
+    public CommandScope(final String name, final CommandScope parentScope) {
         parentOpt.set(parentScope);
         this.name = name;
         this.fullName = buildFullName();
@@ -108,6 +108,10 @@ public final class CommandScope {
         return (!fullName.isEmpty() ? fullName : "<ROOT>");
     }
 
+    String getScopedCommandName(final Command command) {
+        return !isWhitespace(fullName) ? format("{0}: {1}", fullName, command.getName()) : command.getName();
+    }
+
     void setShortcut(final Shortcut shortcut, final Command command) {
         assertValidCommand(command);
         if (shortcutsCommandMap.containsKey(shortcut)) {
@@ -133,7 +137,7 @@ public final class CommandScope {
     private void assertValidCommand(final Command command) {
         if (command.getScope() != this) {
             throw new IllegalArgumentException(StringUtils
-                .format("Unexpected command {0} passed into scope {1}", command.getFullName(), this.getFullName()));
+                .format("Unexpected command {0} passed into scope {1}", command.getFullName(), fullName));
         }
     }
 

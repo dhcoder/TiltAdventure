@@ -29,6 +29,7 @@ public final class Command {
     private final String fullName;
     private final String description;
     private final RunCallback runCallback;
+    private boolean excludeFromSearch;
     private TestActiveCallback testActiveCallback = ALWAYS_ACTIVE;
 
     public Command(final String id, final CommandScope scope, final String name, final String description,
@@ -37,8 +38,9 @@ public final class Command {
         this.name = name;
         this.description = description;
         this.runCallback = runCallback;
-        this.fullName = StringUtils.format("{0}: {1}", scope.getFullName(), name);
         this.scope = scope;
+
+        this.fullName = scope.getScopedCommandName(this);
     }
 
     public void setShortcut(final Shortcut shortcut) {
@@ -68,6 +70,14 @@ public final class Command {
 
     public String getDescription() {
         return description;
+    }
+
+    void setExcludedFromSearch(final boolean excludedFromSearch) {
+        this.excludeFromSearch = excludedFromSearch;
+    }
+
+    boolean isExcludedFromSearch() {
+        return excludeFromSearch;
     }
 
     public String getName() {

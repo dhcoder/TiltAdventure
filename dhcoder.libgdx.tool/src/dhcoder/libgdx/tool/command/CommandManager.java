@@ -44,6 +44,10 @@ public final class CommandManager {
     public static List<Command> regexSearch(final Pattern pattern, final List<Command> commandSet) {
         ArrayList<Command> matchingCommands = new ArrayList<Command>();
         for (Command command : commandSet) {
+            if (command.isExcludedFromSearch()) {
+                continue;
+            }
+
             if (pattern.matcher(command.getName()).matches()) {
                 matchingCommands.add(command);
             }
@@ -79,6 +83,10 @@ public final class CommandManager {
      */
     public List<Command> allCommands() {
         return commandIdsMap.getValues();
+    }
+
+    public void excludeFromSearch(final Command command) {
+        command.setExcludedFromSearch(true);
     }
 
     /**
