@@ -8,8 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import dhcoder.libgdx.tool.command.CommandManager;
-import tiltadv.tools.scene.commands.Commands;
+import dhcoder.libgdx.tool.action.ActionManager;
+import tiltadv.tools.scene.action.Actions;
 
 import static dhcoder.support.text.StringUtils.format;
 
@@ -35,7 +35,7 @@ public final class SceneTool extends ApplicationAdapter {
         skin = new Skin(Gdx.files.internal("ui/skin.json"), skinAtlas);
 
         Label firstRunLabel =
-            new Label(format("Press {0} to open the action window", Commands.ShowActionWindow.getShortcutOpt().getValue()),
+            new Label(format("Press {0} to open the action window", Actions.ShowActionWindow.getShortcutOpt().getValue()),
                 skin);
 
         table.add(firstRunLabel);
@@ -66,7 +66,7 @@ public final class SceneTool extends ApplicationAdapter {
     }
 
     private void initializeCommands() {
-        CommandManager commandManager = new CommandManager();
-        Commands.registerWith(commandManager);
+        ActionManager actionManager = new ActionManager();
+        Actions.registerWith(actionManager);
     }
 }

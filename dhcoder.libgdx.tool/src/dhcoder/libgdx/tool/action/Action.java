@@ -1,22 +1,22 @@
-package dhcoder.libgdx.tool.command;
+package dhcoder.libgdx.tool.action;
 
 import dhcoder.support.opt.Opt;
 import dhcoder.support.text.StringUtils;
 
 /**
- * A command, essentially a callback with some useful meta information like name and description.
+ * An action is essentially a callback with some useful meta information like name and description.
  */
-public final class Command {
+public final class Action {
 
     public interface RunCallback {
         void run();
     }
 
-    public interface TestActiveCallback {
+    public interface ActiveCallback {
         boolean isActive();
     }
 
-    private static final TestActiveCallback ALWAYS_ACTIVE = new TestActiveCallback() {
+    private static final ActiveCallback ALWAYS_ACTIVE = new ActiveCallback() {
         @Override
         public boolean isActive() {
             return true;
@@ -24,15 +24,15 @@ public final class Command {
     };
 
     private final String id;
-    private final CommandScope scope;
+    private final ActionScope scope;
     private final String name;
     private final String fullName;
     private final String description;
     private final RunCallback runCallback;
     private boolean excludeFromSearch;
-    private TestActiveCallback testActiveCallback = ALWAYS_ACTIVE;
+    private ActiveCallback activeCallback = ALWAYS_ACTIVE;
 
-    public Command(final String id, final CommandScope scope, final String name, final String description,
+    public Action(final String id, final ActionScope scope, final String name, final String description,
         final RunCallback runCallback) {
         this.id = id;
         this.name = name;
@@ -40,7 +40,7 @@ public final class Command {
         this.runCallback = runCallback;
         this.scope = scope;
 
-        this.fullName = scope.getScopedCommandName(this);
+        this.fullName = scope.getScopedActionName(this);
     }
 
     public void setShortcut(final Shortcut shortcut) {
@@ -51,7 +51,7 @@ public final class Command {
         return scope.getShortcutOpt(this);
     }
 
-    public CommandScope getScope() {
+    public ActionScope getScope() {
         return scope;
     }
 
@@ -59,13 +59,13 @@ public final class Command {
         return fullName;
     }
 
-    public Command setTestActiveCallback(final TestActiveCallback testActiveCallback) {
-        this.testActiveCallback = testActiveCallback;
+    public Action setActiveCallback(final ActiveCallback activeCallback) {
+        this.activeCallback = activeCallback;
         return this;
     }
 
     public boolean isEnabled() {
-        return testActiveCallback.isActive();
+        return activeCallback.isActive();
     }
 
     public String getDescription() {

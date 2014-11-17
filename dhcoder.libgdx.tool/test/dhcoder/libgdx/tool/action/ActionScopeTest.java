@@ -1,16 +1,16 @@
-package dhcoder.libgdx.tool.command;
+package dhcoder.libgdx.tool.action;
 
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-public final class CommandScopeTest {
+public final class ActionScopeTest {
     @Test
     public void nestedScopesHaveExpectedNames() {
-        CommandScope fileScope = new CommandScope("File");
-        CommandScope fileSettingsScope = new CommandScope("Settings", fileScope);
-        CommandScope fileSettingsMiscScope = new CommandScope("Misc", fileSettingsScope);
+        ActionScope fileScope = new ActionScope("File");
+        ActionScope fileSettingsScope = new ActionScope("Settings", fileScope);
+        ActionScope fileSettingsMiscScope = new ActionScope("Misc", fileSettingsScope);
 
         assertThat(fileScope.getName(), equalTo("File"));
         assertThat(fileScope.getFullName(), equalTo("File"));
