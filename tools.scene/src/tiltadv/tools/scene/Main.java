@@ -9,6 +9,8 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 public final class Main {
     public static void main(final String[] arg) {
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+        config.width = 1280;
+        config.height = 720;
         new LwjglApplication(new SceneTool(), config);
     }
 }

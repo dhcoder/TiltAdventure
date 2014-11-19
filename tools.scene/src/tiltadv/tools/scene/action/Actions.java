@@ -44,7 +44,7 @@ public final class Actions {
             public void run() {
 
             }
-        })
+        });
 
     public static final Action Undo =
         new Action("undo", Scopes.Edit, "Undo", "Undo your last action", new Action.RunCallback() {
