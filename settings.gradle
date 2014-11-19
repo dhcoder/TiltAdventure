@@ -1,1 +1,1 @@
-include 'desktop', 'android', 'core', 'dhcoder.libgdx', 'dhcoder.libgdx.tool', 'dhcoder.support', 'dhcoder.test', 'tools.scene'
+include 'desktop', 'android', 'core', 'dhcoder.libgdx', 'dhcoder.libgdx.tool', 'dhcoder.support', 'dhcoder.test', 'tools.scene', 'tools.font'
