@@ -41,9 +41,8 @@ public final class SceneTool extends ApplicationAdapter {
         TextureAtlas skinAtlas = new TextureAtlas(Gdx.files.internal("ui/skin.atlas"));
         skin = new Skin(Gdx.files.internal("ui/skin.json"), skinAtlas);
 
-        Label firstRunLabel =
-            new Label(format("Press {0} to open the action window", Actions.ShowActionWindow.getShortcutOpt().getValue()),
-                skin);
+        Label firstRunLabel = new Label(
+            format("Press {0} to open the action window", Actions.ShowActionWindow.getShortcutOpt().getValue()), skin);
 
         table.add(firstRunLabel);
 

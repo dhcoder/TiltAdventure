@@ -1,7 +1,55 @@
 {
   "com.badlogic.gdx.graphics.g2d.BitmapFont": {
     "default-font": {
-      "file": "fonts/generated/default-font.fnt"
+      "file": "fonts/generated/ui-16.fnt"
+    },
+    "fixed-font-xs": {
+      "file": "fonts/generated/fixed-10.fnt"
+    },
+    "fixed-font-s": {
+      "file": "fonts/generated/fixed-12.fnt"
+    },
+    "fixed-font-m": {
+      "file": "fonts/generated/fixed-16.fnt"
+    },
+    "fixed-font-xl": {
+      "file": "fonts/generated/fixed-36.fnt"
+    },
+    "ui-font-xs": {
+      "file": "fonts/generated/ui-10.fnt"
+    },
+    "ui-font-s": {
+      "file": "fonts/generated/ui-12.fnt"
+    },
+    "ui-font-m": {
+      "file": "fonts/generated/ui-16.fnt"
+    },
+    "ui-font-xl": {
+      "file": "fonts/generated/ui-36.fnt"
+    },
+    "ui-bold-font-xs": {
+      "file": "fonts/generated/ui-bold-10.fnt"
+    },
+    "ui-bold-font-s": {
+      "file": "fonts/generated/ui-bold-12.fnt"
+    },
+    "ui-bold-font-m": {
+      "file": "fonts/generated/ui-bold-16.fnt"
+    },
+    "ui-bold-font-xl": {
+      "file": "fonts/generated/ui-bold-36.fnt"
+    },
+    "ui-italic-font-xs": {
+      "file": "fonts/generated/ui-italic-10.fnt"
+    },
+    "ui-italic-font-s": {
+      "file": "fonts/generated/ui-italic-12.fnt"
+    },
+    "ui-italic-font-m": {
+      "file": "fonts/generated/ui-italic-16.fnt"
+    },
+    "ui-italic-font-xl": {
+      "file": "fonts/generated/ui-italic-36.fnt"
     }
   },
   "com.badlogic.gdx.graphics.Color": {
