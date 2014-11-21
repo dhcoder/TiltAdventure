@@ -1,4 +1,4 @@
-package dhcoder.libgdx.tool.action;
+package dhcoder.libgdx.tool.command;
 
 import com.badlogic.gdx.Input.Keys;
 
@@ -6,13 +6,13 @@ import com.badlogic.gdx.Input.Keys;
  * Class that handles input and fires the appropriate {@link Shortcut}s.
  */
 public final class InputHandler {
-    private final ActionManager actionManager;
+    private final CommandManager commandManager;
     private boolean ctrl;
     private boolean alt;
     private boolean shift;
 
-    public InputHandler(final ActionManager actionManager) {
-        this.actionManager = actionManager;
+    public InputHandler(final CommandManager commandManager) {
+        this.commandManager = commandManager;
     }
 
     public boolean handleKeyDown(final int key) {
@@ -27,7 +27,7 @@ public final class InputHandler {
         }
         else {
             Shortcut shortcut = new Shortcut(ctrl, alt, shift, key);
-            return actionManager.handle(shortcut);
+            return commandManager.handle(shortcut);
         }
 
         return false;

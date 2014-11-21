@@ -1,4 +1,4 @@
-package dhcoder.libgdx.tool.action;
+package dhcoder.libgdx.tool.command;
 
 import dhcoder.support.opt.Opt;
 import dhcoder.support.text.StringUtils;
@@ -6,7 +6,7 @@ import dhcoder.support.text.StringUtils;
 /**
  * An action is essentially a callback with some useful meta information like name and description.
  */
-public final class Action {
+public final class Command {
 
     public interface RunCallback {
         void run();
@@ -24,7 +24,7 @@ public final class Action {
     };
 
     private final String id;
-    private final ActionScope scope;
+    private final CommandScope scope;
     private final String name;
     private final String fullName;
     private final String description;
@@ -32,7 +32,7 @@ public final class Action {
     private boolean excludeFromSearch;
     private ActiveCallback activeCallback = ALWAYS_ACTIVE;
 
-    public Action(final String id, final ActionScope scope, final String name, final String description,
+    public Command(final String id, final CommandScope scope, final String name, final String description,
         final RunCallback runCallback) {
         this.id = id;
         this.name = name;
@@ -40,7 +40,7 @@ public final class Action {
         this.runCallback = runCallback;
         this.scope = scope;
 
-        this.fullName = scope.getScopedActionName(this);
+        this.fullName = scope.getScopedName(this);
     }
 
     public void setShortcut(final Shortcut shortcut) {
@@ -51,7 +51,7 @@ public final class Action {
         return scope.getShortcutOpt(this);
     }
 
-    public ActionScope getScope() {
+    public CommandScope getScope() {
         return scope;
     }
 
@@ -59,7 +59,7 @@ public final class Action {
         return fullName;
     }
 
-    public Action setActiveCallback(final ActiveCallback activeCallback) {
+    public Command setActiveCallback(final ActiveCallback activeCallback) {
         this.activeCallback = activeCallback;
         return this;
     }

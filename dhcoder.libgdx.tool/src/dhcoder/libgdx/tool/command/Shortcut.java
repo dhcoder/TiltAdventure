@@ -1,4 +1,4 @@
-package dhcoder.libgdx.tool.action;
+package dhcoder.libgdx.tool.command;
 
 import com.badlogic.gdx.Input;
 import dhcoder.support.text.StringUtils;

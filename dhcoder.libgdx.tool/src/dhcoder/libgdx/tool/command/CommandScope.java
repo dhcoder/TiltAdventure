@@ -1,4 +1,4 @@
-package dhcoder.libgdx.tool.action;
+package dhcoder.libgdx.tool.command;
 
 import dhcoder.support.collection.ArrayMap;
 import dhcoder.support.opt.Opt;
@@ -13,34 +13,34 @@ import static dhcoder.support.text.StringUtils.isWhitespace;
 /**
  * Scope for an action, which can be used to narrow down the available actions at any given time.
  */
-public final class ActionScope {
+public final class CommandScope {
     /**
      * How many number of actions we expect to register to this scope. You can register more - this just determines
      * initial sizes for preallocation.
      */
     public static final int EXPECTED_SIZE = 10;
 
-    private final Opt<ActionScope> parentOpt = Opt.withNoValue();
-    private final List<ActionScope> children = new ArrayList<ActionScope>(0);
+    private final Opt<CommandScope> parentOpt = Opt.withNoValue();
+    private final List<CommandScope> children = new ArrayList<CommandScope>(0);
     private final String name;
     private final String fullName;
-    private final ArrayMap<Shortcut, Action> shortcutActionsMap = new ArrayMap<Shortcut, Action>(EXPECTED_SIZE);
+    private final ArrayMap<Shortcut, Command> shortcutCommandsMap = new ArrayMap<Shortcut, Command>(EXPECTED_SIZE);
     private final ArrayMap<String, Shortcut> idShortcutsMap = new ArrayMap<String, Shortcut>(EXPECTED_SIZE);
 
-    public ActionScope() {
+    public CommandScope() {
         this("");
     }
 
-    public ActionScope(final String name) {
+    public CommandScope(final String name) {
         this.name = name;
         fullName = name;
     }
 
-    public ActionScope(final ActionScope parentScope) {
+    public CommandScope(final CommandScope parentScope) {
         this("", parentScope);
     }
 
-    public ActionScope(final String name, final ActionScope parentScope) {
+    public CommandScope(final String name, final CommandScope parentScope) {
         parentOpt.set(parentScope);
         this.name = name;
         this.fullName = buildFullName();
@@ -52,28 +52,28 @@ public final class ActionScope {
         return !parentOpt.hasValue();
     }
 
-    public Opt<ActionScope> getParentOpt() {
+    public Opt<CommandScope> getParentOpt() {
         return parentOpt;
     }
 
-    public List<ActionScope> getChildren() {
+    public List<CommandScope> getChildren() {
         return children;
     }
 
-    public boolean isAncestorOf(final ActionScope otherScope) {
+    public boolean isAncestorOf(final CommandScope otherScope) {
         return (otherScope.isDescendantOf(this));
     }
 
-    public boolean isRelatedTo(final ActionScope otherScope) {
+    public boolean isRelatedTo(final CommandScope otherScope) {
         return (this.isAncestorOf(otherScope) || this.isDescendantOf(otherScope));
     }
 
-    public boolean isDescendantOf(final ActionScope otherScope) {
+    public boolean isDescendantOf(final CommandScope otherScope) {
         if (this == otherScope) {
             return true;
         }
 
-        ActionScope currentScope = this;
+        CommandScope currentScope = this;
         while (currentScope.parentOpt.hasValue()) {
             currentScope = currentScope.parentOpt.getValue();
             if (currentScope == otherScope) {
@@ -92,13 +92,13 @@ public final class ActionScope {
     }
 
     public boolean handle(final Shortcut shortcut) {
-        Opt<Action> actionOpt = Opt.withNoValue();
-        shortcutActionsMap.get(shortcut, actionOpt);
-        if (actionOpt.hasValue() && actionOpt.getValue().run()) {
+        Opt<Command> commandOpt = Opt.withNoValue();
+        shortcutCommandsMap.get(shortcut, commandOpt);
+        if (commandOpt.hasValue() && commandOpt.getValue().run()) {
             return true;
         }
 
-        for (ActionScope child : children) {
+        for (CommandScope child : children) {
             if (child.handle(shortcut)) {
                 return true;
             }
@@ -112,42 +112,42 @@ public final class ActionScope {
         return (!fullName.isEmpty() ? fullName : "<ROOT>");
     }
 
-    String getScopedActionName(final Action action) {
-        return !isWhitespace(fullName) ? format("{0}: {1}", fullName, action.getName()) : action.getName();
+    String getScopedName(final Command command) {
+        return !isWhitespace(fullName) ? format("{0}: {1}", fullName, command.getName()) : command.getName();
     }
 
-    void setShortcut(final Shortcut shortcut, final Action action) {
-        assertValid(action);
-        if (shortcutActionsMap.containsKey(shortcut)) {
+    void setShortcut(final Shortcut shortcut, final Command command) {
+        assertValid(command);
+        if (shortcutCommandsMap.containsKey(shortcut)) {
             throw new IllegalArgumentException(
-                format("The shortcut {0} being registered for '{1}' is already assigned to '{2}'", shortcut, action,
-                    shortcutActionsMap.get(shortcut)));
+                format("The shortcut {0} being registered for '{1}' is already assigned to '{2}'", shortcut, command,
+                    shortcutCommandsMap.get(shortcut)));
         }
 
-        shortcutActionsMap.put(shortcut, action);
-        idShortcutsMap.put(action.getId(), shortcut);
+        shortcutCommandsMap.put(shortcut, command);
+        idShortcutsMap.put(command.getId(), shortcut);
     }
 
     /**
      * Get the shortcut registered with the target command (if any)
      */
-    Opt<Shortcut> getShortcutOpt(final Action action) {
-        assertValid(action);
+    Opt<Shortcut> getShortcutOpt(final Command command) {
+        assertValid(command);
         Opt<Shortcut> shortcutOpt = Opt.withNoValue();
-        idShortcutsMap.get(action.getId(), shortcutOpt);
+        idShortcutsMap.get(command.getId(), shortcutOpt);
         return shortcutOpt;
     }
 
-    private void assertValid(final Action action) {
-        if (action.getScope() != this) {
+    private void assertValid(final Command command) {
+        if (command.getScope() != this) {
             throw new IllegalArgumentException(StringUtils
-                .format("Unexpected command {0} passed into scope {1}", action.getFullName(), fullName));
+                .format("Unexpected command {0} passed into scope {1}", command.getFullName(), fullName));
         }
     }
 
     private String buildFullName() {
         StringBuilder fullNameBuilder = new StringBuilder(name);
-        ActionScope currentScope = this;
+        CommandScope currentScope = this;
         while (currentScope.parentOpt.hasValue()) {
             currentScope = currentScope.parentOpt.getValue();
             if (!currentScope.name.isEmpty()) {

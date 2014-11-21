@@ -11,9 +11,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import dhcoder.libgdx.tool.action.ActionManager;
-import dhcoder.libgdx.tool.action.InputHandler;
-import tiltadv.tools.scene.action.Actions;
+import dhcoder.libgdx.tool.command.CommandManager;
+import dhcoder.libgdx.tool.command.InputHandler;
+import tiltadv.tools.scene.command.Commands;
 
 import static dhcoder.support.text.StringUtils.format;
 
@@ -30,9 +30,9 @@ public final class SceneTool extends ApplicationAdapter {
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
-        ActionManager actionManager = new ActionManager();
-        Actions.registerWith(actionManager);
-        inputHandler = new InputHandler(actionManager);
+        CommandManager commandManager = new CommandManager();
+        Commands.registerWith(commandManager);
+        inputHandler = new InputHandler(commandManager);
 
         Table table = new Table();
         table.setFillParent(true);
@@ -41,8 +41,8 @@ public final class SceneTool extends ApplicationAdapter {
         TextureAtlas skinAtlas = new TextureAtlas(Gdx.files.internal("ui/skin.atlas"));
         skin = new Skin(Gdx.files.internal("ui/skin.json"), skinAtlas);
 
-        Label firstRunLabel = new Label(
-            format("Press {0} to open the action window", Actions.ShowActionWindow.getShortcutOpt().getValue()), skin);
+        Label firstRunLabel = new Label(format("Press {0} to open the command window",
+            Commands.SHOW_COMMAND_WINDOW.getShortcutOpt().getValue()), skin);
 
         table.add(firstRunLabel);
 
