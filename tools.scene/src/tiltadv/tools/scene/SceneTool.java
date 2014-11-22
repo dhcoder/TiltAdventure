@@ -10,14 +10,19 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import dhcoder.libgdx.tool.command.CommandManager;
 import dhcoder.libgdx.tool.command.InputHandler;
+import dhcoder.libgdx.tool.command.serialization.ShortcutsLoader;
 import tiltadv.tools.scene.command.Commands;
 
 import static dhcoder.support.text.StringUtils.format;
 
 public final class SceneTool extends ApplicationAdapter {
+
+    private static final String PATH_ASSETS = "ui/";
+    private static final String PATH_CONFIG = "config/scene/";
 
     private static final boolean SHOW_DEBUG_SHAPES = true;
     // For debug rendering
@@ -32,14 +37,16 @@ public final class SceneTool extends ApplicationAdapter {
 
         CommandManager commandManager = new CommandManager();
         Commands.registerWith(commandManager);
+        loadShortcutsInto(commandManager);
+
         inputHandler = new InputHandler(commandManager);
 
         Table table = new Table();
         table.setFillParent(true);
         stage.addActor(table);
 
-        TextureAtlas skinAtlas = new TextureAtlas(Gdx.files.internal("ui/skin.atlas"));
-        skin = new Skin(Gdx.files.internal("ui/skin.json"), skinAtlas);
+        TextureAtlas skinAtlas = new TextureAtlas(Gdx.files.internal(PATH_ASSETS + "skin.atlas"));
+        skin = new Skin(Gdx.files.internal(PATH_ASSETS + "skin.json"), skinAtlas);
 
         Label firstRunLabel = new Label(format("Press {0} to open the command window",
             Commands.SHOW_COMMAND_WINDOW.getShortcutOpt().getValue()), skin);
@@ -61,6 +68,11 @@ public final class SceneTool extends ApplicationAdapter {
         if (SHOW_DEBUG_SHAPES) {
             table.setDebug(true);
         }
+    }
+
+    private void loadShortcutsInto(final CommandManager commandManager) {
+        Json json = new Json();
+        ShortcutsLoader.load(json, commandManager, PATH_CONFIG + "shortcuts.json");
     }
 
     @Override

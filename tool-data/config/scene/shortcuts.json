@@ -1,0 +1,8 @@
+{
+  "shortcuts": [
+    {
+      "shortcut": "Ctrl+\\",
+      "commandId": "show_command_window"
+    }
+  ]
+}

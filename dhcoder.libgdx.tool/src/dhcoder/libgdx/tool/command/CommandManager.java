@@ -82,6 +82,12 @@ public final class CommandManager {
         command.setExcludedFromSearch(true);
     }
 
+    public Opt<Command> findCommand(final String id) {
+        Opt<Command> commandOpt = Opt.withNoValue();
+        commandIdsMap.get(id, commandOpt);
+        return commandOpt;
+    }
+
     /**
      * Return all actions registered with this manager.
      */
