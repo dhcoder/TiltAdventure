@@ -71,10 +71,10 @@ public final class CommandManager {
         CommandScope currentScope = command.getScope();
         while (true) {
             addToScope(currentScope, command);
-            if (!currentScope.getParentOpt().hasValue()) {
+            if (currentScope.isTopLevel()) {
                 break;
             }
-            currentScope = currentScope.getParentOpt().getValue();
+            currentScope = currentScope.getParent();
         }
     }
 
