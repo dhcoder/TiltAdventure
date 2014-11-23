@@ -48,7 +48,7 @@ public final class CommandManager {
                 continue;
             }
 
-            if (pattern.matcher(command.getName()).matches()) {
+            if (pattern.matcher(command.getFullName()).matches()) {
                 matchingCommands.add(command);
             }
         }

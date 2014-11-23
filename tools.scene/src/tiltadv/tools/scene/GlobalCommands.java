@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import dhcoder.libgdx.tool.command.Command;
 import dhcoder.libgdx.tool.command.CommandManager;
 import dhcoder.libgdx.tool.command.CommandScope;
+import dhcoder.libgdx.tool.widget.CommandWindow;
 
 /**
  * Commands that should get executed anytime.
@@ -29,8 +30,11 @@ public final class GlobalCommands {
                 "Opens the Command Window which allows for searching all commands", new Command.RunCallback() {
                 @Override
                 public void run() {
+                    final CommandWindow commandWindow = sceneTool.getCommandWindow();
+                    commandWindow.show();
                 }
             }));
+        commandManager.excludeFromSearch(showCommandWindow);
 
         newScene = commandManager.register(
             new Command("new_scene", fileScope, "New Scene", "Opens a new, blank scene to work on",

@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import dhcoder.libgdx.tool.command.CommandManager;
 import dhcoder.libgdx.tool.command.InputHandler;
 import dhcoder.libgdx.tool.command.serialization.ShortcutsLoader;
+import dhcoder.libgdx.tool.widget.CommandWindow;
 import dhcoder.support.opt.Opt;
 
 import static dhcoder.support.text.StringUtils.format;
@@ -24,13 +25,17 @@ public final class SceneTool extends ApplicationAdapter {
     private static final String PATH_ASSETS = "ui/";
     private static final String PATH_CONFIG = "config/scene/";
 
-    private static final boolean SHOW_DEBUG_SHAPES = true;
     private final Opt<SceneContext> activeContextOpt = Opt.withNoValue();
     // For debug rendering
     private Stage stage;
     private Skin skin;
     private InputHandler inputHandler;
     private GlobalCommands globalCommands;
+    private CommandWindow commandWindow;
+
+    public CommandWindow getCommandWindow() {
+        return commandWindow;
+    }
 
     public GlobalCommands getGlobalCommands() {
         return globalCommands;
@@ -47,17 +52,24 @@ public final class SceneTool extends ApplicationAdapter {
 
         inputHandler = new InputHandler(commandManager);
 
-        Table table = new Table();
-        table.setFillParent(true);
-        stage.addActor(table);
-
         TextureAtlas skinAtlas = new TextureAtlas(Gdx.files.internal(PATH_ASSETS + "skin.atlas"));
         skin = new Skin(Gdx.files.internal(PATH_ASSETS + "skin.json"), skinAtlas);
 
+        Table backgroundTable = new Table();
+        backgroundTable.setFillParent(true);
+        stage.addActor(backgroundTable);
+
         Label firstRunLabel = new Label(format("Press {0} to open the command window",
             globalCommands.showCommandWindow.getShortcutOpt().getValue()), skin);
+        backgroundTable.add(firstRunLabel);
+        backgroundTable.row();
 
-        table.add(firstRunLabel);
+        Table commandWindowTable = new Table();
+        commandWindowTable.setFillParent(true);
+        stage.addActor(commandWindowTable);
+
+        commandWindow = new CommandWindow(commandManager, skin);
+        commandWindowTable.add(commandWindow).expandY().fillY().width(400f).fillX().top().pad(20f, 0f, 0f, 0f);
 
         stage.addListener(new InputListener() {
             @Override
@@ -70,10 +82,6 @@ public final class SceneTool extends ApplicationAdapter {
                 return inputHandler.handleKeyUp(keycode);
             }
         });
-
-        if (SHOW_DEBUG_SHAPES) {
-            table.setDebug(true);
-        }
     }
 
     @Override
