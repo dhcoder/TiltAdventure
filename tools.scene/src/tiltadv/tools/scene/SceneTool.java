@@ -15,7 +15,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import dhcoder.libgdx.tool.command.CommandManager;
 import dhcoder.libgdx.tool.command.InputHandler;
 import dhcoder.libgdx.tool.command.serialization.ShortcutsLoader;
-import tiltadv.tools.scene.command.Commands;
+import dhcoder.support.opt.Opt;
 
 import static dhcoder.support.text.StringUtils.format;
 
@@ -25,10 +25,16 @@ public final class SceneTool extends ApplicationAdapter {
     private static final String PATH_CONFIG = "config/scene/";
 
     private static final boolean SHOW_DEBUG_SHAPES = true;
+    private final Opt<SceneContext> activeContextOpt = Opt.withNoValue();
     // For debug rendering
     private Stage stage;
     private Skin skin;
     private InputHandler inputHandler;
+    private GlobalCommands globalCommands;
+
+    public GlobalCommands getGlobalCommands() {
+        return globalCommands;
+    }
 
     @Override
     public void create() {
@@ -36,7 +42,7 @@ public final class SceneTool extends ApplicationAdapter {
         Gdx.input.setInputProcessor(stage);
 
         CommandManager commandManager = new CommandManager();
-        Commands.registerWith(commandManager);
+        globalCommands = new GlobalCommands(this, commandManager);
         loadShortcutsInto(commandManager);
 
         inputHandler = new InputHandler(commandManager);
@@ -49,7 +55,7 @@ public final class SceneTool extends ApplicationAdapter {
         skin = new Skin(Gdx.files.internal(PATH_ASSETS + "skin.json"), skinAtlas);
 
         Label firstRunLabel = new Label(format("Press {0} to open the command window",
-            Commands.SHOW_COMMAND_WINDOW.getShortcutOpt().getValue()), skin);
+            globalCommands.showCommandWindow.getShortcutOpt().getValue()), skin);
 
         table.add(firstRunLabel);
 
@@ -70,11 +76,6 @@ public final class SceneTool extends ApplicationAdapter {
         }
     }
 
-    private void loadShortcutsInto(final CommandManager commandManager) {
-        Json json = new Json();
-        ShortcutsLoader.load(json, commandManager, PATH_CONFIG + "shortcuts.json");
-    }
-
     @Override
     public void resize(final int width, final int height) {
         stage.getViewport().update(width, height, true);
@@ -93,5 +94,10 @@ public final class SceneTool extends ApplicationAdapter {
     public void dispose() {
         stage.dispose();
         skin.dispose();
+    }
+
+    private void loadShortcutsInto(final CommandManager commandManager) {
+        Json json = new Json();
+        ShortcutsLoader.load(json, commandManager, PATH_CONFIG + "shortcuts.json");
     }
 }

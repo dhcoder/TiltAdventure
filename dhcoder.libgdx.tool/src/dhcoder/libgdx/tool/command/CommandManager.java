@@ -60,7 +60,7 @@ public final class CommandManager {
     private final ArrayMap<CommandScope, ArrayList<Command>> scopedCommandsMap =
         new ArrayMap<CommandScope, ArrayList<Command>>();
 
-    public void register(final Command command) {
+    public Command register(final Command command) {
         if (commandIdsMap.containsKey(command.getId())) {
             throw new IllegalArgumentException(
                 format("Duplicate command, id={0}, name={1}", command.getId(), command.getName()));
@@ -76,6 +76,8 @@ public final class CommandManager {
             }
             currentScope = currentScope.getParent();
         }
+
+        return command;
     }
 
     public void excludeFromSearch(final Command command) {

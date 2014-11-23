@@ -26,7 +26,6 @@ public final class CommandScope {
     private final String fullName;
     private final ArrayMap<Shortcut, Command> shortcutCommandsMap = new ArrayMap<Shortcut, Command>(EXPECTED_SIZE);
     private final ArrayMap<String, Shortcut> idShortcutsMap = new ArrayMap<String, Shortcut>(EXPECTED_SIZE);
-    private final Opt contextOpt = Opt.withNoValue();
 
     public CommandScope() {
         this("");
@@ -47,29 +46,6 @@ public final class CommandScope {
         this.fullName = buildFullName();
 
         parentScope.children.add(this);
-    }
-
-    /**
-     * Set the context data for this scope. All commands under this scope can request this context when executing their
-     * command.
-     */
-    public CommandScope setContext(final Object context) {
-        contextOpt.set(context);
-        return this;
-    }
-
-    /**
-     * Returns the context associate with this scope, or throws an exception if not set.
-     */
-    public Object getContext() {
-        CommandScope currentScope = this;
-        while (!currentScope.contextOpt.hasValue()) {
-            if (!currentScope.isTopLevel()) {
-                currentScope = currentScope.getParent();
-            }
-        }
-
-        return currentScope.contextOpt.getValue();
     }
 
     public boolean isTopLevel() {
