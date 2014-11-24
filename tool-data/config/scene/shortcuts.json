@@ -3,6 +3,10 @@
     {
       "shortcut": "Ctrl+\\",
       "commandId": "show_command_window"
+    },
+    {
+      "shortcut": "Ctrl+N",
+      "commandId": "new_scene"
     }
   ]
 }

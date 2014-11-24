@@ -37,10 +37,12 @@ public final class CommandWindow extends Table {
         commandsTable = new Table();
         commandsPane = new ScrollPane(commandsTable, skin);
         commandsPane.setVisible(false);
+        commandsPane.getMaxHeight();
 
         add(searchText).expandX().fillX();
         row();
-        add(commandsPane).expand().maxHeight(400f).fillX().top();
+//        add(commandsPane).expand().maxHeight(80f).fill().top();
+        add(commandsPane).expand().fillX().top();
 
         allCommandsSorted = commandManager.searchableCommands();
         allCommandsSorted.sort(new Comparator<Command>() {
@@ -94,6 +96,10 @@ public final class CommandWindow extends Table {
                         return true;
                     }
                 }
+                else if (keycode == Keys.ESCAPE) {
+                    hide(true);
+                    return true;
+                }
                 return false;
             }
         });
@@ -119,11 +125,6 @@ public final class CommandWindow extends Table {
         lastFocus = null;
     }
 
-    @Override
-    public void layout() {
-        super.layout();
-    }
-
     private void rebuildCommandsTable(final Skin skin) {
         commandsTable.clearChildren();
         commandsPane.setVisible(false);
@@ -133,7 +134,13 @@ public final class CommandWindow extends Table {
             Command command = matchedCommands.get(i);
             Label commandLabel =
                 new Label(getFormattedCommandName(command), skin, i == selectedCommandIndex ? "bold" : "default");
+            commandLabel.setEllipse(true);
             commandsTable.add(commandLabel).expandX().fillX().pad(0f, 10f, 0f, 10f);
+
+            if (command.getShortcutOpt().hasValue()) {
+                Label shortcutLabel = new Label(command.getShortcutOpt().getValue().toString(), skin, "italic-xs");
+                commandsTable.add(shortcutLabel).pad(0f, 0f, 0f, 10f);
+            }
             commandsTable.row();
         }
 

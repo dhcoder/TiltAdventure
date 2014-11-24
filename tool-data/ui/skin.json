@@ -186,8 +186,15 @@
     "bold": {
       "font": "ui-bold-font-m",
       "fontColor": "white"
+    },
+    "italic-s": {
+      "font": "ui-italic-font-s",
+      "fontColor": "white"
+    },
+    "italic-xs": {
+      "font": "ui-italic-font-xs",
+      "fontColor": "white"
     }
-
   },
   "com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle": {
     "default": {
