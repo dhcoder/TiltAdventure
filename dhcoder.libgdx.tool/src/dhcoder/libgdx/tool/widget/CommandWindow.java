@@ -21,18 +21,15 @@ import java.util.regex.Pattern;
  */
 public final class CommandWindow extends Table {
     public static final int MAX_COMMAND_COUNT = 30;
-    private final CommandManager commandManager;
     private final Table commandsTable;
     private final ScrollPane commandsPane;
     private final TextField searchText;
-    private List<Command> allCommandsSorted;
+    private final List<Command> allCommandsSorted;
     private List<Command> matchedCommands;
     private int selectedCommandIndex;
 
     public CommandWindow(final CommandManager commandManager, final Skin skin) {
         super(skin);
-
-        this.commandManager = commandManager;
 
         searchText = new TextField("", skin);
         commandsTable = new Table();
@@ -43,7 +40,7 @@ public final class CommandWindow extends Table {
         row();
         add(commandsPane).expand().maxHeight(400f).fillX().top();
 
-        allCommandsSorted = commandManager.allCommands();
+        allCommandsSorted = commandManager.searchableCommands();
         allCommandsSorted.sort(new Comparator<Command>() {
             @Override
             public int compare(final Command o1, final Command o2) {
@@ -112,7 +109,8 @@ public final class CommandWindow extends Table {
         int commandCount = Math.min(MAX_COMMAND_COUNT, matchedCommands.size());
         for (int i = 0; i < commandCount; i++) {
             Command command = matchedCommands.get(i);
-            Label commandLabel = new Label(command.getFullName(), skin, i == selectedCommandIndex ? "bold" : "default");
+            Label commandLabel =
+                new Label(getFormattedCommandName(command), skin, i == selectedCommandIndex ? "bold" : "default");
             commandsTable.add(commandLabel).expandX().fillX().pad(0f, 10f, 0f, 10f);
             commandsTable.row();
         }
@@ -120,5 +118,47 @@ public final class CommandWindow extends Table {
         if (commandCount > 0) {
             commandsPane.setVisible(true);
         }
+    }
+
+    private String getFormattedCommandName(final Command command) {
+        String name = command.getFullName();
+        String query = searchText.getText();
+        StringBuilder stringBuilder = new StringBuilder(name.length() + 2 * query.length()); // Extra for parens
+
+        boolean inParens = false;
+        int queryIndex = 0;
+        for (int nameIndex = 0; nameIndex < name.length(); nameIndex++) {
+            char nameChar = name.charAt(nameIndex);
+
+            if (queryIndex < query.length()) {
+                char queryChar = query.charAt(queryIndex);
+                if (Character.toLowerCase(nameChar) == Character.toLowerCase(queryChar)) {
+                    if (!inParens) {
+                        stringBuilder.append('(');
+                        inParens = true;
+                    }
+                    queryIndex++;
+                }
+                else {
+                    if (inParens) {
+                        stringBuilder.append(')');
+                        inParens = false;
+                    }
+                }
+            }
+            else {
+                if (inParens) {
+                    stringBuilder.append(')');
+                    inParens = false;
+                }
+            }
+            stringBuilder.append(nameChar);
+        }
+
+        if (inParens) {
+            stringBuilder.append(')');
+        }
+
+        return stringBuilder.toString();
     }
 }

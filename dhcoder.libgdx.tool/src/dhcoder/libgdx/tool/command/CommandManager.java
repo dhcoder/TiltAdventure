@@ -6,6 +6,7 @@ import dhcoder.support.text.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import static dhcoder.support.text.StringUtils.format;
@@ -95,6 +96,17 @@ public final class CommandManager {
      */
     public List<Command> allCommands() {
         return commandIdsMap.getValues();
+    }
+
+    public List<Command> searchableCommands() {
+        List<Command> searchableCommands = allCommands();
+        searchableCommands.removeIf(new Predicate<Command>() {
+            @Override
+            public boolean test(final Command command) {
+                return command.isExcludedFromSearch();
+            }
+        });
+        return searchableCommands;
     }
 
     /**
