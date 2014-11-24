@@ -1,6 +1,7 @@
 package dhcoder.libgdx.tool.widget;
 
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -27,6 +28,7 @@ public final class CommandWindow extends Table {
     private final List<Command> allCommandsSorted;
     private List<Command> matchedCommands;
     private int selectedCommandIndex;
+    private Actor lastFocus;
 
     public CommandWindow(final CommandManager commandManager, final Skin skin) {
         super(skin);
@@ -47,7 +49,6 @@ public final class CommandWindow extends Table {
                 return o1.getFullName().compareTo(o2.getFullName());
             }
         });
-        matchedCommands = allCommandsSorted;
 
         searchText.setTextFieldListener(new TextField.TextFieldListener() {
             @Override
@@ -85,6 +86,14 @@ public final class CommandWindow extends Table {
                     rebuildCommandsTable(skin);
                     return true;
                 }
+                else if (keycode == Keys.ENTER) {
+                    if (selectedCommandIndex < matchedCommands.size()) {
+                        final Command command = matchedCommands.get(selectedCommandIndex);
+                        command.run();
+                        hide(true);
+                        return true;
+                    }
+                }
                 return false;
             }
         });
@@ -93,8 +102,21 @@ public final class CommandWindow extends Table {
     }
 
     public void show() {
+        lastFocus = getStage().getKeyboardFocus();
         getStage().setKeyboardFocus(searchText);
         setVisible(true);
+        matchedCommands = allCommandsSorted;
+        selectedCommandIndex = 0;
+    }
+
+    private void hide(final boolean restoreFocus) {
+        setVisible(false);
+        if (restoreFocus) {
+            getStage().setKeyboardFocus(lastFocus);
+        }
+        commandsTable.clearChildren();
+        searchText.setText("");
+        lastFocus = null;
     }
 
     @Override
@@ -103,7 +125,7 @@ public final class CommandWindow extends Table {
     }
 
     private void rebuildCommandsTable(final Skin skin) {
-        commandsTable.reset();
+        commandsTable.clearChildren();
         commandsPane.setVisible(false);
 
         int commandCount = Math.min(MAX_COMMAND_COUNT, matchedCommands.size());
@@ -121,8 +143,11 @@ public final class CommandWindow extends Table {
     }
 
     private String getFormattedCommandName(final Command command) {
-        String name = command.getFullName();
         String query = searchText.getText();
+        if (StringUtils.isWhitespace(query)) {
+            return command.getFullName();
+        }
+        String name = command.getFullName();
         StringBuilder stringBuilder = new StringBuilder(name.length() + 2 * query.length()); // Extra for parens
 
         boolean inParens = false;
@@ -132,10 +157,19 @@ public final class CommandWindow extends Table {
 
             if (queryIndex < query.length()) {
                 char queryChar = query.charAt(queryIndex);
+
                 if (Character.toLowerCase(nameChar) == Character.toLowerCase(queryChar)) {
                     if (!inParens) {
-                        stringBuilder.append('(');
-                        inParens = true;
+                        if (queryChar != ' ') {
+                            stringBuilder.append('(');
+                            inParens = true;
+                        }
+                    }
+                    else {
+                        if (queryChar == ' ') {
+                            stringBuilder.append(')');
+                            inParens = false;
+                        }
                     }
                     queryIndex++;
                 }
