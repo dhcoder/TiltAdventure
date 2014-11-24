@@ -37,12 +37,11 @@ public final class CommandWindow extends Table {
         commandsTable = new Table();
         commandsPane = new ScrollPane(commandsTable, skin);
         commandsPane.setVisible(false);
-        commandsPane.getMaxHeight();
 
         add(searchText).expandX().fillX();
         row();
 //        add(commandsPane).expand().maxHeight(80f).fill().top();
-        add(commandsPane).expand().fillX().top();
+        add(commandsPane).expand().fillX().top().maxHeight(30f);
 
         allCommandsSorted = commandManager.searchableCommands();
         allCommandsSorted.sort(new Comparator<Command>() {
