@@ -4,8 +4,6 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -13,9 +11,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import dhcoder.libgdx.tool.command.CommandManager;
-import dhcoder.libgdx.tool.command.InputHandler;
 import dhcoder.libgdx.tool.command.serialization.ShortcutsLoader;
-import dhcoder.libgdx.tool.widget.CommandWindow;
+import dhcoder.libgdx.tool.scene2d.CommandListener;
+import dhcoder.libgdx.tool.scene2d.widget.CommandWindow;
 import dhcoder.support.opt.Opt;
 
 import static dhcoder.support.text.StringUtils.format;
@@ -29,7 +27,6 @@ public final class SceneTool extends ApplicationAdapter {
     // For debug rendering
     private Stage stage;
     private Skin skin;
-    private InputHandler inputHandler;
     private GlobalCommands globalCommands;
     private CommandWindow commandWindow;
 
@@ -50,8 +47,6 @@ public final class SceneTool extends ApplicationAdapter {
         globalCommands = new GlobalCommands(this, commandManager);
         loadShortcutsInto(commandManager);
 
-        inputHandler = new InputHandler(commandManager);
-
         TextureAtlas skinAtlas = new TextureAtlas(Gdx.files.internal(PATH_ASSETS + "skin.atlas"));
         skin = new Skin(Gdx.files.internal(PATH_ASSETS + "skin.json"), skinAtlas);
 
@@ -71,17 +66,7 @@ public final class SceneTool extends ApplicationAdapter {
         commandWindow = new CommandWindow(commandManager, skin);
         commandWindowTable.add(commandWindow).expandY().fillY().width(400f).fillX().top().pad(20f, 0f, 0f, 0f);
 
-        stage.addListener(new InputListener() {
-            @Override
-            public boolean keyDown(final InputEvent event, final int keycode) {
-                return inputHandler.handleKeyDown(keycode);
-            }
-
-            @Override
-            public boolean keyUp(final InputEvent event, final int keycode) {
-                return inputHandler.handleKeyUp(keycode);
-            }
-        });
+        stage.addListener(new CommandListener(globalCommands.globalScope));
     }
 
     @Override

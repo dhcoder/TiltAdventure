@@ -2,7 +2,6 @@ package dhcoder.libgdx.tool.command;
 
 import dhcoder.support.collection.ArrayMap;
 import dhcoder.support.opt.Opt;
-import dhcoder.support.text.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +9,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import static dhcoder.support.text.StringUtils.format;
+import static dhcoder.support.text.StringUtils.isWhitespace;
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 
 /**
@@ -20,12 +20,12 @@ public final class CommandManager {
     private static final int EXPECTED_COUNT = 100;
 
     /**
-     * Given a query like "zya", return a pattern that matches values like "fu*zz*ySe*arch".
+     * Given a query like "zyar", return a pattern that matches values like "fu(z)z(y)Se(ar)ch".
      *
      * @throws IllegalArgumentException if the input query has no characters.
      */
     public static Pattern toFuzzySearch(final String query) {
-        if (StringUtils.isWhitespace(query)) {
+        if (isWhitespace(query)) {
             throw new IllegalArgumentException("Invalid query is all whitespace");
         }
 
@@ -62,6 +62,10 @@ public final class CommandManager {
         new ArrayMap<CommandScope, ArrayList<Command>>();
 
     public Command register(final Command command) {
+        if (isWhitespace(command.getId())) {
+            throw new IllegalArgumentException("Attempting to register a lightweight (ID-less) command");
+        }
+
         if (commandIdsMap.containsKey(command.getId())) {
             throw new IllegalArgumentException(
                 format("Duplicate command, id={0}, name={1}", command.getId(), command.getName()));

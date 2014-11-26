@@ -1,9 +1,7 @@
-package dhcoder.libgdx.tool.widget;
+package dhcoder.libgdx.tool.scene2d.widget;
 
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -11,6 +9,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import dhcoder.libgdx.tool.command.Command;
 import dhcoder.libgdx.tool.command.CommandManager;
+import dhcoder.libgdx.tool.command.CommandScope;
+import dhcoder.libgdx.tool.command.Shortcut;
+import dhcoder.libgdx.tool.scene2d.CommandListener;
 import dhcoder.support.text.StringUtils;
 
 import java.util.Comparator;
@@ -71,38 +72,48 @@ public final class CommandWindow extends Table {
             }
         });
 
-        addListener(new InputListener() {
+        CommandScope commandWindowScope = new CommandScope();
+        commandWindowScope.addLambdaCommand(Shortcut.noModifier(Keys.UP), new Command.RunCallback() {
             @Override
-            public boolean keyDown(final InputEvent event, final int keycode) {
-                if (keycode == Keys.UP) {
-                    selectedCommandIndex--;
-                    if (selectedCommandIndex < 0) {
-                        selectedCommandIndex = matchedCommands.size() - 1;
-                    }
-                    rebuildCommandsTable(skin);
-                    return true;
+            public void run() {
+                selectedCommandIndex--;
+                if (selectedCommandIndex < 0) {
+                    selectedCommandIndex = matchedCommands.size() - 1;
                 }
-                else if (keycode == Keys.DOWN) {
-                    selectedCommandIndex = (selectedCommandIndex + 1) % matchedCommands.size();
-                    rebuildCommandsTable(skin);
-                    return true;
-                }
-                else if (keycode == Keys.ENTER) {
-                    if (selectedCommandIndex < matchedCommands.size()) {
-                        final Command command = matchedCommands.get(selectedCommandIndex);
-                        command.run();
-                        hide(true);
-                        return true;
-                    }
-                }
-                else if (keycode == Keys.ESCAPE) {
-                    hide(true);
-                    return true;
-                }
-                return false;
+                rebuildCommandsTable(skin);
             }
         });
 
+        commandWindowScope.addLambdaCommand(Shortcut.noModifier(Keys.DOWN), new Command.RunCallback() {
+            @Override
+            public void run() {
+                selectedCommandIndex = (selectedCommandIndex + 1) % matchedCommands.size();
+                rebuildCommandsTable(skin);
+            }
+        });
+
+        commandWindowScope.addLambdaCommand(Shortcut.noModifier(Keys.ENTER), new Command.RunCallback() {
+            @Override
+            public void run() {
+                final Command command = matchedCommands.get(selectedCommandIndex);
+                command.run();
+                hide(true);
+            }
+        }).setActiveCallback(new Command.ActiveCallback() {
+            @Override
+            public boolean isActive() {
+                return (selectedCommandIndex < matchedCommands.size());
+            }
+        });
+
+        commandWindowScope.addLambdaCommand(Shortcut.noModifier(Keys.ESCAPE), new Command.RunCallback() {
+            @Override
+            public void run() {
+                hide(true);
+            }
+        });
+
+        addListener(new CommandListener(commandWindowScope));
         setVisible(false);
     }
 

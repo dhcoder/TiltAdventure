@@ -48,6 +48,13 @@ public final class CommandScope {
         parentScope.children.add(this);
     }
 
+    /**
+     * Convenience method to create a lightweight, unnamed {@link Command}
+     */
+    public Command addLambdaCommand(final Shortcut shortcut, final Command.RunCallback runCallback) {
+        return new Command(this, runCallback).setShortcut(shortcut);
+    }
+
     public boolean isTopLevel() {
         return !parentOpt.hasValue();
     }
@@ -116,6 +123,9 @@ public final class CommandScope {
         return !isWhitespace(fullName) ? format("{0}: {1}", fullName, command.getName()) : command.getName();
     }
 
+    /**
+     * Internal method. Users should call {@link Command#setShortcut(Shortcut)} instead.
+     */
     void setShortcut(final Shortcut shortcut, final Command command) {
         assertValid(command);
         if (shortcutCommandsMap.containsKey(shortcut)) {
@@ -129,7 +139,7 @@ public final class CommandScope {
     }
 
     /**
-     * Get the shortcut registered with the target command (if any)
+     * Internal method. Users should call {@link Command#getShortcutOpt()} instead.
      */
     Opt<Shortcut> getShortcutOpt(final Command command) {
         assertValid(command);

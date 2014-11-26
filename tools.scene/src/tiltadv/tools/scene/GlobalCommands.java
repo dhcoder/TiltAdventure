@@ -4,13 +4,17 @@ import com.badlogic.gdx.Gdx;
 import dhcoder.libgdx.tool.command.Command;
 import dhcoder.libgdx.tool.command.CommandManager;
 import dhcoder.libgdx.tool.command.CommandScope;
-import dhcoder.libgdx.tool.widget.CommandWindow;
+import dhcoder.libgdx.tool.scene2d.widget.CommandWindow;
 
 /**
  * Commands that should get executed anytime.
  */
 public final class GlobalCommands {
 
+    public final CommandScope globalScope;
+    public final CommandScope helpScope;
+    public final CommandScope fileScope;
+    public final CommandScope editScope;
     public final Command showCommandWindow;
     public final Command newScene;
     public final Command closeScene;
@@ -20,10 +24,10 @@ public final class GlobalCommands {
     public final Command listAllCommands;
 
     public GlobalCommands(final SceneTool sceneTool, final CommandManager commandManager) {
-        CommandScope globalScope = new CommandScope();
-        CommandScope helpScope = new CommandScope("Help", globalScope);
-        CommandScope fileScope = new CommandScope("File", globalScope);
-        CommandScope editScope = new CommandScope("Edit", globalScope);
+        globalScope = new CommandScope();
+        helpScope = new CommandScope("Help", globalScope);
+        fileScope = new CommandScope("File", globalScope);
+        editScope = new CommandScope("Edit", globalScope);
 
         showCommandWindow = commandManager.register(
             new Command("show_command_window", globalScope, "Show Command Window",
