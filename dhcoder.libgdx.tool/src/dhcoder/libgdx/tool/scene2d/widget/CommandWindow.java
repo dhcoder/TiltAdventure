@@ -1,12 +1,15 @@
 package dhcoder.libgdx.tool.scene2d.widget;
 
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import dhcoder.libgdx.tool.command.Command;
 import dhcoder.libgdx.tool.command.CommandManager;
 import dhcoder.libgdx.tool.command.CommandScope;
@@ -20,6 +23,11 @@ import java.util.regex.Pattern;
 
 /**
  * A modal dialog which can search through all actions registered with the current tool.
+ *
+ * Requires the following font styles:
+ *   - bold
+ *   - default
+ *   - italic-xs
  */
 public final class CommandWindow extends Table {
     public static final int MAX_COMMAND_COUNT = 30;
@@ -37,12 +45,12 @@ public final class CommandWindow extends Table {
         searchText = new TextField("", skin);
         commandsTable = new Table();
         commandsPane = new ScrollPane(commandsTable, skin);
+        commandsPane.setFadeScrollBars(false);
         commandsPane.setVisible(false);
 
         add(searchText).expandX().fillX();
         row();
-//        add(commandsPane).expand().maxHeight(80f).fill().top();
-        add(commandsPane).expand().fillX().top().maxHeight(30f);
+        add(commandsPane).expand().fillX().maxHeight(400f).top();
 
         allCommandsSorted = commandManager.searchableCommands();
         allCommandsSorted.sort(new Comparator<Command>() {
@@ -120,6 +128,7 @@ public final class CommandWindow extends Table {
     public void show() {
         lastFocus = getStage().getKeyboardFocus();
         getStage().setKeyboardFocus(searchText);
+        getStage().setScrollFocus(commandsPane);
         setVisible(true);
         matchedCommands = allCommandsSorted;
         selectedCommandIndex = 0;
@@ -130,6 +139,7 @@ public final class CommandWindow extends Table {
         if (restoreFocus) {
             getStage().setKeyboardFocus(lastFocus);
         }
+        getStage().setScrollFocus(null);
         commandsTable.clearChildren();
         searchText.setText("");
         lastFocus = null;
@@ -141,20 +151,59 @@ public final class CommandWindow extends Table {
 
         int commandCount = Math.min(MAX_COMMAND_COUNT, matchedCommands.size());
         for (int i = 0; i < commandCount; i++) {
-            Command command = matchedCommands.get(i);
-            Label commandLabel =
+            if (i > 0) {
+                commandsTable.row();
+            }
+
+            final Command command = matchedCommands.get(i);
+            final Label commandLabel =
                 new Label(getFormattedCommandName(command), skin, i == selectedCommandIndex ? "bold" : "default");
             commandLabel.setEllipse(true);
+            final Color defaultColor = commandLabel.getColor().cpy();
+            commandLabel.setColor(defaultColor);
+            commandLabel.addListener(new ClickListener() {
+                @Override
+                public boolean touchDown(final InputEvent event, final float x, final float y, final int pointer,
+                    final int button) {
+                    command.run();
+                    hide(false);
+                    return true;
+                }
+
+                @Override
+                public void enter(final InputEvent event, final float x, final float y, final int pointer,
+                    final Actor fromActor) {
+                    commandLabel.setColor(Color.YELLOW);
+                }
+
+                @Override
+                public void exit(final InputEvent event, final float x, final float y, final int pointer,
+                    final Actor toActor) {
+                    commandLabel.setColor(defaultColor);
+                }
+            });
             commandsTable.add(commandLabel).expandX().fillX().pad(0f, 10f, 0f, 10f);
 
             if (command.getShortcutOpt().hasValue()) {
                 Label shortcutLabel = new Label(command.getShortcutOpt().getValue().toString(), skin, "italic-xs");
                 commandsTable.add(shortcutLabel).pad(0f, 0f, 0f, 10f);
             }
-            commandsTable.row();
         }
 
         if (commandCount > 0) {
+            // Ensure the current command is visible
+            float rowHeight = commandsTable.getHeight() / commandCount;
+            float ensureVisibleLowerY = rowHeight * selectedCommandIndex;
+            float ensureVisibleUpperY = ensureVisibleLowerY + rowHeight;
+
+            if (commandsPane.getScrollY() >= ensureVisibleLowerY) {
+                // Scroll UP to the active command
+                commandsPane.setScrollY(ensureVisibleLowerY);
+            }
+            else if (commandsPane.getScrollY() + commandsPane.getScrollHeight() <= ensureVisibleLowerY) {
+                // Scroll DOWN to the active command
+                commandsPane.setScrollY(ensureVisibleUpperY - commandsPane.getScrollHeight());
+            }
             commandsPane.setVisible(true);
         }
     }
