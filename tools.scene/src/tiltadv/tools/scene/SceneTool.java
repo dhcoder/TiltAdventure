@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import dhcoder.libgdx.tool.command.CommandManager;
 import dhcoder.libgdx.tool.command.serialization.ShortcutsLoader;
 import dhcoder.libgdx.tool.scene2d.CommandListener;
+import dhcoder.libgdx.tool.scene2d.widget.CommandTree;
 import dhcoder.libgdx.tool.scene2d.widget.CommandWindow;
 import dhcoder.support.opt.Opt;
 
@@ -29,9 +30,14 @@ public final class SceneTool extends ApplicationAdapter {
     private Skin skin;
     private GlobalCommands globalCommands;
     private CommandWindow commandWindow;
+    private CommandTree commandTree;
 
     public CommandWindow getCommandWindow() {
         return commandWindow;
+    }
+
+    public CommandTree getCommandTree() {
+        return commandTree;
     }
 
     public GlobalCommands getGlobalCommands() {
@@ -64,7 +70,12 @@ public final class SceneTool extends ApplicationAdapter {
         stage.addActor(commandWindowTable);
 
         commandWindow = new CommandWindow(commandManager, skin);
+        commandWindow.setVisible(false);
         commandWindowTable.add(commandWindow).expandY().fillY().width(400f).fillX().top().pad(20f, 0f, 0f, 0f);
+
+        commandTree = new CommandTree(commandManager, skin);
+        commandTree.setVisible(false);
+        stage.addActor(commandTree);
 
         stage.addListener(new CommandListener(globalCommands.globalScope));
     }

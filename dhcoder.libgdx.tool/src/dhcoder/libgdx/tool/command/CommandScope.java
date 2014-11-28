@@ -27,23 +27,23 @@ public final class CommandScope {
     private final ArrayMap<Shortcut, Command> shortcutCommandsMap = new ArrayMap<Shortcut, Command>(EXPECTED_SIZE);
     private final ArrayMap<String, Shortcut> idShortcutsMap = new ArrayMap<String, Shortcut>(EXPECTED_SIZE);
 
-    public CommandScope() {
-        this("");
-    }
-
     public CommandScope(final String name) {
-        this.name = name;
-        fullName = name;
-    }
-
-    public CommandScope(final CommandScope parentScope) {
-        this("", parentScope);
+        this(name, false);
     }
 
     public CommandScope(final String name, final CommandScope parentScope) {
+        this(name, parentScope, false);
+    }
+
+    public CommandScope(final String name, final boolean excludeFullName) {
+        this.name = name;
+        this.fullName = excludeFullName ? "" : name;
+    }
+
+    public CommandScope(final String name, final CommandScope parentScope, final boolean excludeFullName) {
         parentOpt.set(parentScope);
         this.name = name;
-        this.fullName = buildFullName();
+        this.fullName = excludeFullName ? parentScope.getFullName() : buildFullName();
 
         parentScope.children.add(this);
     }
@@ -156,15 +156,13 @@ public final class CommandScope {
     }
 
     private String buildFullName() {
-        StringBuilder fullNameBuilder = new StringBuilder(name);
-        CommandScope currentScope = this;
-        while (currentScope.parentOpt.hasValue()) {
-            currentScope = currentScope.parentOpt.getValue();
-            if (!currentScope.name.isEmpty()) {
-                fullNameBuilder.insert(0, '.');
-                fullNameBuilder.insert(0, currentScope.name);
-            }
+        if (!parentOpt.hasValue() || parentOpt.getValue().fullName.isEmpty()) {
+            return name;
         }
+
+        StringBuilder fullNameBuilder = new StringBuilder(name);
+        fullNameBuilder.insert(0, '.');
+        fullNameBuilder.insert(0, parentOpt.getValue().fullName);
         return fullNameBuilder.toString();
     }
 }

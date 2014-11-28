@@ -81,7 +81,7 @@ public final class CommandWindow extends Table {
             }
         });
 
-        CommandScope commandWindowScope = new CommandScope();
+        CommandScope commandWindowScope = new CommandScope("CommandWindow");
         commandWindowScope.addLambdaCommand(Shortcut.noModifier(Keys.UP), new Command.RunCallback() {
             @Override
             public void run() {
@@ -123,7 +123,6 @@ public final class CommandWindow extends Table {
         });
 
         addListener(new CommandListener(commandWindowScope));
-        setVisible(false);
     }
 
     public void show() {
@@ -187,7 +186,7 @@ public final class CommandWindow extends Table {
 
             if (command.getShortcutOpt().hasValue()) {
                 Label shortcutLabel = new Label(command.getShortcutOpt().getValue().toString(), skin, "italic-xs");
-                commandsTable.add(shortcutLabel).pad(0f, 0f, 0f, 10f);
+                commandsTable.add(shortcutLabel).pad(0f, 0f, 0f, 10f).right();
             }
         }
 

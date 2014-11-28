@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import dhcoder.libgdx.tool.command.Command;
 import dhcoder.libgdx.tool.command.CommandManager;
 import dhcoder.libgdx.tool.command.CommandScope;
+import dhcoder.libgdx.tool.scene2d.widget.CommandTree;
 import dhcoder.libgdx.tool.scene2d.widget.CommandWindow;
 
 /**
@@ -24,7 +25,7 @@ public final class GlobalCommands {
     public final Command listAllCommands;
 
     public GlobalCommands(final SceneTool sceneTool, final CommandManager commandManager) {
-        globalScope = new CommandScope();
+        globalScope = new CommandScope("Global");
         helpScope = new CommandScope("Help", globalScope);
         fileScope = new CommandScope("File", globalScope);
         editScope = new CommandScope("Edit", globalScope);
@@ -82,11 +83,12 @@ public final class GlobalCommands {
             }));
 
         listAllCommands = commandManager.register(
-            new Command("list_all_commands", helpScope, "List All Commands", "Shows all actions in a window",
+            new Command("toggle_command_tree", helpScope, "Show/Hide Command Tree", "Toggles the command tree window",
                 new Command.RunCallback() {
                     @Override
                     public void run() {
-
+                        CommandTree commandTree = sceneTool.getCommandTree();
+                        commandTree.setVisible(!commandTree.isVisible());
                     }
                 }));
     }

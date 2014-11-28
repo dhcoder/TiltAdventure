@@ -7,6 +7,19 @@
     {
       "shortcut": "Ctrl+N",
       "commandId": "new_scene"
+    },
+    {
+      "shortcut": "Ctrl+Z",
+      "commandId": "undo"
+    },
+    {
+      "shortcut": "Ctrl+Shift+Z",
+      "commandId": "redo"
+    },
+    {
+      "shortcut": "Ctrl+Q",
+      "commandId": "exit"
     }
+
   ]
 }

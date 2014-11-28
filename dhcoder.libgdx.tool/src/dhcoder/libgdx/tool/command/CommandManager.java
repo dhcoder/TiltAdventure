@@ -113,8 +113,6 @@ public final class CommandManager {
     }
 
     /**
-     * Return all commands registered with this command manager that fall under the passed in scopes.
-     */
     public List<Command> scopedCommands(final CommandScope... scopes) {
         for (int i = 0; i < scopes.length; i++) {
             for (int j = i + 1; j < scopes.length; j++) {
@@ -136,19 +134,32 @@ public final class CommandManager {
         }
 
         return scopedCommands;
-    }
+    }*/
 
     public boolean handle(final Shortcut shortcut) {
-        List<CommandScope> scopes = scopedCommandsMap.getKeys();
-        for (CommandScope scope : scopes) {
-            if (scope.isTopLevel()) {
-                if (scope.handle(shortcut)) {
-                    return true;
-                }
+        for (CommandScope scope : getCommandScopes()) {
+            if (scope.handle(shortcut)) {
+                return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * Return all top-level command scopes registered with this command manager.
+     *
+     * This generates a new list copy each time so you may wish to cache it.
+     */
+    public List<CommandScope> getCommandScopes() {
+        List<CommandScope> allScopes = scopedCommandsMap.getKeys();
+        List<CommandScope> topLevelScopes = new ArrayList<CommandScope>(allScopes.size());
+        for (CommandScope scope : allScopes) {
+            if (scope.isTopLevel()) {
+                topLevelScopes.add(scope);
+            }
+        }
+        return topLevelScopes;
     }
 
     private void addToScope(final CommandScope scope, final Command command) {
