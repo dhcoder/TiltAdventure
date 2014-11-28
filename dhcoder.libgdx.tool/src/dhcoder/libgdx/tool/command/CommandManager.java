@@ -5,7 +5,6 @@ import dhcoder.support.opt.Opt;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import static dhcoder.support.text.StringUtils.format;
@@ -103,13 +102,13 @@ public final class CommandManager {
     }
 
     public List<Command> searchableCommands() {
-        List<Command> searchableCommands = allCommands();
-        searchableCommands.removeIf(new Predicate<Command>() {
-            @Override
-            public boolean test(final Command command) {
-                return command.isExcludedFromSearch();
+        List<Command> allCommands = allCommands();
+        List<Command> searchableCommands = new ArrayList<Command>(allCommands.size());
+        for (Command command : allCommands) {
+            if (!command.isExcludedFromSearch()) {
+                searchableCommands.add(command);
             }
-        });
+        }
         return searchableCommands;
     }
 

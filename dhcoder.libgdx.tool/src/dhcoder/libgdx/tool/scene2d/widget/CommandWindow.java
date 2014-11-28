@@ -17,6 +17,7 @@ import dhcoder.libgdx.tool.command.Shortcut;
 import dhcoder.libgdx.tool.scene2d.CommandListener;
 import dhcoder.support.text.StringUtils;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -53,7 +54,7 @@ public final class CommandWindow extends Table {
         add(commandsPane).expand().fillX().maxHeight(400f).top();
 
         allCommandsSorted = commandManager.searchableCommands();
-        allCommandsSorted.sort(new Comparator<Command>() {
+        Collections.sort(allCommandsSorted, new Comparator<Command>() {
             @Override
             public int compare(final Command o1, final Command o2) {
                 return o1.getFullName().compareTo(o2.getFullName());
