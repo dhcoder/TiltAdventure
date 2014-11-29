@@ -60,8 +60,11 @@ public final class CommandManager {
     private final ArrayMap<String, Command> commandIdsMap = new ArrayMap<String, Command>();
     private final Array<CommandScope> commandScopes = new Array<CommandScope>();
 
+    /**
+     * Register a {@link CommandScope} with this command manager. You should do this after you've registered all
+     * commands with the scope.
+     */
     public void register(final CommandScope scope) {
-
         if (!scope.isTopLevel()) {
             throw new IllegalArgumentException(
                 format("Can't register scope {0} which isn't at the top-level", scope.getFullName()));

@@ -88,6 +88,5 @@ public final class GlobalCommands {
                 });
 
         commandManager.register(globalScope);
-
     }
 }
