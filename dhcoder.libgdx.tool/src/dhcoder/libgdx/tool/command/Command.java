@@ -48,6 +48,8 @@ public final class Command {
         this.scope = scope;
 
         this.fullName = scope.getScopedName(this);
+
+        scope.addCommand(this);
     }
 
     /**

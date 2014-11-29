@@ -27,31 +27,31 @@ public final class CommandTree extends Window {
         ScrollPane treePane = new ScrollPane(tree, skin);
         add(treePane).expand().fill();
 
-        for (CommandScope commandScope : commandManager.getCommandScopes()) {
-            newScopeNode(tree, commandScope);
-        }
-
-
-        while (!commandScopes.isEmpty()) {
-            CommandScope activeScope = commandScopes.pop();
-            Node scopeNode = new Node(new Label(activeScope.getName(), skin));
-            if (ancestorNodes.isEmpty()) {
-                tree.add(scopeNode);
-            }
-            else {
-                ancestorNodes.peek().add(scopeNode);
-            }
-
-            ancestorNodes.push(scopeNode);
-
-            for (CommandScope childScope : activeScope.getChildren()) {
-                commandScopes.push(childScope);
-            }
-        }
-
-
-
-
+//        for (CommandScope commandScope : commandManager.getCommandScopes()) {
+//            newScopeNode(tree, commandScope);
+//        }
+//
+//
+//        while (!commandScopes.isEmpty()) {
+//            CommandScope activeScope = commandScopes.pop();
+//            Node scopeNode = new Node(new Label(activeScope.getName(), skin));
+//            if (ancestorNodes.isEmpty()) {
+//                tree.add(scopeNode);
+//            }
+//            else {
+//                ancestorNodes.peek().add(scopeNode);
+//            }
+//
+//            ancestorNodes.push(scopeNode);
+//
+//            for (CommandScope childScope : activeScope.getChildren()) {
+//                commandScopes.push(childScope);
+//            }
+//        }
+//
+//
+//
+//
 //        tree.add(new Tree.Node(new Label("TEST", skin)));
 //        Tree.Node node = new Tree.Node(new Label("PARENT", skin));
 //        tree.add(node);

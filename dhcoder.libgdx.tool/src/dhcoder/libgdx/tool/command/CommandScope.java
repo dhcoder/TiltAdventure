@@ -1,5 +1,6 @@
 package dhcoder.libgdx.tool.command;
 
+import com.badlogic.gdx.utils.Array;
 import dhcoder.support.collection.ArrayMap;
 import dhcoder.support.opt.Opt;
 import dhcoder.support.text.StringUtils;
@@ -24,6 +25,7 @@ public final class CommandScope {
     private final List<CommandScope> children = new ArrayList<CommandScope>(0);
     private final String name;
     private final String fullName;
+    private final Array<Command> commands = new Array<Command>();
     private final ArrayMap<Shortcut, Command> shortcutCommandsMap = new ArrayMap<Shortcut, Command>(EXPECTED_SIZE);
     private final ArrayMap<String, Shortcut> idShortcutsMap = new ArrayMap<String, Shortcut>(EXPECTED_SIZE);
 
@@ -46,6 +48,10 @@ public final class CommandScope {
         this.fullName = excludeFullName ? parentScope.getFullName() : buildFullName();
 
         parentScope.children.add(this);
+    }
+
+    void addCommand(final Command command) {
+        commands.add(command);
     }
 
     /**
@@ -117,6 +123,10 @@ public final class CommandScope {
     @Override
     public String toString() {
         return (!fullName.isEmpty() ? fullName : "<ROOT>");
+    }
+
+    public Array<Command> getCommands() {
+        return commands;
     }
 
     String getScopedName(final Command command) {

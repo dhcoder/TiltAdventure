@@ -1,12 +1,15 @@
 package dhcoder.libgdx.tool.command;
 
+import com.badlogic.gdx.utils.Array;
 import dhcoder.support.collection.ArrayMap;
 import dhcoder.support.opt.Opt;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 import java.util.regex.Pattern;
 
+import static dhcoder.libgdx.collection.CollectionUtils.toArrayList;
 import static dhcoder.support.text.StringUtils.format;
 import static dhcoder.support.text.StringUtils.isWhitespace;
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
@@ -16,8 +19,6 @@ import static java.util.regex.Pattern.CASE_INSENSITIVE;
  * searching.
  */
 public final class CommandManager {
-    private static final int EXPECTED_COUNT = 100;
-
     /**
      * Given a query like "zyar", return a pattern that matches values like "fu(z)z(y)Se(ar)ch".
      *
@@ -56,32 +57,38 @@ public final class CommandManager {
         return matchingCommands;
     }
 
-    private final ArrayMap<String, Command> commandIdsMap = new ArrayMap<String, Command>(EXPECTED_COUNT);
-    private final ArrayMap<CommandScope, ArrayList<Command>> scopedCommandsMap =
-        new ArrayMap<CommandScope, ArrayList<Command>>();
+    private final ArrayMap<String, Command> commandIdsMap = new ArrayMap<String, Command>();
+    private final Array<CommandScope> commandScopes = new Array<CommandScope>();
 
-    public Command register(final Command command) {
-        if (isWhitespace(command.getId())) {
-            throw new IllegalArgumentException("Attempting to register a lightweight (ID-less) command");
-        }
+    public void register(final CommandScope scope) {
 
-        if (commandIdsMap.containsKey(command.getId())) {
+        if (!scope.isTopLevel()) {
             throw new IllegalArgumentException(
-                format("Duplicate command, id={0}, name={1}", command.getId(), command.getName()));
+                format("Can't register scope {0} which isn't at the top-level", scope.getFullName()));
         }
 
-        commandIdsMap.put(command.getId(), command);
+        Stack<CommandScope> scopeStack = new Stack<CommandScope>();
+        scopeStack.add(scope);
 
-        CommandScope currentScope = command.getScope();
-        while (true) {
-            addToScope(currentScope, command);
-            if (currentScope.isTopLevel()) {
-                break;
+        while (!scopeStack.isEmpty()) {
+            CommandScope activeScope = scopeStack.pop();
+            scopeStack.addAll(activeScope.getChildren());
+
+            for (Command command : activeScope.getCommands()) {
+                if (command.getId().isEmpty()) {
+                    continue;
+                }
+
+                if (commandIdsMap.containsKey(command.getId())) {
+                    throw new IllegalArgumentException(
+                        format("Duplicate command, id={0}, name={1}", command.getId(), command.getName()));
+                }
+
+                commandIdsMap.put(command.getId(), command);
             }
-            currentScope = currentScope.getParent();
         }
 
-        return command;
+        commandScopes.add(scope);
     }
 
     public void excludeFromSearch(final Command command) {
@@ -112,30 +119,6 @@ public final class CommandManager {
         return searchableCommands;
     }
 
-    /**
-    public List<Command> scopedCommands(final CommandScope... scopes) {
-        for (int i = 0; i < scopes.length; i++) {
-            for (int j = i + 1; j < scopes.length; j++) {
-                if (scopes[i].isRelatedTo(scopes[j])) {
-                    throw new IllegalArgumentException(
-                        format("Redundant scopes {0} and {1} requested", scopes[i], scopes[j]));
-                }
-            }
-        }
-
-        ArrayList<Command> scopedCommands = new ArrayList<Command>();
-
-        Opt<ArrayList<Command>> scopedCommandsOpt = Opt.withNoValue();
-        for (CommandScope scope : scopes) {
-            scopedCommandsMap.get(scope, scopedCommandsOpt);
-            if (scopedCommandsOpt.hasValue()) {
-                scopedCommands.addAll(scopedCommandsOpt.getValue());
-            }
-        }
-
-        return scopedCommands;
-    }*/
-
     public boolean handle(final Shortcut shortcut) {
         for (CommandScope scope : getCommandScopes()) {
             if (scope.handle(shortcut)) {
@@ -148,36 +131,10 @@ public final class CommandManager {
 
     /**
      * Return all top-level command scopes registered with this command manager.
-     *
+     * <p/>
      * This generates a new list copy each time so you may wish to cache it.
      */
     public List<CommandScope> getCommandScopes() {
-        List<CommandScope> allScopes = scopedCommandsMap.getKeys();
-        List<CommandScope> topLevelScopes = new ArrayList<CommandScope>(allScopes.size());
-        for (CommandScope scope : allScopes) {
-            if (scope.isTopLevel()) {
-                topLevelScopes.add(scope);
-            }
-        }
-        return topLevelScopes;
-    }
-
-    private void addToScope(final CommandScope scope, final Command command) {
-        if (!command.getScope().isDescendantOf(scope)) {
-            throw new IllegalArgumentException(
-                format("Command with scope {0} can't be associated with scope {1}", command.getScope(), scope));
-        }
-
-        ArrayList<Command> scopedCommands;
-        Opt<ArrayList<Command>> scopedCommandsOpt = Opt.withNoValue();
-        scopedCommandsMap.get(scope, scopedCommandsOpt);
-        if (scopedCommandsOpt.hasValue()) {
-            scopedCommands = scopedCommandsOpt.getValue();
-        }
-        else {
-            scopedCommands = new ArrayList<Command>(EXPECTED_COUNT / CommandScope.EXPECTED_SIZE);
-            scopedCommandsMap.put(scope, scopedCommands);
-        }
-        scopedCommands.add(command);
+        return toArrayList(commandScopes);
     }
 }
