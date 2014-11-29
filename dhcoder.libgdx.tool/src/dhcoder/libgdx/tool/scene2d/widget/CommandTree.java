@@ -25,33 +25,14 @@ public final class CommandTree extends Window {
 
         Tree tree = new Tree(skin);
         ScrollPane treePane = new ScrollPane(tree, skin);
+        treePane.setFadeScrollBars(false);
         add(treePane).expand().fill();
 
-//        for (CommandScope commandScope : commandManager.getCommandScopes()) {
-//            newScopeNode(tree, commandScope);
-//        }
-//
-//
-//        while (!commandScopes.isEmpty()) {
-//            CommandScope activeScope = commandScopes.pop();
-//            Node scopeNode = new Node(new Label(activeScope.getName(), skin));
-//            if (ancestorNodes.isEmpty()) {
-//                tree.add(scopeNode);
-//            }
-//            else {
-//                ancestorNodes.peek().add(scopeNode);
-//            }
-//
-//            ancestorNodes.push(scopeNode);
-//
-//            for (CommandScope childScope : activeScope.getChildren()) {
-//                commandScopes.push(childScope);
-//            }
-//        }
-//
-//
-//
-//
+        TreeNodeAdder treeNodeAdder = new TreeNodeAdder(tree);
+        for (CommandScope commandScope : commandManager.getCommandScopes()) {
+            addScopeToTree(treeNodeAdder, commandScope, skin);
+        }
+
 //        tree.add(new Tree.Node(new Label("TEST", skin)));
 //        Tree.Node node = new Tree.Node(new Label("PARENT", skin));
 //        tree.add(node);
@@ -93,15 +74,18 @@ public final class CommandTree extends Window {
         }
     }
 
-    private void newScopeNode(final NodeAdder nodeAdder, final CommandScope commandScope, final Skin skin) {
-        Node node = createNodeFor(commandScope, skin);
-        nodeAdder.add(node);
+    private void addScopeToTree(final NodeAdder nodeAdder, final CommandScope commandScope, final Skin skin) {
+        Node scopeNode = createNodeFor(commandScope, skin);
+        nodeAdder.add(scopeNode);
 
-        ChildNodeAdder childAdder = new ChildNodeAdder(node);
-
+        ChildNodeAdder childAdder = new ChildNodeAdder(scopeNode);
+        for (Command command : commandScope.getCommands()) {
+            Node commandNode = createNodeFor(command, skin);
+            childAdder.add(commandNode);
+        }
 
         for (CommandScope childScope : commandScope.getChildren()) {
-            newScopeNode(childAdder, childScope, skin);
+            addScopeToTree(childAdder, childScope, skin);
         }
     }
 
