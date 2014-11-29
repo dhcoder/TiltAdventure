@@ -105,8 +105,8 @@ public final class CommandWindow extends Table {
             @Override
             public void run() {
                 final Command command = matchedCommands.get(selectedCommandIndex);
+                hide();
                 command.run();
-                hide(true);
             }
         }).setActiveCallback(new Command.ActiveCallback() {
             @Override
@@ -118,7 +118,7 @@ public final class CommandWindow extends Table {
         commandWindowScope.addLambdaCommand(Shortcut.noModifier(Keys.ESCAPE), new Command.RunCallback() {
             @Override
             public void run() {
-                hide(true);
+                hide();
             }
         });
 
@@ -134,11 +134,9 @@ public final class CommandWindow extends Table {
         selectedCommandIndex = 0;
     }
 
-    private void hide(final boolean restoreFocus) {
+    private void hide() {
         setVisible(false);
-        if (restoreFocus) {
-            getStage().setKeyboardFocus(lastFocus);
-        }
+        getStage().setKeyboardFocus(lastFocus);
         getStage().setScrollFocus(null);
         commandsTable.clearChildren();
         searchText.setText("");
@@ -165,8 +163,8 @@ public final class CommandWindow extends Table {
                 @Override
                 public boolean touchDown(final InputEvent event, final float x, final float y, final int pointer,
                     final int button) {
+                    hide();
                     command.run();
-                    hide(false);
                     return true;
                 }
 
@@ -196,11 +194,11 @@ public final class CommandWindow extends Table {
             float ensureVisibleLowerY = rowHeight * selectedCommandIndex;
             float ensureVisibleUpperY = ensureVisibleLowerY + rowHeight;
 
-            if (commandsPane.getScrollY() >= ensureVisibleLowerY) {
+            if (commandsPane.getScrollY() > ensureVisibleLowerY) {
                 // Scroll UP to the active command
                 commandsPane.setScrollY(ensureVisibleLowerY);
             }
-            else if (commandsPane.getScrollY() + commandsPane.getScrollHeight() <= ensureVisibleLowerY) {
+            else if (commandsPane.getScrollY() + commandsPane.getScrollHeight() < ensureVisibleLowerY) {
                 // Scroll DOWN to the active command
                 commandsPane.setScrollY(ensureVisibleUpperY - commandsPane.getScrollHeight());
             }
