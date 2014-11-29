@@ -15,6 +15,7 @@ import dhcoder.libgdx.tool.command.CommandManager;
 import dhcoder.libgdx.tool.command.CommandScope;
 import dhcoder.libgdx.tool.command.Shortcut;
 import dhcoder.libgdx.tool.scene2d.CommandListener;
+import dhcoder.libgdx.tool.scene2d.KeyboardRepeater;
 import dhcoder.support.text.StringUtils;
 
 import java.util.Collections;
@@ -36,6 +37,7 @@ public final class CommandWindow extends Table {
     private final ScrollPane commandsPane;
     private final TextField searchText;
     private final List<Command> allCommandsSorted;
+    private final KeyboardRepeater keyboardRepeater;
     private List<Command> matchedCommands;
     private int selectedCommandIndex;
     private Actor lastFocus;
@@ -122,6 +124,8 @@ public final class CommandWindow extends Table {
             }
         });
 
+        keyboardRepeater = new KeyboardRepeater(this);
+        addListener(keyboardRepeater);
         addListener(new CommandListener(commandWindowScope));
     }
 
@@ -136,6 +140,7 @@ public final class CommandWindow extends Table {
 
     private void hide() {
         setVisible(false);
+        keyboardRepeater.cancel();
         getStage().setKeyboardFocus(lastFocus);
         getStage().setScrollFocus(null);
         commandsTable.clearChildren();
