@@ -26,9 +26,9 @@ public final class GlobalCommands {
 
     public GlobalCommands(final SceneTool sceneTool, final CommandManager commandManager) {
         globalScope = new CommandScope("Global", true);
-        helpScope = new CommandScope("Help", globalScope);
         fileScope = new CommandScope("File", globalScope);
         editScope = new CommandScope("Edit", globalScope);
+        helpScope = new CommandScope("Help", globalScope);
 
         showCommandWindow = new Command("show_command_window", globalScope, "Show Command Window",
             "Opens the Command Window which allows for searching all commands", new Command.RunCallback() {

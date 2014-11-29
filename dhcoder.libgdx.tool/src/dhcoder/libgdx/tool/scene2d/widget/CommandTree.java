@@ -17,7 +17,7 @@ import dhcoder.libgdx.tool.command.CommandScope;
 public final class CommandTree extends Window {
 
     public CommandTree(final CommandManager commandManager, final Skin skin) {
-        super("Commands", skin);
+        super("Command Tree", skin);
         setResizable(true);
 
         setWidth(500f);
@@ -57,6 +57,7 @@ public final class CommandTree extends Window {
 
         @Override
         public void add(final Node node) {
+            node.setExpanded(true);
             tree.add(node);
         }
     }
@@ -79,13 +80,13 @@ public final class CommandTree extends Window {
         nodeAdder.add(scopeNode);
 
         ChildNodeAdder childAdder = new ChildNodeAdder(scopeNode);
+        for (CommandScope childScope : commandScope.getChildren()) {
+            addScopeToTree(childAdder, childScope, skin);
+        }
+
         for (Command command : commandScope.getCommands()) {
             Node commandNode = createNodeFor(command, skin);
             childAdder.add(commandNode);
-        }
-
-        for (CommandScope childScope : commandScope.getChildren()) {
-            addScopeToTree(childAdder, childScope, skin);
         }
     }
 
