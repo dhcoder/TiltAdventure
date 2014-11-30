@@ -1,7 +1,6 @@
-package tiltadv.tools.scene;
+package tiltadv.tools.scene.forms;
 
-import com.intellij.uiDesigner.core.GridConstraints;
-import com.intellij.uiDesigner.core.GridLayoutManager;
+import tiltadv.tools.scene.GlobalCommands;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,10 +10,15 @@ import static dhcoder.support.text.StringUtils.format;
 /**
  * Panel which we show the user when the application first runs. It will contain useful tips to get someone started.
  */
-public final class FirstRunPanel extends JPanel {
+public final class FirstRunForm {
     private JLabel labelCommandWindow;
+    private JPanel panelRoot;
 
-    public FirstRunPanel(final GlobalCommands globalCommands) {
+    public JPanel getPanelRoot() {
+        return panelRoot;
+    }
+
+    public FirstRunForm(final GlobalCommands globalCommands) {
         super();
         labelCommandWindow.setText(format("<html>Press <b>{0}</b> to open the command window</html>",
             globalCommands.showCommandWindow.getShortcutOpt().getValue()));
@@ -35,12 +39,16 @@ public final class FirstRunPanel extends JPanel {
      * @noinspection ALL
      */
     private void $$$setupUI$$$() {
-        final JPanel panel1 = new JPanel();
-        panel1.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        panelRoot = new JPanel();
+        panelRoot.setLayout(new BorderLayout(0, 0));
         labelCommandWindow = new JLabel();
+        labelCommandWindow.setHorizontalAlignment(0);
         labelCommandWindow.setText("(command window help text)");
-        panel1.add(labelCommandWindow,
-            new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE,
-                GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelRoot.add(labelCommandWindow, BorderLayout.CENTER);
     }
+
+    /**
+     * @noinspection ALL
+     */
+    public JComponent $$$getRootComponent$$$() { return panelRoot; }
 }

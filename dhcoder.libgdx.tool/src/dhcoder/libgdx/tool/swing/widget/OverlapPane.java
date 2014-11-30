@@ -14,11 +14,13 @@ public final class OverlapPane extends JLayeredPane implements ComponentListener
 
     public OverlapPane() {
         super();
+        setLayout(null);
         addComponentListener(this);
     }
 
     public void addComponent(final JComponent component) {
         components.add(component);
+        component.setBounds(0, 0, getWidth(), getHeight());
         add(component, components.size());
     }
 

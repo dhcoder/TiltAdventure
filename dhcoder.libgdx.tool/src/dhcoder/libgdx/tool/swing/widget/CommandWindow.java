@@ -10,6 +10,12 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -18,7 +24,7 @@ import java.util.regex.Pattern;
 /**
  * A widget which can search through all actions registered with the current tool.
  */
-public final class CommandWindow extends JPanel {
+public final class CommandWindow extends JDialog {
     public static final int MAX_COMMAND_COUNT = 30;
 
     private JTextField textSearch;
@@ -30,14 +36,51 @@ public final class CommandWindow extends JPanel {
     private List<Command> matchedCommands;
     private int selectedCommandIndex;
 
-    public CommandWindow(final CommandManager commandManager) {
-        super();
+    public CommandWindow(final Frame owner, final CommandManager commandManager) {
+        super(owner);
 
         allCommandsSorted = commandManager.searchableCommands();
         Collections.sort(allCommandsSorted, new Comparator<Command>() {
             @Override
             public int compare(final Command o1, final Command o2) {
                 return o1.getFullName().compareTo(o2.getFullName());
+            }
+        });
+        matchedCommands = allCommandsSorted;
+
+        setContentPane(panelRoot);
+        setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+        setUndecorated(true);
+
+        this.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(final ComponentEvent componentEvent) {
+                textSearch.setText("");
+                textSearch.grabFocus();
+                rebuildCommandsList();
+            }
+        });
+
+        this.addWindowFocusListener(new WindowFocusListener() {
+            @Override
+            public void windowGainedFocus(WindowEvent e) {
+                //do nothing
+            }
+
+            @Override
+            public void windowLostFocus(WindowEvent e) {
+                if (SwingUtilities.isDescendingFrom(e.getOppositeWindow(), CommandWindow.this)) {
+                    return;
+                }
+                setVisible(false);
+            }
+        });
+
+        textSearch.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "close");
+        textSearch.getActionMap().put("close", new AbstractAction() {
+            @Override
+            public void actionPerformed(final ActionEvent actionEvent) {
+                setVisible(false);
             }
         });
 
@@ -112,7 +155,7 @@ public final class CommandWindow extends JPanel {
     private void rebuildCommandsList() {
         listCommands.removeAll();
 
-        DefaultListModel<Command> commandsListModel = new DefaultListModel<Command>();
+        DefaultListModel commandsListModel = new DefaultListModel();
         int commandCount = Math.min(MAX_COMMAND_COUNT, matchedCommands.size());
         for (int i = 0; i < commandCount; i++) {
             commandsListModel.addElement(matchedCommands.get(i));
@@ -145,7 +188,8 @@ public final class CommandWindow extends JPanel {
 
         String name = command.getFullName();
         // Allocate extra for <html></html> and <b></b>
-        StringBuilder stringBuilder = new StringBuilder(name.length() + 13 + 7 * query.length());
+        int maxLength = name.length() + 13 + 7 * query.length();
+        StringBuilder stringBuilder = new StringBuilder(maxLength);
         stringBuilder.append("<html>");
 
         boolean inBoldSection = false;
@@ -193,6 +237,7 @@ public final class CommandWindow extends JPanel {
 
         stringBuilder.append("</html>");
 
+        assert stringBuilder.toString().length() <= maxLength;
         return stringBuilder.toString();
     }
 
