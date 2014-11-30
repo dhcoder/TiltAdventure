@@ -5,7 +5,7 @@ import dhcoder.libgdx.tool.command.Command;
 import dhcoder.libgdx.tool.command.CommandManager;
 import dhcoder.libgdx.tool.command.CommandScope;
 import dhcoder.libgdx.tool.scene2d.widget.CommandTree;
-import dhcoder.libgdx.tool.scene2d.widget.CommandWindow;
+import dhcoder.libgdx.tool.swing.widget.CommandWindow;
 
 /**
 * Commands that should get executed anytime.
@@ -35,7 +35,9 @@ public final class GlobalCommands {
             @Override
             public void run() {
                 final CommandWindow commandWindow = sceneTool.getCommandWindow();
-                commandWindow.show();
+                commandWindow.setVisible(true);
+//                final CommandWindow commandWindow = sceneTool.getCommandWindow();
+//                commandWindow.show();
             }
         });
         commandManager.excludeFromSearch(showCommandWindow);

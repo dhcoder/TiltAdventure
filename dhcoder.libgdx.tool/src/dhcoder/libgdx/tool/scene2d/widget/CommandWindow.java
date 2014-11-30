@@ -36,8 +36,8 @@ public final class CommandWindow extends Table {
     private final Table commandsTable;
     private final ScrollPane commandsPane;
     private final TextField searchText;
-    private final List<Command> allCommandsSorted;
     private final KeyboardRepeater keyboardRepeater;
+    private final List<Command> allCommandsSorted;
     private List<Command> matchedCommands;
     private int selectedCommandIndex;
     private Actor lastFocus;
