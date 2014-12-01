@@ -35,9 +35,8 @@ public final class GlobalCommands {
             @Override
             public void run() {
                 final CommandWindow commandWindow = sceneTool.getCommandWindow();
+                commandWindow.setLocationRelativeTo(sceneTool);
                 commandWindow.setVisible(true);
-//                final CommandWindow commandWindow = sceneTool.getCommandWindow();
-//                commandWindow.show();
             }
         });
         commandManager.excludeFromSearch(showCommandWindow);

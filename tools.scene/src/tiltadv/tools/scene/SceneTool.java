@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Json;
 import dhcoder.tool.command.CommandManager;
 import dhcoder.tool.command.Shortcut;
 import dhcoder.tool.libgdx.serialization.ShortcutsLoader;
+import dhcoder.tool.swing.command.CommandListener;
 import dhcoder.tool.swing.command.SwingKeyNameProvider;
 import dhcoder.tool.swing.widget.CommandWindow;
 import dhcoder.tool.swing.widget.OverlapPane;
@@ -15,8 +16,6 @@ import tiltadv.tools.scene.serialization.SettingsLoader.AppSettings;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 
 /**
  * Main class for the scene tool. Acts as a collection of all high level UI elements and components, as well
@@ -88,15 +87,17 @@ public final class SceneTool extends JFrame {
 //        commandTree.setVisible(false);
 //        stage.addActor(commandTree);
 
-        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-            .put(KeyStroke.getKeyStroke('\\', InputEvent.CTRL_DOWN_MASK), "show_command_window");
-        rootPane.getActionMap().put("show_command_window", new AbstractAction() {
-            @Override
-            public void actionPerformed(final ActionEvent actionEvent) {
-                commandWindow.setLocationRelativeTo(SceneTool.this);
-                commandWindow.setVisible(true);
-            }
-        });
+
+//        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+//            .put(KeyStroke.getKeyStroke('\\', InputEvent.CTRL_DOWN_MASK), "show_command_window");
+//        rootPane.getActionMap().put("show_command_window", new AbstractAction() {
+//            @Override
+//            public void actionPerformed(final ActionEvent actionEvent) {
+//                commandWindow.setLocationRelativeTo(SceneTool.this);
+//                commandWindow.setVisible(true);
+//            }
+//        });
+        rootPane.addKeyListener(new CommandListener(globalCommands.globalScope));
     }
 
     public void run(final int width, final int height) {
