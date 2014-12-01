@@ -1,11 +1,11 @@
 package tiltadv.tools.scene;
 
 import com.badlogic.gdx.Gdx;
-import dhcoder.libgdx.tool.command.Command;
-import dhcoder.libgdx.tool.command.CommandManager;
-import dhcoder.libgdx.tool.command.CommandScope;
-import dhcoder.libgdx.tool.scene2d.widget.CommandTree;
-import dhcoder.libgdx.tool.swing.widget.CommandWindow;
+import dhcoder.tool.command.Command;
+import dhcoder.tool.command.CommandManager;
+import dhcoder.tool.command.CommandScope;
+//import dhcoder.tool.scene2d.widget.CommandTree;
+import dhcoder.tool.swing.widget.CommandWindow;
 
 /**
 * Commands that should get executed anytime.
@@ -22,7 +22,7 @@ public final class GlobalCommands {
     public final Command exit;
     public final Command undo;
     public final Command redo;
-    public final Command toggleCommandTree;
+//    public final Command toggle_command_tree;
 
     public GlobalCommands(final SceneTool sceneTool, final CommandManager commandManager) {
         globalScope = new CommandScope("Global", true);
@@ -79,15 +79,15 @@ public final class GlobalCommands {
             }
         });
 
-        toggleCommandTree =
-            new Command("toggle_command_tree", helpScope, "Show/Hide Command Tree", "Toggles the command tree window",
-                new Command.RunCallback() {
-                    @Override
-                    public void run() {
-                        CommandTree commandTree = sceneTool.getCommandTree();
-                        commandTree.setVisible(!commandTree.isVisible());
-                    }
-                });
+//        toggleCommandTree =
+//            new Command("toggle_command_tree", helpScope, "Show/Hide Command Tree", "Toggles the command tree window",
+//                new Command.RunCallback() {
+//                    @Override
+//                    public void run() {
+//                        CommandTree commandTree = sceneTool.getCommandTree();
+//                        commandTree.setVisible(!commandTree.isVisible());
+//                    }
+//                });
 
         commandManager.register(globalScope);
     }

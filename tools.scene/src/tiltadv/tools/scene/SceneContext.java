@@ -1,7 +1,7 @@
 package tiltadv.tools.scene;
 
 import dhcoder.libgdx.assets.Scene;
-import dhcoder.libgdx.tool.history.History;
+import dhcoder.tool.history.History;
 
 /**
  * Miscellaneous context data related to a scene. Toolbars in this tool should be able to repond to a context change and

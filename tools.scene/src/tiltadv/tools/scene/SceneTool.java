@@ -3,11 +3,12 @@ package tiltadv.tools.scene;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglFiles;
 import com.badlogic.gdx.utils.Json;
-import dhcoder.libgdx.tool.command.CommandManager;
-import dhcoder.libgdx.tool.command.serialization.ShortcutsLoader;
-import dhcoder.libgdx.tool.scene2d.widget.CommandTree;
-import dhcoder.libgdx.tool.swing.widget.CommandWindow;
-import dhcoder.libgdx.tool.swing.widget.OverlapPane;
+import dhcoder.tool.command.CommandManager;
+import dhcoder.tool.command.Shortcut;
+import dhcoder.tool.libgdx.serialization.ShortcutsLoader;
+import dhcoder.tool.swing.command.SwingKeyNameProvider;
+import dhcoder.tool.swing.widget.CommandWindow;
+import dhcoder.tool.swing.widget.OverlapPane;
 import tiltadv.tools.scene.forms.FirstRunForm;
 import tiltadv.tools.scene.serialization.SettingsLoader;
 import tiltadv.tools.scene.serialization.SettingsLoader.AppSettings;
@@ -49,6 +50,7 @@ public final class SceneTool extends JFrame {
     public SceneTool() throws HeadlessException {
         super("Scene Editor");
 
+        Shortcut.setKeyNameProvider(new SwingKeyNameProvider());
         setContentPane(panelRoot);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
@@ -105,10 +107,6 @@ public final class SceneTool extends JFrame {
 
     public CommandWindow getCommandWindow() {
         return commandWindow;
-    }
-
-    public CommandTree getCommandTree() {
-        return null;
     }
 
     private void loadShortcuts(final Json json, final CommandManager commandManager) {

@@ -2,7 +2,9 @@ apply plugin: "java"
 
 dependencies {
     compile project(":dhcoder.libgdx")
-    compile project(":dhcoder.libgdx.tool")
+    compile project(":dhcoder.tool")
+    compile project(":dhcoder.tool.swing")
+    compile project(":dhcoder.tool.libgdx")
     compile "com.intellij:forms_rt:7.0.3"
     compile "com.badlogicgames.gdx:gdx:$gdxVersion"
     compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"

@@ -10,11 +10,11 @@
 //import com.badlogic.gdx.scenes.scene2d.ui.Table;
 //import com.badlogic.gdx.utils.Json;
 //import com.badlogic.gdx.utils.viewport.ScreenViewport;
-//import dhcoder.libgdx.tool.command.CommandManager;
-//import dhcoder.libgdx.tool.command.serialization.ShortcutsLoader;
-//import dhcoder.libgdx.tool.scene2d.CommandListener;
-//import dhcoder.libgdx.tool.scene2d.widget.CommandTree;
-//import dhcoder.libgdx.tool.scene2d.widget.CommandWindow;
+//import dhcoder.tool.command.CommandManager;
+//import dhcoder.tool.libgdx.serialization.ShortcutsLoader;
+//import dhcoder.tool.scene2d.CommandListener;
+//import dhcoder.tool.scene2d.widget.CommandTree;
+//import dhcoder.tool.scene2d.widget.CommandWindow;
 //import dhcoder.support.opt.Opt;
 //
 //import static dhcoder.support.text.StringUtils.format;
