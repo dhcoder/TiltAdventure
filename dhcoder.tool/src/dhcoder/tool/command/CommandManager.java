@@ -111,9 +111,9 @@ public final class CommandManager {
      */
     public Collection<Command> allCommands() { return commandIdsMap.values(); }
 
-    public List<Command> searchableCommands() {
+    public Collection<Command> searchableCommands() {
         Collection<Command> allCommands = allCommands();
-        List<Command> searchableCommands = new ArrayList<Command>(allCommands.size());
+        Collection<Command> searchableCommands = new ArrayList<Command>(allCommands.size());
         for (Command command : allCommands) {
             if (!command.isExcludedFromSearch()) {
                 searchableCommands.add(command);

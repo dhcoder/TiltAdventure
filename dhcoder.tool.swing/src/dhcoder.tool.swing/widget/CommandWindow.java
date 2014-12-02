@@ -2,9 +2,9 @@ package dhcoder.tool.swing.widget;
 
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
+import dhcoder.support.text.StringUtils;
 import dhcoder.tool.command.Command;
 import dhcoder.tool.command.CommandManager;
-import dhcoder.support.text.StringUtils;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -16,6 +16,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -39,7 +40,7 @@ public final class CommandWindow extends JDialog {
     public CommandWindow(final Frame owner, final CommandManager commandManager) {
         super(owner);
 
-        allCommandsSorted = commandManager.searchableCommands();
+        allCommandsSorted = new ArrayList<Command>(commandManager.searchableCommands());
         Collections.sort(allCommandsSorted, new Comparator<Command>() {
             @Override
             public int compare(final Command o1, final Command o2) {

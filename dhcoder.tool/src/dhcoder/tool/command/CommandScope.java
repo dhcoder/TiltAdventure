@@ -5,6 +5,7 @@ import dhcoder.support.opt.Opt;
 import dhcoder.support.text.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static dhcoder.support.text.StringUtils.format;
@@ -124,9 +125,29 @@ public final class CommandScope {
         return (!fullName.isEmpty() ? fullName : "<ROOT>");
     }
 
-    public List<Command> getCommands() {
+    /**
+     * Returns only the commands registered at this scope.
+     */
+    public Collection<Command> getCommands() {
         return commands;
     }
+
+    /**
+     * Returns the commands registered at this scope and below.
+     */
+    public Collection<Command> getAllCommands() {
+        Collection<Command> allCommands = new ArrayList<Command>();
+        getAllCommandsRecursively(allCommands);
+        return allCommands;
+    }
+
+    private void getAllCommandsRecursively(final Collection<Command> commands) {
+        commands.addAll(getCommands());
+        for (CommandScope childScope : getChildren()) {
+            childScope.getAllCommandsRecursively(commands);
+        }
+    }
+
 
     String getScopedName(final Command command) {
         return !isWhitespace(fullName) ? format("{0}: {1}", fullName, command.getName()) : command.getName();

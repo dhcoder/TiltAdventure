@@ -97,7 +97,8 @@ public final class SceneTool extends JFrame {
 //                commandWindow.setVisible(true);
 //            }
 //        });
-        rootPane.addKeyListener(new CommandListener(globalCommands.globalScope));
+        CommandListener commandListener = new CommandListener(globalCommands.globalScope);
+        commandListener.registerWith(rootPane);
     }
 
     public void run(final int width, final int height) {
@@ -112,10 +113,6 @@ public final class SceneTool extends JFrame {
 
     private void loadShortcuts(final Json json, final CommandManager commandManager) {
         ShortcutsLoader.load(json, commandManager, PATH_CONFIG + "shortcuts.json");
-    }
-
-    private void createUIComponents() {
-        // TODO: place custom component creation code here
     }
 
     {
