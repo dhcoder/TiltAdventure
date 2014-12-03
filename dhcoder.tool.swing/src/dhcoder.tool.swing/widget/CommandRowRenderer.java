@@ -1,5 +1,6 @@
 package dhcoder.tool.swing.widget;
 
+import dhcoder.support.text.StringUtils;
 import dhcoder.tool.command.Command;
 
 import javax.swing.*;
@@ -22,7 +23,7 @@ public final class CommandRowRenderer extends JPanel implements ListCellRenderer
 
         Font defaultFont = shortcutLabel.getFont();
         Font commandFont = new Font(defaultFont.getName(), Font.PLAIN, 16);
-        Font shortcutFont = new Font(defaultFont.getName(), Font.ITALIC, 10);
+        Font shortcutFont = new Font(defaultFont.getName(), Font.ITALIC, 12);
 
         commandLabel.setFont(commandFont);
         shortcutLabel.setFont(shortcutFont);
@@ -32,13 +33,79 @@ public final class CommandRowRenderer extends JPanel implements ListCellRenderer
     }
 
     @Override
-    public Component getListCellRendererComponent(final JList<? extends Command> list, final Command value,
+    public Component getListCellRendererComponent(final JList<? extends Command> listCommands, final Command command,
         final int index, final boolean isSelected, final boolean cellHasFocus) {
-        commandLabel.setText(value.getFullName());
-        if (value.getShortcutOpt().hasValue()) {
-            shortcutLabel.setText(value.getShortcutOpt().getValue().toString());
+        //        listputClientProperty("textSearch", textSearch); // For handoff to CommandRowRenderer
+        JTextField textSearch = (JTextField)listCommands.getClientProperty("textSearch");
+        commandLabel.setText(getFormattedCommandName(textSearch.getText(), command));
+        if (command.getShortcutOpt().hasValue()) {
+            shortcutLabel.setText(command.getShortcutOpt().getValue().toString() + " "); // Add space to prevent clipping
+        }
+        else {
+            shortcutLabel.setText("");
         }
 
         return this;
     }
+
+    private String getFormattedCommandName(final String query, final Command command) {
+        if (StringUtils.isWhitespace(query)) {
+            return command.getFullName();
+        }
+
+        String name = command.getFullName();
+        // Allocate extra for <html></html> and <b></b>
+        int maxLength = name.length() + 13 + 7 * query.length();
+        StringBuilder stringBuilder = new StringBuilder(maxLength);
+        stringBuilder.append("<html>");
+
+        boolean inBoldSection = false;
+        int queryIndex = 0;
+        for (int nameIndex = 0; nameIndex < name.length(); nameIndex++) {
+            char nameChar = name.charAt(nameIndex);
+
+            if (queryIndex < query.length()) {
+                char queryChar = query.charAt(queryIndex);
+
+                if (Character.toLowerCase(nameChar) == Character.toLowerCase(queryChar)) {
+                    if (!inBoldSection) {
+                        if (queryChar != ' ') {
+                            stringBuilder.append("<b>");
+                            inBoldSection = true;
+                        }
+                    }
+                    else {
+                        if (queryChar == ' ') {
+                            stringBuilder.append("</b>");
+                            inBoldSection = false;
+                        }
+                    }
+                    queryIndex++;
+                }
+                else {
+                    if (inBoldSection) {
+                        stringBuilder.append("</b>");
+                        inBoldSection = false;
+                    }
+                }
+            }
+            else {
+                if (inBoldSection) {
+                    stringBuilder.append("</b>");
+                    inBoldSection = false;
+                }
+            }
+            stringBuilder.append(nameChar);
+        }
+
+        if (inBoldSection) {
+            stringBuilder.append("</b>");
+        }
+
+        stringBuilder.append("</html>");
+
+        assert stringBuilder.toString().length() <= maxLength;
+        return stringBuilder.toString();
+    }
+
 }

@@ -90,6 +90,7 @@ public final class CommandWindow extends JDialog {
 
         listCommands.setCellRenderer(new CommandRowRenderer());
         listCommands.setModel(new DefaultListModel<Command>());
+        listCommands.putClientProperty("textSearch", textSearch); // For handoff to CommandRowRenderer
 
         //            final Label commandLabel =
 //                new Label(getFormattedCommandName(command), skin, i == selectedCommandIndex ? "bold" : "default");
@@ -185,67 +186,6 @@ public final class CommandWindow extends JDialog {
 //            }
 //            commandsPane.setVisible(true);
         }
-    }
-
-    private String getFormattedCommandName(final Command command) {
-        String query = textSearch.getText();
-        if (StringUtils.isWhitespace(query)) {
-            return command.getFullName();
-        }
-
-        String name = command.getFullName();
-        // Allocate extra for <html></html> and <b></b>
-        int maxLength = name.length() + 13 + 7 * query.length();
-        StringBuilder stringBuilder = new StringBuilder(maxLength);
-        stringBuilder.append("<html>");
-
-        boolean inBoldSection = false;
-        int queryIndex = 0;
-        for (int nameIndex = 0; nameIndex < name.length(); nameIndex++) {
-            char nameChar = name.charAt(nameIndex);
-
-            if (queryIndex < query.length()) {
-                char queryChar = query.charAt(queryIndex);
-
-                if (Character.toLowerCase(nameChar) == Character.toLowerCase(queryChar)) {
-                    if (!inBoldSection) {
-                        if (queryChar != ' ') {
-                            stringBuilder.append("<b>");
-                            inBoldSection = true;
-                        }
-                    }
-                    else {
-                        if (queryChar == ' ') {
-                            stringBuilder.append("</b>");
-                            inBoldSection = false;
-                        }
-                    }
-                    queryIndex++;
-                }
-                else {
-                    if (inBoldSection) {
-                        stringBuilder.append("</b>");
-                        inBoldSection = false;
-                    }
-                }
-            }
-            else {
-                if (inBoldSection) {
-                    stringBuilder.append("</b>");
-                    inBoldSection = false;
-                }
-            }
-            stringBuilder.append(nameChar);
-        }
-
-        if (inBoldSection) {
-            stringBuilder.append("</b>");
-        }
-
-        stringBuilder.append("</html>");
-
-        assert stringBuilder.toString().length() <= maxLength;
-        return stringBuilder.toString();
     }
 
     {
