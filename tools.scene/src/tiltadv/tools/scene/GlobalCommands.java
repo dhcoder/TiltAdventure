@@ -1,11 +1,11 @@
 package tiltadv.tools.scene;
 
-import com.badlogic.gdx.Gdx;
 import dhcoder.tool.command.Command;
 import dhcoder.tool.command.CommandManager;
 import dhcoder.tool.command.CommandScope;
-//import dhcoder.tool.scene2d.widget.CommandTree;
 import dhcoder.tool.swing.widget.CommandWindow;
+
+//import dhcoder.tool.scene2d.widget.CommandTree;
 
 /**
 * Commands that should get executed anytime.
@@ -60,7 +60,7 @@ public final class GlobalCommands {
         exit = new Command("exit", fileScope, "Exit", "Exits the application", new Command.RunCallback() {
             @Override
             public void run() {
-                Gdx.app.exit();
+                sceneTool.dispose();
             }
         });
 

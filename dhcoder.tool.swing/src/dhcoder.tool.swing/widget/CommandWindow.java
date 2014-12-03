@@ -29,7 +29,7 @@ public final class CommandWindow extends JDialog {
     public static final int MAX_COMMAND_COUNT = 30;
 
     private JTextField textSearch;
-    private JList listCommands;
+    private JList<Command> listCommands;
     private JScrollPane scrollCommands;
     private JPanel panelRoot;
 
@@ -64,12 +64,15 @@ public final class CommandWindow extends JDialog {
 
         this.addWindowFocusListener(new WindowFocusListener() {
             @Override
-            public void windowGainedFocus(WindowEvent e) {
+            public void windowGainedFocus(final WindowEvent e) {
                 //do nothing
             }
 
             @Override
-            public void windowLostFocus(WindowEvent e) {
+            public void windowLostFocus(final WindowEvent e) {
+                if (e.getOppositeWindow() == null) {
+                    return;
+                }
                 if (SwingUtilities.isDescendingFrom(e.getOppositeWindow(), CommandWindow.this)) {
                     return;
                 }
@@ -84,6 +87,9 @@ public final class CommandWindow extends JDialog {
                 setVisible(false);
             }
         });
+
+        listCommands.setCellRenderer(new CommandRowRenderer());
+        listCommands.setModel(new DefaultListModel<Command>());
 
         //            final Label commandLabel =
 //                new Label(getFormattedCommandName(command), skin, i == selectedCommandIndex ? "bold" : "default");
@@ -154,9 +160,9 @@ public final class CommandWindow extends JDialog {
     }
 
     private void rebuildCommandsList() {
-        listCommands.removeAll();
+        DefaultListModel<Command> commandsListModel = (DefaultListModel<Command>)listCommands.getModel();
+        commandsListModel.clear();
 
-        DefaultListModel commandsListModel = new DefaultListModel();
         int commandCount = Math.min(MAX_COMMAND_COUNT, matchedCommands.size());
         for (int i = 0; i < commandCount; i++) {
             commandsListModel.addElement(matchedCommands.get(i));
