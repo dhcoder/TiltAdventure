@@ -4,6 +4,7 @@ import dhcoder.tool.command.Shortcut;
 
 import javax.swing.*;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 /**
@@ -23,6 +24,11 @@ public final class KeystrokeUtils {
             modifiers |= InputEvent.ALT_MASK;
         }
         return KeyStroke.getKeyStroke(shortcut.key(), modifiers);
+    }
+
+    public static Shortcut toShortcut(final KeyEvent keyEvent) {
+        return new Shortcut(keyEvent.isControlDown(), keyEvent.isAltDown(), keyEvent.isShiftDown(),
+            keyEvent.getKeyCode());
     }
 
     private KeystrokeUtils() { }

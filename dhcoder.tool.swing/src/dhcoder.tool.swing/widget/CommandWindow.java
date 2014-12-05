@@ -5,15 +5,16 @@ import com.intellij.uiDesigner.core.GridLayoutManager;
 import dhcoder.support.text.StringUtils;
 import dhcoder.tool.command.Command;
 import dhcoder.tool.command.CommandManager;
+import dhcoder.tool.command.CommandScope;
+import dhcoder.tool.command.Shortcut;
+import dhcoder.tool.swing.command.CommandListener;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.util.ArrayList;
@@ -22,11 +23,22 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import static java.awt.event.KeyEvent.VK_DOWN;
+import static java.awt.event.KeyEvent.VK_ENTER;
+import static java.awt.event.KeyEvent.VK_ESCAPE;
+import static java.awt.event.KeyEvent.VK_UP;
+
 /**
  * A widget which can search through all actions registered with the current tool.
  */
 public final class CommandWindow extends JDialog {
     public static final int MAX_COMMAND_COUNT = 30;
+
+    class CommandRowContext {
+        public String getQuery() {
+            return textSearch.getText();
+        }
+    }
 
     private JTextField textSearch;
     private JList<Command> listCommands;
@@ -36,6 +48,14 @@ public final class CommandWindow extends JDialog {
     private final List<Command> allCommandsSorted;
     private List<Command> matchedCommands;
     private int selectedCommandIndex;
+
+    String getQuery() {
+        return textSearch.getText();
+    }
+
+    int getSelectedCommandIndex() {
+        return selectedCommandIndex;
+    }
 
     public CommandWindow(final Frame owner, final CommandManager commandManager) {
         super(owner);
@@ -80,50 +100,53 @@ public final class CommandWindow extends JDialog {
             }
         });
 
-        textSearch.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "close");
-        textSearch.getActionMap().put("close", new AbstractAction() {
+        CommandScope commandWindowScope = new CommandScope("CommandWindow");
+        commandWindowScope.addLambdaCommand(Shortcut.noModifier(VK_UP), new Command.RunCallback() {
             @Override
-            public void actionPerformed(final ActionEvent actionEvent) {
+            public void run() {
+                selectedCommandIndex--;
+                if (selectedCommandIndex < 0) {
+                    selectedCommandIndex = matchedCommands.size() - 1;
+                }
+                rebuildCommandsList();
+            }
+        });
+
+        commandWindowScope.addLambdaCommand(Shortcut.noModifier(VK_DOWN), new Command.RunCallback() {
+            @Override
+            public void run() {
+                selectedCommandIndex = (selectedCommandIndex + 1) % matchedCommands.size();
+                rebuildCommandsList();
+            }
+        });
+
+        commandWindowScope.addLambdaCommand(Shortcut.noModifier(VK_ENTER), new Command.RunCallback() {
+            @Override
+            public void run() {
+                final Command command = matchedCommands.get(selectedCommandIndex);
+                setVisible(false);
+                command.run();
+            }
+        }).setActiveCallback(new Command.ActiveCallback() {
+            @Override
+            public boolean isActive() {
+                return (selectedCommandIndex < matchedCommands.size());
+            }
+        });
+
+        commandWindowScope.addLambdaCommand(Shortcut.noModifier(VK_ESCAPE), new Command.RunCallback() {
+            @Override
+            public void run() {
                 setVisible(false);
             }
         });
 
+        CommandListener commandListener = new CommandListener(commandWindowScope);
+        commandListener.registerListener(textSearch);
+
         listCommands.setCellRenderer(new CommandRowRenderer());
         listCommands.setModel(new DefaultListModel<Command>());
-        listCommands.putClientProperty("textSearch", textSearch); // For handoff to CommandRowRenderer
-
-        //            final Label commandLabel =
-//                new Label(getFormattedCommandName(command), skin, i == selectedCommandIndex ? "bold" : "default");
-//            commandLabel.setEllipse(true);
-//            final Color defaultColor = commandLabel.getColor().cpy();
-//            commandLabel.setColor(defaultColor);
-//            commandLabel.addListener(new ClickListener() {
-//                @Override
-//                public boolean touchDown(final InputEvent event, final float x, final float y, final int pointer,
-//                    final int button) {
-//                    hide();
-//                    command.run();
-//                    return true;
-//                }
-//
-//                @Override
-//                public void enter(final InputEvent event, final float x, final float y, final int pointer,
-//                    final Actor fromActor) {
-//                    commandLabel.setColor(Color.YELLOW);
-//                }
-//
-//                @Override
-//                public void exit(final InputEvent event, final float x, final float y, final int pointer,
-//                    final Actor toActor) {
-//                    commandLabel.setColor(defaultColor);
-//                }
-//            });
-//            commandsTable.add(commandLabel).expandX().fillX().pad(0f, 10f, 0f, 10f);
-//
-//            if (command.getShortcutOpt().hasValue()) {
-//                Label shortcutLabel = new Label(command.getShortcutOpt().getValue().toString(), skin, "italic-xs");
-//                commandsTable.add(shortcutLabel).pad(0f, 0f, 0f, 10f).right();
-//            }
+        listCommands.putClientProperty("context", new CommandRowContext()); // For handoff to CommandRowRenderer
 
         textSearch.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -167,6 +190,10 @@ public final class CommandWindow extends JDialog {
         int commandCount = Math.min(MAX_COMMAND_COUNT, matchedCommands.size());
         for (int i = 0; i < commandCount; i++) {
             commandsListModel.addElement(matchedCommands.get(i));
+        }
+
+        if (selectedCommandIndex < matchedCommands.size()) {
+            listCommands.setSelectedIndex(selectedCommandIndex);
         }
 
         if (commandCount > 0) {

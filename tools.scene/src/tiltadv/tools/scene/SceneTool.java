@@ -98,7 +98,7 @@ public final class SceneTool extends JFrame {
 //            }
 //        });
         CommandListener commandListener = new CommandListener(globalCommands.globalScope);
-        commandListener.registerWith(rootPane);
+        commandListener.registerUmbrellaListener(rootPane);
     }
 
     public void run(final int width, final int height) {

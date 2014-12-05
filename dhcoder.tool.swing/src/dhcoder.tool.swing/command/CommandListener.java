@@ -7,6 +7,8 @@ import dhcoder.tool.command.Shortcut;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Collection;
 
@@ -20,7 +22,10 @@ public final class CommandListener {
         this.commandScope = commandScope;
     }
 
-    public void registerWith(final JComponent component) {
+    /**
+     * Listen to the target component and all of its children.
+     */
+    public void registerUmbrellaListener(final JComponent component) {
         Collection<Command> allCommands = commandScope.getAllCommands();
         for (final Command command : allCommands) {
             Opt<Shortcut> shortcutOpt = command.getShortcutOpt();
@@ -36,5 +41,19 @@ public final class CommandListener {
         }
     }
 
+    /**
+     * Listen to just the target component, especially useful for leaf components. Unlike {@link
+     * CommandListener#registerUmbrellaListener(JComponent)}, this has a chance to listen to key events first.
+     */
+    public void registerListener(final JComponent component) {
+        component.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(final KeyEvent e) {
+                if (commandScope.handle(KeystrokeUtils.toShortcut(e))) {
+                    e.consume();
+                }
+            }
+        });
+    }
 
 }

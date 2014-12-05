@@ -35,9 +35,18 @@ public final class CommandRowRenderer extends JPanel implements ListCellRenderer
     @Override
     public Component getListCellRendererComponent(final JList<? extends Command> listCommands, final Command command,
         final int index, final boolean isSelected, final boolean cellHasFocus) {
-        //        listputClientProperty("textSearch", textSearch); // For handoff to CommandRowRenderer
-        JTextField textSearch = (JTextField)listCommands.getClientProperty("textSearch");
-        commandLabel.setText(getFormattedCommandName(textSearch.getText(), command));
+
+        commandLabel.setText("");
+        shortcutLabel.setText("");
+        setOpaque(false);
+        if (isSelected) {
+            setOpaque(true);
+            setBackground(Color.YELLOW);
+        }
+
+        CommandWindow.CommandRowContext context =
+            (CommandWindow.CommandRowContext)listCommands.getClientProperty("context");
+        commandLabel.setText(getFormattedCommandName(context.getQuery(), command));
         if (command.getShortcutOpt().hasValue()) {
             shortcutLabel.setText(command.getShortcutOpt().getValue().toString() + " "); // Add space to prevent clipping
         }
