@@ -194,24 +194,7 @@ public final class CommandWindow extends JDialog {
 
         if (selectedCommandIndex < matchedCommands.size()) {
             listCommands.setSelectedIndex(selectedCommandIndex);
-        }
-
-        if (commandCount > 0) {
-//            scrollCommands.scroll
-//            // Ensure the current command is visible
-//            float rowHeight = commandsTable.getHeight() / commandCount;
-//            float ensureVisibleLowerY = rowHeight * selectedCommandIndex;
-//            float ensureVisibleUpperY = ensureVisibleLowerY + rowHeight;
-//
-//            if (commandsPane.getScrollY() > ensureVisibleLowerY) {
-//                // Scroll UP to the active command
-//                commandsPane.setScrollY(ensureVisibleLowerY);
-//            }
-//            else if (commandsPane.getScrollY() + commandsPane.getScrollHeight() < ensureVisibleLowerY) {
-//                // Scroll DOWN to the active command
-//                commandsPane.setScrollY(ensureVisibleUpperY - commandsPane.getScrollHeight());
-//            }
-//            commandsPane.setVisible(true);
+            listCommands.ensureIndexIsVisible(selectedCommandIndex);
         }
     }
 
