@@ -3,7 +3,6 @@ package tiltadv.tools.scene;
 import dhcoder.tool.command.Command;
 import dhcoder.tool.command.CommandManager;
 import dhcoder.tool.command.CommandScope;
-import dhcoder.tool.swing.widget.CommandWindow;
 
 //import dhcoder.tool.scene2d.widget.CommandTree;
 
@@ -34,9 +33,7 @@ public final class GlobalCommands {
             "Opens the Command Window which allows for searching all commands", new Command.RunCallback() {
             @Override
             public void run() {
-                final CommandWindow commandWindow = sceneTool.getCommandWindow();
-                commandWindow.setLocationRelativeTo(sceneTool);
-                commandWindow.setVisible(true);
+                sceneTool.showCommandWindow();
             }
         });
         commandManager.excludeFromSearch(showCommandWindow);

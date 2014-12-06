@@ -32,7 +32,7 @@ import static java.awt.event.KeyEvent.VK_UP;
  * A widget which can search through all actions registered with the current tool.
  */
 public final class CommandWindow extends JDialog {
-    public static final int MAX_COMMAND_COUNT = 30;
+    public static final int MAX_VISIBLE_COMMANDS = 16;
 
     class CommandRowContext {
         public String getQuery() {
@@ -187,7 +187,7 @@ public final class CommandWindow extends JDialog {
         DefaultListModel<Command> commandsListModel = (DefaultListModel<Command>)listCommands.getModel();
         commandsListModel.clear();
 
-        int commandCount = Math.min(MAX_COMMAND_COUNT, matchedCommands.size());
+        int commandCount = matchedCommands.size();
         for (int i = 0; i < commandCount; i++) {
             commandsListModel.addElement(matchedCommands.get(i));
         }
@@ -196,6 +196,9 @@ public final class CommandWindow extends JDialog {
             listCommands.setSelectedIndex(selectedCommandIndex);
             listCommands.ensureIndexIsVisible(selectedCommandIndex);
         }
+
+        listCommands.setVisibleRowCount(Math.min(MAX_VISIBLE_COMMANDS, matchedCommands.size()));
+        pack();
     }
 
     {
@@ -218,8 +221,8 @@ public final class CommandWindow extends JDialog {
         textSearch = new JTextField();
         panelRoot.add(textSearch,
             new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL,
-                GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1),
-                null, 0, false));
+                GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(400, -1),
+                new Dimension(400, -1), null, 0, false));
         scrollCommands = new JScrollPane();
         panelRoot.add(scrollCommands,
             new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH,
@@ -227,6 +230,7 @@ public final class CommandWindow extends JDialog {
                 GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0,
                 false));
         listCommands = new JList();
+        listCommands.setVisibleRowCount(1);
         scrollCommands.setViewportView(listCommands);
     }
 

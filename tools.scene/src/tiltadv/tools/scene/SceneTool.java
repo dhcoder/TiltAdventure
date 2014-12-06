@@ -63,40 +63,11 @@ public final class SceneTool extends JFrame {
         globalCommands = new GlobalCommands(this, commandManager);
         loadShortcuts(json, commandManager);
 
-//        labelCommandTree.setText(format("Once open, try searching for \"{0}\" and press <ENTER>",
-//            globalCommands.toggleCommandTree.getName()));
-
         commandWindow = new CommandWindow(this, commandManager);
-        commandWindow.setBounds(0, 0, 400, 600);
-        commandWindow.setBackground(Color.RED);
 
         FirstRunForm firstRunForm = new FirstRunForm(globalCommands);
         overlapPane.addComponent(firstRunForm.getPanelRoot());
-//        JPanel test = new JPanel();
-//        test.setBackground(Color.ORANGE);
-//        JLabel testLabel = new JLabel("DUMMY");
-//        test.add(testLabel);
-//        overlapPane.addComponent(test);
-//        layeredPane.add(commandWindow, layer++);
 
-//        commandWindow = new CommandWindow(commandManager, skin);
-//        commandWindow.setVisible(false);
-//        commandWindowTable.add(commandWindow).expandY().fillY().width(400f).fillX().top().pad(20f, 0f, 0f, 0f);
-//
-//        commandTree = new CommandTree(commandManager, skin);
-//        commandTree.setVisible(false);
-//        stage.addActor(commandTree);
-
-
-//        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-//            .put(KeyStroke.getKeyStroke('\\', InputEvent.CTRL_DOWN_MASK), "show_command_window");
-//        rootPane.getActionMap().put("show_command_window", new AbstractAction() {
-//            @Override
-//            public void actionPerformed(final ActionEvent actionEvent) {
-//                commandWindow.setLocationRelativeTo(SceneTool.this);
-//                commandWindow.setVisible(true);
-//            }
-//        });
         CommandListener commandListener = new CommandListener(globalCommands.globalScope);
         commandListener.registerUmbrellaListener(rootPane);
     }
@@ -107,9 +78,12 @@ public final class SceneTool extends JFrame {
         setVisible(true);
     }
 
-    public CommandWindow getCommandWindow() {
-        return commandWindow;
+    public void showCommandWindow() {
+        commandWindow.pack();
+        commandWindow.setLocation(getWidth() / 2 - commandWindow.getWidth() / 2, 50);
+        commandWindow.setVisible(true);
     }
+
 
     private void loadShortcuts(final Json json, final CommandManager commandManager) {
         ShortcutsLoader.load(json, commandManager, PATH_CONFIG + "shortcuts.json");

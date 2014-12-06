@@ -38,10 +38,15 @@ public final class CommandRowRenderer extends JPanel implements ListCellRenderer
 
         commandLabel.setText("");
         shortcutLabel.setText("");
+        commandLabel.setForeground(listCommands.getForeground());
+        shortcutLabel.setForeground(listCommands.getForeground());
+
         setOpaque(false);
         if (isSelected) {
             setOpaque(true);
-            setBackground(Color.YELLOW);
+            setBackground(listCommands.getSelectionBackground());
+            commandLabel.setForeground(listCommands.getSelectionForeground());
+            shortcutLabel.setForeground(listCommands.getSelectionForeground());
         }
 
         CommandWindow.CommandRowContext context =
@@ -49,9 +54,6 @@ public final class CommandRowRenderer extends JPanel implements ListCellRenderer
         commandLabel.setText(getFormattedCommandName(context.getQuery(), command));
         if (command.getShortcutOpt().hasValue()) {
             shortcutLabel.setText(command.getShortcutOpt().getValue().toString() + " "); // Add space to prevent clipping
-        }
-        else {
-            shortcutLabel.setText("");
         }
 
         return this;

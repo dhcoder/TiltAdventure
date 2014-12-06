@@ -11,7 +11,8 @@
       <component id="fc33b" class="javax.swing.JTextField" binding="textSearch">
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-            <preferred-size width="150" height="-1"/>
+            <minimum-size width="400" height="-1"/>
+            <preferred-size width="400" height="-1"/>
           </grid>
         </constraints>
         <properties/>
@@ -25,7 +26,9 @@
         <children>
           <component id="5abc" class="javax.swing.JList" binding="listCommands">
             <constraints/>
-            <properties/>
+            <properties>
+              <visibleRowCount value="1"/>
+            </properties>
           </component>
         </children>
       </scrollpane>
