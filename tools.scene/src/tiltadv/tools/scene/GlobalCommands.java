@@ -66,6 +66,11 @@ public final class GlobalCommands {
             public void run() {
 
             }
+        }).setActiveCallback(new Command.ActiveCallback() {
+            @Override
+            public boolean isActive() {
+                return false;
+            }
         });
 
         redo = new Command("redo", editScope, "Redo", "Redo your last undone action", new Command.RunCallback() {

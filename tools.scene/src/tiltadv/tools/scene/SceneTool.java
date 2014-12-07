@@ -80,7 +80,7 @@ public final class SceneTool extends JFrame {
 
     public void showCommandWindow() {
         commandWindow.pack();
-        commandWindow.setLocation(getWidth() / 2 - commandWindow.getWidth() / 2, 50);
+        commandWindow.setLocation(getX() + getWidth() / 2 - commandWindow.getWidth() / 2, getY() + 50);
         commandWindow.setVisible(true);
     }
 

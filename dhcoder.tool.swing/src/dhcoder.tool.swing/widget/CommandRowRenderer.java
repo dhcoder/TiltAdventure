@@ -10,16 +10,30 @@ import java.awt.*;
  * Renderer for the list displayed in the {@link CommandWindow}
  */
 public final class CommandRowRenderer extends JPanel implements ListCellRenderer<Command> {
-    private final JLabel commandLabel;
-    private final JLabel shortcutLabel;
+    private static final class AlphaLabel extends JLabel {
+
+        @Override
+        protected void paintComponent(final Graphics g) {
+//            Composite alphaComposite =
+//                AlphaComposite.getInstance(AlphaComposite.SRC_OVER, getForeground().getAlpha() / 255.0f);
+//
+//            Graphics2D g2d = (Graphics2D)g.create();
+//            g2d.setComposite(alphaComposite);
+//
+            super.paintComponent(g);
+        }
+    }
+
+    private final AlphaLabel commandLabel;
+    private final AlphaLabel shortcutLabel;
 
     public CommandRowRenderer() {
         super(new BorderLayout());
 
         setOpaque(false);
 
-        commandLabel = new JLabel();
-        shortcutLabel = new JLabel();
+        commandLabel = new AlphaLabel();
+        shortcutLabel = new AlphaLabel();
 
         Font defaultFont = shortcutLabel.getFont();
         Font commandFont = new Font(defaultFont.getName(), Font.PLAIN, 16);
@@ -49,11 +63,18 @@ public final class CommandRowRenderer extends JPanel implements ListCellRenderer
             shortcutLabel.setForeground(listCommands.getSelectionForeground());
         }
 
+        if (!command.isEnabled()) {
+            setOpaque(false);
+            Color disabledCommandColor = new Color(0x80000000 & getBackground().getRGB(), true);
+            setBackground(disabledCommandColor);
+        }
+
         CommandWindow.CommandRowContext context =
             (CommandWindow.CommandRowContext)listCommands.getClientProperty("context");
         commandLabel.setText(getFormattedCommandName(context.getQuery(), command));
         if (command.getShortcutOpt().hasValue()) {
-            shortcutLabel.setText(command.getShortcutOpt().getValue().toString() + " "); // Add space to prevent clipping
+            shortcutLabel
+                .setText(command.getShortcutOpt().getValue().toString() + " "); // Add space to prevent clipping
         }
 
         return this;
