@@ -6,10 +6,6 @@ import com.badlogic.gdx.utils.Json;
 import dhcoder.tool.command.CommandManager;
 import dhcoder.tool.command.Shortcut;
 import dhcoder.tool.libgdx.serialization.ShortcutsLoader;
-import dhcoder.tool.swing.command.CommandListener;
-import dhcoder.tool.swing.command.SwingKeyNameProvider;
-import dhcoder.tool.swing.widget.CommandWindow;
-import dhcoder.tool.swing.widget.OverlapPane;
 import tiltadv.tools.scene.forms.FirstRunForm;
 import tiltadv.tools.scene.serialization.SettingsLoader;
 import tiltadv.tools.scene.serialization.SettingsLoader.AppSettings;
@@ -37,8 +33,7 @@ public final class SceneTool extends JFrame {
 
     private final GlobalCommands globalCommands;
 
-    private OverlapPane overlapPane;
-    private CommandWindow commandWindow;
+//    private CommandWindow commandWindow;
 
     static {
         Gdx.files = new LwjglFiles();

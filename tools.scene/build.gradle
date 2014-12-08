@@ -1,10 +1,15 @@
 apply plugin: "java"
 
+ext {
+    controlsFxVersion="8.20.8"
+}
+
 dependencies {
     compile project(":dhcoder.libgdx")
     compile project(":dhcoder.tool")
-    compile project(":dhcoder.tool.swing")
+    compile project(":dhcoder.tool.javafx")
     compile project(":dhcoder.tool.libgdx")
+    compile "org.controlsfx:controlsfx:$controlsFxVersion"
     compile "com.intellij:forms_rt:7.0.3"
     compile "com.badlogicgames.gdx:gdx:$gdxVersion"
     compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"

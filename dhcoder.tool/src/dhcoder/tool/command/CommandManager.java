@@ -42,7 +42,7 @@ public final class CommandManager {
         return queryPattern;
     }
 
-    public static List<Command> regexSearch(final Pattern pattern, final List<Command> commandSet) {
+    public static List<Command> regexSearch(final Pattern pattern, final Collection<Command> commandSet) {
         ArrayList<Command> matchingCommands = new ArrayList<Command>();
         for (Command command : commandSet) {
             if (command.isExcludedFromSearch()) {
