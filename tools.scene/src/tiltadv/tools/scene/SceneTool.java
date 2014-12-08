@@ -3,18 +3,24 @@ package tiltadv.tools.scene;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglFiles;
 import com.badlogic.gdx.utils.Json;
+import dhcoder.tool.command.Command;
 import dhcoder.tool.command.CommandManager;
+import dhcoder.tool.command.CommandScope;
 import dhcoder.tool.command.Shortcut;
 import dhcoder.tool.javafx.command.JavaFXKeyNameProvider;
 import dhcoder.tool.libgdx.serialization.ShortcutsLoader;
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import tiltadv.tools.scene.serialization.SettingsLoader;
+import tiltadv.tools.scene.view.NoSceneViewController;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 
 /**
  * Main class for the scene tool. Acts as a collection of all high level UI elements and components, as well
@@ -53,7 +59,6 @@ public final class SceneTool extends Application {
 //        CommandListener commandListener = new CommandListener(globalCommands.globalScope);
 //        commandListener.registerUmbrellaListener(rootPane);
 
-
     }
 
     @Override
@@ -64,6 +69,26 @@ public final class SceneTool extends Application {
         stage.setTitle("Scene Editor");
 
         StackPane rootPane = new StackPane();
+
+        try {
+            // Load person overview.
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(SceneTool.class.getResource("view/NoSceneView.fxml"));
+            Pane noSceneView = (Pane)loader.load();
+
+            rootPane.getChildren().add(noSceneView);
+
+            // Give the controller access to the main app.
+            NoSceneViewController controller = loader.getController();
+            Command dummyCommand =
+                new Command("dummy_id", new CommandScope("dummy_scope"), "Show Command Window", "Yeah", () -> {});
+
+            controller.setCommandWindowCommand(dummyCommand);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         Scene scene = new Scene(rootPane, appSettings.getWidth(), appSettings.getHeight());
 
         stage.setScene(scene);
