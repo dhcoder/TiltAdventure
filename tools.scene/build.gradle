@@ -1,24 +1,23 @@
 apply plugin: "java"
 
-ext {
-    controlsFxVersion="8.20.8"
-}
-
 dependencies {
     compile project(":dhcoder.libgdx")
     compile project(":dhcoder.tool")
     compile project(":dhcoder.tool.javafx")
     compile project(":dhcoder.tool.libgdx")
     compile "org.controlsfx:controlsfx:$controlsFxVersion"
-    compile "com.intellij:forms_rt:7.0.3"
+//    compile "com.intellij:forms_rt:7.0.3"
     compile "com.badlogicgames.gdx:gdx:$gdxVersion"
     compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
     compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
 }
 
-sourceCompatibility = 1.6
+sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = ["src/"]
+
+//src.options.fork = true;
+//compile.options.forkOptions.executable='/Library/Java/JavaVirtualMachines/jdk1.8.0_25.jdk/Contents/Home/bin'
 
 project.ext.mainClassName = "tiltadv.tools.scene.SceneTool"
 project.ext.assetsDir = new File("../android/assets");
@@ -40,6 +39,11 @@ task dist(type: Jar) {
     manifest {
         attributes 'Main-Class': project.mainClassName
     }
+}
+
+tasks.withType(JavaCompile) {
+    options.fork = true;
+    options.forkOptions.executable = '/Library/Java/JavaVirtualMachines/jdk1.8.0_25.jdk/Contents/Home/bin/javac'
 }
 
 dist.dependsOn classes

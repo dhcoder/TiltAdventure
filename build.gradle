@@ -16,6 +16,7 @@ allprojects {
         appName = 'TiltAdventure'
         gdxVersion = '1.4.1'
         roboVMVersion = '1.0.0-alpha-02'
+        controlsFxVersion="8.20.8"
     }
 
     repositories {

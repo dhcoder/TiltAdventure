@@ -5,10 +5,13 @@ import com.badlogic.gdx.backends.lwjgl.LwjglFiles;
 import com.badlogic.gdx.utils.Json;
 import dhcoder.tool.command.CommandManager;
 import dhcoder.tool.command.Shortcut;
+import dhcoder.tool.javafx.command.JavaFXKeyNameProvider;
 import dhcoder.tool.libgdx.serialization.ShortcutsLoader;
-import tiltadv.tools.scene.forms.FirstRunForm;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 import tiltadv.tools.scene.serialization.SettingsLoader;
-import tiltadv.tools.scene.serialization.SettingsLoader.AppSettings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,68 +20,61 @@ import java.awt.*;
  * Main class for the scene tool. Acts as a collection of all high level UI elements and components, as well
  * as being the entry point of the application.
  */
-public final class SceneTool extends JFrame {
+public final class SceneTool extends Application {
 
     private static final String PATH_CONFIG = "config/scene/";
 
     public static void main(final String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                SceneTool sceneTool = new SceneTool();
-                sceneTool.run(1280, 720);
-            }
-        });
+        Application.launch(args);
     }
 
-    private final GlobalCommands globalCommands;
+//    private final GlobalCommands globalCommands;
 
 //    private CommandWindow commandWindow;
 
     static {
-        Gdx.files = new LwjglFiles();
     }
 
     private JPanel panelRoot;
 
-    public SceneTool() throws HeadlessException {
-        super("Scene Editor");
+    public SceneTool() {
+        Gdx.files = new LwjglFiles();
+        Shortcut.setKeyNameProvider(new JavaFXKeyNameProvider());
 
-        Shortcut.setKeyNameProvider(new SwingKeyNameProvider());
-        setContentPane(panelRoot);
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+//        CommandManager commandManager = new CommandManager();
+//        globalCommands = new GlobalCommands(this, commandManager);
+//        loadShortcuts(json, commandManager);
 
-        overlapPane = new OverlapPane();
-        panelRoot.add(overlapPane, BorderLayout.CENTER);
+//        commandWindow = new CommandWindow(this, commandManager);
 
-        Json json = new Json();
-        AppSettings appSettings = SettingsLoader.load(json, PATH_CONFIG + "settings.json");
+//        FirstRunForm firstRunForm = new FirstRunForm(globalCommands);
+//        overlapPane.addComponent(firstRunForm.getPanelRoot());
 
-        CommandManager commandManager = new CommandManager();
-        globalCommands = new GlobalCommands(this, commandManager);
-        loadShortcuts(json, commandManager);
+//        CommandListener commandListener = new CommandListener(globalCommands.globalScope);
+//        commandListener.registerUmbrellaListener(rootPane);
 
-        commandWindow = new CommandWindow(this, commandManager);
 
-        FirstRunForm firstRunForm = new FirstRunForm(globalCommands);
-        overlapPane.addComponent(firstRunForm.getPanelRoot());
-
-        CommandListener commandListener = new CommandListener(globalCommands.globalScope);
-        commandListener.registerUmbrellaListener(rootPane);
     }
 
-    public void run(final int width, final int height) {
-        pack();
-        setSize(width, height);
-        setVisible(true);
+    @Override
+    public void start(final Stage stage) {
+        Json json = new Json();
+        SettingsLoader.AppSettings appSettings = SettingsLoader.load(json, PATH_CONFIG + "settings.json");
+
+        stage.setTitle("Scene Editor");
+
+        StackPane rootPane = new StackPane();
+        Scene scene = new Scene(rootPane, appSettings.getWidth(), appSettings.getHeight());
+
+        stage.setScene(scene);
+        stage.show();
     }
 
     public void showCommandWindow() {
-        commandWindow.pack();
-        commandWindow.setLocation(getX() + getWidth() / 2 - commandWindow.getWidth() / 2, getY() + 50);
-        commandWindow.setVisible(true);
+//        commandWindow.pack();
+//        commandWindow.setLocation(getX() + getWidth() / 2 - commandWindow.getWidth() / 2, getY() + 50);
+//        commandWindow.setVisible(true);
     }
-
 
     private void loadShortcuts(final Json json, final CommandManager commandManager) {
         ShortcutsLoader.load(json, commandManager, PATH_CONFIG + "shortcuts.json");

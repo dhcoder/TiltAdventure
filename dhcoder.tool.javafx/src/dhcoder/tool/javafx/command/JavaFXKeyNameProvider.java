@@ -6,11 +6,11 @@ import javafx.scene.input.KeyCode;
 
 import static dhcoder.support.text.StringUtils.format;
 
-public final class JfxKeyNameProvider implements KeyNameProvider {
+public final class JavaFXKeyNameProvider implements KeyNameProvider {
 
     BiMap<KeyCode, String> keyNames = new BiMap<KeyCode, String>();
 
-    public JfxKeyNameProvider() {
+    public JavaFXKeyNameProvider() {
 
         keyNames.put(KeyCode.DIGIT0, "0");
         keyNames.put(KeyCode.DIGIT1, "1");
@@ -189,5 +189,13 @@ public final class JfxKeyNameProvider implements KeyNameProvider {
             throw new IllegalArgumentException(format("Unknown key name {0}", name));
         }
         return keyNames.getKey(name).ordinal();
+    }
+
+    public KeyCode getKeyCode(final String name) {
+        return getKeyCode(getKey(name));
+    }
+
+    public KeyCode getKeyCode(final int key) {
+        return KeyCode.values()[key];
     }
 }

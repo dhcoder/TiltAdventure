@@ -13,3 +13,8 @@ sourceCompatibility = 1.8
 
 sourceSets.main.java.srcDirs = ["src/"]
 sourceSets.test.java.srcDirs = ["test/"]
+
+tasks.withType(JavaCompile) {
+    options.fork = true;
+    options.forkOptions.executable = '/Library/Java/JavaVirtualMachines/jdk1.8.0_25.jdk/Contents/Home/bin/javac'
+}
