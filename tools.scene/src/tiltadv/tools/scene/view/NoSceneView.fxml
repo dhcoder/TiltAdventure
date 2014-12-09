@@ -3,22 +3,22 @@
 <?import javafx.scene.text.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tiltadv.tools.scene.view.NoSceneViewController">
-   <children>
-      <VBox alignment="CENTER" layoutX="250.0" layoutY="77.0" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <children>
-            <TextFlow textAlignment="CENTER">
-               <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Press " />
-                  <Text fx:id="textCommandWindowShortcut" layoutX="10.0" layoutY="10.0" strokeType="OUTSIDE" strokeWidth="0.0" text="(shortcut)">
-                     <font>
-                        <Font name="System Bold" size="13.0" />
-                     </font>
-                  </Text>
-                  <Text layoutX="37.0" layoutY="10.0" strokeType="OUTSIDE" strokeWidth="0.0" text=" to open the Command Window" />
-               </children>
-            </TextFlow>
-         </children>
-      </VBox>
-   </children>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
+            prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tiltadv.tools.scene.view.NoSceneViewController">
+   <VBox alignment="CENTER" layoutX="250.0" layoutY="77.0" prefHeight="200.0" prefWidth="100.0"
+         AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+         AnchorPane.topAnchor="0.0">
+      <TextFlow textAlignment="CENTER">
+         <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Press "/>
+         <Text fx:id="textCommandWindowShortcut" layoutX="10.0" layoutY="10.0" strokeType="OUTSIDE"
+               strokeWidth="0.0" text="(shortcut)">
+            <font>
+               <Font name="System Bold" size="13.0"/>
+            </font>
+         </Text>
+         <Text layoutX="37.0" layoutY="10.0" strokeType="OUTSIDE" strokeWidth="0.0"
+               text=" to open the Command Window"/>
+      </TextFlow>
+   </VBox>
 </AnchorPane>
