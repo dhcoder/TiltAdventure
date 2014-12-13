@@ -7,11 +7,13 @@ import dhcoder.tool.command.Command;
 import dhcoder.tool.command.CommandManager;
 import dhcoder.tool.command.CommandScope;
 import dhcoder.tool.command.Shortcut;
-import dhcoder.tool.javafx.command.JavaFXKeyNameProvider;
+import dhcoder.tool.javafx.command.JFXKey;
+import dhcoder.tool.javafx.command.JFXKeyNameProvider;
 import dhcoder.tool.libgdx.serialization.ShortcutsLoader;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -45,7 +47,7 @@ public final class SceneTool extends Application {
 
     public SceneTool() {
         Gdx.files = new LwjglFiles();
-        Shortcut.setKeyNameProvider(new JavaFXKeyNameProvider());
+        Shortcut.setKeyNameProvider(new JFXKeyNameProvider());
 
 //        CommandManager commandManager = new CommandManager();
 //        globalCommands = new GlobalCommands(this, commandManager);
@@ -82,7 +84,7 @@ public final class SceneTool extends Application {
             NoSceneViewController controller = loader.getController();
             Command dummyCommand =
                 new Command("dummy_id", new CommandScope("dummy_scope"), "Show Command Window", "Yeah", () -> {});
-
+            dummyCommand.setShortcut(Shortcut.ctrl(JFXKey.SLASH));
             controller.setCommandWindowCommand(dummyCommand);
 
         } catch (IOException e) {

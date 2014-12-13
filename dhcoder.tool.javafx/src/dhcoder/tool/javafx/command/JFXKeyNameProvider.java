@@ -6,11 +6,11 @@ import javafx.scene.input.KeyCode;
 
 import static dhcoder.support.text.StringUtils.format;
 
-public final class JavaFXKeyNameProvider implements KeyNameProvider {
+public final class JFXKeyNameProvider implements KeyNameProvider {
 
     BiMap<KeyCode, String> keyNames = new BiMap<KeyCode, String>();
 
-    public JavaFXKeyNameProvider() {
+    public JFXKeyNameProvider() {
 
         keyNames.put(KeyCode.DIGIT0, "0");
         keyNames.put(KeyCode.DIGIT1, "1");
