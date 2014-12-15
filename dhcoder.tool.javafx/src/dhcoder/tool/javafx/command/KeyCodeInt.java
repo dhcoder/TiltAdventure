@@ -5,9 +5,9 @@ import javafx.scene.input.KeyCode;
 /**
  * Using syntax like {@link KeyCode}.SLASH.ordinal() everywhere you need to cast KeyCode -> int is just too verbose.
  * This class provides direct integer values for the corresponding {@link KeyCode}, so, for the previous example, you
- * would just use {@link JFXKey}.SLASH instead.
+ * would just use {@link KeyCodeInt}.SLASH instead.
  */
-public final class JFXKey {
+public final class KeyCodeInt {
 
    public static final int DIGIT0 = KeyCode.DIGIT0.ordinal();
    public static final int DIGIT1 = KeyCode.DIGIT1.ordinal();
