@@ -9,16 +9,16 @@ import dhcoder.tool.command.CommandScope;
 import dhcoder.tool.command.Shortcut;
 import dhcoder.tool.javafx.command.JFXKey;
 import dhcoder.tool.javafx.command.JFXKeyNameProvider;
+import dhcoder.tool.javafx.control.CommandWindow;
 import dhcoder.tool.libgdx.serialization.ShortcutsLoader;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import tiltadv.tools.scene.serialization.SettingsLoader;
-import tiltadv.tools.scene.view.NoSceneViewController;
+import tiltadv.tools.scene.view.NoSceneController;
 
 import javax.swing.*;
 import java.awt.*;
@@ -38,7 +38,7 @@ public final class SceneTool extends Application {
 
 //    private final GlobalCommands globalCommands;
 
-//    private CommandWindow commandWindow;
+    private CommandWindow commandWindow;
 
     static {
     }
@@ -76,12 +76,12 @@ public final class SceneTool extends Application {
             // Load person overview.
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(SceneTool.class.getResource("view/NoSceneView.fxml"));
-            Pane noSceneView = (Pane)loader.load();
+            Pane noSceneView = loader.load();
 
             rootPane.getChildren().add(noSceneView);
 
             // Give the controller access to the main app.
-            NoSceneViewController controller = loader.getController();
+            NoSceneController controller = loader.getController();
             Command dummyCommand =
                 new Command("dummy_id", new CommandScope("dummy_scope"), "Show Command Window", "Yeah", () -> {});
             dummyCommand.setShortcut(Shortcut.ctrl(JFXKey.SLASH));
@@ -92,9 +92,14 @@ public final class SceneTool extends Application {
         }
 
         Scene scene = new Scene(rootPane, appSettings.getWidth(), appSettings.getHeight());
-
         stage.setScene(scene);
+
+        commandWindow = new CommandWindow();
         stage.show();
+
+        commandWindow.setWidth(400);
+        commandWindow.setHeight(600);
+        commandWindow.show();
     }
 
     public void showCommandWindow() {
