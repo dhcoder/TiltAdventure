@@ -13,6 +13,9 @@
         <option name="METHODS_ORDER_WEIGHT" value="7" />
         <option name="STATIC_INNER_CLASSES_ORDER_WEIGHT" value="2" />
         <option name="INNER_CLASSES_ORDER_WEIGHT" value="5" />
+        <JavaCodeStyleSettings>
+          <option name="DO_NOT_WRAP_AFTER_SINGLE_ANNOTATION" value="true" />
+        </JavaCodeStyleSettings>
         <XML>
           <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
         </XML>
@@ -412,4 +415,3 @@
     <option name="USE_PER_PROJECT_SETTINGS" value="true" />
   </component>
 </project>
-
