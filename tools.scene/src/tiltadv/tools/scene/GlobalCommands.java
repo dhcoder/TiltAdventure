@@ -30,12 +30,9 @@ public final class GlobalCommands {
         helpScope = new CommandScope("Help", globalScope);
 
         showCommandWindow = new Command("show_command_window", globalScope, "Show Command Window",
-            "Opens the Command Window which allows for searching all commands", new Command.RunCallback() {
-            @Override
-            public void run() {
-                sceneTool.getCommandWindow().show(sceneTool.getStage());
-            }
-        });
+            "Opens the Command Window which allows for searching all commands", () -> {
+                sceneTool.showCommandWindow();
+            });
         commandManager.excludeFromSearch(showCommandWindow);
 
         newScene = new Command("new_scene", fileScope, "New Scene", "Opens a new, blank scene to work on",

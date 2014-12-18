@@ -4,20 +4,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglFiles;
 import com.badlogic.gdx.utils.Json;
 import dhcoder.support.opt.Opt;
-import dhcoder.tool.command.Command;
 import dhcoder.tool.command.CommandManager;
-import dhcoder.tool.command.CommandScope;
 import dhcoder.tool.command.Shortcut;
+import dhcoder.tool.javafx.command.CommandListener;
 import dhcoder.tool.javafx.command.JFXKeyNameProvider;
-import dhcoder.tool.javafx.command.KeyCodeInt;
 import dhcoder.tool.javafx.control.CommandWindow;
 import dhcoder.tool.libgdx.serialization.ShortcutsLoader;
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -47,9 +42,6 @@ public final class SceneTool extends Application {
     public Stage getStage() {
         return stageOpt.getValue();
     }
-    public CommandWindow getCommandWindow() {
-        return commandWindow;
-    }
 
     private CommandWindow commandWindow;
 
@@ -62,7 +54,7 @@ public final class SceneTool extends Application {
         commandManager = new CommandManager();
         globalCommands = new GlobalCommands(this, commandManager);
 
-//        commandWindow = new CommandWindow(this, commandManager);
+        commandWindow = new CommandWindow(commandManager);
 
 //        FirstRunForm firstRunForm = new FirstRunForm(globalCommands);
 //        overlapPane.addComponent(firstRunForm.getPanelRoot());
@@ -99,10 +91,7 @@ public final class SceneTool extends Application {
 
             // Give the controller access to the main app.
             NoSceneController controller = loader.getController();
-            Command dummyCommand =
-                new Command("dummy_id", new CommandScope("dummy_scope"), "Show Command Window", "Yeah", () -> {});
-            dummyCommand.setShortcut(Shortcut.ctrl(KeyCodeInt.BACK_SLASH));
-            controller.setCommandWindowCommand(dummyCommand);
+            controller.setCommandWindowCommand(globalCommands.showCommandWindow);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -111,16 +100,9 @@ public final class SceneTool extends Application {
         Scene scene = new Scene(rootPane, appSettings.getWidth(), appSettings.getHeight());
         stage.setScene(scene);
 
-        scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(final KeyEvent event) {
-                if (event.isControlDown() && event.getCode() == KeyCode.BACK_SLASH) {
-                    showCommandWindow();
-                }
-            }
-        });
+        CommandListener listener = new CommandListener(globalCommands.globalScope);
+        listener.install(scene);
 
-        commandWindow = new CommandWindow();
         stage.show();
     }
 
