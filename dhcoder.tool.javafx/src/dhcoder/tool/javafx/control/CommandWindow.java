@@ -12,7 +12,11 @@ import java.io.IOException;
  */
 public final class CommandWindow extends PopupWindow {
 
+    private final CommandManager commandManager;
+
     public CommandWindow(final CommandManager commandManager) {
+        this.commandManager = commandManager;
+
         autoHideProperty().set(true);
 
         FXMLLoader loader = new FXMLLoader();
@@ -20,10 +24,14 @@ public final class CommandWindow extends PopupWindow {
         try {
             Pane commandWindowView = loader.load();
             CommandWindowController controller = loader.getController();
-            controller.setCommandManager(commandManager);
+            controller.setCommandWindow(this);
             getScene().setRoot(commandWindowView);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public CommandManager getCommandManager() {
+        return commandManager;
     }
 }
