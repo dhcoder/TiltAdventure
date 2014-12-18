@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextFlow?>
+
+<GridPane fx:id="pane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dhcoder.tool.javafx.control.CommandRowController">
+   <columnConstraints>
+      <ColumnConstraints hgrow="ALWAYS" />
+      <ColumnConstraints fillWidth="false" hgrow="SOMETIMES" />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints vgrow="SOMETIMES" />
+   </rowConstraints>
+   <children>
+      <TextFlow fx:id="flowCommandName">
+         <children>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Global: Command Name" />
+         </children>
+      </TextFlow>
+      <Label fx:id="labelShortcut" contentDisplay="RIGHT" text="Ctrl+Shift Q" GridPane.columnIndex="1">
+         <font>
+            <Font name="Arial Italic" size="11.0" />
+         </font>
+      </Label>
+   </children>
+</GridPane>
