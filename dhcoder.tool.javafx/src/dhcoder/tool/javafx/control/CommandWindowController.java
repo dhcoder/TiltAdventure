@@ -8,7 +8,8 @@ import dhcoder.tool.command.CommandScope;
 import dhcoder.tool.command.Shortcut;
 import dhcoder.tool.javafx.command.CommandListener;
 import dhcoder.tool.javafx.command.KeyCodeInt;
-import javafx.application.Platform;
+import dhcoder.tool.javafx.fxutils.FontUtils;
+import dhcoder.tool.javafx.fxutils.ListUtils;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -27,7 +28,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public final class CommandWindowController {
-    private CommandWindow commandWindow;
 
     @FXML private TextField textSearch;
     @FXML private ListView<Command> listCommands;
@@ -59,7 +59,7 @@ public final class CommandWindowController {
             commandRowController.getPane().setBackground(Background.EMPTY);
 
             if (!empty) {
-                commandRowController.getFlowCommandName().getChildren().add(new Text(command.getFullName()));
+                updateName(command);
                 Opt<Shortcut> shortcutOpt = command.getShortcutOpt();
                 if (shortcutOpt.hasValue()) {
                     commandRowController.getLabelShortcut().setText(shortcutOpt.getValue().toString());
@@ -68,10 +68,87 @@ public final class CommandWindowController {
 
             setGraphic(commandRowController.getPane());
         }
+
+        private void updateName(final Command command) {
+            String name = command.getFullName();
+
+            final String query = textSearch.getText();
+            if (StringUtils.isWhitespace(query)) {
+                addText(name);
+                return;
+            }
+
+            StringBuilder stringBuilder = new StringBuilder();
+
+            boolean inBoldSection = false;
+            int queryIndex = 0;
+            for (int nameIndex = 0; nameIndex < name.length(); nameIndex++) {
+                char nameChar = name.charAt(nameIndex);
+
+                if (queryIndex < query.length()) {
+                    char queryChar = query.charAt(queryIndex);
+
+                    if (Character.toLowerCase(nameChar) == Character.toLowerCase(queryChar)) {
+                        if (!inBoldSection) {
+                            if (queryChar != ' ') {
+                                addTextSoFar(stringBuilder, inBoldSection);
+                                inBoldSection = true;
+                            }
+                        }
+                        else {
+                            if (queryChar == ' ') {
+                                addTextSoFar(stringBuilder, inBoldSection);
+                                inBoldSection = false;
+                            }
+                        }
+                        queryIndex++;
+                    }
+                    else {
+                        if (inBoldSection) {
+                            addTextSoFar(stringBuilder, inBoldSection);
+                            inBoldSection = false;
+                        }
+                    }
+                }
+                else {
+                    if (inBoldSection) {
+                        addTextSoFar(stringBuilder, inBoldSection);
+                        inBoldSection = false;
+                    }
+                }
+                stringBuilder.append(nameChar);
+            }
+
+            addTextSoFar(stringBuilder, inBoldSection);
+        }
+
+        private void addText(final String text) {
+            commandRowController.getFlowCommandName().getChildren().add(new Text(text));
+        }
+
+
+        private void addTextSoFar(final StringBuilder stringBuilder, final boolean isBold) {
+            if (stringBuilder.length() == 0) {
+                return;
+            }
+
+            Text text = new Text(stringBuilder.toString());
+            stringBuilder.setLength(0);
+
+            if (isBold) {
+                text.setFont(FontUtils.cloneBold(text.getFont()));
+            }
+            commandRowController.getFlowCommandName().getChildren().add(text);
+        }
     }
 
     public void setCommandWindow(final CommandWindow commandWindow) {
-        this.commandWindow = commandWindow;
+
+        commandWindow.setOnShown(event -> {
+            textSearch.clear();
+            selectedCommandIndex = 0;
+            updateSelection();
+        });
 
         allCommandsSorted = new ArrayList<>(commandWindow.getCommandManager().searchableCommands());
         allCommandsSorted.sort((command1, command2) -> command1.getFullName().compareTo(command2.getFullName()));
@@ -83,12 +160,12 @@ public final class CommandWindowController {
             if (selectedCommandIndex < 0) {
                 selectedCommandIndex = matchedCommands.size() - 1;
             }
-            refreshSelectedCommand();
+            updateSelection();
         });
 
         commandWindowScope.addLambdaCommand(Shortcut.noModifier(KeyCodeInt.DOWN), () -> {
             selectedCommandIndex = (selectedCommandIndex + 1) % matchedCommands.size();
-            refreshSelectedCommand();
+            updateSelection();
         });
 
         commandWindowScope.addLambdaCommand(Shortcut.noModifier(KeyCodeInt.ENTER), () -> {
@@ -97,16 +174,14 @@ public final class CommandWindowController {
             command.run();
         }).setActiveCallback(() -> (selectedCommandIndex < matchedCommands.size()));
 
-        commandWindowScope.addLambdaCommand(Shortcut.noModifier(KeyCodeInt.ESCAPE), () -> {
-            commandWindow.hide();
-        });
+        commandWindowScope.addLambdaCommand(Shortcut.noModifier(KeyCodeInt.ESCAPE), commandWindow::hide);
 
         CommandListener commandListener = new CommandListener(commandWindowScope);
         commandListener.install(textSearch);
 
         listCommands.setCellFactory(param -> new CommandRowCell());
         listCommands.setItems(matchedCommands);
-        refreshSelectedCommand();
+        updateSelection();
 
         textSearch.textProperty().addListener(new ChangeListener<String>() {
             @Override
@@ -124,14 +199,15 @@ public final class CommandWindowController {
 
                 if (matchedCommands.size() > 0) {
                     selectedCommandIndex = Math.min(selectedCommandIndex, matchedCommands.size() - 1);
-                    refreshSelectedCommand();
+                    updateSelection();
                 }
 
+                ListUtils.forceRefresh(listCommands);
             }
         });
     }
 
-    private void refreshSelectedCommand() {
-        Platform.runLater(() -> listCommands.getSelectionModel().select(selectedCommandIndex));
+    private void updateSelection() {
+        listCommands.getSelectionModel().select(selectedCommandIndex);
     }
 }
