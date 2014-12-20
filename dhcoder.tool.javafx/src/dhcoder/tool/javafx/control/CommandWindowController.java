@@ -9,10 +9,9 @@ import dhcoder.tool.command.Shortcut;
 import dhcoder.tool.javafx.command.CommandListener;
 import dhcoder.tool.javafx.command.KeyCodeInt;
 import dhcoder.tool.javafx.fxutils.FontUtils;
-import dhcoder.tool.javafx.fxutils.ListUtils;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import dhcoder.tool.javafx.fxutils.ListViewUtils;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -28,6 +27,8 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public final class CommandWindowController {
+
+    private static final int MAX_COMMANDS = 30;
 
     @FXML private TextField textSearch;
     @FXML private ListView<Command> listCommands;
@@ -126,7 +127,6 @@ public final class CommandWindowController {
             commandRowController.getFlowCommandName().getChildren().add(new Text(text));
         }
 
-
         private void addTextSoFar(final StringBuilder stringBuilder, final boolean isBold) {
             if (stringBuilder.length() == 0) {
                 return;
@@ -152,7 +152,13 @@ public final class CommandWindowController {
 
         allCommandsSorted = new ArrayList<>(commandWindow.getCommandManager().searchableCommands());
         allCommandsSorted.sort((command1, command2) -> command1.getFullName().compareTo(command2.getFullName()));
-        matchedCommands = FXCollections.observableArrayList(allCommandsSorted);
+        matchedCommands = FXCollections.observableArrayList();
+        matchedCommands.addListener((ListChangeListener<Command>)c -> {
+            if (matchedCommands.size() > MAX_COMMANDS) {
+                matchedCommands.remove(MAX_COMMANDS, matchedCommands.size());
+            }
+        });
+        matchedCommands.addAll(allCommandsSorted);
 
         CommandScope commandWindowScope = new CommandScope("CommandWindow");
         commandWindowScope.addLambdaCommand(Shortcut.noModifier(KeyCodeInt.UP), () -> {
@@ -181,29 +187,26 @@ public final class CommandWindowController {
 
         listCommands.setCellFactory(param -> new CommandRowCell());
         listCommands.setItems(matchedCommands);
+        ListViewUtils.sizeToContents(listCommands);
+
         updateSelection();
 
-        textSearch.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(final ObservableValue<? extends String> observable, final String oldValue,
-                final String newValue) {
-
-                final String query = newValue;
-                if (StringUtils.isWhitespace(query)) {
-                    matchedCommands.setAll(allCommandsSorted);
-                    return;
-                }
-
+        textSearch.textProperty().addListener((observable, oldValue, newValue) -> {
+            final String query = newValue;
+            if (StringUtils.isWhitespace(query)) {
+                matchedCommands.setAll(allCommandsSorted);
+            }
+            else {
                 Pattern fuzzySearch = CommandManager.toFuzzySearch(query);
                 matchedCommands.setAll(CommandManager.regexSearch(fuzzySearch, allCommandsSorted));
-
-                if (matchedCommands.size() > 0) {
-                    selectedCommandIndex = Math.min(selectedCommandIndex, matchedCommands.size() - 1);
-                    updateSelection();
-                }
-
-                ListUtils.forceRefresh(listCommands);
             }
+
+            if (matchedCommands.size() > 0) {
+                selectedCommandIndex = Math.min(selectedCommandIndex, matchedCommands.size() - 1);
+                updateSelection();
+            }
+
+            ListViewUtils.forceRefresh(listCommands);
         });
     }
 
