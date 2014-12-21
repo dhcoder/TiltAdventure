@@ -16,6 +16,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import tiltadv.tools.scene.serialization.SettingsLoader;
 import tiltadv.tools.scene.view.NoSceneController;
 
@@ -107,7 +108,12 @@ public final class SceneTool extends Application {
     }
 
     public void showCommandWindow() {
+        Window window = getStage().getScene().getWindow();
+        double windowX = window.getX();
+        double windowY = window.getY();
         commandWindow.show(getStage());
+        commandWindow.setX(windowX + (window.getWidth() - commandWindow.getWidth()) / 2);
+        commandWindow.setY(windowY + 50);
     }
 
     private void loadShortcuts(final Json json, final CommandManager commandManager) {
