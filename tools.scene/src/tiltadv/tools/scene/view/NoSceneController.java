@@ -10,8 +10,11 @@ import javafx.scene.text.Text;
  */
 public final class NoSceneController {
     @FXML private Text textCommandWindowShortcut;
+    @FXML public Text textNewSceneCommand;
 
-    public void setCommandWindowCommand(final Command commandWindowCommand) {
+    public void setCommandWindowCommand(final Command commandWindowCommand, final Command newSceneCommand) {
         textCommandWindowShortcut.setText(commandWindowCommand.getShortcutOpt().getValue().toString());
+        textNewSceneCommand.setText(newSceneCommand.getName());
+
     }
 }

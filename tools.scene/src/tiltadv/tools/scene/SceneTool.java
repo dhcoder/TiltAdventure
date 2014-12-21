@@ -92,7 +92,7 @@ public final class SceneTool extends Application {
 
             // Give the controller access to the main app.
             NoSceneController controller = loader.getController();
-            controller.setCommandWindowCommand(globalCommands.showCommandWindow);
+            controller.setCommandWindowCommand(globalCommands.showCommandWindow, globalCommands.newScene);
 
         } catch (IOException e) {
             e.printStackTrace();
