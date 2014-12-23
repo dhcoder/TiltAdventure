@@ -39,10 +39,13 @@ public final class SceneTool extends Application {
     private final GlobalCommands globalCommands;
 
     private final Opt<Stage> stageOpt = Opt.withNoValue();
+    private final Opt<SceneContext> contextOpt = Opt.withNoValue();
 
     public Stage getStage() {
         return stageOpt.getValue();
     }
+
+    public Opt<SceneContext> getContextOpt() { return contextOpt; }
 
     private CommandWindow commandWindow;
 

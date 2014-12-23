@@ -4,15 +4,12 @@ import dhcoder.tool.command.Command;
 import dhcoder.tool.command.CommandManager;
 import dhcoder.tool.command.CommandScope;
 
-//import dhcoder.tool.scene2d.widget.CommandTree;
-
 /**
-* Commands that should get executed anytime.
-*/
+ * Commands that can get executed anywhere in the tool, no matter what toolbar has focus.
+ */
 public final class GlobalCommands {
 
     public final CommandScope globalScope;
-    public final CommandScope helpScope;
     public final CommandScope fileScope;
     public final CommandScope editScope;
     public final Command showCommandWindow;
@@ -21,71 +18,35 @@ public final class GlobalCommands {
     public final Command exit;
     public final Command undo;
     public final Command redo;
-//    public final Command toggle_command_tree;
 
     public GlobalCommands(final SceneTool sceneTool, final CommandManager commandManager) {
         globalScope = new CommandScope("Global", true);
         fileScope = new CommandScope("File", globalScope);
         editScope = new CommandScope("Edit", globalScope);
-        helpScope = new CommandScope("Help", globalScope);
 
         showCommandWindow = new Command("show_command_window", globalScope, "Show Command Window",
-            "Opens the Command Window which allows for searching all commands", () -> {
-                sceneTool.showCommandWindow();
-            });
+            "Opens the Command Window which allows for searching all commands", sceneTool::showCommandWindow);
         commandManager.excludeFromSearch(showCommandWindow);
 
-        newScene = new Command("new_scene", fileScope, "New Scene", "Opens a new, blank scene to work on",
-            new Command.RunCallback() {
-                @Override
-                public void run() {
+        newScene = new Command("new_scene", fileScope, "New Scene", "Opens a new, blank scene to work on", () -> {
 
-                }
-            });
-
-        closeScene =
-            new Command("close_scene", fileScope, "Close Scene", "Closes the current scene", new Command.RunCallback() {
-                @Override
-                public void run() {
-
-                }
-            });
-
-        exit = new Command("exit", fileScope, "Exit", "Exits the application", new Command.RunCallback() {
-            @Override
-            public void run() {
-                sceneTool.getStage().close();
-            }
         });
 
-        undo = new Command("undo", editScope, "Undo", "Undo your last action", new Command.RunCallback() {
-            @Override
-            public void run() {
+        closeScene = new Command("close_scene", fileScope, "Close Scene", "Closes the current scene", () -> {
 
-            }
-        }).setActiveCallback(new Command.ActiveCallback() {
-            @Override
-            public boolean isActive() {
-                return false;
-            }
         });
 
-        redo = new Command("redo", editScope, "Redo", "Redo your last undone action", new Command.RunCallback() {
-            @Override
-            public void run() {
+        exit = new Command("exit", fileScope, "Exit", "Exits the application", () -> sceneTool.getStage().close());
 
-            }
-        });
+        undo = new Command("undo", editScope, "Undo", "Undo your last action",
+            () -> sceneTool.getContextOpt().getValue().getHistory().undo()).
+            setActiveCallback(() -> sceneTool.getContextOpt().hasValue() &&
+                sceneTool.getContextOpt().getValue().getHistory().canUndo());
 
-//        toggleCommandTree =
-//            new Command("toggle_command_tree", helpScope, "Show/Hide Command Tree", "Toggles the command tree window",
-//                new Command.RunCallback() {
-//                    @Override
-//                    public void run() {
-//                        CommandTree commandTree = sceneTool.getCommandTree();
-//                        commandTree.setVisible(!commandTree.isVisible());
-//                    }
-//                });
+        redo = new Command("redo", editScope, "Redo", "Redo your last undone action",
+            () -> sceneTool.getContextOpt().getValue().getHistory().redo()).
+            setActiveCallback(() -> sceneTool.getContextOpt().hasValue() &&
+                sceneTool.getContextOpt().getValue().getHistory().canRedo());
 
         commandManager.register(globalScope);
     }

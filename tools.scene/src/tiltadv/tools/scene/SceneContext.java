@@ -11,7 +11,11 @@ public final class SceneContext {
     private final History history = new History();
     private final Scene scene;
 
-    public SceneContext() {
-        scene = null;
+    public SceneContext(final Scene scene) {
+        this.scene = scene;
+    }
+
+    public History getHistory() {
+        return history;
     }
 }
