@@ -29,7 +29,7 @@
                         <Font name="System Bold" size="13.0" />
                      </font>
                   </Text>
-                  <Text layoutX="37.0" layoutY="10.0" strokeType="OUTSIDE" strokeWidth="0.0" text=", then &lt;ENTER&gt;" />
+                  <Text layoutX="37.0" layoutY="10.0" strokeType="OUTSIDE" strokeWidth="0.0" text=", then press &lt;ENTER&gt;" />
                </children>
             </TextFlow>
          </children>
