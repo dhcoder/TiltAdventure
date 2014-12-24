@@ -28,13 +28,11 @@ public final class GlobalCommands {
             "Opens the Command Window which allows for searching all commands", sceneTool::showCommandWindow);
         commandManager.excludeFromSearch(showCommandWindow);
 
-        newScene = new Command("new_scene", fileScope, "New Scene", "Opens a new, blank scene to work on", () -> {
+        newScene = new Command("new_scene", fileScope, "New Scene", "Opens a new, blank scene to work on",
+            sceneTool::newScene);
 
-        });
-
-        closeScene = new Command("close_scene", fileScope, "Close Scene", "Closes the current scene", () -> {
-
-        });
+        closeScene =
+            new Command("close_scene", fileScope, "Close Scene", "Closes the current scene", sceneTool::closeScene);
 
         exit = new Command("exit", fileScope, "Exit", "Exits the application", () -> sceneTool.getStage().close());
 

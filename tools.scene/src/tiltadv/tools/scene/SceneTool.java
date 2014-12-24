@@ -12,15 +12,14 @@ import dhcoder.tool.javafx.control.CommandWindow;
 import dhcoder.tool.libgdx.serialization.ShortcutsLoader;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import tiltadv.tools.scene.serialization.SettingsLoader;
 import tiltadv.tools.scene.view.NoSceneController;
 
-import javax.swing.*;
 import java.io.IOException;
 
 /**
@@ -37,19 +36,12 @@ public final class SceneTool extends Application {
 
     private final CommandManager commandManager;
     private final GlobalCommands globalCommands;
-
-    private final Opt<Stage> stageOpt = Opt.withNoValue();
     private final Opt<SceneContext> contextOpt = Opt.withNoValue();
+    private final CommandWindow commandWindow;
 
-    public Stage getStage() {
-        return stageOpt.getValue();
-    }
-
-    public Opt<SceneContext> getContextOpt() { return contextOpt; }
-
-    private CommandWindow commandWindow;
-
-    private JPanel panelRoot;
+    private Stage stage;
+    private StackPane rootPane;
+    private Node sceneView;
 
     public SceneTool() {
         Gdx.files = new LwjglFiles();
@@ -59,23 +51,17 @@ public final class SceneTool extends Application {
         globalCommands = new GlobalCommands(this, commandManager);
 
         commandWindow = new CommandWindow(commandManager);
-
-//        FirstRunForm firstRunForm = new FirstRunForm(globalCommands);
-//        overlapPane.addComponent(firstRunForm.getPanelRoot());
-
-//        CommandListener commandListener = new CommandListener(globalCommands.globalScope);
-//        commandListener.registerUmbrellaListener(rootPane);
-
     }
 
-    @Override
-    public void stop() {
-        stageOpt.clear();
+    public Stage getStage() {
+        return stage;
     }
+
+    public Opt<SceneContext> getContextOpt() { return contextOpt; }
 
     @Override
     public void start(final Stage stage) {
-        stageOpt.set(stage);
+        this.stage = stage;
 
         Json json = new Json();
         SettingsLoader.AppSettings appSettings = SettingsLoader.load(json, PATH_CONFIG + "settings.json");
@@ -83,20 +69,10 @@ public final class SceneTool extends Application {
 
         stage.setTitle("Scene Editor");
 
-        StackPane rootPane = new StackPane();
-
+        rootPane = new StackPane();
         try {
-            // Load person overview.
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(SceneTool.class.getResource("view/NoSceneView.fxml"));
-            Pane noSceneView = loader.load();
-
-            rootPane.getChildren().add(noSceneView);
-
-            // Give the controller access to the main app.
-            NoSceneController controller = loader.getController();
-            controller.setCommandWindowCommand(globalCommands.showCommandWindow, globalCommands.newScene);
-
+            rootPane.getChildren().add(loadNoSceneView());
+            sceneView = loadSceneView();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -110,6 +86,17 @@ public final class SceneTool extends Application {
         stage.show();
     }
 
+    public void newScene() {
+        if (!rootPane.getChildren().contains(sceneView)) {
+            rootPane.getChildren().add(sceneView);
+        }
+    }
+
+    public void closeScene() {
+        //TODO: Close tab, and remove sceneview if closing the last one
+        rootPane.getChildren().remove(sceneView);
+    }
+
     public void showCommandWindow() {
         Window window = getStage().getScene().getWindow();
         double windowX = window.getX();
@@ -117,6 +104,25 @@ public final class SceneTool extends Application {
         commandWindow.show(getStage());
         commandWindow.setX(windowX + (window.getWidth() - commandWindow.getWidth()) / 2);
         commandWindow.setY(windowY + 50);
+    }
+
+    private Node loadNoSceneView() throws IOException {
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(SceneTool.class.getResource("view/NoSceneView.fxml"));
+        Node noSceneView = loader.load();
+
+        NoSceneController controller = loader.getController();
+        controller.setCommandWindowCommand(globalCommands.showCommandWindow, globalCommands.newScene);
+
+        return noSceneView;
+    }
+
+    private Node loadSceneView() throws IOException {
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(SceneTool.class.getResource("view/SceneView.fxml"));
+        Node sceneView = loader.load();
+
+        return sceneView;
     }
 
     private void loadShortcuts(final Json json, final CommandManager commandManager) {
