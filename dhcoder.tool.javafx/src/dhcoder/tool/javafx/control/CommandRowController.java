@@ -1,19 +1,18 @@
 package dhcoder.tool.javafx.control;
 
+import dhcoder.tool.javafx.fxutils.FxController;
 import javafx.fxml.FXML;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.TextFlow;
 
-public final class CommandRowController {
-    @FXML private Pane pane;
-
+public final class CommandRowController extends FxController {
+    @FXML private Pane rootPane;
     @FXML private TextFlow flowCommandName;
     @FXML private Label labelShortcut;
 
-    public Pane getPane() {
-        return pane;
-    }
+    public Pane getPane() { return rootPane; }
 
     public TextFlow getFlowCommandName() {
         return flowCommandName;
@@ -23,4 +22,8 @@ public final class CommandRowController {
         return labelShortcut;
     }
 
+    @Override
+    public Parent getRoot() {
+        return rootPane;
+    }
 }
