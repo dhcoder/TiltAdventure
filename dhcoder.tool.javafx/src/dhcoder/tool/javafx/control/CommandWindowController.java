@@ -9,46 +9,33 @@ import dhcoder.tool.command.Shortcut;
 import dhcoder.tool.javafx.command.CommandListener;
 import dhcoder.tool.javafx.command.KeyCodeInt;
 import dhcoder.tool.javafx.fxutils.FontUtils;
+import dhcoder.tool.javafx.fxutils.FxController;
 import dhcoder.tool.javafx.fxutils.ListViewUtils;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Background;
 import javafx.scene.text.Text;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public final class CommandWindowController {
+public final class CommandWindowController extends FxController {
 
-    private static final int MAX_COMMANDS = 30;
 
-    @FXML private TextField textSearch;
-    @FXML private ListView<Command> listCommands;
-
-    private List<Command> allCommandsSorted;
-    private ObservableList<Command> matchedCommands;
-    private int selectedCommandIndex;
 
     private class CommandRowCell extends ListCell<Command> {
 
         private CommandRowController commandRowController;
 
         public CommandRowCell() {
-            FXMLLoader loader = new FXMLLoader(CommandWindow.class.getResource("CommandRowView.fxml"));
-            try {
-                loader.load();
-                commandRowController = loader.getController();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            commandRowController = FxController.load(CommandRowController.class);
         }
 
         @Override
@@ -142,6 +129,15 @@ public final class CommandWindowController {
         }
     }
 
+    private static final int MAX_COMMANDS = 30;
+
+    @FXML private Parent rootPane;
+    @FXML private TextField textSearch;
+    @FXML private ListView<Command> listCommands;
+    private List<Command> allCommandsSorted;
+    private ObservableList<Command> matchedCommands;
+    private int selectedCommandIndex;
+
     public void setCommandWindow(final CommandWindow commandWindow) {
 
         commandWindow.setOnShown(event -> {
@@ -208,6 +204,11 @@ public final class CommandWindowController {
 
             ListViewUtils.forceRefresh(listCommands);
         });
+    }
+
+    @Override
+    public Parent getRoot() {
+        return rootPane;
     }
 
     private void updateSelection() {
