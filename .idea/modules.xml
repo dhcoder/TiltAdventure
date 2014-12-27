@@ -12,6 +12,7 @@
       <module fileurl="file://$PROJECT_DIR$/dhcoder.tool/dhcoder.tool.iml" filepath="$PROJECT_DIR$/dhcoder.tool/dhcoder.tool.iml" />
       <module fileurl="file://$PROJECT_DIR$/dhcoder.tool.javafx/dhcoder.tool.javafx.iml" filepath="$PROJECT_DIR$/dhcoder.tool.javafx/dhcoder.tool.javafx.iml" />
       <module fileurl="file://$PROJECT_DIR$/dhcoder.tool.libgdx/dhcoder.tool.libgdx.iml" filepath="$PROJECT_DIR$/dhcoder.tool.libgdx/dhcoder.tool.libgdx.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dhcoder.tool.libgdx.javafx/dhcoder.tool.libgdx.javafx.iml" filepath="$PROJECT_DIR$/dhcoder.tool.libgdx.javafx/dhcoder.tool.libgdx.javafx.iml" />
       <module fileurl="file://$PROJECT_DIR$/tools.font/tools.font.iml" filepath="$PROJECT_DIR$/tools.font/tools.font.iml" />
       <module fileurl="file://$PROJECT_DIR$/tools.scene/tools.scene.iml" filepath="$PROJECT_DIR$/tools.scene/tools.scene.iml" />
     </modules>
