@@ -1,8 +1,7 @@
-package dhcoder.tool.libgdx.serialization;
+package dhcoder.tool.javafx.libgdx.serialization;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.utils.Json;
 import dhcoder.tool.command.Command;
 import dhcoder.tool.command.CommandManager;
