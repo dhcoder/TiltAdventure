@@ -5,19 +5,23 @@
       "commandId": "show_command_window"
     },
     {
-      "shortcut": "Ctrl+N",
+      "shortcut": "Cmd+N",
       "commandId": "new_scene"
     },
     {
-      "shortcut": "Ctrl+Z",
+      "shortcut": "Cmd+W",
+      "commandId": "close_scene"
+    },
+    {
+      "shortcut": "Cmd+Z",
       "commandId": "undo"
     },
     {
-      "shortcut": "Ctrl+Shift+Z",
+      "shortcut": "Cmd+Shift+Z",
       "commandId": "redo"
     },
     {
-      "shortcut": "Ctrl+Q",
+      "shortcut": "Cmd+Q",
       "commandId": "exit"
     }
 

@@ -157,7 +157,7 @@ public final class CommandWindowController extends FxController {
         matchedCommands.addAll(allCommandsSorted);
 
         CommandScope commandWindowScope = new CommandScope("CommandWindow");
-        commandWindowScope.addLambdaCommand(Shortcut.noModifier(KeyCodeInt.UP), () -> {
+        commandWindowScope.addLambdaCommand(Shortcut.of(KeyCodeInt.UP).build(), () -> {
             selectedCommandIndex--;
             if (selectedCommandIndex < 0) {
                 selectedCommandIndex = matchedCommands.size() - 1;
@@ -165,18 +165,18 @@ public final class CommandWindowController extends FxController {
             updateSelection();
         });
 
-        commandWindowScope.addLambdaCommand(Shortcut.noModifier(KeyCodeInt.DOWN), () -> {
+        commandWindowScope.addLambdaCommand(Shortcut.of(KeyCodeInt.DOWN).build(), () -> {
             selectedCommandIndex = (selectedCommandIndex + 1) % matchedCommands.size();
             updateSelection();
         });
 
-        commandWindowScope.addLambdaCommand(Shortcut.noModifier(KeyCodeInt.ENTER), () -> {
+        commandWindowScope.addLambdaCommand(Shortcut.of(KeyCodeInt.ENTER).build(), () -> {
             final Command command = matchedCommands.get(selectedCommandIndex);
             commandWindow.hide();
             command.run();
         }).setActiveCallback(() -> (selectedCommandIndex < matchedCommands.size()));
 
-        commandWindowScope.addLambdaCommand(Shortcut.noModifier(KeyCodeInt.ESCAPE), commandWindow::hide);
+        commandWindowScope.addLambdaCommand(Shortcut.of(KeyCodeInt.ESCAPE).build(), commandWindow::hide);
 
         CommandListener commandListener = new CommandListener(commandWindowScope);
         commandListener.install(textSearch);

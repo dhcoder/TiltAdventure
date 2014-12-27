@@ -11,49 +11,46 @@ import static dhcoder.support.text.StringUtils.format;
  */
 public final class Shortcut {
 
+    public static class Builder {
+        final int key;
+        boolean ctrl;
+        boolean cmd;
+        boolean alt;
+        boolean shift;
+
+        public Builder(final int key) {this.key = key;}
+
+        public Builder ctrl() {
+            ctrl = true;
+            return this;
+        }
+
+        public Builder cmd() {
+            cmd = true;
+            return this;
+        }
+
+        public Builder alt() {
+            alt = true;
+            return this;
+        }
+
+        public Builder shift() {
+            shift = true;
+            return this;
+        }
+
+        public Shortcut build() {
+            return new Shortcut(ctrl, cmd, alt, shift, key);
+        }
+    }
+
+    private static boolean IS_MAC = System.getProperty("os.name").startsWith("Mac OS");
+    public static boolean TREAT_CMD_AS_CTRL = !IS_MAC;
     private static KeyNameProvider keyNameProvider;
 
-    private static KeyNameProvider getKeyNameProvider() {
-        if (keyNameProvider == null) {
-            throw new IllegalStateException("You must call setKeyNameProvider before using this class.");
-        }
-        return keyNameProvider;
-    }
-
-    public static void setKeyNameProvider(final KeyNameProvider keyNameProvider) {
-        Shortcut.keyNameProvider = keyNameProvider;
-    }
-
-    public static Shortcut noModifier(final int key) {
-        return new Shortcut(false, false, false, key);
-    }
-
-    public static Shortcut ctrl(final int key) {
-        return new Shortcut(true, false, false, key);
-    }
-
-    public static Shortcut alt(final int key) {
-        return new Shortcut(false, true, false, key);
-    }
-
-    public static Shortcut shift(final int key) {
-        return new Shortcut(false, false, true, key);
-    }
-
-    public static Shortcut ctrlAlt(final int key) {
-        return new Shortcut(true, true, false, key);
-    }
-
-    public static Shortcut ctrlShift(final int key) {
-        return new Shortcut(true, false, true, key);
-    }
-
-    public static Shortcut altShift(final int key) {
-        return new Shortcut(false, true, true, key);
-    }
-
-    public static Shortcut ctrlAltShift(final int key) {
-        return new Shortcut(true, true, true, key);
+    public static Builder of(final int key) {
+        return new Builder(key);
     }
 
     public static Shortcut fromString(final String shortcutString) throws ParseException {
@@ -66,7 +63,7 @@ public final class Shortcut {
             throw new ParseException(shortcutString, 0);
         }
 
-        boolean ctrl = false, alt = false, shift = false;
+        boolean ctrl = false, cmd = false, alt = false, shift = false;
         int position = 0;
         for (int i = 0; i < shortcutParts.length - 1; i++) {
             String modifierPart = shortcutParts[i];
@@ -78,6 +75,14 @@ public final class Shortcut {
             }
             else if (modifierPart.equals("Shift")) {
                 shift = true;
+            }
+            else if (modifierPart.equals("Cmd")) {
+                if (TREAT_CMD_AS_CTRL) {
+                    ctrl = true;
+                }
+                else {
+                    cmd = true;
+                }
             }
             else {
                 throw new ParseException(shortcutString, position);
@@ -92,24 +97,44 @@ public final class Shortcut {
             throw new ParseException(shortcutString, position);
         }
 
-        return new Shortcut(ctrl, alt, shift, key);
+        return new Shortcut(ctrl, cmd, alt, shift, key);
+    }
+
+    private static KeyNameProvider getKeyNameProvider() {
+        if (keyNameProvider == null) {
+            throw new IllegalStateException("You must call setKeyNameProvider before using this class.");
+        }
+        return keyNameProvider;
+    }
+
+    public static void setKeyNameProvider(final KeyNameProvider keyNameProvider) {
+        Shortcut.keyNameProvider = keyNameProvider;
     }
 
     private final boolean ctrl;
     private final boolean alt;
     private final boolean shift;
+    private final boolean cmd;
     private final int key;
 
-    public Shortcut(final boolean ctrl, final boolean alt, final boolean shift, final int key) {
-        this.shift = shift;
-        this.ctrl = ctrl;
+    public Shortcut(final boolean ctrl, final boolean cmd, final boolean alt, final boolean shift, final int key) {
+        if (TREAT_CMD_AS_CTRL) {
+            this.ctrl = ctrl || cmd;
+            this.cmd = false;
+        }
+        else {
+            this.ctrl = ctrl;
+            this.cmd = cmd;
+        }
         this.alt = alt;
+        this.shift = shift;
         this.key = key;
     }
 
     @Override
     public int hashCode() {
         int result = (ctrl ? 1 : 0);
+        result = 31 * result + (cmd ? 1 : 0);
         result = 31 * result + (alt ? 1 : 0);
         result = 31 * result + (shift ? 1 : 0);
         result = 31 * result + key;
@@ -123,18 +148,19 @@ public final class Shortcut {
 
         Shortcut shortcut = (Shortcut)o;
 
-        if (alt != shortcut.alt) { return false; }
         if (ctrl != shortcut.ctrl) { return false; }
-        if (key != shortcut.key) { return false; }
+        if (cmd != shortcut.cmd) { return false; }
+        if (alt != shortcut.alt) { return false; }
         if (shift != shortcut.shift) { return false; }
+        if (key != shortcut.key) { return false; }
 
         return true;
     }
 
     @Override
     public String toString() {
-        return format("{0}{1}{2}{3}", ctrl ? "Ctrl+" : "", alt ? "Alt+" : "", shift ? "Shift+" : "",
-            getKeyNameProvider().getName(key));
+        return format("{0}{1}{2}{3}{4}", ctrl ? "Ctrl+" : "", cmd ? "Cmd+" : "", alt ? "Alt+" : "",
+            shift ? "Shift+" : "", getKeyNameProvider().getName(key));
     }
 
     public boolean ctrl() {
@@ -148,6 +174,8 @@ public final class Shortcut {
     public boolean shift() {
         return shift;
     }
+
+    public boolean cmd() { return cmd; }
 
     public int key() {
         return key;
