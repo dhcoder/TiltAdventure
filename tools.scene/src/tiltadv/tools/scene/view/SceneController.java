@@ -44,13 +44,4 @@ public final class SceneController extends FxController {
         return scenes;
 
     }
-
-    public List<Scene> getScenes() {
-        ArrayList<Scene> scenes = new ArrayList<>(tabScenes.getTabs().size());
-        for (Tab tabScene : tabScenes.getTabs()) {
-            scenes.add((Scene)tabScene.getUserData());
-        }
-        return scenes;
-
-    }
 }
