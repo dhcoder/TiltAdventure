@@ -2,7 +2,6 @@ package dhcoder.tool.javafx.control;
 
 import dhcoder.tool.javafx.fxutils.FxController;
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.TextFlow;
@@ -20,10 +19,5 @@ public final class CommandRowController extends FxController {
 
     public Label getLabelShortcut() {
         return labelShortcut;
-    }
-
-    @Override
-    public Parent getRoot() {
-        return rootPane;
     }
 }

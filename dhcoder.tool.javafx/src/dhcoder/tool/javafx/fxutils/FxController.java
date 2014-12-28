@@ -47,7 +47,10 @@ public abstract class FxController {
                 format("Can't load {0}/{1}, detail: {2}", controllerClass.getSimpleName(), fxmlFile, e));
         }
 
-        return (C)loader.getController();
+        C controller = loader.getController();
+        controller.setRoot(loader.getRoot());
+
+        return controller;
     }
 
     /**
@@ -68,8 +71,16 @@ public abstract class FxController {
         return load(controllerClass, fxmlFileBuilder.toString());
     }
 
+    private Parent root;
+
     /**
      * Returns the node associated with this controller.
      */
-    public abstract Parent getRoot();
+    public Parent getRoot() {
+        return root;
+    }
+
+    void setRoot(final Parent root) {
+        this.root = root;
+    }
 }
