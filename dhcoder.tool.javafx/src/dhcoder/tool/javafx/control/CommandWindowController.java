@@ -1,26 +1,27 @@
 package dhcoder.tool.javafx.control;
 
-import dhcoder.support.opt.Opt;
 import dhcoder.support.text.StringUtils;
-import dhcoder.tool.command.Command;
 import dhcoder.tool.command.CommandManager;
-import dhcoder.tool.command.CommandScope;
-import dhcoder.tool.command.Shortcut;
-import dhcoder.tool.javafx.command.CommandListener;
-import dhcoder.tool.javafx.command.KeyCodeInt;
+import dhcoder.tool.javafx.fxutils.ActionListener;
 import dhcoder.tool.javafx.fxutils.FontUtils;
 import dhcoder.tool.javafx.fxutils.FxController;
 import dhcoder.tool.javafx.fxutils.ListViewUtils;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.text.Text;
+import org.controlsfx.control.action.Action;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +29,7 @@ import java.util.regex.Pattern;
 
 public final class CommandWindowController extends FxController {
 
-
-
-    private class CommandRowCell extends ListCell<Command> {
+    private class CommandRowCell extends ListCell<Action> {
 
         private CommandRowController commandRowController;
 
@@ -39,30 +38,29 @@ public final class CommandWindowController extends FxController {
         }
 
         @Override
-        protected void updateItem(final Command command, final boolean empty) {
-            super.updateItem(command, empty);
+        protected void updateItem(final Action action, final boolean empty) {
+            super.updateItem(action, empty);
 
             commandRowController.getFlowCommandName().getChildren().clear();
             commandRowController.getLabelShortcut().setText("");
             commandRowController.getPane().setBackground(Background.EMPTY);
 
             if (!empty) {
-                updateName(command);
-                Opt<Shortcut> shortcutOpt = command.getShortcutOpt();
-                if (shortcutOpt.hasValue()) {
-                    commandRowController.getLabelShortcut().setText(shortcutOpt.getValue().toString());
+                updateName(action);
+                if (action.getAccelerator() != null) {
+                    commandRowController.getLabelShortcut().setText(action.getAccelerator().getDisplayText());
                 }
             }
 
             setGraphic(commandRowController.getPane());
         }
 
-        private void updateName(final Command command) {
-            String name = command.getFullName();
+        private void updateName(final Action command) {
+            String name = command.getText();
 
             final String query = textSearch.getText();
             if (StringUtils.isWhitespace(query)) {
-                addText(name);
+                addText(name); // Whitespace only means no filtering
                 return;
             }
 
@@ -131,11 +129,10 @@ public final class CommandWindowController extends FxController {
 
     private static final int MAX_COMMANDS = 30;
 
-    @FXML private Parent rootPane;
     @FXML private TextField textSearch;
-    @FXML private ListView<Command> listCommands;
-    private List<Command> allCommandsSorted;
-    private ObservableList<Command> matchedCommands;
+    @FXML private ListView<Action> listCommands;
+    private List<Action> allCommandsSorted;
+    private ObservableList<Action> matchedCommands;
     private int selectedCommandIndex;
 
     public void setCommandWindow(final CommandWindow commandWindow) {
@@ -149,37 +146,55 @@ public final class CommandWindowController extends FxController {
         allCommandsSorted = new ArrayList<>(commandWindow.getCommandManager().searchableCommands());
         allCommandsSorted.sort((command1, command2) -> command1.getFullName().compareTo(command2.getFullName()));
         matchedCommands = FXCollections.observableArrayList();
-        matchedCommands.addListener((ListChangeListener<Command>)c -> {
+        matchedCommands.addListener((ListChangeListener<Action>)c -> {
             if (matchedCommands.size() > MAX_COMMANDS) {
                 matchedCommands.remove(MAX_COMMANDS, matchedCommands.size());
             }
         });
         matchedCommands.addAll(allCommandsSorted);
 
-        CommandScope commandWindowScope = new CommandScope("CommandWindow");
-        commandWindowScope.addLambdaCommand(Shortcut.of(KeyCodeInt.UP).build(), () -> {
+        Action prevCommand = new Action(actionEvent -> {
+            if (matchedCommands.size() <= 0) {return;}
+
             selectedCommandIndex--;
             if (selectedCommandIndex < 0) {
                 selectedCommandIndex = matchedCommands.size() - 1;
             }
             updateSelection();
-        });
 
-        commandWindowScope.addLambdaCommand(Shortcut.of(KeyCodeInt.DOWN).build(), () -> {
+            actionEvent.consume();
+        });
+        prevCommand.setAccelerator(new KeyCodeCombination(KeyCode.UP));
+
+        Action nextCommand = new Action(actionEvent -> {
+            if (matchedCommands.size() <= 0) {return;}
+
             selectedCommandIndex = (selectedCommandIndex + 1) % matchedCommands.size();
             updateSelection();
+
+            actionEvent.consume();
         });
+        nextCommand.setAccelerator(new KeyCodeCombination(KeyCode.DOWN));
 
-        commandWindowScope.addLambdaCommand(Shortcut.of(KeyCodeInt.ENTER).build(), () -> {
-            final Command command = matchedCommands.get(selectedCommandIndex);
+        Action acceptCommand = new Action(actionEvent -> {
+            if (selectedCommandIndex < 0 || selectedCommandIndex >= matchedCommands.size()) {return;}
+
+            final Action action = matchedCommands.get(selectedCommandIndex);
             commandWindow.hide();
-            command.run();
-        }).setActiveCallback(() -> (selectedCommandIndex < matchedCommands.size()));
+            action.handle(new ActionEvent());
 
-        commandWindowScope.addLambdaCommand(Shortcut.of(KeyCodeInt.ESCAPE).build(), commandWindow::hide);
+            actionEvent.consume();
+        });
+        acceptCommand.setAccelerator(new KeyCodeCombination(KeyCode.ENTER));
 
-        CommandListener commandListener = new CommandListener(commandWindowScope);
-        commandListener.install(textSearch);
+        Action closeWindow = new Action(actionEvent -> {
+            commandWindow.hide();
+            actionEvent.consume();
+        });
+        closeWindow.setAccelerator(new KeyCodeCombination(KeyCode.ESCAPE));
+
+        ActionListener actionListener = new ActionListener(nextCommand, prevCommand, acceptCommand, closeWindow);
+        actionListener.install(textSearch);
 
         listCommands.setCellFactory(param -> new CommandRowCell());
         listCommands.setItems(matchedCommands);

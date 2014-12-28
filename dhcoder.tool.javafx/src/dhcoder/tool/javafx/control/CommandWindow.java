@@ -1,18 +1,18 @@
 package dhcoder.tool.javafx.control;
 
-import dhcoder.tool.command.CommandManager;
 import dhcoder.tool.javafx.fxutils.FxController;
 import javafx.stage.PopupWindow;
+import org.controlsfx.control.action.ActionGroup;
 
 /**
  * A dialog which can search through all registered, named actions.
  */
 public final class CommandWindow extends PopupWindow {
 
-    private final CommandManager commandManager;
+    private final ActionGroup allActions;
 
-    public CommandWindow(final CommandManager commandManager) {
-        this.commandManager = commandManager;
+    public CommandWindow() {
+        allActions = new ActionGroup("");
 
         autoHideProperty().set(true);
 
@@ -21,7 +21,7 @@ public final class CommandWindow extends PopupWindow {
         getScene().setRoot(controller.getRoot());
     }
 
-    public CommandManager getCommandManager() {
-        return commandManager;
+    public ActionGroup getAllActions() {
+        return allActions;
     }
 }
