@@ -1,7 +1,7 @@
 package tiltadv.tools.scene.view;
 
 import dhcoder.libgdx.assets.Scene;
-import dhcoder.tool.javafx.fxutils.FxController;
+import dhcoder.tool.javafx.utils.FxController;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -20,7 +20,7 @@ public final class SceneController extends FxController {
     @FXML private AnchorPane sceneGridPane;
     @FXML private ListView listSceneItems;
     @FXML private TabPane tabScenes;
-    
+
     public void addScene(final Scene gameScene, final String name, final EventHandler<Event> onSceneClosed) {
         Tab tabScene = new Tab(name);
         tabScene.setUserData(gameScene);

@@ -1,4 +1,4 @@
-package dhcoder.tool.javafx.fxutils;
+package dhcoder.tool.javafx.utils;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;

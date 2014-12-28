@@ -1,4 +1,4 @@
-package dhcoder.tool.javafx.fxutils;
+package dhcoder.tool.javafx.utils;
 
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;

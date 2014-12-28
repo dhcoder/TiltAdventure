@@ -1,6 +1,6 @@
 package dhcoder.tool.javafx.control;
 
-import dhcoder.tool.javafx.fxutils.FxController;
+import dhcoder.tool.javafx.utils.FxController;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;

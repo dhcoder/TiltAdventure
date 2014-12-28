@@ -1,4 +1,4 @@
-package dhcoder.tool.javafx.fxutils;
+package dhcoder.tool.javafx.utils;
 
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;

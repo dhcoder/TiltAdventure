@@ -1,4 +1,4 @@
-package dhcoder.tool.javafx.fxutils;
+package dhcoder.tool.javafx.utils;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

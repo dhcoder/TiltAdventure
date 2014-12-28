@@ -20,7 +20,7 @@ import tiltadv.tools.scene.serialization.SettingsLoader;
 import tiltadv.tools.scene.view.NoSceneController;
 import tiltadv.tools.scene.view.SceneController;
 
-import static dhcoder.tool.javafx.fxutils.FxController.load;
+import static dhcoder.tool.javafx.utils.FxController.load;
 
 /**
  * Main class for the scene tool. Acts as a collection of all high level UI elements and components, as well

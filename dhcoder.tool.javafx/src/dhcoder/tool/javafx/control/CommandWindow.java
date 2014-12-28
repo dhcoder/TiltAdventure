@@ -1,6 +1,6 @@
 package dhcoder.tool.javafx.control;
 
-import dhcoder.tool.javafx.fxutils.FxController;
+import dhcoder.tool.javafx.utils.FxController;
 import javafx.stage.PopupWindow;
 import org.controlsfx.control.action.ActionGroup;
 

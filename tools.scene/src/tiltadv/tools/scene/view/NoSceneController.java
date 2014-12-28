@@ -1,6 +1,6 @@
 package tiltadv.tools.scene.view;
 
-import dhcoder.tool.javafx.fxutils.FxController;
+import dhcoder.tool.javafx.utils.FxController;
 import javafx.fxml.FXML;
 import javafx.scene.text.Text;
 import org.controlsfx.control.action.Action;
