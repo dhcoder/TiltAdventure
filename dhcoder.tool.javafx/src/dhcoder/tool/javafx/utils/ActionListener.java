@@ -6,8 +6,9 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
 import org.controlsfx.control.action.Action;
+import org.controlsfx.control.action.ActionGroup;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 
 public final class ActionListener {
@@ -33,7 +34,23 @@ public final class ActionListener {
     };
 
     public ActionListener(final Action... actions) {
-        this.actions = Arrays.asList(actions);
+        this.actions = new ArrayList<>();
+
+        for (Action action : actions) {
+            flatten(action, this.actions);
+        }
+    }
+
+    private void flatten(final Action action, final Collection<Action> actions) {
+        if (action instanceof ActionGroup) {
+            ActionGroup actionGroup = (ActionGroup)action;
+            for (Action childAction : actionGroup.getActions()) {
+                flatten(childAction, actions);
+            }
+        }
+        else {
+            actions.add(action);
+        }
     }
 
     public void install(final Scene scene) {

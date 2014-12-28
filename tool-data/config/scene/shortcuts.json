@@ -1,27 +1,27 @@
 {
   "shortcuts": [
     {
-      "shortcut": "Ctrl+\\",
-      "commandId": "show_command_window"
+      "shortcut": "ctrl+\\",
+      "commandId": "show_action_window"
     },
     {
-      "shortcut": "Cmd+N",
+      "shortcut": "shortcut+N",
       "commandId": "new_scene"
     },
     {
-      "shortcut": "Cmd+W",
+      "shortcut": "shortcut+W",
       "commandId": "close_scene"
     },
     {
-      "shortcut": "Cmd+Z",
+      "shortcut": "shortcut+Z",
       "commandId": "undo"
     },
     {
-      "shortcut": "Cmd+Shift+Z",
+      "shortcut": "shortcut+shift+Z",
       "commandId": "redo"
     },
     {
-      "shortcut": "Cmd+Q",
+      "shortcut": "shortcut+Q",
       "commandId": "exit"
     }
 

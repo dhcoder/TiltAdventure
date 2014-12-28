@@ -33,10 +33,15 @@ public final class Opt<T> implements Poolable {
     }
 
     /**
-     * Creates a new optional type.
+     * Creates an Opt wrapper around a value that can be null.
      */
     public static <T> Opt<T> ofNullable(final T value) {
-        return new Opt<T>(value);
+        if (value != null) {
+            return new Opt<T>(value);
+        }
+        else {
+            return new Opt<T>();
+        }
     }
 
     /**

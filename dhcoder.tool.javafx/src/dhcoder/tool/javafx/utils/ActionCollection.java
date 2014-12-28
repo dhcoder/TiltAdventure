@@ -1,26 +1,29 @@
 package dhcoder.tool.javafx.utils;
 
-import dhcoder.support.text.StringUtils;
+import dhcoder.support.opt.Opt;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionGroup;
 
+import java.util.AbstractCollection;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Pattern;
 
-import static dhcoder.support.text.StringUtils.*;
+import static dhcoder.support.text.StringUtils.format;
 import static dhcoder.support.text.StringUtils.isWhitespace;
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
+
 /**
  * A flat, searchable collection of {@link Action}s.
  */
-public final class ActionCollection {
+public final class ActionCollection extends AbstractCollection<Action> {
+
+    public static final String PROPERTY_UNSEARCHABLE = "unsearchable";
+    public static final String PROPERTY_ID = "id";
 
     /**
      * Given a query like "zyar", return a pattern that matches values like "fu(z)z(y)Se(ar)ch".
@@ -45,17 +48,20 @@ public final class ActionCollection {
         return queryPattern;
     }
 
-    private final Collection<Action> allActions = new ArrayList<>();
-    private final Map<Action, String> fullNames = new HashMap<>();
-    private final Set<Action> unsearchableActions = new HashSet<Action>();
-    private final Stack<String> stackPrefixes = new Stack<>();
-
-    public void add(final Action... actions) {
-        add(Arrays.asList(actions));
+    public static void setUnsearchable(final Action action) {
+        action.getProperties().put(PROPERTY_UNSEARCHABLE, true);
     }
 
-    public void addGroup(final ActionGroup actionGroup) {
+    public static void setId(final Action action, final String id) {
+        action.getProperties().put(PROPERTY_ID, id);
+    }
 
+    private final ArrayList<Action> actions = new ArrayList<>();
+    private final Map<Action, String> fullNames = new HashMap<>();
+    private final Map<String, Action> ids = new HashMap<>();
+    private final Stack<String> stackPrefixes = new Stack<>();
+
+    public boolean addGroup(final ActionGroup actionGroup) {
         if (stackPrefixes.size() == 0) {
             stackPrefixes.push(actionGroup.getText());
         }
@@ -63,52 +69,65 @@ public final class ActionCollection {
             stackPrefixes.push(format("{0}.{1}", stackPrefixes.peek(), actionGroup.getText()));
         }
 
-        add(actionGroup.getActions());
+        boolean groupAdded = addAll(actionGroup.getActions());
 
         stackPrefixes.pop();
+
+        return groupAdded;
     }
 
-    public void add(final Iterable<Action> actions) {
-        for (Action action : actions) {
-            if (action instanceof ActionGroup) {
-                addGroup((ActionGroup)action);
-                continue;
-            }
-            allActions.add(action);
-
-            if (stackPrefixes.size() > 0) {
-                String prefix = stackPrefixes.peek();
-                fullNames.put(action, format("{0}: {1}", prefix, action.getText()));
-            }
-            else {
-                fullNames.put(action, action.getText());
-            }
-        }
-    }
-
-    public void setUnsearchable(final Action action) {
-        unsearchableActions.add(action);
+    public Opt<Action> findById(final String id) {
+        return Opt.ofNullable(ids.get(id));
     }
 
     public String getScopedName(final Action action) {
         return fullNames.get(action);
     }
 
-    public Iterable<Action> filter(final Pattern regex) {
-            ArrayList<Action> matchingCommands = new ArrayList<>();
-            for (Action action : allActions) {
-                if (unsearchableActions.contains(action)) {
-                    continue;
-                }
-
-                if (regex.matcher(fullNames.get(action)).matches()) {
-                    matchingCommands.add(action);
-                }
+    public Collection<Action> search(final Pattern regex) {
+        ArrayList<Action> matchingCommands = new ArrayList<>();
+        for (Action action : actions) {
+            if (action.getProperties().containsKey(PROPERTY_UNSEARCHABLE)) {
+                continue;
             }
 
-            return matchingCommands;
+            if (regex.matcher(fullNames.get(action)).matches()) {
+                matchingCommands.add(action);
+            }
         }
 
+        return matchingCommands;
+    }
 
+    @Override
+    public Iterator<Action> iterator() {
+        return actions.iterator();
+    }
+
+    @Override
+    public int size() {
+        return actions.size();
+    }
+
+    @Override
+    public boolean add(final Action action) {
+        if (action instanceof ActionGroup) {
+            return addGroup((ActionGroup)action);
+        }
+
+        if (stackPrefixes.size() > 0) {
+            String prefix = stackPrefixes.peek();
+            fullNames.put(action, format("{0}: {1}", prefix, action.getText()));
+        }
+        else {
+            fullNames.put(action, action.getText());
+        }
+
+        String id = (String)action.getProperties().get(PROPERTY_ID);
+        if (id != null) {
+            ids.put(id, action);
+        }
+
+        return actions.add(action);
     }
 }

@@ -13,8 +13,11 @@ public final class NoSceneController extends FxController {
     @FXML public Text textNewSceneCommand;
     @FXML private Text textCommandWindowShortcut;
 
-    public void setCommandWindowCommand(final Action commandWindowCommand, final Action newSceneCommand) {
-        textCommandWindowShortcut.setText(commandWindowCommand.getAccelerator().getDisplayText());
+    /**
+     * Set commands we want to show advice about for new users.
+     */
+    public void setTooltipCommands(final Action actionWindowCommand, final Action newSceneCommand) {
+        textCommandWindowShortcut.setText(actionWindowCommand.getAccelerator().getName());
         textNewSceneCommand.setText(newSceneCommand.getText());
     }
 }

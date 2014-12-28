@@ -4,12 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglFiles;
 import com.badlogic.gdx.utils.Json;
 import dhcoder.support.opt.Opt;
-import dhcoder.tool.command.CommandManager;
-import dhcoder.tool.command.Shortcut;
-import dhcoder.tool.javafx.command.CommandListener;
-import dhcoder.tool.javafx.command.JFXKeyNameProvider;
 import dhcoder.tool.javafx.control.CommandWindow;
-import dhcoder.tool.libgdx.serialization.ShortcutsLoader;
+import dhcoder.tool.javafx.libgdx.serialization.ShortcutsLoader;
+import dhcoder.tool.javafx.utils.ActionCollection;
+import dhcoder.tool.javafx.utils.ActionListener;
 import javafx.application.Application;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -34,8 +32,7 @@ public final class SceneTool extends Application {
         Application.launch(args);
     }
 
-    private final CommandManager commandManager;
-    private final GlobalCommands globalCommands;
+    private final GlobalActions globalActions;
     private final Opt<SceneContext> contextOpt = Opt.withNoValue();
     private final CommandWindow commandWindow;
 
@@ -45,12 +42,9 @@ public final class SceneTool extends Application {
 
     public SceneTool() {
         Gdx.files = new LwjglFiles();
-        Shortcut.setKeyNameProvider(new JFXKeyNameProvider());
 
-        commandManager = new CommandManager();
-        globalCommands = new GlobalCommands(this, commandManager);
-
-        commandWindow = new CommandWindow(commandManager);
+        commandWindow = new CommandWindow();
+        globalActions = new GlobalActions(this, commandWindow.getAllActions());
     }
 
     public Stage getStage() {
@@ -65,7 +59,7 @@ public final class SceneTool extends Application {
 
         Json json = new Json();
         SettingsLoader.AppSettings appSettings = SettingsLoader.load(json, PATH_CONFIG + "settings.json");
-        loadShortcuts(json, commandManager);
+        loadShortcuts(json, commandWindow.getAllActions());
 
         stage.setTitle("Scene Editor");
 
@@ -73,13 +67,13 @@ public final class SceneTool extends Application {
         NoSceneController noSceneController = load(NoSceneController.class);
         sceneController = load(SceneController.class);
 
-        noSceneController.setCommandWindowCommand(globalCommands.showCommandWindow, globalCommands.newScene);
+        noSceneController.setTooltipCommands(globalActions.showActionWindow, globalActions.newScene);
         rootPane.getChildren().add(noSceneController.getRoot());
 
         Scene scene = new Scene(rootPane, appSettings.getWidth(), appSettings.getHeight());
         stage.setScene(scene);
 
-        CommandListener listener = new CommandListener(globalCommands.globalScope);
+        ActionListener listener = new ActionListener(globalActions.globalScope);
         listener.install(scene);
 
         stage.show();
@@ -113,7 +107,7 @@ public final class SceneTool extends Application {
         commandWindow.setY(windowY + 50);
     }
 
-    private void loadShortcuts(final Json json, final CommandManager commandManager) {
-        ShortcutsLoader.load(json, commandManager, PATH_CONFIG + "shortcuts.json");
+    private void loadShortcuts(final Json json, final ActionCollection actions) {
+        ShortcutsLoader.load(json, actions, PATH_CONFIG + "shortcuts.json");
     }
 }

@@ -1,7 +1,7 @@
 package dhcoder.tool.javafx.control;
 
 import dhcoder.support.text.StringUtils;
-import dhcoder.tool.command.CommandManager;
+import dhcoder.tool.javafx.utils.ActionCollection;
 import dhcoder.tool.javafx.utils.ActionListener;
 import dhcoder.tool.javafx.utils.FontUtils;
 import dhcoder.tool.javafx.utils.FxController;
@@ -11,7 +11,6 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
@@ -21,8 +20,6 @@ import javafx.scene.layout.Background;
 import javafx.scene.text.Text;
 import org.controlsfx.control.action.Action;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 
 public final class CommandWindowController extends FxController {
@@ -129,7 +126,6 @@ public final class CommandWindowController extends FxController {
 
     @FXML private TextField textSearch;
     @FXML private ListView<Action> listCommands;
-    private List<Action> allCommandsSorted;
     private ObservableList<Action> matchedCommands;
     private int selectedCommandIndex;
 
@@ -141,15 +137,13 @@ public final class CommandWindowController extends FxController {
             updateSelection();
         });
 
-        allCommandsSorted = new ArrayList<>(commandWindow.getCommandManager().searchableCommands());
-        allCommandsSorted.sort((command1, command2) -> command1.getFullName().compareTo(command2.getFullName()));
         matchedCommands = FXCollections.observableArrayList();
         matchedCommands.addListener((ListChangeListener<Action>)c -> {
             if (matchedCommands.size() > MAX_COMMANDS) {
                 matchedCommands.remove(MAX_COMMANDS, matchedCommands.size());
             }
         });
-        matchedCommands.addAll(allCommandsSorted);
+        matchedCommands.addAll(commandWindow.getAllActions());
 
         Action prevCommand = new Action(actionEvent -> {
             if (matchedCommands.size() <= 0) {return;}
@@ -203,11 +197,11 @@ public final class CommandWindowController extends FxController {
         textSearch.textProperty().addListener((observable, oldValue, newValue) -> {
             final String query = newValue;
             if (StringUtils.isWhitespace(query)) {
-                matchedCommands.setAll(allCommandsSorted);
+                matchedCommands.setAll(commandWindow.getAllActions());
             }
             else {
-                Pattern fuzzySearch = CommandManager.toFuzzySearch(query);
-                matchedCommands.setAll(CommandManager.regexSearch(fuzzySearch, allCommandsSorted));
+                Pattern fuzzySearch = ActionCollection.toFuzzySearch(query);
+                matchedCommands.setAll(commandWindow.getAllActions().search(fuzzySearch));
             }
 
             if (matchedCommands.size() > 0) {
@@ -217,11 +211,6 @@ public final class CommandWindowController extends FxController {
 
             ListViewUtils.forceRefresh(listCommands);
         });
-    }
-
-    @Override
-    public Parent getRoot() {
-        return rootPane;
     }
 
     private void updateSelection() {
