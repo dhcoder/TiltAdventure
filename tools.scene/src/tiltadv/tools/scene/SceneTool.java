@@ -18,7 +18,7 @@ import tiltadv.tools.scene.serialization.SettingsLoader;
 import tiltadv.tools.scene.view.NoSceneController;
 import tiltadv.tools.scene.view.SceneController;
 
-import static dhcoder.tool.javafx.utils.FxController.load;
+import static dhcoder.tool.javafx.utils.FxController.loadView;
 
 /**
  * Main class for the scene tool. Acts as a collection of all high level UI elements and components, as well
@@ -64,8 +64,8 @@ public final class SceneTool extends Application {
         stage.setTitle("Scene Editor");
 
         rootPane = new StackPane();
-        NoSceneController noSceneController = load(NoSceneController.class);
-        sceneController = load(SceneController.class);
+        NoSceneController noSceneController = loadView(NoSceneController.class);
+        sceneController = loadView(SceneController.class);
 
         noSceneController.setTooltipCommands(globalActions.showActionWindow, globalActions.newScene);
         rootPane.getChildren().add(noSceneController.getRoot());

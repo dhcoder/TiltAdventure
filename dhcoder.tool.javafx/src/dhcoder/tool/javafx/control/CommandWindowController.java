@@ -30,7 +30,7 @@ public final class CommandWindowController extends FxController {
         private CommandRowController commandRowController;
 
         public CommandRowCell() {
-            commandRowController = FxController.load(CommandRowController.class);
+            commandRowController = FxController.loadView(CommandRowController.class);
         }
 
         @Override

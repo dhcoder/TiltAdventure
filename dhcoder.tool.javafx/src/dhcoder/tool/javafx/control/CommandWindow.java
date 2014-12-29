@@ -16,7 +16,7 @@ public final class CommandWindow extends PopupWindow {
 
         autoHideProperty().set(true);
 
-        CommandWindowController controller = FxController.load(CommandWindowController.class);
+        CommandWindowController controller = FxController.loadView(CommandWindowController.class);
         controller.setCommandWindow(this);
         getScene().setRoot(controller.getRoot());
     }

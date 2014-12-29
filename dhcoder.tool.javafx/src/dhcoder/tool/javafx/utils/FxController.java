@@ -54,19 +54,39 @@ public abstract class FxController {
     }
 
     /**
-     * Helper method which calls {@link #load(Class, String)} assuming a "XxxController" -> "XxxView.fxml" naming
+     * Helper method which calls {@link #loadByPattern(Class, String)} assuming an XxxController -> XxxView.fxml
      * relationship.
      */
-    public static <C extends FxController> C load(final Class<C> controllerClass) {
+
+    public static <C extends FxController> C loadView(final Class<C> controllerClass) {
+        return loadByPattern(controllerClass, "*View.fxml");
+    }
+
+    /**
+     * Helper method which calls {@link #load(Class, String)} given a transformation pattern to map from class name to
+     * file name. This method assumes the controller class ends with "Controller", which is important because it strips
+     * that value first before making the filename transformation.
+     * <p/>
+     * A pattern uses a single wildcard (*) character to indicate which part of the filename should be replaced with the
+     * controller class name. For example, TestController + "*View.fxml" -> "TestView.fxml"
+     */
+    public static <C extends FxController> C loadByPattern(final Class<C> controllerClass, final String pattern) {
+        int wildcardIndex = pattern.indexOf('*');
+        if (wildcardIndex < 0) {
+            throw new IllegalArgumentException(
+                format("Invalid fxml pattern \"{0}\", must have a wildcard (*)", pattern));
+        }
+
         String simpleName = controllerClass.getSimpleName();
         if (!simpleName.endsWith(CONTROLLER_NAMING_CONVENTION)) {
             throw new IllegalArgumentException(
                 format("Invalid class name {0}, must end with \"Controller\"", simpleName));
         }
 
-        StringBuilder fxmlFileBuilder = new StringBuilder(simpleName);
-        fxmlFileBuilder
-            .replace(simpleName.length() - CONTROLLER_NAMING_CONVENTION.length(), simpleName.length(), "View.fxml");
+        StringBuilder fxmlFileBuilder = new StringBuilder(pattern);
+        fxmlFileBuilder.
+            replace(wildcardIndex, wildcardIndex + 1,
+                simpleName.substring(0, simpleName.length() - CONTROLLER_NAMING_CONVENTION.length()));
 
         return load(controllerClass, fxmlFileBuilder.toString());
     }
