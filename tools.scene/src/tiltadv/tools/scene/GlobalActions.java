@@ -42,12 +42,14 @@ public final class GlobalActions {
             .setOnAction(() -> sceneTool.getStage().close()).build();
 
         undo = new ActionBuilder().setId("undo").setParent(editScope).setText("Undo", "Undo your last action")
-            .setOnAction(() -> sceneTool.getContextOpt().getValue().getHistory().undo())
-            .setActionTest(v -> sceneTool.getContextOpt().getValue().getHistory().canUndo()).build();
+            .setOnAction(() -> sceneTool.getContextOpt().getValue().getHistory().undo()).setActiveTest(
+                v -> sceneTool.getContextOpt().hasValue() &&
+                    sceneTool.getContextOpt().getValue().getHistory().canUndo()).build();
 
         redo = new ActionBuilder().setId("redo").setParent(editScope).setText("Redo", "Redo your last action")
-            .setOnAction(() -> sceneTool.getContextOpt().getValue().getHistory().redo())
-            .setActionTest(v -> sceneTool.getContextOpt().getValue().getHistory().canRedo()).build();
+            .setOnAction(() -> sceneTool.getContextOpt().getValue().getHistory().redo()).setActiveTest(
+                v -> sceneTool.getContextOpt().hasValue() &&
+                    sceneTool.getContextOpt().getValue().getHistory().canRedo()).build();
 
         // No reason to search for the command that brings up the command window when it is already showing
         ActionCollection.setUnsearchable(showActionWindow);

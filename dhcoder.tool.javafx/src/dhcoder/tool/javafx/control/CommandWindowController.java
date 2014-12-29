@@ -1,6 +1,7 @@
 package dhcoder.tool.javafx.control;
 
 import dhcoder.support.text.StringUtils;
+import dhcoder.tool.javafx.utils.ActionBuilder;
 import dhcoder.tool.javafx.utils.ActionCollection;
 import dhcoder.tool.javafx.utils.ActionListener;
 import dhcoder.tool.javafx.utils.FontUtils;
@@ -134,6 +135,7 @@ public final class CommandWindowController extends FxController {
 
         commandWindow.setOnShown(event -> {
             textSearch.clear();
+            matchedCommands.setAll(commandWindow.getAllActions().searchAll());
             selectedCommandIndex = 0;
             updateSelection();
         });
@@ -144,7 +146,6 @@ public final class CommandWindowController extends FxController {
                 matchedCommands.remove(MAX_COMMANDS, matchedCommands.size());
             }
         });
-        matchedCommands.addAll(commandWindow.getAllActions().searchAll());
 
         Action prevCommand = new Action(actionEvent -> {
             if (matchedCommands.size() <= 0) {return;}
@@ -159,32 +160,21 @@ public final class CommandWindowController extends FxController {
         });
         prevCommand.setAccelerator(new KeyCodeCombination(KeyCode.UP));
 
-        Action nextCommand = new Action(actionEvent -> {
-            if (matchedCommands.size() <= 0) {return;}
-
+        Action nextCommand = new ActionBuilder().setActiveTest(v -> matchedCommands.size() > 0).setOnAction(() -> {
             selectedCommandIndex = (selectedCommandIndex + 1) % matchedCommands.size();
             updateSelection();
+        }).setAccelerator(KeyCode.DOWN).build();
 
-            actionEvent.consume();
-        });
-        nextCommand.setAccelerator(new KeyCodeCombination(KeyCode.DOWN));
+        Action acceptCommand = new ActionBuilder()
+            .setActiveTest(v -> selectedCommandIndex >= 0 && selectedCommandIndex < matchedCommands.size())
+            .setOnAction(() -> {
+                    final Action action = matchedCommands.get(selectedCommandIndex);
+                    commandWindow.hide();
+                    action.handle(new ActionEvent());
+                }).setAccelerator(KeyCode.ENTER).build();
 
-        Action acceptCommand = new Action(actionEvent -> {
-            if (selectedCommandIndex < 0 || selectedCommandIndex >= matchedCommands.size()) {return;}
-
-            final Action action = matchedCommands.get(selectedCommandIndex);
-            commandWindow.hide();
-            action.handle(new ActionEvent());
-
-            actionEvent.consume();
-        });
-        acceptCommand.setAccelerator(new KeyCodeCombination(KeyCode.ENTER));
-
-        Action closeWindow = new Action(actionEvent -> {
-            commandWindow.hide();
-            actionEvent.consume();
-        });
-        closeWindow.setAccelerator(new KeyCodeCombination(KeyCode.ESCAPE));
+        Action closeWindow =
+            new ActionBuilder().setOnAction(commandWindow::hide).setAccelerator(KeyCode.ESCAPE).build();
 
         ActionListener actionListener = new ActionListener(nextCommand, prevCommand, acceptCommand, closeWindow);
         actionListener.install(textSearch);

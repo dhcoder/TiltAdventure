@@ -1,5 +1,7 @@
 package dhcoder.tool.javafx.utils;
 
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionGroup;
@@ -39,13 +41,18 @@ public final class ActionBuilder {
         return this;
     }
 
-    public ActionBuilder setActionTest(final Predicate<Void> actionTest) {
+    public ActionBuilder setActiveTest(final Predicate<Void> actionTest) {
         this.actionTest = actionTest;
         return this;
     }
 
     public ActionBuilder setAccelerator(final KeyCombination accelerator) {
         this.accelerator = accelerator;
+        return this;
+    }
+
+    public ActionBuilder setAccelerator(final KeyCode keyCode) {
+        this.accelerator = new KeyCodeCombination(keyCode);
         return this;
     }
 
