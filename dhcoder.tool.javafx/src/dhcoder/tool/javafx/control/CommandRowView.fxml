@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -19,12 +23,12 @@
    <children>
       <TextFlow fx:id="flowCommandName">
          <children>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Global: Command Name" />
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Scope: Command Name" />
          </children>
       </TextFlow>
       <Label fx:id="labelShortcut" contentDisplay="RIGHT" text="Ctrl+Shift Q" GridPane.columnIndex="1">
          <font>
-            <Font name="Arial Italic" size="11.0" />
+            <Font name="Courier New Italic" size="14.0" />
          </font>
       </Label>
    </children>

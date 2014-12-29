@@ -160,13 +160,13 @@ public final class CommandWindowController extends FxController {
         });
         prevCommand.setAccelerator(new KeyCodeCombination(KeyCode.UP));
 
-        Action nextCommand = new ActionBuilder().setActiveTest(v -> matchedCommands.size() > 0).setHandler(() -> {
+        Action nextCommand = new ActionBuilder().setIsActive(v -> matchedCommands.size() > 0).setHandler(() -> {
             selectedCommandIndex = (selectedCommandIndex + 1) % matchedCommands.size();
             updateSelection();
         }).setAccelerator(KeyCode.DOWN).build();
 
         Action acceptCommand = new ActionBuilder()
-            .setActiveTest(v -> selectedCommandIndex >= 0 && selectedCommandIndex < matchedCommands.size())
+            .setIsActive(v -> selectedCommandIndex >= 0 && selectedCommandIndex < matchedCommands.size())
             .setHandler(() -> {
                 final Action action = matchedCommands.get(selectedCommandIndex);
                 commandWindow.hide();

@@ -8,16 +8,13 @@ import org.controlsfx.control.action.ActionGroup;
 
 import java.util.function.Predicate;
 
-/**
- * A flat, searchable collection of {@link Action}s.
- */
 public final class ActionBuilder {
     private String id;
     private ActionGroup parent;
     private String text;
     private String longText;
     private Runnable actionHandler;
-    private Predicate<Void> actionTest;
+    private Predicate<Void> isActive;
     private KeyCombination accelerator;
 
     public ActionBuilder setId(final String id) {
@@ -41,8 +38,8 @@ public final class ActionBuilder {
         return this;
     }
 
-    public ActionBuilder setActiveTest(final Predicate<Void> actionTest) {
-        this.actionTest = actionTest;
+    public ActionBuilder setIsActive(final Predicate<Void> isActive) {
+        this.isActive = isActive;
         return this;
     }
 
@@ -61,7 +58,7 @@ public final class ActionBuilder {
         }
 
         Action action = new Action(event -> {
-            if (actionTest != null && !actionTest.test(null)) {return;}
+            if (isActive != null && !isActive.test(null)) {return;}
             actionHandler.run();
             event.consume();
         });

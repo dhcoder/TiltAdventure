@@ -44,12 +44,12 @@ public final class GlobalActions {
             .setHandler(() -> sceneTool.getStage().close()).build();
 
         undo = new ActionBuilder().setId("undo").setParent(editScope).setText("Undo", "Undo your last action")
-            .setHandler(() -> sceneTool.getContextOpt().getValue().getHistory().undo()).setActiveTest(
+            .setHandler(() -> sceneTool.getContextOpt().getValue().getHistory().undo()).setIsActive(
                 v -> sceneTool.getContextOpt().hasValue() &&
                     sceneTool.getContextOpt().getValue().getHistory().canUndo()).build();
 
         redo = new ActionBuilder().setId("redo").setParent(editScope).setText("Redo", "Redo your last action")
-            .setHandler(() -> sceneTool.getContextOpt().getValue().getHistory().redo()).setActiveTest(
+            .setHandler(() -> sceneTool.getContextOpt().getValue().getHistory().redo()).setIsActive(
                 v -> sceneTool.getContextOpt().hasValue() &&
                     sceneTool.getContextOpt().getValue().getHistory().canRedo()).build();
 
