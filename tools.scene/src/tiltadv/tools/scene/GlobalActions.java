@@ -13,6 +13,7 @@ public final class GlobalActions {
     public final ActionGroup globalScope;
     public final ActionGroup fileScope;
     public final ActionGroup editScope;
+    public final ActionGroup viewScope;
     public final Action showActionWindow;
     public final Action newScene;
     public final Action closeScene;
@@ -24,10 +25,11 @@ public final class GlobalActions {
         globalScope = new ActionGroup("Global");
         fileScope = new ActionGroup("File");
         editScope = new ActionGroup("Edit");
+        viewScope = new ActionGroup("View");
 
-        globalScope.getActions().addAll(fileScope, editScope);
+        globalScope.getActions().addAll(fileScope, editScope, viewScope);
 
-        showActionWindow = new ActionBuilder().setId("show_action_window").setParent(globalScope)
+        showActionWindow = new ActionBuilder().setId("show_action_window").setParent(viewScope)
             .setText("Show Action Window",
                 "Opens the Action Window which allows for searching quickly through all commands")
             .setOnAction(sceneTool::showCommandWindow).build();

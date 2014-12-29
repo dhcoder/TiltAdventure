@@ -1,5 +1,6 @@
 package dhcoder.tool.javafx.utils;
 
+import dhcoder.support.text.StringUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -20,9 +21,13 @@ public final class ActionListener {
         public void handle(final KeyEvent keyEvent) {
             ActionEvent actionEvent = new ActionEvent();
             for (Action action : actions) {
+                System.out.println(StringUtils.format("Matching {0} against {1} ({2})", keyEvent, action.getAccelerator(), action.getText()));
+
                 if (!action.getAccelerator().match(keyEvent)) {
                     continue;
                 }
+
+                System.out.println("MATCH!");
 
                 action.handle(actionEvent);
                 if (actionEvent.isConsumed()) {
