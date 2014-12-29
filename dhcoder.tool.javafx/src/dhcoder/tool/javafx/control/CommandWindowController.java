@@ -51,7 +51,8 @@ public final class CommandWindowController extends FxController {
         }
 
         private void updateName(final Action command) {
-            String name = command.getText();
+            ActionCollection actionCollection = (ActionCollection)getUserData();
+            String name = actionCollection.getScopedName(command);
 
             final String query = textSearch.getText();
             if (StringUtils.isWhitespace(query)) {
@@ -143,7 +144,7 @@ public final class CommandWindowController extends FxController {
                 matchedCommands.remove(MAX_COMMANDS, matchedCommands.size());
             }
         });
-        matchedCommands.addAll(commandWindow.getAllActions());
+        matchedCommands.addAll(commandWindow.getAllActions().searchAll());
 
         Action prevCommand = new Action(actionEvent -> {
             if (matchedCommands.size() <= 0) {return;}
@@ -188,7 +189,11 @@ public final class CommandWindowController extends FxController {
         ActionListener actionListener = new ActionListener(nextCommand, prevCommand, acceptCommand, closeWindow);
         actionListener.install(textSearch);
 
-        listCommands.setCellFactory(param -> new CommandRowCell());
+        listCommands.setCellFactory(param -> {
+            CommandRowCell commandRowCell = new CommandRowCell();
+            commandRowCell.setUserData(commandWindow.getAllActions());
+            return commandRowCell;
+        });
         listCommands.setItems(matchedCommands);
         ListViewUtils.sizeToContents(listCommands);
 
@@ -197,7 +202,7 @@ public final class CommandWindowController extends FxController {
         textSearch.textProperty().addListener((observable, oldValue, newValue) -> {
             final String query = newValue;
             if (StringUtils.isWhitespace(query)) {
-                matchedCommands.setAll(commandWindow.getAllActions());
+                matchedCommands.setAll(commandWindow.getAllActions().searchAll());
             }
             else {
                 Pattern fuzzySearch = ActionCollection.toFuzzySearch(query);

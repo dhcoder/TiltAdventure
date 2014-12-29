@@ -60,6 +60,7 @@ public final class ActionCollection extends AbstractCollection<Action> {
     private final Map<Action, String> fullNames = new HashMap<>();
     private final Map<String, Action> ids = new HashMap<>();
     private final Stack<String> stackPrefixes = new Stack<>();
+    public static final Pattern SERACH_ALL = Pattern.compile(".*");
 
     public boolean addGroup(final ActionGroup actionGroup) {
         if (stackPrefixes.size() == 0) {
@@ -82,6 +83,10 @@ public final class ActionCollection extends AbstractCollection<Action> {
 
     public String getScopedName(final Action action) {
         return fullNames.get(action);
+    }
+
+    public Collection<Action> searchAll() {
+        return search(SERACH_ALL);
     }
 
     public Collection<Action> search(final Pattern regex) {

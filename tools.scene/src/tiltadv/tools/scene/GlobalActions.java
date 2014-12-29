@@ -1,7 +1,7 @@
 package tiltadv.tools.scene;
 
+import dhcoder.tool.javafx.utils.ActionBuilder;
 import dhcoder.tool.javafx.utils.ActionCollection;
-import dhcoder.tool.javafx.utils.ActionFactory;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionGroup;
 
@@ -27,21 +27,27 @@ public final class GlobalActions {
 
         globalScope.getActions().addAll(fileScope, editScope);
 
-        showActionWindow = ActionFactory.create("show_action_window", globalScope, "Show Action Window",
-            "Opens the Action Window which allows for searching quickly through all commands",
-            sceneTool::showCommandWindow);
+        showActionWindow = new ActionBuilder().setId("show_action_window").setParent(globalScope)
+            .setText("Show Action Window",
+                "Opens the Action Window which allows for searching quickly through all commands")
+            .setOnAction(sceneTool::showCommandWindow).build();
 
-        newScene =
-            ActionFactory.create("new_scene", fileScope, "New Scene", "Opens a new, blank scene to work on", sceneTool::newScene);
+        newScene = new ActionBuilder().setId("new_scene").setParent(fileScope)
+            .setText("New Scene", "Opens a new, blank scene to work on").setOnAction(sceneTool::newScene).build();
 
-        closeScene = ActionFactory.create("close_scene", fileScope, "Close Scene", "Closes the current scene", sceneTool::closeScene);
+        closeScene = new ActionBuilder().setId("close_scene").setParent(fileScope)
+            .setText("Close Scene", "Closes the current scene").setOnAction(sceneTool::closeScene).build();
 
-        exit = ActionFactory.create("exit", fileScope, "Exit", "Exits the application", () -> sceneTool.getStage().close());
+        exit = new ActionBuilder().setId("exit").setParent(fileScope).setText("Exit", "Exits the application")
+            .setOnAction(() -> sceneTool.getStage().close()).build();
 
-        undo = ActionFactory.create("undo", editScope, "Undo", "Undo your last action",
-            () -> sceneTool.getContextOpt().getValue().getHistory().undo());
-        redo = ActionFactory.create("redo", editScope, "Redo", "Redo your last action",
-            () -> sceneTool.getContextOpt().getValue().getHistory().redo());
+        undo = new ActionBuilder().setId("undo").setParent(editScope).setText("Undo", "Undo your last action")
+            .setOnAction(() -> sceneTool.getContextOpt().getValue().getHistory().undo())
+            .setActionTest(v -> sceneTool.getContextOpt().getValue().getHistory().canUndo()).build();
+
+        redo = new ActionBuilder().setId("redo").setParent(editScope).setText("Redo", "Redo your last action")
+            .setOnAction(() -> sceneTool.getContextOpt().getValue().getHistory().redo())
+            .setActionTest(v -> sceneTool.getContextOpt().getValue().getHistory().canRedo()).build();
 
         // No reason to search for the command that brings up the command window when it is already showing
         ActionCollection.setUnsearchable(showActionWindow);
