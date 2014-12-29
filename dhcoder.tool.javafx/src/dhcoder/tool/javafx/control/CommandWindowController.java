@@ -160,21 +160,21 @@ public final class CommandWindowController extends FxController {
         });
         prevCommand.setAccelerator(new KeyCodeCombination(KeyCode.UP));
 
-        Action nextCommand = new ActionBuilder().setActiveTest(v -> matchedCommands.size() > 0).setOnAction(() -> {
+        Action nextCommand = new ActionBuilder().setActiveTest(v -> matchedCommands.size() > 0).setHandler(() -> {
             selectedCommandIndex = (selectedCommandIndex + 1) % matchedCommands.size();
             updateSelection();
         }).setAccelerator(KeyCode.DOWN).build();
 
         Action acceptCommand = new ActionBuilder()
             .setActiveTest(v -> selectedCommandIndex >= 0 && selectedCommandIndex < matchedCommands.size())
-            .setOnAction(() -> {
-                    final Action action = matchedCommands.get(selectedCommandIndex);
-                    commandWindow.hide();
-                    action.handle(new ActionEvent());
-                }).setAccelerator(KeyCode.ENTER).build();
+            .setHandler(() -> {
+                final Action action = matchedCommands.get(selectedCommandIndex);
+                commandWindow.hide();
+                action.handle(new ActionEvent());
+            }).setAccelerator(KeyCode.ENTER).build();
 
         Action closeWindow =
-            new ActionBuilder().setOnAction(commandWindow::hide).setAccelerator(KeyCode.ESCAPE).build();
+            new ActionBuilder().setHandler(commandWindow::hide).setAccelerator(KeyCode.ESCAPE).build();
 
         ActionListener actionListener = new ActionListener(nextCommand, prevCommand, acceptCommand, closeWindow);
         actionListener.install(textSearch);

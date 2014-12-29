@@ -32,28 +32,28 @@ public final class GlobalActions {
         showActionWindow = new ActionBuilder().setId("show_action_window").setParent(viewScope)
             .setText("Show Action Window",
                 "Opens the Action Window which allows for searching quickly through all commands")
-            .setOnAction(sceneTool::showCommandWindow).build();
+            .setHandler(sceneTool::showCommandWindow).build();
 
         newScene = new ActionBuilder().setId("new_scene").setParent(fileScope)
-            .setText("New Scene", "Opens a new, blank scene to work on").setOnAction(sceneTool::newScene).build();
+            .setText("New Scene", "Opens a new, blank scene to work on").setHandler(sceneTool::newScene).build();
 
         closeScene = new ActionBuilder().setId("close_scene").setParent(fileScope)
-            .setText("Close Scene", "Closes the current scene").setOnAction(sceneTool::closeScene).build();
+            .setText("Close Scene", "Closes the current scene").setHandler(sceneTool::closeScene).build();
 
         exit = new ActionBuilder().setId("exit").setParent(fileScope).setText("Exit", "Exits the application")
-            .setOnAction(() -> sceneTool.getStage().close()).build();
+            .setHandler(() -> sceneTool.getStage().close()).build();
 
         undo = new ActionBuilder().setId("undo").setParent(editScope).setText("Undo", "Undo your last action")
-            .setOnAction(() -> sceneTool.getContextOpt().getValue().getHistory().undo()).setActiveTest(
+            .setHandler(() -> sceneTool.getContextOpt().getValue().getHistory().undo()).setActiveTest(
                 v -> sceneTool.getContextOpt().hasValue() &&
                     sceneTool.getContextOpt().getValue().getHistory().canUndo()).build();
 
         redo = new ActionBuilder().setId("redo").setParent(editScope).setText("Redo", "Redo your last action")
-            .setOnAction(() -> sceneTool.getContextOpt().getValue().getHistory().redo()).setActiveTest(
+            .setHandler(() -> sceneTool.getContextOpt().getValue().getHistory().redo()).setActiveTest(
                 v -> sceneTool.getContextOpt().hasValue() &&
                     sceneTool.getContextOpt().getValue().getHistory().canRedo()).build();
 
-        // No reason to search for the command that brings up the command window when it is already showing
+        // No reason to search for the command that brings up the action window when it is already showing
         ActionCollection.setUnsearchable(showActionWindow);
 
         actionCollection.addAll(globalScope.getActions());

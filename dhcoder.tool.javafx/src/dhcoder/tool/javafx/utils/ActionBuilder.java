@@ -16,7 +16,7 @@ public final class ActionBuilder {
     private ActionGroup parent;
     private String text;
     private String longText;
-    private Runnable onAction;
+    private Runnable actionHandler;
     private Predicate<Void> actionTest;
     private KeyCombination accelerator;
 
@@ -36,8 +36,8 @@ public final class ActionBuilder {
         return this;
     }
 
-    public ActionBuilder setOnAction(final Runnable onAction) {
-        this.onAction = onAction;
+    public ActionBuilder setHandler(final Runnable actionHandler) {
+        this.actionHandler = actionHandler;
         return this;
     }
 
@@ -52,24 +52,17 @@ public final class ActionBuilder {
     }
 
     public ActionBuilder setAccelerator(final KeyCode keyCode) {
-        this.accelerator = new KeyCodeCombination(keyCode);
-        return this;
+        return setAccelerator(new KeyCodeCombination(keyCode));
     }
 
     public Action build() {
-
-        if (onAction == null) {
+        if (actionHandler == null) {
             throw new IllegalStateException("Can't create an action without logic");
         }
 
         Action action = new Action(event -> {
-            if (actionTest != null) {
-                if (!actionTest.test(null)) {
-                    return;
-                }
-            }
-
-            onAction.run();
+            if (actionTest != null && !actionTest.test(null)) {return;}
+            actionHandler.run();
             event.consume();
         });
 
