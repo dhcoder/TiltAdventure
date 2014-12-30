@@ -10,10 +10,14 @@ import dhcoder.tool.javafx.utils.ActionCollection;
 import dhcoder.tool.javafx.utils.ActionListener;
 import javafx.application.Application;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import org.controlsfx.control.action.ActionUtils;
 import tiltadv.tools.scene.serialization.SettingsLoader;
 import tiltadv.tools.scene.view.NoSceneController;
 import tiltadv.tools.scene.view.SceneController;
@@ -37,8 +41,9 @@ public final class SceneTool extends Application {
     private final CommandWindow commandWindow;
 
     private Stage stage;
-    private StackPane rootPane;
+    private Parent rootPane;
     private SceneController sceneController;
+    private StackPane appPane;
 
     public SceneTool() {
         Gdx.files = new LwjglFiles();
@@ -63,12 +68,17 @@ public final class SceneTool extends Application {
 
         stage.setTitle("Scene Editor");
 
-        rootPane = new StackPane();
+        appPane = new StackPane();
+        rootPane = new VBox(
+            ActionUtils.createMenuBar(globalActions.globalScope.getActions()), appPane
+        );
+        VBox.setVgrow(appPane, Priority.ALWAYS);
+
         NoSceneController noSceneController = loadView(NoSceneController.class);
         sceneController = loadView(SceneController.class);
 
         noSceneController.setTooltipCommands(globalActions.showActionWindow, globalActions.newScene);
-        rootPane.getChildren().add(noSceneController.getRoot());
+        appPane.getChildren().add(noSceneController.getRoot());
 
         Scene scene = new Scene(rootPane, appSettings.getWidth(), appSettings.getHeight());
         stage.setScene(scene);
@@ -82,13 +92,13 @@ public final class SceneTool extends Application {
     public static int TEST_VALUE = 1;
     public void newScene() {
         Node sceneView = sceneController.getRoot();
-        if (!rootPane.getChildren().contains(sceneView)) {
-            rootPane.getChildren().add(sceneView);
+        if (!appPane.getChildren().contains(sceneView)) {
+            appPane.getChildren().add(sceneView);
         }
 
         sceneController.addScene(null, "Test " + TEST_VALUE, event -> {
             if (sceneController.getScenes().size() == 0) {
-                rootPane.getChildren().remove(sceneView);
+                appPane.getChildren().remove(sceneView);
             }
         });
         TEST_VALUE++;
