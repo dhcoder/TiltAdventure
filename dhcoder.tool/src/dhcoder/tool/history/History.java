@@ -35,6 +35,13 @@ public final class History {
     private final Stack<UndoGroup> redoStack = new Stack<UndoGroup>();
     private final int maxHistoryDepth;
     private int isRecording;
+    /**
+     * currentPtr points to the position in the history that represents the "current" state. This is useful for an
+     * owning system to know if, say, the state of data that it is managing has changed.
+     *
+     * See also: {@link #isCurrent()} and {@link #markCurrent()}
+     */
+    private int currentPtr;
 
     public History() {
         this(DEFAULT_HISTORY_DEPTH);
@@ -120,12 +127,27 @@ public final class History {
                 undoStack.pop(); // Nothing happened during this recording
             }
             else {
+                if (undoStack.size() <= currentPtr) {
+                    // If here, it means we did a bunch of actions, marked a state as current, then undid those changes,
+                    // and then started recording some new changes. Our old, current state is now lost until
+                    // markCurrent is called again.
+                    currentPtr = -1;
+                }
+
                 redoStack.clear();
                 if (undoStack.size() > maxHistoryDepth) {
                     undoStack.removeElementAt(0); // Drop old history
                 }
             }
         }
+    }
+
+    public void markCurrent() {
+        currentPtr = undoStack.size();
+    }
+
+    public boolean isCurrent() {
+        return currentPtr == undoStack.size();
     }
 
     // Visible for testing

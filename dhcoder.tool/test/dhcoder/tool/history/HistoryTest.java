@@ -217,4 +217,59 @@ public class HistoryTest {
         assertThat(history.getUndoDepth(), equalTo(1));
         assertThat(history.getUndoDescription(0), equalTo("Outer recording"));
     }
+
+    @Test
+    public void markCurrentWorks() {
+        History history = new History();
+        UndoInt undoInt = new UndoInt(history, 1);
+
+        assertThat(history.isCurrent(), equalTo(true));
+        history.startRecording("Change 1->2");
+        undoInt.setValue(2);
+        history.stopRecording();
+        assertThat(history.isCurrent(), equalTo(false));
+
+        history.startRecording("Change 2->3");
+        undoInt.setValue(3);
+        history.stopRecording();
+
+        history.markCurrent(); // Mark current at 3
+        assertThat(history.isCurrent(), equalTo(true));
+
+        history.startRecording("Change 3->4");
+        undoInt.setValue(4);
+        history.stopRecording();
+        assertThat(history.isCurrent(), equalTo(false));
+
+        history.undo(); // undoInt -> 3
+        assertThat(history.isCurrent(), equalTo(true));
+
+        history.undo(); // undoInt -> 2
+        assertThat(history.isCurrent(), equalTo(false));
+
+        history.redo(); // undoInt -> 3
+        assertThat(history.isCurrent(), equalTo(true));
+
+        history.startRecording("Change 3->5");
+        undoInt.setValue(5);
+        history.stopRecording();
+        assertThat(history.isCurrent(), equalTo(false));
+
+        history.undo(); // undoInt -> 3
+        assertThat(history.isCurrent(), equalTo(true));
+
+        history.undo(); // undoInt -> 2
+        assertThat(history.isCurrent(), equalTo(false));
+
+        history.startRecording("Change 2->6");
+        undoInt.setValue(6);
+        history.stopRecording();
+        assertThat(history.isCurrent(), equalTo(false));
+
+        history.undo(); // undoInt -> 2
+        assertThat(history.isCurrent(), equalTo(false));
+
+        history.undo(); // undoInt -> 1
+        assertThat(history.isCurrent(), equalTo(false));
+    }
 }
