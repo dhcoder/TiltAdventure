@@ -57,9 +57,16 @@ public abstract class FxController {
      * Helper method which calls {@link #loadByPattern(Class, String)} assuming an XxxController -> XxxView.fxml
      * relationship.
      */
-
     public static <C extends FxController> C loadView(final Class<C> controllerClass) {
         return loadByPattern(controllerClass, "*View.fxml");
+    }
+
+    /**
+     * Helper method which calls {@link #loadByPattern(Class, String)} assuming an XxxController -> XxxView.fxml
+     * relationship.
+     */
+    public static <C extends FxController> C loadDialog(final Class<C> controllerClass) {
+        return loadByPattern(controllerClass, "*Dialog.fxml");
     }
 
     /**
