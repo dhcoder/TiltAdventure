@@ -7,9 +7,7 @@ import dhcoder.support.opt.Opt;
 import dhcoder.tool.javafx.control.CommandWindow;
 import dhcoder.tool.javafx.libgdx.serialization.ShortcutsLoader;
 import dhcoder.tool.javafx.utils.ActionCollection;
-import dhcoder.tool.javafx.utils.ActionListener;
 import javafx.application.Application;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.Priority;
@@ -19,6 +17,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.controlsfx.control.action.ActionUtils;
 import tiltadv.tools.scene.serialization.SettingsLoader;
+import tiltadv.tools.scene.view.NewSceneDialog;
 import tiltadv.tools.scene.view.NoSceneController;
 import tiltadv.tools.scene.view.SceneController;
 
@@ -83,25 +82,29 @@ public final class SceneTool extends Application {
         Scene scene = new Scene(rootPane, appSettings.getWidth(), appSettings.getHeight());
         stage.setScene(scene);
 
-        ActionListener listener = new ActionListener(globalActions.globalScope);
-        listener.install(scene);
-
         stage.show();
     }
 
     public static int TEST_VALUE = 1;
     public void newScene() {
-        Node sceneView = sceneController.getRoot();
-        if (!appPane.getChildren().contains(sceneView)) {
-            appPane.getChildren().add(sceneView);
+        if (TEST_VALUE == 2) {
+            int breakhere =0;
         }
-
-        sceneController.addScene(null, "Test " + TEST_VALUE, event -> {
-            if (sceneController.getScenes().size() == 0) {
-                appPane.getChildren().remove(sceneView);
-            }
-        });
+        System.out.println("HERE?");
+        NewSceneDialog newSceneDialog = new NewSceneDialog();
+        newSceneDialog.showAndWait();
         TEST_VALUE++;
+//        Node sceneView = sceneController.getRoot();
+//        if (!appPane.getChildren().contains(sceneView)) {
+//            appPane.getChildren().add(sceneView);
+//        }
+//
+//        sceneController.addScene(null, "Test " + TEST_VALUE, event -> {
+//            if (sceneController.getScenes().size() == 0) {
+//                appPane.getChildren().remove(sceneView);
+//            }
+//        });
+//        TEST_VALUE++;
     }
 
     public void closeScene() {

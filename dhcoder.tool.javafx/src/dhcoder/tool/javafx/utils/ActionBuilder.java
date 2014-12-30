@@ -1,5 +1,6 @@
 package dhcoder.tool.javafx.utils;
 
+import javafx.application.Platform;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -59,7 +60,8 @@ public final class ActionBuilder {
 
         Action action = new Action(event -> {
             if (isActive != null && !isActive.test(null)) {return;}
-            actionHandler.run();
+            // Delay the action until later, to allow any calling events to clean up first
+            Platform.runLater(actionHandler::run);
             event.consume();
         });
 

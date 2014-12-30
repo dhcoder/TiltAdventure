@@ -62,14 +62,6 @@ public abstract class FxController {
     }
 
     /**
-     * Helper method which calls {@link #loadByPattern(Class, String)} assuming an XxxController -> XxxView.fxml
-     * relationship.
-     */
-    public static <C extends FxController> C loadDialog(final Class<C> controllerClass) {
-        return loadByPattern(controllerClass, "*Dialog.fxml");
-    }
-
-    /**
      * Helper method which calls {@link #load(Class, String)} given a transformation pattern to map from class name to
      * file name. This method assumes the controller class ends with "Controller", which is important because it strips
      * that value first before making the filename transformation.
