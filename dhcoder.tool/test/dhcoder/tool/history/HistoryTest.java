@@ -272,4 +272,30 @@ public class HistoryTest {
         history.undo(); // undoInt -> 1
         assertThat(history.isCurrent(), equalTo(false));
     }
+
+    @Test
+    public void markCurrentCanChange() {
+        History history = new History();
+        UndoInt undoInt = new UndoInt(history, 1);
+
+        assertThat(history.isCurrent(), equalTo(true));
+        history.startRecording("Change 1->2");
+        undoInt.setValue(2);
+        history.stopRecording();
+        assertThat(history.isCurrent(), equalTo(false));
+
+        history.markCurrent(); // Mark current at 2
+        assertThat(history.isCurrent(), equalTo(true));
+
+        history.startRecording("Change 2->3");
+        undoInt.setValue(3);
+        history.stopRecording();
+        assertThat(history.isCurrent(), equalTo(false));
+
+        history.markCurrent(); // Mark current at 3
+        assertThat(history.isCurrent(), equalTo(true));
+
+        history.undo();
+        assertThat(history.isCurrent(), equalTo(false));
+   }
 }
