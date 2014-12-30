@@ -223,7 +223,7 @@ public class HistoryTest {
         History history = new History();
         UndoInt undoInt = new UndoInt(history, 1);
 
-        assertThat(history.isCurrent(), equalTo(true));
+        assertThat(history.isCurrent(), equalTo(false));
         history.startRecording("Change 1->2");
         undoInt.setValue(2);
         history.stopRecording();
@@ -278,7 +278,6 @@ public class HistoryTest {
         History history = new History();
         UndoInt undoInt = new UndoInt(history, 1);
 
-        assertThat(history.isCurrent(), equalTo(true));
         history.startRecording("Change 1->2");
         undoInt.setValue(2);
         history.stopRecording();

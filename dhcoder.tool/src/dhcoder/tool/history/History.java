@@ -39,9 +39,11 @@ public final class History {
      * currentPtr points to the position in the history that represents the "current" state. This is useful for an
      * owning system to know if, say, the state of data that it is managing has changed.
      *
+     * A history always starts in a non-current state, and will remain so until marked current.
+     *
      * See also: {@link #isCurrent()} and {@link #markCurrent()}
      */
-    private int currentPtr;
+    private int currentPtr = -1;
 
     public History() {
         this(DEFAULT_HISTORY_DEPTH);
