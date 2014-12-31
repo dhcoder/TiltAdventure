@@ -3,6 +3,7 @@ package tiltadv.tools.scene.view;
 import dhcoder.support.opt.Opt;
 import dhcoder.tool.javafx.utils.FxController;
 import javafx.application.Platform;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import tiltadv.tools.scene.SceneTool;
@@ -45,19 +46,28 @@ public final class NewSceneDialog {
     }
 
     public Opt<Result> showAndWait(final SceneTool sceneTool) {
-        Dialog<Result> newSceneDialog = new Dialog<>();
-        NewSceneDialogController newSceneDialogController = FxController.loadView(NewSceneDialogController.class);
-        newSceneDialogController.setSceneTool(sceneTool);
+        NewSceneDialogController controller = FxController.loadView(NewSceneDialogController.class);
+        controller.setSceneTool(sceneTool);
 
+        Dialog<ButtonType> newSceneDialog = new Dialog<>();
+        newSceneDialog.initOwner(sceneTool.getStage());
         newSceneDialog.setTitle("New Scene");
         newSceneDialog.setHeaderText("Initialize a new scene\n\n(Values can be modified later)");
-        newSceneDialog.getDialogPane().setContent(newSceneDialogController.getRoot());
+        newSceneDialog.getDialogPane().setContent(controller.getRoot());
 
         newSceneDialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, ButtonType.OK);
-        Platform.runLater(newSceneDialogController.textSceneName::requestFocus);
+        controller.setOkButton((Button)newSceneDialog.getDialogPane().lookupButton(ButtonType.OK));
 
-        Optional<Result> result = newSceneDialog.showAndWait();
-        return Opt.ofNullable(result.orElse(null));
+        Platform.runLater(controller.textSceneName::requestFocus); // Run after the dialog shows
+        Optional<ButtonType> innerResult = newSceneDialog.showAndWait();
+
+        Opt<Result> result = Opt.withNoValue();
+        if (innerResult.get() == ButtonType.OK) {
+            result.set(new Result(controller.textSceneName.getText(), Integer.parseInt(controller.textCols.getText()),
+                Integer.parseInt(controller.textRows.getText()), new File(controller.textTileset.getText())));
+        }
+
+        return result;
     }
 
 }

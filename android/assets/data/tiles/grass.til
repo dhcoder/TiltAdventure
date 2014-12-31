@@ -1,5 +1,5 @@
 {
-    "tilesetPath": "data/tilesets/grass.json",
+    "tilesetPath": "data/tilesets/grass.tst",
     "tiles": [
         {
             "name": "plain",

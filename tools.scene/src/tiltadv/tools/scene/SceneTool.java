@@ -90,7 +90,14 @@ public final class SceneTool extends Application {
 
     public void newScene() {
         NewSceneDialog newSceneDialog = new NewSceneDialog();
-        newSceneDialog.showAndWait(this);
+        Opt<NewSceneDialog.Result> resultOpt = newSceneDialog.showAndWait(this);
+        if (resultOpt.hasValue()) {
+            if (!appPane.getChildren().contains(sceneController.getRoot())) {
+                appPane.getChildren().add(sceneController.getRoot());
+            }
+
+            sceneController.addScene(null, resultOpt.getValue().getSceneName(), (event) -> { });
+        }
     }
 
     public void closeScene() {

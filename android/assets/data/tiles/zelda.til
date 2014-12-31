@@ -1,5 +1,5 @@
 {
-    "tilesetPath": "data/tilesets/zelda.json",
+    "tilesetPath": "data/tilesets/zelda.tst",
     "tiles": [
         {
             "name": "boulder",

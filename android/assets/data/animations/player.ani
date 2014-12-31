@@ -1,5 +1,5 @@
 {
-    "tilesetPath": "data/tilesets/player.json",
+    "tilesetPath": "data/tilesets/player.tst",
     "animations": [
         {
             "name": "idle_s",

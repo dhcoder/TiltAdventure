@@ -1,5 +1,5 @@
 {
-    "tilesetPath": "data/tilesets/grass.json",
+    "tilesetPath": "data/tilesets/grass.tst",
     "numCols": 20,
     "offsetX": 0,
     "offsetY": 0,

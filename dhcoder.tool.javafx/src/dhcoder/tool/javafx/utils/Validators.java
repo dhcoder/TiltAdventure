@@ -11,6 +11,11 @@ public final class Validators {
         Validator.createRegexValidator("Value must be numerical", "\\d+", Severity.ERROR);
 
     public static final Validator<String> asciiValidator = Validator
-        .createRegexValidator("Value must have one or more a-z and A-Z characters (no spaces)", "[a-zA-Z]+",
+        .createRegexValidator("Value can only have letters (no spaces)", "[a-zA-Z]+",
             Severity.ERROR);
+
+    public static final Validator<String> alphaNumericValidator = Validator
+        .createRegexValidator("Value can only have letters and numbers (no spaces)", "[a-zA-Z][a-zA-Z0-9]*",
+            Severity.ERROR);
+
 }
