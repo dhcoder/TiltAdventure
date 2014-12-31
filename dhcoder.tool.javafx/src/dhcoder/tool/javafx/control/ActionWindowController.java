@@ -23,32 +23,32 @@ import org.controlsfx.control.action.Action;
 
 import java.util.regex.Pattern;
 
-public final class CommandWindowController extends FxController {
+public final class ActionWindowController extends FxController {
 
     private class CommandRowCell extends ListCell<Action> {
 
-        private CommandRowController commandRowController;
+        private ActionRowController actionRowController;
 
         public CommandRowCell() {
-            commandRowController = FxController.loadView(CommandRowController.class);
+            actionRowController = FxController.loadView(ActionRowController.class);
         }
 
         @Override
         protected void updateItem(final Action action, final boolean empty) {
             super.updateItem(action, empty);
 
-            commandRowController.getFlowCommandName().getChildren().clear();
-            commandRowController.getLabelShortcut().setText("");
-            commandRowController.getPane().setBackground(Background.EMPTY);
+            actionRowController.getFlowCommandName().getChildren().clear();
+            actionRowController.getLabelShortcut().setText("");
+            actionRowController.getPane().setBackground(Background.EMPTY);
 
             if (!empty) {
                 updateName(action);
                 if (action.getAccelerator() != null) {
-                    commandRowController.getLabelShortcut().setText(action.getAccelerator().getDisplayText());
+                    actionRowController.getLabelShortcut().setText(action.getAccelerator().getDisplayText());
                 }
             }
 
-            setGraphic(commandRowController.getPane());
+            setGraphic(actionRowController.getPane());
         }
 
         private void updateName(final Action command) {
@@ -106,7 +106,7 @@ public final class CommandWindowController extends FxController {
         }
 
         private void addText(final String text) {
-            commandRowController.getFlowCommandName().getChildren().add(new Text(text));
+            actionRowController.getFlowCommandName().getChildren().add(new Text(text));
         }
 
         private void addTextSoFar(final StringBuilder stringBuilder, final boolean isBold) {
@@ -120,7 +120,7 @@ public final class CommandWindowController extends FxController {
             if (isBold) {
                 text.setFont(FontUtils.cloneBold(text.getFont()));
             }
-            commandRowController.getFlowCommandName().getChildren().add(text);
+            actionRowController.getFlowCommandName().getChildren().add(text);
         }
     }
 
@@ -131,11 +131,11 @@ public final class CommandWindowController extends FxController {
     private ObservableList<Action> matchedCommands;
     private int selectedCommandIndex;
 
-    public void setCommandWindow(final CommandWindow commandWindow) {
+    public void setCommandWindow(final ActionWindow actionWindow) {
 
-        commandWindow.setOnShown(event -> {
+        actionWindow.setOnShown(event -> {
             textSearch.clear();
-            matchedCommands.setAll(commandWindow.getAllActions().searchAll());
+            matchedCommands.setAll(actionWindow.getAllActions().searchAll());
             selectedCommandIndex = 0;
             updateSelection();
         });
@@ -169,19 +169,19 @@ public final class CommandWindowController extends FxController {
             .setIsActive(v -> selectedCommandIndex >= 0 && selectedCommandIndex < matchedCommands.size())
             .setHandler(() -> {
                 final Action action = matchedCommands.get(selectedCommandIndex);
-                commandWindow.hide();
+                actionWindow.hide();
                 action.handle(new ActionEvent());
             }).setAccelerator(KeyCode.ENTER).build();
 
         Action closeWindow =
-            new ActionBuilder().setHandler(commandWindow::hide).setAccelerator(KeyCode.ESCAPE).build();
+            new ActionBuilder().setHandler(actionWindow::hide).setAccelerator(KeyCode.ESCAPE).build();
 
         ActionListener actionListener = new ActionListener(nextCommand, prevCommand, acceptCommand, closeWindow);
         actionListener.install(textSearch);
 
         listCommands.setCellFactory(param -> {
             CommandRowCell commandRowCell = new CommandRowCell();
-            commandRowCell.setUserData(commandWindow.getAllActions());
+            commandRowCell.setUserData(actionWindow.getAllActions());
             return commandRowCell;
         });
         listCommands.setItems(matchedCommands);
@@ -192,11 +192,11 @@ public final class CommandWindowController extends FxController {
         textSearch.textProperty().addListener((observable, oldValue, newValue) -> {
             final String query = newValue;
             if (StringUtils.isWhitespace(query)) {
-                matchedCommands.setAll(commandWindow.getAllActions().searchAll());
+                matchedCommands.setAll(actionWindow.getAllActions().searchAll());
             }
             else {
                 Pattern fuzzySearch = ActionCollection.toFuzzySearch(query);
-                matchedCommands.setAll(commandWindow.getAllActions().search(fuzzySearch));
+                matchedCommands.setAll(actionWindow.getAllActions().search(fuzzySearch));
             }
 
             if (matchedCommands.size() > 0) {

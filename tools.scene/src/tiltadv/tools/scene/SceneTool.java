@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglFiles;
 import com.badlogic.gdx.utils.Json;
 import dhcoder.support.opt.Opt;
-import dhcoder.tool.javafx.control.CommandWindow;
+import dhcoder.tool.javafx.control.ActionWindow;
 import dhcoder.tool.javafx.libgdx.serialization.ShortcutsLoader;
 import dhcoder.tool.javafx.utils.ActionCollection;
 import javafx.application.Application;
@@ -37,18 +37,23 @@ public final class SceneTool extends Application {
 
     private final GlobalActions globalActions;
     private final Opt<SceneContext> contextOpt = Opt.withNoValue();
-    private final CommandWindow commandWindow;
+    private final ActionWindow actionWindow;
 
     private Stage stage;
     private Parent rootPane;
     private SceneController sceneController;
     private StackPane appPane;
+    private SettingsLoader.AppSettings appSettings;
 
     public SceneTool() {
         Gdx.files = new LwjglFiles();
 
-        commandWindow = new CommandWindow();
-        globalActions = new GlobalActions(this, commandWindow.getAllActions());
+        actionWindow = new ActionWindow();
+        globalActions = new GlobalActions(this, actionWindow.getAllActions());
+    }
+
+    public SettingsLoader.AppSettings getAppSettings() {
+        return appSettings;
     }
 
     public Stage getStage() {
@@ -62,15 +67,13 @@ public final class SceneTool extends Application {
         this.stage = stage;
 
         Json json = new Json();
-        SettingsLoader.AppSettings appSettings = SettingsLoader.load(json, PATH_CONFIG + "settings.json");
-        loadShortcuts(json, commandWindow.getAllActions());
+        appSettings = SettingsLoader.load(json, PATH_CONFIG + "settings.json");
+        loadShortcuts(json, actionWindow.getAllActions());
 
         stage.setTitle("Scene Editor");
 
         appPane = new StackPane();
-        rootPane = new VBox(
-            ActionUtils.createMenuBar(globalActions.globalScope.getActions()), appPane
-        );
+        rootPane = new VBox(ActionUtils.createMenuBar(globalActions.globalScope.getActions()), appPane);
         VBox.setVgrow(appPane, Priority.ALWAYS);
 
         NoSceneController noSceneController = loadView(NoSceneController.class);
@@ -87,7 +90,7 @@ public final class SceneTool extends Application {
 
     public void newScene() {
         NewSceneDialog newSceneDialog = new NewSceneDialog();
-        newSceneDialog.showAndWait();
+        newSceneDialog.showAndWait(this);
     }
 
     public void closeScene() {
@@ -98,9 +101,9 @@ public final class SceneTool extends Application {
         Window window = getStage().getScene().getWindow();
         double windowX = window.getX();
         double windowY = window.getY();
-        commandWindow.show(getStage());
-        commandWindow.setX(windowX + (window.getWidth() - commandWindow.getWidth()) / 2);
-        commandWindow.setY(windowY + 50);
+        actionWindow.show(getStage());
+        actionWindow.setX(windowX + (window.getWidth() - actionWindow.getWidth()) / 2);
+        actionWindow.setY(windowY + 50);
     }
 
     private void loadShortcuts(final Json json, final ActionCollection actions) {

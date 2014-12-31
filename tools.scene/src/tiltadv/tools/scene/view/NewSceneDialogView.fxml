@@ -14,7 +14,7 @@
       <HBox alignment="CENTER_LEFT">
          <children>
             <Label prefHeight="16.0" prefWidth="90.0" text="Name:" />
-            <TextField fx:id="textSceneName" prefHeight="26.0" prefWidth="184.0">
+            <TextField fx:id="textSceneName" prefHeight="26.0" prefWidth="184.0" text="NewScene">
                <HBox.margin>
                   <Insets right="10.0" />
                </HBox.margin>
@@ -41,7 +41,7 @@
                   <Insets right="10.0" />
                </HBox.margin>
             </TextField>
-            <Button fx:id="buttonBrowseTileset" mnemonicParsing="false" text="Browse..." />
+            <Button fx:id="buttonBrowseTileset" mnemonicParsing="false" onMouseClicked="#onBrowseClicked" text="Browse..." />
          </children>
       </HBox>
    </children>

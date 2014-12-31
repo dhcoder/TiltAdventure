@@ -7,16 +7,16 @@ import javafx.stage.PopupWindow;
 /**
  * A dialog which can search through all registered, named actions.
  */
-public final class CommandWindow extends PopupWindow {
+public final class ActionWindow extends PopupWindow {
 
     private final ActionCollection allActions;
 
-    public CommandWindow() {
+    public ActionWindow() {
         allActions = new ActionCollection();
 
         autoHideProperty().set(true);
 
-        CommandWindowController controller = FxController.loadView(CommandWindowController.class);
+        ActionWindowController controller = FxController.loadView(ActionWindowController.class);
         controller.setCommandWindow(this);
         getScene().setRoot(controller.getRoot());
     }

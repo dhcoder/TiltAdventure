@@ -6,7 +6,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.TextFlow;
 
-public final class CommandRowController extends FxController {
+public final class ActionRowController extends FxController {
     @FXML private Pane rootPane;
     @FXML private TextFlow flowCommandName;
     @FXML private Label labelShortcut;
