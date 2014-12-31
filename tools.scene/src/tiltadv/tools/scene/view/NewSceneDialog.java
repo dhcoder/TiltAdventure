@@ -3,11 +3,11 @@ package tiltadv.tools.scene.view;
 import dhcoder.support.opt.Opt;
 import dhcoder.tool.javafx.utils.FxController;
 import javafx.application.Platform;
-import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 
 import java.io.File;
+import java.util.Optional;
 
 /**
  * Dialog to collect information when creating a new scene.
@@ -45,16 +45,14 @@ public final class NewSceneDialog {
     public Opt<Result> showAndWait() {
         Dialog<Result> newSceneDialog = new Dialog<>();
         NewSceneDialogController newSceneDialogController = FxController.loadView(NewSceneDialogController.class);
+
         newSceneDialog.getDialogPane().setContent(newSceneDialogController.getRoot());
 
         newSceneDialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, ButtonType.OK);
-        Node buttonOk = newSceneDialog.getDialogPane().lookupButton(ButtonType.OK);
-        buttonOk.setDisable(true);
-        Node buttonCancel = newSceneDialog.getDialogPane().lookupButton(ButtonType.CANCEL);
-        Platform.runLater(buttonCancel::requestFocus);
+        Platform.runLater(newSceneDialogController.textSceneName::requestFocus);
 
-        newSceneDialog.showAndWait();
-        return Opt.withNoValue();
+        Optional<Result> result = newSceneDialog.showAndWait();
+        return Opt.ofNullable(result.orElse(null));
     }
 
 }

@@ -85,26 +85,9 @@ public final class SceneTool extends Application {
         stage.show();
     }
 
-    public static int TEST_VALUE = 1;
     public void newScene() {
-        if (TEST_VALUE == 2) {
-            int breakhere =0;
-        }
-        System.out.println("HERE?");
         NewSceneDialog newSceneDialog = new NewSceneDialog();
         newSceneDialog.showAndWait();
-        TEST_VALUE++;
-//        Node sceneView = sceneController.getRoot();
-//        if (!appPane.getChildren().contains(sceneView)) {
-//            appPane.getChildren().add(sceneView);
-//        }
-//
-//        sceneController.addScene(null, "Test " + TEST_VALUE, event -> {
-//            if (sceneController.getScenes().size() == 0) {
-//                appPane.getChildren().remove(sceneView);
-//            }
-//        });
-//        TEST_VALUE++;
     }
 
     public void closeScene() {
