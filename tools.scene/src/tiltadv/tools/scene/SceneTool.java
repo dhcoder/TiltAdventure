@@ -21,6 +21,9 @@ import tiltadv.tools.scene.view.NewSceneDialog;
 import tiltadv.tools.scene.view.NoSceneController;
 import tiltadv.tools.scene.view.SceneController;
 
+import java.io.IOException;
+import java.nio.file.Paths;
+
 import static dhcoder.tool.javafx.utils.FxController.loadView;
 
 /**
@@ -67,7 +70,11 @@ public final class SceneTool extends Application {
         this.stage = stage;
 
         Json json = new Json();
-        appSettings = SettingsLoader.load(json, PATH_CONFIG + "settings.json");
+        try {
+            appSettings = SettingsLoader.load(json, Paths.get(PATH_CONFIG, "settings.json"));
+        } catch (IOException e) {
+            throw new RuntimeException("Can't open app settings!");
+        }
         loadShortcuts(json, actionWindow.getAllActions());
 
         stage.setTitle("Scene Editor");
@@ -114,6 +121,10 @@ public final class SceneTool extends Application {
     }
 
     private void loadShortcuts(final Json json, final ActionCollection actions) {
-        ShortcutsLoader.load(json, actions, PATH_CONFIG + "shortcuts.json");
+        try {
+            ShortcutsLoader.load(json, actions, Paths.get(PATH_CONFIG, "shortcuts.json"));
+        } catch (IOException e) {
+            System.err.println("Can't find shortcuts config file");
+        }
     }
 }

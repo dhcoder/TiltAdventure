@@ -8,9 +8,9 @@ dependencies {
     compile "org.controlsfx:controlsfx:$controlsFxVersion"
     compile "com.google.guava:guava:18.0"
     compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-    compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
-    compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-    compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
+//    compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+//    compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+//    compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
 }
 
 sourceCompatibility = 1.8

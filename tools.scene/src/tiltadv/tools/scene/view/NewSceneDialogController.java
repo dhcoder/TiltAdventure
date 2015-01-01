@@ -66,8 +66,6 @@ public final class NewSceneDialogController extends FxController {
         validationSupport.registerValidator(textRows, Validators.numericValidator);
         validationSupport.registerValidator(textTileset, (Control c, String text) -> ValidationResult
             .fromErrorIf(c, "Tileset target must exist", (isWhitespace(text) || !tilesetExists(text))));
-
-        validationSupport.redecorate();
     }
 
     private boolean tilesetExists(final String text) {

@@ -52,13 +52,16 @@ public final class NewSceneDialog {
         Dialog<ButtonType> newSceneDialog = new Dialog<>();
         newSceneDialog.initOwner(sceneTool.getStage());
         newSceneDialog.setTitle("New Scene");
-        newSceneDialog.setHeaderText("Initialize a new scene\n\n(Values can be modified later)");
+        newSceneDialog.setHeaderText("Initialize a new scene (values can be modified later)");
         newSceneDialog.getDialogPane().setContent(controller.getRoot());
 
         newSceneDialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, ButtonType.OK);
         controller.setOkButton((Button)newSceneDialog.getDialogPane().lookupButton(ButtonType.OK));
 
-        Platform.runLater(controller.textSceneName::requestFocus); // Run after the dialog shows
+        Platform.runLater(() -> {
+            controller.textSceneName.requestFocus();
+            controller.validationSupport.redecorate();
+        });
         Optional<ButtonType> innerResult = newSceneDialog.showAndWait();
 
         Opt<Result> result = Opt.withNoValue();
