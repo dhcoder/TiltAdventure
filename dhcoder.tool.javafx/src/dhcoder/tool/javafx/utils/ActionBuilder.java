@@ -7,7 +7,7 @@ import javafx.scene.input.KeyCombination;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionGroup;
 
-import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public final class ActionBuilder {
     private String id;
@@ -15,7 +15,7 @@ public final class ActionBuilder {
     private String text;
     private String longText;
     private Runnable actionHandler;
-    private Predicate<Void> isActive;
+    private Supplier<Boolean> isActive;
     private KeyCombination accelerator;
 
     public ActionBuilder setId(final String id) {
@@ -39,7 +39,7 @@ public final class ActionBuilder {
         return this;
     }
 
-    public ActionBuilder setIsActive(final Predicate<Void> isActive) {
+    public ActionBuilder setIsActive(final Supplier<Boolean> isActive) {
         this.isActive = isActive;
         return this;
     }
@@ -59,7 +59,7 @@ public final class ActionBuilder {
         }
 
         Action action = new Action(event -> {
-            if (isActive != null && !isActive.test(null)) {return;}
+            if (isActive != null && !isActive.get()) {return;}
             // Delay the action until later, to allow any calling events to clean up first
             Platform.runLater(actionHandler::run);
             event.consume();

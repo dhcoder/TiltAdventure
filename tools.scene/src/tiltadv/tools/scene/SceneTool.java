@@ -14,13 +14,16 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.controlsfx.control.action.ActionUtils;
+import tiltadv.tools.scene.model.GameScene;
 import tiltadv.tools.scene.serialization.SettingsLoader;
 import tiltadv.tools.scene.view.NewSceneDialog;
 import tiltadv.tools.scene.view.NoSceneController;
-import tiltadv.tools.scene.view.SceneController;
+import tiltadv.tools.scene.view.ScenesController;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 import static dhcoder.tool.javafx.utils.FxController.loadView;
 
@@ -37,12 +40,13 @@ public final class SceneTool extends Application {
     }
 
     private final GlobalActions globalActions;
-    private final Opt<SceneContext> contextOpt = Opt.withNoValue();
+    private final Opt<GameSceneContext> contextOpt = Opt.withNoValue();
+    private final Map<GameScene, GameSceneContext> sceneContextMap = new HashMap<>();
     private final ActionWindow actionWindow;
 
     private Stage stage;
     private Parent rootPane;
-    private SceneController sceneController;
+    private ScenesController scenesController;
     private StackPane appPane;
     private SettingsLoader.AppSettings appSettings;
 
@@ -59,7 +63,7 @@ public final class SceneTool extends Application {
         return stage;
     }
 
-    public Opt<SceneContext> getContextOpt() { return contextOpt; }
+    public Opt<GameSceneContext> getContextOpt() { return contextOpt; }
 
     @Override
     public void start(final Stage stage) {
@@ -80,7 +84,26 @@ public final class SceneTool extends Application {
         VBox.setVgrow(appPane, Priority.ALWAYS);
 
         NoSceneController noSceneController = loadView(NoSceneController.class);
-        sceneController = loadView(SceneController.class);
+        scenesController = loadView(ScenesController.class);
+        scenesController.setOnSceneAdding(scene -> {
+            if (!appPane.getChildren().contains(scenesController.getRoot())) {
+                appPane.getChildren().add(scenesController.getRoot());
+            }
+
+            GameSceneContext context = new GameSceneContext(scene);
+            sceneContextMap.put(scene, context);
+        });
+        scenesController.setOnSceneRemoved(scene -> {
+            if (scenesController.getSceneCount() == 0) {
+                appPane.getChildren().remove(scenesController.getRoot());
+                contextOpt.clear();
+            }
+
+            sceneContextMap.remove(scene);
+        });
+        scenesController.setOnSceneSelected(scene -> {
+            contextOpt.set(sceneContextMap.get(scene));
+        });
 
         noSceneController.setTooltipCommands(globalActions.showActionWindow, globalActions.newScene);
         appPane.getChildren().add(noSceneController.getRoot());
@@ -95,16 +118,12 @@ public final class SceneTool extends Application {
         NewSceneDialog newSceneDialog = new NewSceneDialog();
         Opt<NewSceneDialog.Result> resultOpt = newSceneDialog.showAndWait(this);
         if (resultOpt.hasValue()) {
-            if (!appPane.getChildren().contains(sceneController.getRoot())) {
-                appPane.getChildren().add(sceneController.getRoot());
-            }
-
-            sceneController.addScene(null, resultOpt.getValue().getSceneName(), (event) -> { });
+            scenesController.addScene(new GameScene(), resultOpt.getValue().getSceneName());
         }
     }
 
     public void closeScene() {
-        //TODO: Close active tab
+        scenesController.closeActiveScene();
     }
 
     public void showCommandWindow() {

@@ -58,10 +58,7 @@ public final class NewSceneDialog {
         newSceneDialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, ButtonType.OK);
         controller.setOkButton((Button)newSceneDialog.getDialogPane().lookupButton(ButtonType.OK));
 
-        Platform.runLater(() -> {
-            controller.textSceneName.requestFocus();
-            controller.validationSupport.redecorate();
-        });
+        Platform.runLater(() -> controller.textSceneName.requestFocus());
         Optional<ButtonType> innerResult = newSceneDialog.showAndWait();
 
         Opt<Result> result = Opt.withNoValue();

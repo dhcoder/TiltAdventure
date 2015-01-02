@@ -5,35 +5,22 @@
 <?import javafx.scene.layout.*?>
 
 
-<AnchorPane fx:id="rootPane" prefHeight="603.0" prefWidth="793.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tiltadv.tools.scene.view.SceneController">
-   <children>
-      <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+ <SplitPane dividerPositions="0.2895069532237674" prefHeight="526.0" prefWidth="614.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tiltadv.tools.scene.view.SceneController">
+    <items>
+        <AnchorPane SplitPane.resizableWithParent="false">
          <children>
-             <TabPane fx:id="tabScenes"/>
-            <AnchorPane VBox.vgrow="ALWAYS">
-               <children>
-                   <SplitPane dividerPositions="0.2895069532237674" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" VBox.vgrow="ALWAYS">
-                      <items>
-                          <AnchorPane SplitPane.resizableWithParent="false">
-                           <children>
-                              <ListView fx:id="listSceneItems" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                           </children>
-                        </AnchorPane>
-                          <AnchorPane>
-                             <children>
-                                 <SplitPane dividerPositions="0.5656934306569343" layoutY="6.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                    <items>
-                                        <AnchorPane fx:id="sceneGridPane"/>
-                                        <AnchorPane fx:id="propertySheetPane" SplitPane.resizableWithParent="false" />
-                                    </items>
-                                 </SplitPane>
-                             </children>
-                          </AnchorPane>
-                      </items>
-                   </SplitPane>
-               </children>
-            </AnchorPane>
+            <ListView fx:id="listSceneItems" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
          </children>
-      </VBox>
-   </children>
-</AnchorPane>
+      </AnchorPane>
+        <AnchorPane>
+           <children>
+               <SplitPane dividerPositions="0.5656934306569343" layoutY="6.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <items>
+                      <AnchorPane fx:id="sceneGridPane" />
+                      <AnchorPane fx:id="propertySheetPane" SplitPane.resizableWithParent="false" />
+                  </items>
+               </SplitPane>
+           </children>
+        </AnchorPane>
+    </items>
+ </SplitPane>

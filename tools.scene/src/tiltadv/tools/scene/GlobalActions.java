@@ -38,19 +38,20 @@ public final class GlobalActions {
             .setText("New Scene", "Opens a new, blank scene to work on").setHandler(sceneTool::newScene).build();
 
         closeScene = new ActionBuilder().setId("close_scene").setParent(fileScope)
-            .setText("Close Scene", "Closes the current scene").setHandler(sceneTool::closeScene).build();
+            .setText("Close Scene", "Closes the current scene").setHandler(sceneTool::closeScene)
+            .setIsActive(() -> sceneTool.getContextOpt().hasValue()).build();
 
         exit = new ActionBuilder().setId("exit").setParent(fileScope).setText("Exit", "Exits the application")
             .setHandler(() -> sceneTool.getStage().close()).build();
 
         undo = new ActionBuilder().setId("undo").setParent(editScope).setText("Undo", "Undo your last action")
             .setHandler(() -> sceneTool.getContextOpt().getValue().getHistory().undo()).setIsActive(
-                v -> sceneTool.getContextOpt().hasValue() &&
+                () -> sceneTool.getContextOpt().hasValue() &&
                     sceneTool.getContextOpt().getValue().getHistory().canUndo()).build();
 
         redo = new ActionBuilder().setId("redo").setParent(editScope).setText("Redo", "Redo your last action")
             .setHandler(() -> sceneTool.getContextOpt().getValue().getHistory().redo()).setIsActive(
-                v -> sceneTool.getContextOpt().hasValue() &&
+                () -> sceneTool.getContextOpt().hasValue() &&
                     sceneTool.getContextOpt().getValue().getHistory().canRedo()).build();
 
         // No reason to search for the command that brings up the action window when it is already showing

@@ -16,7 +16,6 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.layout.Background;
 import javafx.scene.text.Text;
 import org.controlsfx.control.action.Action;
@@ -147,26 +146,21 @@ public final class ActionWindowController extends FxController {
             }
         });
 
-        Action prevCommand = new Action(actionEvent -> {
-            if (matchedCommands.size() <= 0) {return;}
-
+        Action prevCommand = new ActionBuilder().setHandler(() -> {
             selectedCommandIndex--;
             if (selectedCommandIndex < 0) {
                 selectedCommandIndex = matchedCommands.size() - 1;
             }
             updateSelection();
+        }).setIsActive(() -> matchedCommands.size() > 0).setAccelerator(KeyCode.UP).build();
 
-            actionEvent.consume();
-        });
-        prevCommand.setAccelerator(new KeyCodeCombination(KeyCode.UP));
-
-        Action nextCommand = new ActionBuilder().setIsActive(v -> matchedCommands.size() > 0).setHandler(() -> {
+        Action nextCommand = new ActionBuilder().setIsActive(() -> matchedCommands.size() > 0).setHandler(() -> {
             selectedCommandIndex = (selectedCommandIndex + 1) % matchedCommands.size();
             updateSelection();
         }).setAccelerator(KeyCode.DOWN).build();
 
         Action acceptCommand = new ActionBuilder()
-            .setIsActive(v -> selectedCommandIndex >= 0 && selectedCommandIndex < matchedCommands.size())
+            .setIsActive(() -> selectedCommandIndex >= 0 && selectedCommandIndex < matchedCommands.size())
             .setHandler(() -> {
                 final Action action = matchedCommands.get(selectedCommandIndex);
                 actionWindow.hide();
