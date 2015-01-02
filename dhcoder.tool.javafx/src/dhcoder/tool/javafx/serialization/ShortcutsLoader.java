@@ -1,6 +1,6 @@
-package dhcoder.tool.javafx.libgdx.serialization;
+package dhcoder.tool.javafx.serialization;
 
-import com.badlogic.gdx.utils.Json;
+import com.google.gson.Gson;
 import dhcoder.support.opt.Opt;
 import dhcoder.tool.javafx.utils.ActionCollection;
 import javafx.scene.input.KeyCombination;
@@ -17,19 +17,19 @@ import static dhcoder.support.text.StringUtils.format;
  */
 public final class ShortcutsLoader {
 
-    private final static class ShortcutGroupData {
+    public final static class ShortcutGroupData {
         public ShortcutData[] shortcuts;
     }
 
-    private final static class ShortcutData {
+    public final static class ShortcutData {
         public String shortcut;
         public String commandId;
     }
 
-    public static void load(final Json json, final ActionCollection actionCollection, final Path shortcutsPath)
+    public static void load(final Gson gson, final ActionCollection actionCollection, final Path shortcutsPath)
         throws IOException {
-        ShortcutGroupData shortcutGroupData =
-            json.fromJson(ShortcutGroupData.class, new String(Files.readAllBytes(shortcutsPath)));
+        String jsonContents = new String(Files.readAllBytes(shortcutsPath));
+        ShortcutGroupData shortcutGroupData = gson.fromJson(jsonContents, ShortcutGroupData.class);
 
         for (int i = 0; i < shortcutGroupData.shortcuts.length; ++i) {
             ShortcutData shortcutData = shortcutGroupData.shortcuts[i];

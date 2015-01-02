@@ -1,11 +1,9 @@
 package tiltadv.tools.scene;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.lwjgl.LwjglFiles;
-import com.badlogic.gdx.utils.Json;
+import com.google.gson.Gson;
 import dhcoder.support.opt.Opt;
 import dhcoder.tool.javafx.control.ActionWindow;
-import dhcoder.tool.javafx.libgdx.serialization.ShortcutsLoader;
+import dhcoder.tool.javafx.serialization.ShortcutsLoader;
 import dhcoder.tool.javafx.utils.ActionCollection;
 import javafx.application.Application;
 import javafx.scene.Parent;
@@ -49,8 +47,6 @@ public final class SceneTool extends Application {
     private SettingsLoader.AppSettings appSettings;
 
     public SceneTool() {
-        Gdx.files = new LwjglFiles();
-
         actionWindow = new ActionWindow();
         globalActions = new GlobalActions(this, actionWindow.getAllActions());
     }
@@ -69,13 +65,13 @@ public final class SceneTool extends Application {
     public void start(final Stage stage) {
         this.stage = stage;
 
-        Json json = new Json();
+        Gson gson = new Gson();
         try {
-            appSettings = SettingsLoader.load(json, Paths.get(PATH_CONFIG, "settings.json"));
+            appSettings = SettingsLoader.load(gson, Paths.get(PATH_CONFIG, "settings.json"));
         } catch (IOException e) {
             throw new RuntimeException("Can't open app settings!");
         }
-        loadShortcuts(json, actionWindow.getAllActions());
+        loadShortcuts(gson, actionWindow.getAllActions());
 
         stage.setTitle("Scene Editor");
 
@@ -120,9 +116,9 @@ public final class SceneTool extends Application {
         actionWindow.setY(windowY + 50);
     }
 
-    private void loadShortcuts(final Json json, final ActionCollection actions) {
+    private void loadShortcuts(final Gson gson, final ActionCollection actions) {
         try {
-            ShortcutsLoader.load(json, actions, Paths.get(PATH_CONFIG, "shortcuts.json"));
+            ShortcutsLoader.load(gson, actions, Paths.get(PATH_CONFIG, "shortcuts.json"));
         } catch (IOException e) {
             System.err.println("Can't find shortcuts config file");
         }

@@ -1,6 +1,6 @@
 package tiltadv.tools.scene.serialization;
 
-import com.badlogic.gdx.utils.Json;
+import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,7 +24,7 @@ public final class SettingsLoader {
         }
     }
 
-    public static AppSettings load(final Json json, final Path settingsPath) throws IOException {
-        return json.fromJson(AppSettings.class, new String(Files.readAllBytes(settingsPath)));
+    public static AppSettings load(final Gson gson, final Path settingsPath) throws IOException {
+        return gson.fromJson(new String(Files.readAllBytes(settingsPath)), AppSettings.class);
     }
 }
