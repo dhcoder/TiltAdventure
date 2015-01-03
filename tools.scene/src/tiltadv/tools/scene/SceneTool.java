@@ -1,5 +1,6 @@
 package tiltadv.tools.scene;
 
+import com.google.common.eventbus.EventBus;
 import com.google.gson.Gson;
 import dhcoder.support.opt.Opt;
 import dhcoder.tool.game.model.Scene;
@@ -16,6 +17,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.controlsfx.control.action.ActionUtils;
+import tiltadv.tools.scene.events.ContextChangedEventArgs;
 import tiltadv.tools.scene.serialization.SettingsLoader;
 import tiltadv.tools.scene.view.NewSceneDialog;
 import tiltadv.tools.scene.view.NoSceneController;
@@ -41,11 +43,11 @@ public final class SceneTool extends Application {
     }
 
     private final GlobalActions globalActions;
-    private final Opt<GameSceneContext> contextOpt = Opt.withNoValue();
-    private final Map<Scene, GameSceneContext> sceneContextMap = new HashMap<>();
+    private final Opt<SceneContext> contextOpt = Opt.withNoValue();
+    private final Map<Scene, SceneContext> sceneContextMap = new HashMap<>();
     private final ActionWindow actionWindow;
     private final Gson gson = new Gson();
-
+    private final EventBus eventBus = new EventBus("scenetool");
     private Stage stage;
     private Parent rootPane;
     private ScenesController scenesController;
@@ -57,6 +59,10 @@ public final class SceneTool extends Application {
         globalActions = new GlobalActions(this, actionWindow.getAllActions());
     }
 
+    public EventBus getEventBus() {
+        return eventBus;
+    }
+
     public SettingsLoader.AppSettings getAppSettings() {
         return appSettings;
     }
@@ -65,9 +71,9 @@ public final class SceneTool extends Application {
         return stage;
     }
 
-    public Opt<GameSceneContext> getContextOpt() { return contextOpt; }
+    public Opt<SceneContext> getContextOpt() { return contextOpt; }
 
-    public GameSceneContext getContext(final Scene gameScene) {
+    public SceneContext getContext(final Scene gameScene) {
         return sceneContextMap.get(gameScene);
     }
 
@@ -95,19 +101,22 @@ public final class SceneTool extends Application {
                 appPane.getChildren().add(scenesController.getRoot());
             }
 
-            GameSceneContext context = new GameSceneContext(scene);
+            SceneContext context = new SceneContext(scene);
             sceneContextMap.put(scene, context);
         });
         scenesController.setOnSceneRemoved(scene -> {
             if (scenesController.getSceneCount() == 0) {
                 appPane.getChildren().remove(scenesController.getRoot());
                 contextOpt.clear();
+                eventBus.post(new ContextChangedEventArgs());
             }
 
             sceneContextMap.remove(scene);
         });
         scenesController.setOnSceneSelected(scene -> {
-            contextOpt.set(sceneContextMap.get(scene));
+            SceneContext sceneContext = sceneContextMap.get(scene);
+            contextOpt.set(sceneContext);
+            eventBus.post(new ContextChangedEventArgs(sceneContext));
         });
         scenesController.setSceneTool(this);
 

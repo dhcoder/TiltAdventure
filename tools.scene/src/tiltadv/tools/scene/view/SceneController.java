@@ -1,5 +1,6 @@
 package tiltadv.tools.scene.view;
 
+import com.google.common.eventbus.Subscribe;
 import dhcoder.tool.game.model.Scene;
 import dhcoder.tool.game.view.TileGridCell;
 import dhcoder.tool.javafx.utils.FxController;
@@ -13,7 +14,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.PopupWindow;
 import org.controlsfx.control.GridView;
+import tiltadv.tools.scene.SceneContext;
 import tiltadv.tools.scene.SceneTool;
+import tiltadv.tools.scene.events.ContextChangedEventArgs;
 
 /**
  * UI for editing a scene. Contains a list of all actors in the scene, as well as a property editor and visual grid.
@@ -25,9 +28,16 @@ public final class SceneController extends FxController {
 
     public void setSceneTool(final SceneTool sceneTool) {
         this.sceneTool = sceneTool;
+        sceneTool.getEventBus().register(this);
     }
 
-    public void setToScene(final Scene gameScene) {
+    @Subscribe
+    public void onSceneContextChanged(final ContextChangedEventArgs args) {
+        if (!args.getContextOpt().hasValue()) {return;}
+
+        SceneContext context = args.getContextOpt().getValue();
+        Scene gameScene = context.getScene();
+
         ObservableList<ImageView> tiles = FXCollections.observableArrayList();
         GridView<ImageView> test = new GridView<>(tiles);
         test.setCellFactory(param -> new TileGridCell());
@@ -51,5 +61,6 @@ public final class SceneController extends FxController {
         test.setPrefWidth(300);
         test.setPrefHeight(300);
         popup.show(sceneTool.getStage());
+
     }
 }

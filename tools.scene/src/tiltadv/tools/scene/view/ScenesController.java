@@ -63,8 +63,6 @@ public final class ScenesController extends FxController {
         fireOnSceneAdded(gameScene);
         tabScenes.getTabs().add(tabScene);
         tabScenes.getSelectionModel().select(tabScene);
-
-        sceneController.setToScene(gameScene);
     }
 
     public void closeActiveScene() {
