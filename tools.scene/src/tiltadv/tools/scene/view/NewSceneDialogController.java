@@ -33,7 +33,7 @@ public final class NewSceneDialogController extends FxController {
     public void onBrowseClicked(final MouseEvent clickEvent) {
 
         FileChooser tilesetChooser = new FileChooser();
-        tilesetChooser.setInitialDirectory(sceneTool.getAppSettings().getTilesetPath());
+        tilesetChooser.setInitialDirectory(sceneTool.getAppSettings().getTilesetDir());
         tilesetChooser.getExtensionFilters().add(tilesetFilter);
         Platform.runLater(() -> {
             File selected = tilesetChooser.showOpenDialog(sceneTool.getStage());
@@ -69,6 +69,6 @@ public final class NewSceneDialogController extends FxController {
     }
 
     private boolean tilesetExists(final String text) {
-        return new File(sceneTool.getAppSettings().getTilesetPath().toString() + "/" + text).exists();
+        return new File(sceneTool.getAppSettings().getTilesetDir(), text).exists();
     }
 }

@@ -14,14 +14,15 @@ public final class SettingsLoader {
 
     public final static class AppSettings {
         public int[] size;
-        public String assetPath;
+        public String assetDir;
 
         public int getWidth() { return size[0]; }
+
         public int getHeight() { return size[1]; }
-        public File getAssetPath() { return new File(assetPath); }
-        public File getTilesetPath() {
-            return new File(assetPath + "/data/tilesets");
-        }
+
+        public File getAssetDir() { return new File(assetDir); }
+
+        public File getTilesetDir() { return new File(getAssetDir(), "data/tilesets"); }
     }
 
     public static AppSettings load(final Gson gson, final Path settingsPath) throws IOException {

@@ -2,7 +2,7 @@ package dhcoder.tool.game.model;
 
 import javafx.scene.image.Image;
 
-import java.nio.file.Path;
+import java.io.File;
 
 /**
  * Data class that corresponds to a TiltAdventure tileset.
@@ -12,8 +12,8 @@ public final class Tileset {
     private final int tileWidth;
     private final int tileHeight;
 
-    public Tileset(final Path imagePath, final int tileWidth, final int tileHeight) {
-        this.image = new Image(imagePath.toString());
+    public Tileset(final File imageFile, final int tileWidth, final int tileHeight) {
+        this.image = new Image("file:" + imageFile.toString());
         this.tileWidth = tileWidth;
         this.tileHeight = tileHeight;
     }

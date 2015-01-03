@@ -10,4 +10,8 @@ public final class Scene {
         this.tileset = tileset;
     }
 
+    public Tileset getTileset() {
+        return tileset;
+    }
+
 }

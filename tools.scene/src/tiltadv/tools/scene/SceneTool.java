@@ -67,6 +67,10 @@ public final class SceneTool extends Application {
 
     public Opt<GameSceneContext> getContextOpt() { return contextOpt; }
 
+    public GameSceneContext getContext(final Scene gameScene) {
+        return sceneContextMap.get(gameScene);
+    }
+
     @Override
     public void start(final Stage stage) {
         this.stage = stage;
@@ -105,6 +109,7 @@ public final class SceneTool extends Application {
         scenesController.setOnSceneSelected(scene -> {
             contextOpt.set(sceneContextMap.get(scene));
         });
+        scenesController.setSceneTool(this);
 
         noSceneController.setTooltipCommands(globalActions.showActionWindow, globalActions.newScene);
         appPane.getChildren().add(noSceneController.getRoot());
@@ -120,8 +125,12 @@ public final class SceneTool extends Application {
         Opt<NewSceneDialog.Result> resultOpt = newSceneDialog.showAndWait(this);
         if (resultOpt.hasValue()) {
             NewSceneDialog.Result newSceneValues = resultOpt.getValue();
-            Tileset tileset = TilesetLoader.load(gson, newSceneValues.getTilesetPath());
-            scenesController.addScene(new Scene(newS), resultOpt.getValue().getSceneName());
+            try {
+                Tileset tileset = TilesetLoader.load(gson, appSettings.getAssetDir(), newSceneValues.getTilesetFile());
+                scenesController.addScene(new Scene(tileset), newSceneValues.getSceneName());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -142,7 +151,7 @@ public final class SceneTool extends Application {
         try {
             ShortcutsLoader.load(gson, actions, Paths.get(PATH_CONFIG, "shortcuts.json"));
         } catch (IOException e) {
-            System.err.println("Can't find shortcuts config file");
+            e.printStackTrace();
         }
     }
 }

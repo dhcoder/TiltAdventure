@@ -2,6 +2,7 @@ apply plugin: "java"
 
 dependencies {
     compile project(':dhcoder.tool')
+    compile "org.controlsfx:controlsfx:$controlsFxVersion"
     compile "com.google.code.gson:gson:$gsonVersion"
     testCompile project(':dhcoder.test')
     testCompile group: 'junit', name: 'junit', version: '4.+'

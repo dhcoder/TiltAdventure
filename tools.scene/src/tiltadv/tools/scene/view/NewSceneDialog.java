@@ -9,7 +9,6 @@ import javafx.scene.control.Dialog;
 import tiltadv.tools.scene.SceneTool;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.Optional;
 
 /**
@@ -20,13 +19,13 @@ public final class NewSceneDialog {
     public static final class Result {
         private String sceneName;
         private int numCols, numRows;
-        private Path tilesetPath;
+        private File tilesetFile;
 
-        Result(final String sceneName, final int numCols, final int numRows, final Path tilesetPath) {
+        Result(final String sceneName, final int numCols, final int numRows, final File tilesetFile) {
             this.sceneName = sceneName;
             this.numCols = numCols;
             this.numRows = numRows;
-            this.tilesetPath = tilesetPath;
+            this.tilesetFile = tilesetFile;
         }
 
         public String getSceneName() {
@@ -41,8 +40,8 @@ public final class NewSceneDialog {
             return numRows;
         }
 
-        public Path getTilesetPath() {
-            return tilesetPath;
+        public File getTilesetFile() {
+            return tilesetFile;
         }
     }
 
@@ -64,8 +63,9 @@ public final class NewSceneDialog {
 
         Opt<Result> result = Opt.withNoValue();
         if (innerResult.get() == ButtonType.OK) {
+            File tilesetFile = new File(sceneTool.getAppSettings().getTilesetDir(), controller.textTileset.getText());
             result.set(new Result(controller.textSceneName.getText(), Integer.parseInt(controller.textCols.getText()),
-                Integer.parseInt(controller.textRows.getText()), new File(controller.textTileset.getText())));
+                Integer.parseInt(controller.textRows.getText()), tilesetFile));
         }
 
         return result;

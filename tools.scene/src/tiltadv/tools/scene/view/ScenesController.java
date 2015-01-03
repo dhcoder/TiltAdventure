@@ -7,6 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.AnchorPane;
+import tiltadv.tools.scene.SceneTool;
 
 import java.util.function.Consumer;
 
@@ -20,6 +21,7 @@ public final class ScenesController extends FxController {
     private Consumer<Scene> onSceneAdding;
     private Consumer<Scene> onSceneSelected;
     private Consumer<Scene> onSceneRemoved;
+    private SceneController sceneController;
 
     /**
      * Return the number of open scenes.
@@ -49,6 +51,10 @@ public final class ScenesController extends FxController {
         this.onSceneSelected = onSceneSelected;
     }
 
+    public void setSceneTool(final SceneTool sceneTool) {
+        sceneController.setSceneTool(sceneTool);
+    }
+
     public void addScene(final Scene gameScene, final String name) {
         Tab tabScene = new Tab(name);
         tabScene.setUserData(gameScene);
@@ -57,6 +63,8 @@ public final class ScenesController extends FxController {
         fireOnSceneAdded(gameScene);
         tabScenes.getTabs().add(tabScene);
         tabScenes.getSelectionModel().select(tabScene);
+
+        sceneController.setToScene(gameScene);
     }
 
     public void closeActiveScene() {
@@ -71,7 +79,8 @@ public final class ScenesController extends FxController {
 
     @FXML
     private void initialize() {
-        Parent scenePaneContents = FxController.loadView(SceneController.class).getRoot();
+        sceneController = FxController.loadView(SceneController.class);
+        Parent scenePaneContents = sceneController.getRoot();
         AnchorPane.setBottomAnchor(scenePaneContents, 0.0);
         AnchorPane.setTopAnchor(scenePaneContents, 0.0);
         AnchorPane.setLeftAnchor(scenePaneContents, 0.0);
