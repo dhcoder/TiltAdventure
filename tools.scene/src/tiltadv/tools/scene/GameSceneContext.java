@@ -1,7 +1,7 @@
 package tiltadv.tools.scene;
 
+import dhcoder.tool.game.model.Scene;
 import dhcoder.tool.history.History;
-import dhcoder.tool.game.Scene;
 
 /**
  * Miscellaneous context data related to a scene. Toolbars in this tool should be able to repond to a context change and

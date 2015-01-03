@@ -2,6 +2,7 @@ package tiltadv.tools.scene;
 
 import com.google.gson.Gson;
 import dhcoder.support.opt.Opt;
+import dhcoder.tool.game.model.Scene;
 import dhcoder.tool.javafx.control.ActionWindow;
 import dhcoder.tool.javafx.serialization.ShortcutsLoader;
 import dhcoder.tool.javafx.utils.ActionCollection;
@@ -13,7 +14,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.controlsfx.control.action.ActionUtils;
-import dhcoder.tool.game.Scene;
 import tiltadv.tools.scene.serialization.SettingsLoader;
 import tiltadv.tools.scene.view.NewSceneDialog;
 import tiltadv.tools.scene.view.NoSceneController;

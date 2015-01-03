@@ -1,4 +1,4 @@
-package dhcoder.tool.game;
+package dhcoder.tool.game.model;
 
 import javafx.scene.image.Image;
 

@@ -1,4 +1,4 @@
-package dhcoder.tool.serialization;
+package dhcoder.tool.game.serialization;
 
 import com.google.gson.Gson;
 

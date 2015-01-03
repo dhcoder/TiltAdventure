@@ -1,12 +1,12 @@
 package tiltadv.tools.scene.view;
 
+import dhcoder.tool.game.model.Scene;
 import dhcoder.tool.javafx.utils.FxController;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.AnchorPane;
-import dhcoder.tool.game.Scene;
 
 import java.util.function.Consumer;
 
