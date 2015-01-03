@@ -9,6 +9,7 @@ import javafx.scene.control.Dialog;
 import tiltadv.tools.scene.SceneTool;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Optional;
 
 /**
@@ -19,9 +20,9 @@ public final class NewSceneDialog {
     public static final class Result {
         private String sceneName;
         private int numCols, numRows;
-        private File tilesetPath;
+        private Path tilesetPath;
 
-        Result(final String sceneName, final int numCols, final int numRows, final File tilesetPath) {
+        Result(final String sceneName, final int numCols, final int numRows, final Path tilesetPath) {
             this.sceneName = sceneName;
             this.numCols = numCols;
             this.numRows = numRows;
@@ -40,7 +41,7 @@ public final class NewSceneDialog {
             return numRows;
         }
 
-        public File getTilesetPath() {
+        public Path getTilesetPath() {
             return tilesetPath;
         }
     }

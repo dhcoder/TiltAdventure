@@ -3,6 +3,8 @@ package tiltadv.tools.scene;
 import com.google.gson.Gson;
 import dhcoder.support.opt.Opt;
 import dhcoder.tool.game.model.Scene;
+import dhcoder.tool.game.model.Tileset;
+import dhcoder.tool.game.serialization.TilesetLoader;
 import dhcoder.tool.javafx.control.ActionWindow;
 import dhcoder.tool.javafx.serialization.ShortcutsLoader;
 import dhcoder.tool.javafx.utils.ActionCollection;
@@ -42,6 +44,7 @@ public final class SceneTool extends Application {
     private final Opt<GameSceneContext> contextOpt = Opt.withNoValue();
     private final Map<Scene, GameSceneContext> sceneContextMap = new HashMap<>();
     private final ActionWindow actionWindow;
+    private final Gson gson = new Gson();
 
     private Stage stage;
     private Parent rootPane;
@@ -68,7 +71,6 @@ public final class SceneTool extends Application {
     public void start(final Stage stage) {
         this.stage = stage;
 
-        Gson gson = new Gson();
         try {
             appSettings = SettingsLoader.load(gson, Paths.get(PATH_CONFIG, "settings.json"));
         } catch (IOException e) {
@@ -117,7 +119,9 @@ public final class SceneTool extends Application {
         NewSceneDialog newSceneDialog = new NewSceneDialog();
         Opt<NewSceneDialog.Result> resultOpt = newSceneDialog.showAndWait(this);
         if (resultOpt.hasValue()) {
-            scenesController.addScene(new Scene(), resultOpt.getValue().getSceneName());
+            NewSceneDialog.Result newSceneValues = resultOpt.getValue();
+            Tileset tileset = TilesetLoader.load(gson, newSceneValues.getTilesetPath());
+            scenesController.addScene(new Scene(newS), resultOpt.getValue().getSceneName());
         }
     }
 

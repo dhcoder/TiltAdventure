@@ -11,14 +11,22 @@ public final class Tileset {
     private final Image image;
     private final int tileWidth;
     private final int tileHeight;
-    private final int numRows;
-    private final int numCols;
 
-    public Tileset(final Path path, final int tileWidth, final int tileHeight, final int numRows, final int numCols) {
-        this.image = new Image(path.toString());
+    public Tileset(final Path imagePath, final int tileWidth, final int tileHeight) {
+        this.image = new Image(imagePath.toString());
         this.tileWidth = tileWidth;
         this.tileHeight = tileHeight;
-        this.numRows = numRows;
-        this.numCols = numCols;
+    }
+
+    public Image getImage() {
+        return image;
+    }
+
+    public int getTileWidth() {
+        return tileWidth;
+    }
+
+    public int getTileHeight() {
+        return tileHeight;
     }
 }
