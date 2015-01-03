@@ -6,7 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.AnchorPane;
-import tiltadv.tools.scene.model.GameScene;
+import dhcoder.tool.game.Scene;
 
 import java.util.function.Consumer;
 
@@ -17,9 +17,9 @@ public final class ScenesController extends FxController {
     @FXML private AnchorPane scenePane;
     @FXML private TabPane tabScenes;
 
-    private Consumer<GameScene> onSceneAdding;
-    private Consumer<GameScene> onSceneSelected;
-    private Consumer<GameScene> onSceneRemoved;
+    private Consumer<Scene> onSceneAdding;
+    private Consumer<Scene> onSceneSelected;
+    private Consumer<Scene> onSceneRemoved;
 
     /**
      * Return the number of open scenes.
@@ -28,28 +28,28 @@ public final class ScenesController extends FxController {
         return tabScenes.getTabs().size();
     }
 
-    public GameScene getActiveScene() {
+    public Scene getActiveScene() {
         if (tabScenes.getTabs().size() == 0) {
             throw new IllegalStateException("Attempted to request a scene when there are none open");
         }
 
         Tab tabActive = tabScenes.getSelectionModel().getSelectedItem();
-        return (GameScene)tabActive.getUserData();
+        return (Scene)tabActive.getUserData();
     }
 
-    public void setOnSceneAdding(final Consumer<GameScene> onSceneAdding) {
+    public void setOnSceneAdding(final Consumer<Scene> onSceneAdding) {
         this.onSceneAdding = onSceneAdding;
     }
 
-    public void setOnSceneRemoved(final Consumer<GameScene> onSceneRemoved) {
+    public void setOnSceneRemoved(final Consumer<Scene> onSceneRemoved) {
         this.onSceneRemoved = onSceneRemoved;
     }
 
-    public void setOnSceneSelected(final Consumer<GameScene> onSceneSelected) {
+    public void setOnSceneSelected(final Consumer<Scene> onSceneSelected) {
         this.onSceneSelected = onSceneSelected;
     }
 
-    public void addScene(final GameScene gameScene, final String name) {
+    public void addScene(final Scene gameScene, final String name) {
         Tab tabScene = new Tab(name);
         tabScene.setUserData(gameScene);
 
@@ -66,7 +66,7 @@ public final class ScenesController extends FxController {
 
         Tab tabActive = tabScenes.getSelectionModel().getSelectedItem();
         tabScenes.getTabs().remove(tabActive);
-        fireOnSceneClosed((GameScene)tabActive.getUserData());
+        fireOnSceneClosed((Scene)tabActive.getUserData());
     }
 
     @FXML
@@ -80,24 +80,24 @@ public final class ScenesController extends FxController {
 
         tabScenes.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
             if (newTab != null) {
-                fireOnSceneSelected((GameScene)newTab.getUserData());
+                fireOnSceneSelected((Scene)newTab.getUserData());
             }
         });
     }
 
-    private void fireOnSceneAdded(final GameScene scene) {
+    private void fireOnSceneAdded(final Scene scene) {
         if (onSceneAdding != null) {
             onSceneAdding.accept(scene);
         }
     }
 
-    private void fireOnSceneClosed(final GameScene scene) {
+    private void fireOnSceneClosed(final Scene scene) {
         if (onSceneRemoved != null) {
             onSceneRemoved.accept(scene);
         }
     }
 
-    private void fireOnSceneSelected(final GameScene scene) {
+    private void fireOnSceneSelected(final Scene scene) {
         if (onSceneSelected != null) {
             onSceneSelected.accept(scene);
         }

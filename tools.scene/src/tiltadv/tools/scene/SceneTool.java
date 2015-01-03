@@ -7,14 +7,13 @@ import dhcoder.tool.javafx.serialization.ShortcutsLoader;
 import dhcoder.tool.javafx.utils.ActionCollection;
 import javafx.application.Application;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.controlsfx.control.action.ActionUtils;
-import tiltadv.tools.scene.model.GameScene;
+import dhcoder.tool.game.Scene;
 import tiltadv.tools.scene.serialization.SettingsLoader;
 import tiltadv.tools.scene.view.NewSceneDialog;
 import tiltadv.tools.scene.view.NoSceneController;
@@ -41,7 +40,7 @@ public final class SceneTool extends Application {
 
     private final GlobalActions globalActions;
     private final Opt<GameSceneContext> contextOpt = Opt.withNoValue();
-    private final Map<GameScene, GameSceneContext> sceneContextMap = new HashMap<>();
+    private final Map<Scene, GameSceneContext> sceneContextMap = new HashMap<>();
     private final ActionWindow actionWindow;
 
     private Stage stage;
@@ -108,7 +107,7 @@ public final class SceneTool extends Application {
         noSceneController.setTooltipCommands(globalActions.showActionWindow, globalActions.newScene);
         appPane.getChildren().add(noSceneController.getRoot());
 
-        Scene scene = new Scene(rootPane, appSettings.getWidth(), appSettings.getHeight());
+        javafx.scene.Scene scene = new javafx.scene.Scene(rootPane, appSettings.getWidth(), appSettings.getHeight());
         stage.setScene(scene);
 
         stage.show();
@@ -118,7 +117,7 @@ public final class SceneTool extends Application {
         NewSceneDialog newSceneDialog = new NewSceneDialog();
         Opt<NewSceneDialog.Result> resultOpt = newSceneDialog.showAndWait(this);
         if (resultOpt.hasValue()) {
-            scenesController.addScene(new GameScene(), resultOpt.getValue().getSceneName());
+            scenesController.addScene(new Scene(), resultOpt.getValue().getSceneName());
         }
     }
 

@@ -1,7 +1,7 @@
 package tiltadv.tools.scene;
 
 import dhcoder.tool.history.History;
-import tiltadv.tools.scene.model.GameScene;
+import dhcoder.tool.game.Scene;
 
 /**
  * Miscellaneous context data related to a scene. Toolbars in this tool should be able to repond to a context change and
@@ -9,9 +9,9 @@ import tiltadv.tools.scene.model.GameScene;
  */
 public final class GameSceneContext {
     private final History history = new History();
-    private final GameScene scene;
+    private final Scene scene;
 
-    public GameSceneContext(final GameScene scene) {
+    public GameSceneContext(final Scene scene) {
         this.scene = scene;
     }
 
@@ -19,7 +19,7 @@ public final class GameSceneContext {
         return history;
     }
 
-    public GameScene getScene() {
+    public Scene getScene() {
         return scene;
     }
 }
