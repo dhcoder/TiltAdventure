@@ -3,10 +3,14 @@ package dhcoder.tool.javafx.game.view;
 import dhcoder.support.opt.Opt;
 import dhcoder.tool.javafx.control.ResizableCanvas;
 import dhcoder.tool.javafx.game.model.Tileset;
+import dhcoder.tool.javafx.utils.FxController;
 import dhcoder.tool.javafx.utils.ImageUtils;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.scene.Scene;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Toggle;
 import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -17,18 +21,36 @@ public final class TilesetWindow extends Stage {
 
     private static final int DEFAULT_HEIGHT = 300;
     private static final int DEFAULT_WIDTH = 300;
-    private static final int ZOOM = 4;
-    private Opt<Tileset> tilesetOpt = Opt.withNoValue();
-    private Opt<Image> zoomedImageOpt = Opt.withNoValue();
-    private ResizableCanvas canvas = new ResizableCanvas();
+
+    private final Opt<Tileset> tilesetOpt = Opt.withNoValue();
+    private final Opt<Image> zoomedImageOpt = Opt.withNoValue();
+    private final ResizableCanvas canvas = new ResizableCanvas();
+
+    private int zoomFactor = 1;
 
     public TilesetWindow() {
         super(StageStyle.UTILITY);
         setTitle("Tileset Window");
 
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setContent(canvas);
-        setScene(new Scene(scrollPane, DEFAULT_WIDTH, DEFAULT_HEIGHT));
+        final TilesetWindowController controller = FxController.loadView(TilesetWindowController.class);
+        controller.contentPane.setContent(canvas);
+
+        zoomFactor = getZoomFactor(controller.zoomGroup.getSelectedToggle());
+        controller.zoomGroup.selectedToggleProperty().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(final Observable observable) {
+                if (!tilesetOpt.hasValue()) {
+                    return;
+                }
+
+                Toggle toggle = controller.zoomGroup.getSelectedToggle();
+                zoomFactor = getZoomFactor(toggle);
+                resampleTilesetImage(tilesetOpt.getValue().getImage());
+                draw();
+            }
+        });
+
+        setScene(new Scene(controller.getRoot(), DEFAULT_WIDTH, DEFAULT_HEIGHT));
     }
 
     public Opt<Tileset> getTilesetOpt() {
@@ -46,13 +68,20 @@ public final class TilesetWindow extends Stage {
 
     public TilesetWindow setTileset(final Tileset tileset) {
         tilesetOpt.set(tileset);
-        canvas.setWidth(tileset.getImage().getWidth() * ZOOM);
-        canvas.setHeight(tileset.getImage().getHeight() * ZOOM);
-
-        zoomedImageOpt.set(ImageUtils.zoom(tileset.getImage(), ZOOM));
-
+        resampleTilesetImage(tileset.getImage());
         draw();
         return this;
+    }
+
+    private int getZoomFactor(final Toggle toggle) {
+        // UserData specified in FXML
+        return Integer.parseInt((String)toggle.getUserData());
+    }
+
+    private void resampleTilesetImage(final Image tilesetImage) {
+        canvas.setWidth(tilesetImage.getWidth() * zoomFactor);
+        canvas.setHeight(tilesetImage.getHeight() * zoomFactor);
+        zoomedImageOpt.set(ImageUtils.zoom(tilesetImage, zoomFactor));
     }
 
     private void draw() {
@@ -62,6 +91,8 @@ public final class TilesetWindow extends Stage {
         }
 
         Image image = zoomedImageOpt.getValue();
+        canvas.getGraphicsContext2D().setFill(Color.MAGENTA);
+        canvas.getGraphicsContext2D().fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         canvas.getGraphicsContext2D().drawImage(image, 0, 0, canvas.getWidth(), canvas.getHeight());
     }
 

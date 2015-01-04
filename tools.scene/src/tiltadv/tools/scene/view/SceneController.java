@@ -25,35 +25,15 @@ public final class SceneController extends FxController {
 
     @Subscribe
     public void onSceneContextChanged(final ContextChangedEventArgs args) {
-        if (!args.getContextOpt().hasValue()) {return;}
+        if (!args.getContextOpt().hasValue()) {
+            sceneTool.getTilesetWindow().clearTileset();
+            return;
+        }
 
         SceneContext context = args.getContextOpt().getValue();
         Scene gameScene = context.getScene();
 
         sceneTool.getTilesetWindow().setTileset(gameScene.getTileset());
         sceneTool.getTilesetWindow().show();
-//        ObservableList<Tile> tiles = FXCollections.observableArrayList();
-//        GridView<Tile> gridView = new GridView<>(tiles);
-//        gridView.setCellWidth(64d);
-//        gridView.setCellHeight(64d);
-//        gridView.setCellFactory(param -> new TileGridCell());
-//
-//        for (int i = 0; i < 5; i++) {
-//            tiles.add(new Tile(gameScene.getTileset(), i, 0));
-//        }
-//
-//        Stage stage = new Stage(StageStyle.UTILITY);
-//        stage.initOwner(sceneTool.getStage());
-//        stage.setScene(new javafx.scene.Scene(gridView, 300, 300));
-//        Canvas test = new Canvas(300, 300);
-//        test.getGraphicsContext2D().drawImage(gameScene.getTileset().getImage(), 0, 0);
-//        ImageView test = new ImageView(gameScene.getTileset().getImage());
-//        test.setFitWidth(16*4);
-//        test.setFitHeight(16 * 4);
-//        test.setViewport(new Rectangle2D(0, 0, 16, 16));
-//
-//        Pane pane = new Pane(test);
-//        stage.setScene(new javafx.scene.Scene(pane));
-//        stage.show();
     }
 }
