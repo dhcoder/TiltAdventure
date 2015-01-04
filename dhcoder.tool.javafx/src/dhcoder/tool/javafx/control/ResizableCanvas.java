@@ -11,7 +11,10 @@ import javafx.scene.canvas.GraphicsContext;
  */
 public final class ResizableCanvas extends Canvas {
 
-    public ResizableCanvas() {
+    public ResizableCanvas() { this(0, 0); }
+
+    public ResizableCanvas(final double width, final double height) {
+        super(width, height);
         // Redraw canvas when size changes.
         InvalidationListener sizeListener = evt -> draw();
 

@@ -2,17 +2,16 @@ package tiltadv.tools.scene.view;
 
 import com.google.common.eventbus.Subscribe;
 import dhcoder.tool.game.model.Scene;
+import dhcoder.tool.game.model.Tile;
 import dhcoder.tool.game.view.TileGridCell;
 import dhcoder.tool.javafx.utils.FxController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.control.ListView;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.PopupWindow;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.controlsfx.control.GridView;
 import tiltadv.tools.scene.SceneContext;
 import tiltadv.tools.scene.SceneTool;
@@ -38,29 +37,28 @@ public final class SceneController extends FxController {
         SceneContext context = args.getContextOpt().getValue();
         Scene gameScene = context.getScene();
 
-        ObservableList<ImageView> tiles = FXCollections.observableArrayList();
-        GridView<ImageView> test = new GridView<>(tiles);
-        test.setCellFactory(param -> new TileGridCell());
-
-        Image tilesetImage = gameScene.getTileset().getImage();
+        ObservableList<Tile> tiles = FXCollections.observableArrayList();
+        GridView<Tile> gridView = new GridView<>(tiles);
+        gridView.setCellWidth(64d);
+        gridView.setCellHeight(64d);
+        gridView.setCellFactory(param -> new TileGridCell());
 
         for (int i = 0; i < 5; i++) {
-            ImageView testTile = new ImageView(tilesetImage);
-            testTile.setViewport(
-                new Rectangle2D(0, 0, gameScene.getTileset().getTileWidth(), gameScene.getTileset().getTileHeight()));
-            tiles.add(testTile);
+            tiles.add(new Tile(gameScene.getTileset(), i, 0));
         }
 
-        PopupWindow popup = new PopupWindow() {
-
-        };
-
-        popup.getScene().setRoot(test);
-        popup.setWidth(300);
-        popup.setHeight(300);
-        test.setPrefWidth(300);
-        test.setPrefHeight(300);
-        popup.show(sceneTool.getStage());
-
+        Stage stage = new Stage(StageStyle.UTILITY);
+        stage.initOwner(sceneTool.getStage());
+        stage.setScene(new javafx.scene.Scene(gridView, 300, 300));
+//        Canvas test = new Canvas(300, 300);
+//        test.getGraphicsContext2D().drawImage(gameScene.getTileset().getImage(), 0, 0);
+//        ImageView test = new ImageView(gameScene.getTileset().getImage());
+//        test.setFitWidth(16*4);
+//        test.setFitHeight(16 * 4);
+//        test.setViewport(new Rectangle2D(0, 0, 16, 16));
+//
+//        Pane pane = new Pane(test);
+//        stage.setScene(new javafx.scene.Scene(pane));
+        stage.show();
     }
 }
