@@ -24,6 +24,7 @@ public final class TilesetWindow extends Stage {
 
     public TilesetWindow() {
         super(StageStyle.UTILITY);
+        setTitle("Tileset Window");
 
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setContent(canvas);
