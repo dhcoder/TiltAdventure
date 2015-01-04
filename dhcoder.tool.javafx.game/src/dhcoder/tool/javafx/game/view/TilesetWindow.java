@@ -8,6 +8,7 @@ import dhcoder.tool.javafx.utils.ImageUtils;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.scene.Scene;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Toggle;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
@@ -85,15 +86,27 @@ public final class TilesetWindow extends Stage {
     }
 
     private void draw() {
+        GraphicsContext g = canvas.getGraphicsContext2D();
         if (!zoomedImageOpt.hasValue()) {
-            canvas.getGraphicsContext2D().clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+            g.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
             return;
         }
 
         Image image = zoomedImageOpt.getValue();
-        canvas.getGraphicsContext2D().setFill(Color.MAGENTA);
-        canvas.getGraphicsContext2D().fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        canvas.getGraphicsContext2D().drawImage(image, 0, 0, canvas.getWidth(), canvas.getHeight());
+        g.setFill(Color.WHITE);
+        g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        g.drawImage(image, 0, 0, canvas.getWidth(), canvas.getHeight());
+
+        g.setStroke(Color.BLACK);
+        g.setLineWidth(1);
+        int tileWidthZoomed = tilesetOpt.getValue().getTileWidth() * zoomFactor;
+        int tileHeightZoomed = tilesetOpt.getValue().getTileHeight() * zoomFactor;
+        for (int x = 0; x <= canvas.getWidth(); x += tileWidthZoomed) {
+            g.strokeLine(x, 0, x, canvas.getHeight());
+        }
+        for (int y = 0; y <= canvas.getHeight(); y += tileHeightZoomed) {
+            g.strokeLine(0, y, canvas.getWidth(), y);
+        }
     }
 
 }
