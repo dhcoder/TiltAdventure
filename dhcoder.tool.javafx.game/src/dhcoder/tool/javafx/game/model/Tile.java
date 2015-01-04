@@ -1,4 +1,4 @@
-package dhcoder.tool.game.model;
+package dhcoder.tool.javafx.game.model;
 
 /**
  * Represents a single (x,y) tile in a tileset.

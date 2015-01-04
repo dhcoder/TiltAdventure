@@ -1,6 +1,6 @@
 package tiltadv.tools.scene;
 
-import dhcoder.tool.game.model.Scene;
+import dhcoder.tool.javafx.game.model.Scene;
 import dhcoder.tool.history.History;
 
 /**

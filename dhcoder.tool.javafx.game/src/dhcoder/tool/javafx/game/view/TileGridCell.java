@@ -1,7 +1,7 @@
-package dhcoder.tool.game.view;
+package dhcoder.tool.javafx.game.view;
 
-import dhcoder.tool.game.model.Tile;
-import dhcoder.tool.game.model.Tileset;
+import dhcoder.tool.javafx.game.model.Tile;
+import dhcoder.tool.javafx.game.model.Tileset;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.ImageView;
 import org.controlsfx.control.GridCell;

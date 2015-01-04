@@ -1,7 +1,7 @@
-package dhcoder.tool.game.serialization;
+package dhcoder.tool.javafx.game.serialization;
 
 import com.google.gson.Gson;
-import dhcoder.tool.game.model.Tileset;
+import dhcoder.tool.javafx.game.model.Tileset;
 
 import java.io.File;
 import java.io.IOException;

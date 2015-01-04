@@ -1,4 +1,4 @@
-package dhcoder.tool.game.model;
+package dhcoder.tool.javafx.game.model;
 
 /**
  * Data class that corresponds to a TiltAdventure scene.

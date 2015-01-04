@@ -1,18 +1,11 @@
 package tiltadv.tools.scene.view;
 
 import com.google.common.eventbus.Subscribe;
-import dhcoder.tool.game.model.Scene;
-import dhcoder.tool.game.model.Tile;
-import dhcoder.tool.game.view.TileGridCell;
+import dhcoder.tool.javafx.game.model.Scene;
 import dhcoder.tool.javafx.utils.FxController;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import org.controlsfx.control.GridView;
 import tiltadv.tools.scene.SceneContext;
 import tiltadv.tools.scene.SceneTool;
 import tiltadv.tools.scene.events.ContextChangedEventArgs;
@@ -37,19 +30,21 @@ public final class SceneController extends FxController {
         SceneContext context = args.getContextOpt().getValue();
         Scene gameScene = context.getScene();
 
-        ObservableList<Tile> tiles = FXCollections.observableArrayList();
-        GridView<Tile> gridView = new GridView<>(tiles);
-        gridView.setCellWidth(64d);
-        gridView.setCellHeight(64d);
-        gridView.setCellFactory(param -> new TileGridCell());
-
-        for (int i = 0; i < 5; i++) {
-            tiles.add(new Tile(gameScene.getTileset(), i, 0));
-        }
-
-        Stage stage = new Stage(StageStyle.UTILITY);
-        stage.initOwner(sceneTool.getStage());
-        stage.setScene(new javafx.scene.Scene(gridView, 300, 300));
+        sceneTool.getTilesetWindow().setTileset(gameScene.getTileset());
+        sceneTool.getTilesetWindow().show();
+//        ObservableList<Tile> tiles = FXCollections.observableArrayList();
+//        GridView<Tile> gridView = new GridView<>(tiles);
+//        gridView.setCellWidth(64d);
+//        gridView.setCellHeight(64d);
+//        gridView.setCellFactory(param -> new TileGridCell());
+//
+//        for (int i = 0; i < 5; i++) {
+//            tiles.add(new Tile(gameScene.getTileset(), i, 0));
+//        }
+//
+//        Stage stage = new Stage(StageStyle.UTILITY);
+//        stage.initOwner(sceneTool.getStage());
+//        stage.setScene(new javafx.scene.Scene(gridView, 300, 300));
 //        Canvas test = new Canvas(300, 300);
 //        test.getGraphicsContext2D().drawImage(gameScene.getTileset().getImage(), 0, 0);
 //        ImageView test = new ImageView(gameScene.getTileset().getImage());
@@ -59,6 +54,6 @@ public final class SceneController extends FxController {
 //
 //        Pane pane = new Pane(test);
 //        stage.setScene(new javafx.scene.Scene(pane));
-        stage.show();
+//        stage.show();
     }
 }
