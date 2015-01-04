@@ -3,8 +3,8 @@ apply plugin: "java"
 dependencies {
 //    compile project(":dhcoder.libgdx")
     compile project(":dhcoder.tool")
-    compile project(":dhcoder.tool.game")
     compile project(":dhcoder.tool.javafx")
+    compile project(":dhcoder.tool.javafx.game")
     compile "org.controlsfx:controlsfx:$controlsFxVersion"
     compile "com.google.code.gson:gson:$gsonVersion"
     compile "com.google.guava:guava:$guavaVersion"
