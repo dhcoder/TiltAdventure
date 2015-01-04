@@ -12,6 +12,7 @@ import dhcoder.tool.javafx.serialization.ShortcutsLoader;
 import dhcoder.tool.javafx.utils.ActionCollection;
 import javafx.application.Application;
 import javafx.scene.Parent;
+import javafx.scene.control.MenuBar;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -98,7 +99,9 @@ public final class SceneTool extends Application {
         stage.setTitle("Scene Editor");
 
         appPane = new StackPane();
-        rootPane = new VBox(ActionUtils.createMenuBar(globalActions.globalScope.getActions()), appPane);
+        MenuBar menuBar = ActionUtils.createMenuBar(globalActions.globalScope.getActions());
+        menuBar.setUseSystemMenuBar(true);
+        rootPane = new VBox(menuBar, appPane);
         VBox.setVgrow(appPane, Priority.ALWAYS);
 
         NoSceneController noSceneController = loadView(NoSceneController.class);
