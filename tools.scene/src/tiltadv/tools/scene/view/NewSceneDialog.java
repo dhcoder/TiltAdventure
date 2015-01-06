@@ -17,9 +17,10 @@ import java.util.Optional;
 public final class NewSceneDialog {
 
     public static final class Result {
-        private String sceneName;
-        private int numCols, numRows;
-        private File tilesetFile;
+        private final String sceneName;
+        private final int numCols;
+        private final int numRows;
+        private final File tilesetFile;
 
         Result(final String sceneName, final int numCols, final int numRows, final File tilesetFile) {
             this.sceneName = sceneName;

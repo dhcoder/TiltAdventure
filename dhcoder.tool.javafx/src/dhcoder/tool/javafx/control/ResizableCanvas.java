@@ -9,7 +9,7 @@ import javafx.scene.canvas.GraphicsContext;
  * <p/>
  * See also <a href=https://dlemmermann.wordpress.com/2014/04/10/javafx-tip-1-resizable-canvas/>Resizable Canvas tip</a>
  */
-public final class ResizableCanvas extends Canvas {
+public class ResizableCanvas extends Canvas {
 
     public ResizableCanvas() { this(0, 0); }
 

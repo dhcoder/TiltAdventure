@@ -13,11 +13,10 @@ import javafx.scene.paint.Color;
  * JavaFX control for rendering an image overlaid with a grid, furthermore allowing you to select a tile or range of
  * tiles.
  */
-public final class TiledImageView {
+public final class TiledCanvas extends ResizableCanvas {
 
     public static final int DEFAULT_TILE_WIDTH = 16;
     public static final int DEFAULT_TILE_HEIGHT = 16;
-    private final ResizableCanvas canvas = new ResizableCanvas();
     private final Opt<Image> resampledImageOpt = Opt.withNoValue();
 
     private final SimpleObjectProperty<Image> image = new SimpleObjectProperty<Image>() {
@@ -91,33 +90,33 @@ public final class TiledImageView {
         Image imageValue = image.getValue();
         if (imageValue != null) {
             resampledImageOpt.set(ImageUtils.zoom(imageValue, getZoomFactor()));
-            canvas.setHeight((int)imageValue.getHeight() * getZoomFactor());
-            canvas.setWidth((int)imageValue.getWidth() * getZoomFactor());
+            setHeight((int)imageValue.getHeight() * getZoomFactor());
+            setWidth((int)imageValue.getWidth() * getZoomFactor());
         }
         else {
             resampledImageOpt.clear();
         }
 
-        GraphicsContext g = canvas.getGraphicsContext2D();
+        GraphicsContext g = getGraphicsContext2D();
         if (!resampledImageOpt.hasValue()) {
-            g.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+            g.clearRect(0, 0, getWidth(), getHeight());
             return;
         }
 
         Image image = resampledImageOpt.getValue();
         g.setFill(Color.WHITE);
-        g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        g.drawImage(image, 0, 0, canvas.getWidth(), canvas.getHeight());
+        g.fillRect(0, 0, getWidth(), getHeight());
+        g.drawImage(image, 0, 0, getWidth(), getHeight());
 
         g.setStroke(Color.BLACK);
         g.setLineWidth(1);
         int tileWidthZoomed = getTileWidth() * getZoomFactor();
         int tileHeightZoomed = getTileHeight() * getZoomFactor();
-        for (int x = 0; x <= canvas.getWidth(); x += tileWidthZoomed) {
-            g.strokeLine(x, 0, x, canvas.getHeight());
+        for (int x = 0; x <= getWidth(); x += tileWidthZoomed) {
+            g.strokeLine(x, 0, x, getHeight());
         }
-        for (int y = 0; y <= canvas.getHeight(); y += tileHeightZoomed) {
-            g.strokeLine(0, y, canvas.getWidth(), y);
+        for (int y = 0; y <= getHeight(); y += tileHeightZoomed) {
+            g.strokeLine(0, y, getWidth(), y);
         }
     }
 }
