@@ -22,9 +22,6 @@ public final class TiledCanvas extends ResizableCanvas {
     private final SimpleObjectProperty<Image> image = new SimpleObjectProperty<Image>() {
         @Override
         protected void invalidated() {
-            if (image.getValue() == null) {
-                resampledImageOpt.clear();
-            }
             enqueueRefresh(true);
         }
     };
@@ -32,14 +29,14 @@ public final class TiledCanvas extends ResizableCanvas {
     private final SimpleIntegerProperty tileWidth = new SimpleIntegerProperty(DEFAULT_TILE_WIDTH) {
         @Override
         protected void invalidated() {
-            enqueueRefresh(true);
+            enqueueRefresh(false);
         }
     };
 
     private final SimpleIntegerProperty tileHeight = new SimpleIntegerProperty(DEFAULT_TILE_HEIGHT) {
         @Override
         protected void invalidated() {
-            enqueueRefresh(true);
+            enqueueRefresh(false);
         }
     };
 
@@ -50,6 +47,7 @@ public final class TiledCanvas extends ResizableCanvas {
         }
     };
 
+    private boolean imageInvalidated;
     private boolean refreshRequested;
 
     public Opt<Image> getImageOpt() { return Opt.ofNullable(image.getValue()); }
@@ -78,7 +76,10 @@ public final class TiledCanvas extends ResizableCanvas {
 
     public SimpleIntegerProperty zoomFactorProperty() { return zoomFactor; }
 
+    // Call enqueueRefresh instead of refreshing directly, so that multiple property changes in a row have a chance to
+    // get merged into a single refresh call.
     private void enqueueRefresh(final boolean invalidateImage) {
+        imageInvalidated = imageInvalidated || invalidateImage;
         if (!refreshRequested) {
             refreshRequested = true;
             Platform.runLater(this::refresh);
@@ -87,14 +88,17 @@ public final class TiledCanvas extends ResizableCanvas {
 
     private void refresh() {
         refreshRequested = false;
-        Image imageValue = image.getValue();
-        if (imageValue != null) {
-            resampledImageOpt.set(ImageUtils.zoom(imageValue, getZoomFactor()));
-            setHeight((int)imageValue.getHeight() * getZoomFactor());
-            setWidth((int)imageValue.getWidth() * getZoomFactor());
-        }
-        else {
-            resampledImageOpt.clear();
+        if (imageInvalidated) {
+            imageInvalidated = false;
+            Image imageValue = image.getValue();
+            if (imageValue != null) {
+                resampledImageOpt.set(ImageUtils.zoom(imageValue, getZoomFactor()));
+                setHeight((int)imageValue.getHeight() * getZoomFactor());
+                setWidth((int)imageValue.getWidth() * getZoomFactor());
+            }
+            else {
+                resampledImageOpt.clear();
+            }
         }
 
         GraphicsContext g = getGraphicsContext2D();
