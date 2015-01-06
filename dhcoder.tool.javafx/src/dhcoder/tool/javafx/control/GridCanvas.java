@@ -13,10 +13,10 @@ import javafx.scene.paint.Color;
  * JavaFX control for rendering an image overlaid with a grid, furthermore allowing you to select a tile or range of
  * tiles.
  */
-public final class TiledCanvas extends ResizableCanvas {
+public final class GridCanvas extends ResizableCanvas {
 
-    public static final int DEFAULT_TILE_WIDTH = 16;
-    public static final int DEFAULT_TILE_HEIGHT = 16;
+    public static final int DEFAULT_GRID_WIDTH = 16;
+    public static final int DEFAULT_GRID_HEIGHT = 16;
     private final Opt<Image> resampledImageOpt = Opt.withNoValue();
 
     private final SimpleObjectProperty<Image> image = new SimpleObjectProperty<Image>() {
@@ -26,14 +26,14 @@ public final class TiledCanvas extends ResizableCanvas {
         }
     };
 
-    private final SimpleIntegerProperty tileWidth = new SimpleIntegerProperty(DEFAULT_TILE_WIDTH) {
+    private final SimpleIntegerProperty tileWidth = new SimpleIntegerProperty(DEFAULT_GRID_WIDTH) {
         @Override
         protected void invalidated() {
             enqueueRefresh(false);
         }
     };
 
-    private final SimpleIntegerProperty tileHeight = new SimpleIntegerProperty(DEFAULT_TILE_HEIGHT) {
+    private final SimpleIntegerProperty tileHeight = new SimpleIntegerProperty(DEFAULT_GRID_HEIGHT) {
         @Override
         protected void invalidated() {
             enqueueRefresh(false);
@@ -46,6 +46,19 @@ public final class TiledCanvas extends ResizableCanvas {
             enqueueRefresh(true);
         }
     };
+
+    private final SimpleObjectProperty<Color> backgroundColor = new SimpleObjectProperty<Color>(Color.MAGENTA) {
+        @Override
+        protected void invalidated() {
+            enqueueRefresh(false);
+        }
+    };
+
+    public Color getBackgroundColor() { return backgroundColor.getValue(); }
+
+    public void setBackgroundColor(final Color value) { backgroundColor.set(value);}
+
+    public SimpleObjectProperty<Color> backgroundColorProperty() { return backgroundColor; }
 
     private boolean imageInvalidated;
     private boolean refreshRequested;
@@ -108,7 +121,7 @@ public final class TiledCanvas extends ResizableCanvas {
         }
 
         Image image = resampledImageOpt.getValue();
-        g.setFill(Color.WHITE);
+        g.setFill(backgroundColor.getValue());
         g.fillRect(0, 0, getWidth(), getHeight());
         g.drawImage(image, 0, 0, getWidth(), getHeight());
 

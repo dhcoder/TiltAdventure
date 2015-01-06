@@ -1,10 +1,8 @@
 package dhcoder.tool.javafx.game.view;
 
-import dhcoder.tool.javafx.control.TiledCanvas;
+import dhcoder.tool.javafx.control.GridCanvas;
 import dhcoder.tool.javafx.game.model.Tileset;
 import dhcoder.tool.javafx.utils.FxController;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.scene.Scene;
 import javafx.scene.control.Toggle;
 import javafx.stage.Stage;
@@ -15,10 +13,10 @@ import javafx.stage.StageStyle;
  */
 public final class TilesetWindow extends Stage {
 
-    private static final int DEFAULT_HEIGHT = 300;
-    private static final int DEFAULT_WIDTH = 300;
+    private static final int DEFAULT_HEIGHT = 200;
+    private static final int DEFAULT_WIDTH = 600;
 
-    private final TiledCanvas tilesetView = new TiledCanvas();
+    private final GridCanvas tilesetView = new GridCanvas();
 
     public TilesetWindow() {
         super(StageStyle.UTILITY);
@@ -28,17 +26,16 @@ public final class TilesetWindow extends Stage {
         controller.contentPane.setContent(tilesetView);
 
         tilesetView.setZoomFactor(getZoomFactor(controller.zoomGroup.getSelectedToggle()));
-        controller.zoomGroup.selectedToggleProperty().addListener(new InvalidationListener() {
-            @Override
-            public void invalidated(final Observable observable) {
-                Toggle toggle = controller.zoomGroup.getSelectedToggle();
-                tilesetView.setZoomFactor(getZoomFactor(toggle));
-            }
+        controller.zoomGroup.selectedToggleProperty().addListener((observable) -> {
+            Toggle toggle = controller.zoomGroup.getSelectedToggle();
+            tilesetView.setZoomFactor(getZoomFactor(toggle));
         });
+
+        controller.colorPicker.setValue(tilesetView.getBackgroundColor());
+        tilesetView.backgroundColorProperty().bindBidirectional(controller.colorPicker.valueProperty());
 
         setScene(new Scene(controller.getRoot(), DEFAULT_WIDTH, DEFAULT_HEIGHT));
     }
-
 
     public TilesetWindow setTileset(final Tileset tileset) {
         tilesetView.setImage(tileset.getImage());

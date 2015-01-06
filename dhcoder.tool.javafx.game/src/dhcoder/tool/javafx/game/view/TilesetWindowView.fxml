@@ -22,6 +22,9 @@
                   <RadioButton mnemonicParsing="false" text="4x" toggleGroup="$zoomGroup" userData="4" />
                </children>
             </HBox>
+            <Separator orientation="VERTICAL" />
+            <Label text="Background:" />
+            <ColorPicker fx:id="colorPicker" />
         </items>
       </ToolBar>
       <ScrollPane fx:id="contentPane" style="-fx-background: #000000; -fx-background-color: #000000;" VBox.vgrow="ALWAYS" />
