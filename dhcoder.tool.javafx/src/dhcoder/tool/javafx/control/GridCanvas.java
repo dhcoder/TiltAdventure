@@ -8,6 +8,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 
 import static dhcoder.support.text.StringUtils.format;
@@ -108,7 +109,7 @@ public final class GridCanvas extends ResizableCanvas {
             enqueueRefresh(false);
         });
         initMouseOverLogic();
-        initMouseClickLogic();
+        initSelectionLogic();
     }
 
     public GridCanvas() {
@@ -187,7 +188,7 @@ public final class GridCanvas extends ResizableCanvas {
         return gridCoord.x + gridCoord.y * numHorizTiles;
     }
 
-    private void initMouseClickLogic() {
+    private void initSelectionLogic() {
         setOnMouseClicked(event -> {
             int zoomFactor = getZoomFactor();
             int tileWidth = getTileWidth();
@@ -196,6 +197,11 @@ public final class GridCanvas extends ResizableCanvas {
             yClick = ((int)event.getY() / zoomFactor) / tileHeight;
 
             selectionModel.select(new GridCoord(xClick, yClick));
+        });
+        setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ESCAPE) {
+                selectionModel.clearSelection();
+            }
         });
     }
 
@@ -291,10 +297,11 @@ public final class GridCanvas extends ResizableCanvas {
 
             for (GridCoord gridCoord : selectionModel.getSelectedItems()) {
                 g.setStroke(Color.RED);
-                g.strokeRect(gridCoord.x * tileWidthZoomed, gridCoord.y * tileHeightZoomed, tileWidthZoomed,
-                    tileHeightZoomed);
-                g.setFill(Color.rgb(255, 255, 0, 0.5));
-                g.fillRect(gridCoord.x * tileWidthZoomed, gridCoord.y * tileHeightZoomed, tileWidthZoomed,
+                int x = gridCoord.x * tileWidthZoomed;
+                int y = gridCoord.y * tileHeightZoomed;
+                g.strokeRect(x, y, tileWidthZoomed, tileHeightZoomed);
+                g.setFill(Color.rgb(255, 255, 0, selectionModel.isAnchor(gridCoord) ? 0.5 : 0.25));
+                g.fillRect(x, y, tileWidthZoomed,
                     tileHeightZoomed);
             }
         }

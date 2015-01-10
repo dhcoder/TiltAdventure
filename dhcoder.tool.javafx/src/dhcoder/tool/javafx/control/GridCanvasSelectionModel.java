@@ -3,7 +3,10 @@ package dhcoder.tool.javafx.control;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.MultipleSelectionModel;
+import javafx.scene.control.SelectionMode;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -12,8 +15,12 @@ import java.util.Objects;
 public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridCanvas.GridCoord> {
 
     private final GridCanvas gridCanvas;
-    private ObservableList<Integer> selectedIndices = FXCollections.observableArrayList();
-    private ObservableList<GridCanvas.GridCoord> selectedTiles = FXCollections.observableArrayList();
+    private List<Integer> selectedIndices = new ArrayList<>();
+    private List<GridCanvas.GridCoord> selectedTiles = new ArrayList<>();
+    private ObservableList<Integer> observedIndices = FXCollections.observableArrayList();
+    private ObservableList<GridCanvas.GridCoord> observedTiles = FXCollections.observableArrayList();
+
+    private boolean isUpdating;
 
     public GridCanvasSelectionModel(final GridCanvas gridCanvas) {
         this.gridCanvas = gridCanvas;
@@ -21,22 +28,18 @@ public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridC
 
     @Override
     public void clearAndSelect(final int index) {
+        if (getSelectedIndex() == index) {
+            return;
+        }
+
+        selectedIndices.clear();
         selectedTiles.clear();
         select(index);
     }
 
     @Override
     public void select(final int index) {
-        if (getSelectedIndex() == index) {return;}
-
-        setSelectedIndex(index);
-        GridCanvas.GridCoord gridCoord = gridCanvas.getCoord(index);
-        setSelectedItem(gridCoord);
-
-        if (!selectedIndices.contains(index)) {
-            selectedIndices.add(index);
-            selectedTiles.add(gridCoord);
-        }
+        select(gridCanvas.getCoord(index));
     }
 
     @Override
@@ -47,9 +50,15 @@ public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridC
         int index = gridCanvas.getIndex(gridCoord);
         setSelectedIndex(index);
 
+        if (getSelectionMode() == SelectionMode.SINGLE) {
+            selectedTiles.clear();
+            selectedIndices.clear();
+        }
+
         if (!selectedTiles.contains(gridCoord)) {
             selectedTiles.add(gridCoord);
             selectedIndices.add(index);
+            updateObservedLists();
         }
     }
 
@@ -64,6 +73,8 @@ public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridC
                 setSelectedIndex(-1);
                 setSelectedItem(null);
             }
+
+            updateObservedLists();
         }
     }
 
@@ -71,16 +82,17 @@ public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridC
     public void clearSelection() {
         selectedIndices.clear();
         selectedTiles.clear();
+        updateObservedLists();
     }
 
     @Override
     public boolean isSelected(final int index) {
-        return selectedTiles.contains(gridCanvas.getCoord(index));
+        return selectedIndices.contains(index);
     }
 
     @Override
     public boolean isEmpty() {
-        return selectedTiles.isEmpty();
+        return selectedIndices.isEmpty();
     }
 
     @Override
@@ -97,23 +109,35 @@ public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridC
         }
     }
 
+    public boolean isAnchor(final int index) {
+        return selectedIndices.size() > 0 && index == 0;
+    }
+
+    public boolean isAnchor(final GridCanvas.GridCoord gridCoord) {
+        return selectedTiles.size() > 0 && selectedTiles.get(0).equals(gridCoord);
+    }
+
     @Override
     public ObservableList<Integer> getSelectedIndices() {
-        return selectedIndices;
+        return observedIndices;
     }
 
     @Override
     public ObservableList<GridCanvas.GridCoord> getSelectedItems() {
-        return selectedTiles;
+        return observedTiles;
     }
 
     @Override
     public void selectIndices(final int index, final int... indices) {
+        isUpdating = true;
         for (int tailIndex : indices) {
             select(tailIndex);
         }
 
         select(index);
+        isUpdating = false;
+
+        updateObservedLists();
     }
 
     @Override
@@ -133,5 +157,15 @@ public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridC
     @Override
     public void selectLast() {
         select(gridCanvas.getLastIndex());
+    }
+
+    private void updateObservedLists() {
+        if (isUpdating) {
+            return;
+
+        }
+
+        observedIndices.setAll(selectedIndices);
+        observedTiles.setAll(selectedTiles);
     }
 }
