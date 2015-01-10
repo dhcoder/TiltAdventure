@@ -7,6 +7,7 @@ import javafx.beans.Observable;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
@@ -65,13 +66,6 @@ public final class GridCanvas extends ResizableCanvas {
     public static final int DEFAULT_GRID_WIDTH = 0;
     public static final int DEFAULT_GRID_HEIGHT = 0;
     private final Opt<Image> resampledImageOpt = Opt.withNoValue();
-    private final SimpleObjectProperty<Image> image = new SimpleObjectProperty<Image>() {
-        @Override
-        protected void invalidated() {
-            selectionModel.clearSelection();
-            enqueueRefresh(true);
-        }
-    };
     private final SimpleIntegerProperty tileWidth = new SimpleIntegerProperty(DEFAULT_GRID_WIDTH) {
         @Override
         protected void invalidated() {
@@ -97,7 +91,13 @@ public final class GridCanvas extends ResizableCanvas {
         }
     };
     private final GridCanvasSelectionModel selectionModel = new GridCanvasSelectionModel(this);
-
+    private final SimpleObjectProperty<Image> image = new SimpleObjectProperty<Image>() {
+        @Override
+        protected void invalidated() {
+            selectionModel.clearSelection();
+            enqueueRefresh(true);
+        }
+    };
     private int xClick, yClick;
     private int xOver, yOver;
 
@@ -106,9 +106,7 @@ public final class GridCanvas extends ResizableCanvas {
 
     public GridCanvas(final double width, final double height) {
         super(width, height);
-        selectionModel.getSelectedIndices().addListener((Observable observable) -> {
-            enqueueRefresh(false);
-        });
+        selectionModel.getSelectedIndices().addListener((Observable observable) -> enqueueRefresh(false));
 
         initMouseOverLogic();
         initSelectionLogic();
@@ -150,13 +148,15 @@ public final class GridCanvas extends ResizableCanvas {
 
     public SimpleIntegerProperty zoomFactorProperty() { return zoomFactor; }
 
+    public GridCanvasSelectionModel getSelectionModel() { return selectionModel; }
+
     /**
      * Given a 1D index, get the 2D coordinate associated with it. The tiles count from left to right, then top to
      * bottom.
      *
      * @throws IllegalArgumentException if the index is < 0 or too large.
      */
-    public Tile getCoord(final int index) {
+    public Tile getTile(final int index) {
         int intWidth = (int)getWidth();
         int numHorizTiles = intWidth / getTileWidth();
 
@@ -191,6 +191,8 @@ public final class GridCanvas extends ResizableCanvas {
     }
 
     private void initSelectionLogic() {
+        selectionModel.setSelectionMode(SelectionMode.MULTIPLE); // DEBUG ONLY!!!
+
         setOnMouseClicked(event -> {
             int zoomFactor = getZoomFactor();
             int tileWidth = getTileWidth();
@@ -198,7 +200,16 @@ public final class GridCanvas extends ResizableCanvas {
             xClick = ((int)event.getX() / zoomFactor) / tileWidth;
             yClick = ((int)event.getY() / zoomFactor) / tileHeight;
 
-            selectionModel.select(new Tile(xClick, yClick));
+            Tile tile = new Tile(xClick, yClick);
+            if (event.isShortcutDown()) {
+                selectionModel.select(tile);
+            }
+            else if (event.isShiftDown()) {
+                selectionModel.rangeSelect(tile);
+            }
+            else {
+                selectionModel.clearAndSelect(tile);
+            }
         });
         setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ESCAPE) {
@@ -303,8 +314,7 @@ public final class GridCanvas extends ResizableCanvas {
                 int y = tile.y * tileHeightZoomed;
                 g.strokeRect(x, y, tileWidthZoomed, tileHeightZoomed);
                 g.setFill(Color.rgb(255, 255, 0, selectionModel.isAnchor(tile) ? 0.5 : 0.25));
-                g.fillRect(x, y, tileWidthZoomed,
-                    tileHeightZoomed);
+                g.fillRect(x, y, tileWidthZoomed, tileHeightZoomed);
             }
         }
 

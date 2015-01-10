@@ -15,10 +15,10 @@ import java.util.Objects;
 public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridCanvas.Tile> {
 
     private final GridCanvas gridCanvas;
-    private List<Integer> selectedIndices = new ArrayList<>();
-    private List<GridCanvas.Tile> selectedTiles = new ArrayList<>();
-    private ObservableList<Integer> observedIndices = FXCollections.observableArrayList();
-    private ObservableList<GridCanvas.Tile> observedTiles = FXCollections.observableArrayList();
+    private final List<Integer> selectedIndices = new ArrayList<>();
+    private final List<GridCanvas.Tile> selectedTiles = new ArrayList<>();
+    private final ObservableList<Integer> observedIndices = FXCollections.observableArrayList();
+    private final ObservableList<GridCanvas.Tile> observedTiles = FXCollections.observableArrayList();
 
     private boolean ignoreUpdates;
 
@@ -28,18 +28,22 @@ public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridC
 
     @Override
     public void clearAndSelect(final int index) {
-        if (getSelectedIndex() == index) {
+        clearAndSelect(gridCanvas.getTile(index));
+    }
+
+    public void clearAndSelect(final GridCanvas.Tile tile) {
+        if (Objects.equals(getSelectedItem(), tile)) {
             return;
         }
 
         selectedIndices.clear();
         selectedTiles.clear();
-        select(index);
+        select(tile);
     }
 
     @Override
     public void select(final int index) {
-        select(gridCanvas.getCoord(index));
+        select(gridCanvas.getTile(index));
     }
 
     @Override
@@ -67,7 +71,7 @@ public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridC
 
         if (selectedIndices.contains(index)) {
             selectedIndices.remove(index);
-            selectedTiles.remove(gridCanvas.getCoord(index));
+            selectedTiles.remove(gridCanvas.getTile(index));
 
             if (getSelectedIndex() == index) {
                 if (selectedIndices.size() == 0) {
@@ -169,6 +173,31 @@ public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridC
     @Override
     public void selectLast() {
         select(gridCanvas.getLastIndex());
+    }
+
+    public void rangeSelect(final GridCanvas.Tile tile) {
+        if (selectedTiles.size() == 0) {
+            select(tile);
+            return;
+        }
+
+        GridCanvas.Tile anchor = selectedTiles.get(0);
+
+        ignoreUpdates = true;
+        clearSelection();
+        select(anchor); // Make sure anchor stays the anchor by selecting it first
+        int xStart = Math.min(anchor.getX(), tile.getX());
+        int xEnd = Math.max(anchor.getX(), tile.getX());
+        int yStart = Math.min(anchor.getY(), tile.getY());
+        int yEnd = Math.max(anchor.getY(), tile.getY());
+
+        for (int x = xStart; x <= xEnd; ++x) {
+            for (int y = yStart; y <= yEnd; ++y) {
+                select(new GridCanvas.Tile(x, y));
+            }
+        }
+        ignoreUpdates = false;
+        updateObservedLists();
     }
 
     private void updateObservedLists() {
