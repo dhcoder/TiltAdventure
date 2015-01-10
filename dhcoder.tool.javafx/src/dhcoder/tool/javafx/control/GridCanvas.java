@@ -68,6 +68,7 @@ public final class GridCanvas extends ResizableCanvas {
     private final SimpleObjectProperty<Image> image = new SimpleObjectProperty<Image>() {
         @Override
         protected void invalidated() {
+            selectionModel.clearSelection();
             enqueueRefresh(true);
         }
     };
@@ -108,6 +109,7 @@ public final class GridCanvas extends ResizableCanvas {
         selectionModel.getSelectedIndices().addListener((Observable observable) -> {
             enqueueRefresh(false);
         });
+
         initMouseOverLogic();
         initSelectionLogic();
     }

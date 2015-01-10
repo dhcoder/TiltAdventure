@@ -20,7 +20,7 @@ public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridC
     private ObservableList<Integer> observedIndices = FXCollections.observableArrayList();
     private ObservableList<GridCanvas.Tile> observedTiles = FXCollections.observableArrayList();
 
-    private boolean isUpdating;
+    private boolean ignoreUpdates;
 
     public GridCanvasSelectionModel(final GridCanvas gridCanvas) {
         this.gridCanvas = gridCanvas;
@@ -70,8 +70,16 @@ public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridC
             selectedTiles.remove(gridCanvas.getCoord(index));
 
             if (getSelectedIndex() == index) {
-                setSelectedIndex(-1);
-                setSelectedItem(null);
+                if (selectedIndices.size() == 0) {
+                    setSelectedIndex(-1);
+                    setSelectedItem(null);
+                }
+                else {
+                    ignoreUpdates = true;
+                    select(selectedIndices.get(selectedIndices.size() - 1));
+                    ignoreUpdates = false;
+                }
+
             }
 
             updateObservedLists();
@@ -80,8 +88,12 @@ public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridC
 
     @Override
     public void clearSelection() {
+        if (isEmpty()) {return;}
+
         selectedIndices.clear();
         selectedTiles.clear();
+        setSelectedIndex(-1);
+        setSelectedItem(null);
         updateObservedLists();
     }
 
@@ -129,13 +141,13 @@ public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridC
 
     @Override
     public void selectIndices(final int index, final int... indices) {
-        isUpdating = true;
+        ignoreUpdates = true;
         for (int tailIndex : indices) {
             select(tailIndex);
         }
 
         select(index);
-        isUpdating = false;
+        ignoreUpdates = false;
 
         updateObservedLists();
     }
@@ -160,7 +172,7 @@ public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridC
     }
 
     private void updateObservedLists() {
-        if (isUpdating) {
+        if (ignoreUpdates) {
             return;
 
         }
