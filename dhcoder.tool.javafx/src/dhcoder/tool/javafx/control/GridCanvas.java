@@ -3,6 +3,7 @@ package dhcoder.tool.javafx.control;
 import dhcoder.support.opt.Opt;
 import dhcoder.tool.javafx.utils.ImageUtils;
 import javafx.application.Platform;
+import javafx.beans.Observable;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.canvas.GraphicsContext;
@@ -62,74 +63,52 @@ public final class GridCanvas extends ResizableCanvas {
 
     public static final int DEFAULT_GRID_WIDTH = 0;
     public static final int DEFAULT_GRID_HEIGHT = 0;
-
     private final Opt<Image> resampledImageOpt = Opt.withNoValue();
-
     private final SimpleObjectProperty<Image> image = new SimpleObjectProperty<Image>() {
         @Override
         protected void invalidated() {
             enqueueRefresh(true);
         }
     };
-
     private final SimpleIntegerProperty tileWidth = new SimpleIntegerProperty(DEFAULT_GRID_WIDTH) {
         @Override
         protected void invalidated() {
             enqueueRefresh(false);
         }
     };
-
     private final SimpleIntegerProperty tileHeight = new SimpleIntegerProperty(DEFAULT_GRID_HEIGHT) {
         @Override
         protected void invalidated() {
             enqueueRefresh(false);
         }
     };
-
     private final SimpleIntegerProperty zoomFactor = new SimpleIntegerProperty(1) {
         @Override
         protected void invalidated() {
             enqueueRefresh(true);
         }
     };
-
     private final SimpleObjectProperty<Color> backgroundColor = new SimpleObjectProperty<Color>(Color.MAGENTA) {
         @Override
         protected void invalidated() {
             enqueueRefresh(false);
         }
     };
+    private final GridCanvasSelectionModel selectionModel = new GridCanvasSelectionModel(this);
 
-    private int xOver;
-    private int yOver;
+    private int xClick, yClick;
+    private int xOver, yOver;
 
     private boolean imageInvalidated;
     private boolean refreshRequested;
 
     public GridCanvas(final double width, final double height) {
         super(width, height);
-        xOver = yOver = -1;
-        setOnMouseMoved(event -> {
-            int xOverLocal = -1;
-            int yOverLocal = -1;
-            int tileWidth = getTileWidth();
-            int tileHeight = getTileHeight();
-            if (tileWidth > 0 && tileHeight > 0) {
-                int zoomFactor = getZoomFactor();
-                xOverLocal = ((int)event.getX() / zoomFactor) / tileWidth;
-                yOverLocal = ((int)event.getY() / zoomFactor) / tileHeight;
-            }
-
-            if (xOver != xOverLocal || yOver != yOverLocal) {
-                xOver = xOverLocal;
-                yOver = yOverLocal;
-                enqueueRefresh(false);
-            }
-        });
-        setOnMouseExited(event -> {
-            xOver = yOver = -1;
+        selectionModel.getSelectedIndices().addListener((Observable observable) -> {
             enqueueRefresh(false);
         });
+        initMouseOverLogic();
+        initMouseClickLogic();
     }
 
     public GridCanvas() {
@@ -167,6 +146,95 @@ public final class GridCanvas extends ResizableCanvas {
     public void setZoomFactor(final int value) { zoomFactor.set(value);}
 
     public SimpleIntegerProperty zoomFactorProperty() { return zoomFactor; }
+
+    /**
+     * Given a 1D index, get the 2D coordinate associated with it. The tiles count from left to right, then top to
+     * bottom.
+     *
+     * @throws IllegalArgumentException if the index is < 0 or too large.
+     */
+    public GridCoord getCoord(final int index) {
+        int intWidth = (int)getWidth();
+        int numHorizTiles = intWidth / getTileWidth();
+
+        return new GridCoord(index % numHorizTiles, index / numHorizTiles);
+    }
+
+    public int getIndexAfter(final int index) {
+        int maxIndex = assertInBounds(index);
+        return Math.min(index + 1, maxIndex);
+    }
+
+    public int getIndexBefore(final int index) {
+        assertInBounds(index);
+        return Math.max(0, index - 1);
+    }
+
+    public int getLastIndex() {
+        int intWidth = (int)getWidth();
+        int numHorizTiles = intWidth / getTileWidth();
+
+        int intHeight = (int)getHeight();
+        int numVertTiles = intHeight / getTileHeight();
+
+        return numHorizTiles * numVertTiles - 1;
+    }
+
+    public int getIndex(final GridCoord gridCoord) {
+        int intWidth = (int)getWidth();
+        int numHorizTiles = intWidth / getTileWidth();
+
+        return gridCoord.x + gridCoord.y * numHorizTiles;
+    }
+
+    private void initMouseClickLogic() {
+        setOnMouseClicked(event -> {
+            int zoomFactor = getZoomFactor();
+            int tileWidth = getTileWidth();
+            int tileHeight = getTileHeight();
+            xClick = ((int)event.getX() / zoomFactor) / tileWidth;
+            yClick = ((int)event.getY() / zoomFactor) / tileHeight;
+
+            selectionModel.select(new GridCoord(xClick, yClick));
+        });
+    }
+
+    private void initMouseOverLogic() {
+        xOver = yOver = -1;
+        setOnMouseMoved(event -> {
+            int xOverLocal = -1;
+            int yOverLocal = -1;
+            int tileWidth = getTileWidth();
+            int tileHeight = getTileHeight();
+            if (tileWidth > 0 && tileHeight > 0) {
+                int zoomFactor = getZoomFactor();
+                xOverLocal = ((int)event.getX() / zoomFactor) / tileWidth;
+                yOverLocal = ((int)event.getY() / zoomFactor) / tileHeight;
+            }
+
+            if (xOver != xOverLocal || yOver != yOverLocal) {
+                xOver = xOverLocal;
+                yOver = yOverLocal;
+                enqueueRefresh(false);
+            }
+        });
+        setOnMouseExited(event -> {
+            xOver = yOver = -1;
+            enqueueRefresh(false);
+        });
+    }
+
+    /**
+     * Ensure this index is in bounds, furthermore returning the max value this index could be set to.
+     */
+    private int assertInBounds(final int index) {
+        int lastIndex = getLastIndex();
+
+        if (index < 0 || index > lastIndex) {
+            throw new IllegalArgumentException(format("Invalid index {0} is out of bounds [0,{1}]", index, lastIndex));
+        }
+        return lastIndex;
+    }
 
     // Call enqueueRefresh instead of refreshing directly, so that multiple property changes in a row have a chance to
     // get merged into a single refresh call.
@@ -219,6 +287,15 @@ public final class GridCanvas extends ResizableCanvas {
             if (xOver != -1 && yOver != -1) {
                 g.setFill(Color.grayRgb(255, 0.5));
                 g.fillRect(xOver * tileWidthZoomed, yOver * tileHeightZoomed, tileWidthZoomed, tileHeightZoomed);
+            }
+
+            for (GridCoord gridCoord : selectionModel.getSelectedItems()) {
+                g.setStroke(Color.RED);
+                g.strokeRect(gridCoord.x * tileWidthZoomed, gridCoord.y * tileHeightZoomed, tileWidthZoomed,
+                    tileHeightZoomed);
+                g.setFill(Color.rgb(255, 255, 0, 0.5));
+                g.fillRect(gridCoord.x * tileWidthZoomed, gridCoord.y * tileHeightZoomed, tileWidthZoomed,
+                    tileHeightZoomed);
             }
         }
 
