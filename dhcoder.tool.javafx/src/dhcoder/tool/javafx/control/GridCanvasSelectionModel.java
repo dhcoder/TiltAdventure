@@ -12,13 +12,13 @@ import java.util.Objects;
 /**
  * A selection model for selected tiles in a {@link GridCanvas}
  */
-public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridCanvas.GridCoord> {
+public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridCanvas.Tile> {
 
     private final GridCanvas gridCanvas;
     private List<Integer> selectedIndices = new ArrayList<>();
-    private List<GridCanvas.GridCoord> selectedTiles = new ArrayList<>();
+    private List<GridCanvas.Tile> selectedTiles = new ArrayList<>();
     private ObservableList<Integer> observedIndices = FXCollections.observableArrayList();
-    private ObservableList<GridCanvas.GridCoord> observedTiles = FXCollections.observableArrayList();
+    private ObservableList<GridCanvas.Tile> observedTiles = FXCollections.observableArrayList();
 
     private boolean isUpdating;
 
@@ -43,11 +43,11 @@ public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridC
     }
 
     @Override
-    public void select(final GridCanvas.GridCoord gridCoord) {
-        if (Objects.equals(getSelectedItem(), gridCoord)) {return;}
+    public void select(final GridCanvas.Tile tile) {
+        if (Objects.equals(getSelectedItem(), tile)) {return;}
 
-        setSelectedItem(gridCoord);
-        int index = gridCanvas.getIndex(gridCoord);
+        setSelectedItem(tile);
+        int index = gridCanvas.getIndex(tile);
         setSelectedIndex(index);
 
         if (getSelectionMode() == SelectionMode.SINGLE) {
@@ -55,8 +55,8 @@ public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridC
             selectedIndices.clear();
         }
 
-        if (!selectedTiles.contains(gridCoord)) {
-            selectedTiles.add(gridCoord);
+        if (!selectedTiles.contains(tile)) {
+            selectedTiles.add(tile);
             selectedIndices.add(index);
             updateObservedLists();
         }
@@ -113,8 +113,8 @@ public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridC
         return selectedIndices.size() > 0 && index == 0;
     }
 
-    public boolean isAnchor(final GridCanvas.GridCoord gridCoord) {
-        return selectedTiles.size() > 0 && selectedTiles.get(0).equals(gridCoord);
+    public boolean isAnchor(final GridCanvas.Tile tile) {
+        return selectedTiles.size() > 0 && selectedTiles.get(0).equals(tile);
     }
 
     @Override
@@ -123,7 +123,7 @@ public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridC
     }
 
     @Override
-    public ObservableList<GridCanvas.GridCoord> getSelectedItems() {
+    public ObservableList<GridCanvas.Tile> getSelectedItems() {
         return observedTiles;
     }
 

@@ -19,11 +19,11 @@ import static dhcoder.support.text.StringUtils.format;
  */
 public final class GridCanvas extends ResizableCanvas {
 
-    public static class GridCoord {
+    public static class Tile {
         private final int x;
         private final int y;
 
-        public GridCoord(final int x, final int y) {
+        public Tile(final int x, final int y) {
             this.x = x;
             this.y = y;
         }
@@ -48,10 +48,10 @@ public final class GridCanvas extends ResizableCanvas {
             if (this == o) { return true; }
             if (o == null || getClass() != o.getClass()) { return false; }
 
-            GridCoord gridCoord = (GridCoord)o;
+            Tile tile = (Tile)o;
 
-            if (x != gridCoord.x) { return false; }
-            if (y != gridCoord.y) { return false; }
+            if (x != tile.x) { return false; }
+            if (y != tile.y) { return false; }
 
             return true;
         }
@@ -154,11 +154,11 @@ public final class GridCanvas extends ResizableCanvas {
      *
      * @throws IllegalArgumentException if the index is < 0 or too large.
      */
-    public GridCoord getCoord(final int index) {
+    public Tile getCoord(final int index) {
         int intWidth = (int)getWidth();
         int numHorizTiles = intWidth / getTileWidth();
 
-        return new GridCoord(index % numHorizTiles, index / numHorizTiles);
+        return new Tile(index % numHorizTiles, index / numHorizTiles);
     }
 
     public int getIndexAfter(final int index) {
@@ -181,11 +181,11 @@ public final class GridCanvas extends ResizableCanvas {
         return numHorizTiles * numVertTiles - 1;
     }
 
-    public int getIndex(final GridCoord gridCoord) {
+    public int getIndex(final Tile tile) {
         int intWidth = (int)getWidth();
         int numHorizTiles = intWidth / getTileWidth();
 
-        return gridCoord.x + gridCoord.y * numHorizTiles;
+        return tile.x + tile.y * numHorizTiles;
     }
 
     private void initSelectionLogic() {
@@ -196,7 +196,7 @@ public final class GridCanvas extends ResizableCanvas {
             xClick = ((int)event.getX() / zoomFactor) / tileWidth;
             yClick = ((int)event.getY() / zoomFactor) / tileHeight;
 
-            selectionModel.select(new GridCoord(xClick, yClick));
+            selectionModel.select(new Tile(xClick, yClick));
         });
         setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ESCAPE) {
@@ -295,12 +295,12 @@ public final class GridCanvas extends ResizableCanvas {
                 g.fillRect(xOver * tileWidthZoomed, yOver * tileHeightZoomed, tileWidthZoomed, tileHeightZoomed);
             }
 
-            for (GridCoord gridCoord : selectionModel.getSelectedItems()) {
+            for (Tile tile : selectionModel.getSelectedItems()) {
                 g.setStroke(Color.RED);
-                int x = gridCoord.x * tileWidthZoomed;
-                int y = gridCoord.y * tileHeightZoomed;
+                int x = tile.x * tileWidthZoomed;
+                int y = tile.y * tileHeightZoomed;
                 g.strokeRect(x, y, tileWidthZoomed, tileHeightZoomed);
-                g.setFill(Color.rgb(255, 255, 0, selectionModel.isAnchor(gridCoord) ? 0.5 : 0.25));
+                g.setFill(Color.rgb(255, 255, 0, selectionModel.isAnchor(tile) ? 0.5 : 0.25));
                 g.fillRect(x, y, tileWidthZoomed,
                     tileHeightZoomed);
             }
