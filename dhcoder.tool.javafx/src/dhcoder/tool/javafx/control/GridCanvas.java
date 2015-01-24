@@ -285,14 +285,15 @@ public final class GridCanvas extends ResizableCanvas {
             g.clearRect(0, 0, getWidth(), getHeight());
             return;
         }
-
+        
         Image image = resampledImageOpt.getValue();
         g.setFill(backgroundColor.getValue());
         g.fillRect(0, 0, getWidth(), getHeight());
         g.drawImage(image, 0, 0, getWidth(), getHeight());
 
         g.setStroke(Color.BLACK);
-        g.setLineWidth(1);
+        g.setLineWidth(zoomFactor.doubleValue() / 2d);
+
         int tileWidthZoomed = getTileWidth() * getZoomFactor();
         int tileHeightZoomed = getTileHeight() * getZoomFactor();
         if (tileWidthZoomed > 0 && tileHeightZoomed > 0) {
@@ -309,12 +310,12 @@ public final class GridCanvas extends ResizableCanvas {
             }
 
             for (Tile tile : selectionModel.getSelectedItems()) {
-                g.setStroke(Color.RED);
                 int x = tile.x * tileWidthZoomed;
                 int y = tile.y * tileHeightZoomed;
-                g.strokeRect(x, y, tileWidthZoomed, tileHeightZoomed);
                 g.setFill(Color.rgb(255, 255, 0, selectionModel.isAnchor(tile) ? 0.5 : 0.25));
                 g.fillRect(x, y, tileWidthZoomed, tileHeightZoomed);
+                g.setStroke(Color.WHITE);
+                g.strokeRect(x, y, tileWidthZoomed, tileHeightZoomed);
             }
         }
 
