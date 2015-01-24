@@ -202,7 +202,7 @@ public final class GridCanvas extends ResizableCanvas {
 
             Tile tile = new Tile(xClick, yClick);
             if (event.isShortcutDown()) {
-                selectionModel.select(tile);
+                selectionModel.toggle(tile);
             }
             else if (event.isShiftDown()) {
                 selectionModel.rangeSelect(tile);
@@ -285,7 +285,7 @@ public final class GridCanvas extends ResizableCanvas {
             g.clearRect(0, 0, getWidth(), getHeight());
             return;
         }
-        
+
         Image image = resampledImageOpt.getValue();
         g.setFill(backgroundColor.getValue());
         g.fillRect(0, 0, getWidth(), getHeight());
