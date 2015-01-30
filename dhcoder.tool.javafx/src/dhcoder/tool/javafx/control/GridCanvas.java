@@ -7,7 +7,6 @@ import javafx.beans.Observable;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
@@ -191,8 +190,6 @@ public final class GridCanvas extends ResizableCanvas {
     }
 
     private void initSelectionLogic() {
-        selectionModel.setSelectionMode(SelectionMode.MULTIPLE); // DEBUG ONLY!!!
-
         setOnMouseClicked(event -> {
             int zoomFactor = getZoomFactor();
             int tileWidth = getTileWidth();

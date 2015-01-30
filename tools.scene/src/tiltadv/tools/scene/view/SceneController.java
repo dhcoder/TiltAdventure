@@ -26,7 +26,7 @@ public final class SceneController extends FxController {
     @Subscribe
     public void onSceneContextChanged(final ContextChangedEventArgs args) {
         if (!args.getContextOpt().hasValue()) {
-            sceneTool.getTilesetWindow().clearTileset();
+            sceneTool.getTilesetWindow().clear();
             return;
         }
 
