@@ -160,10 +160,13 @@ public final class SceneTool extends Application {
     }
 
     public void showCommandWindow() {
+        // Give primary stage focus in case a child stage has focus (which prevents the popup window from getting focus)
+        stage.requestFocus();
+
         Window window = getStage().getScene().getWindow();
         double windowX = window.getX();
         double windowY = window.getY();
-        actionWindow.show(getStage());
+        actionWindow.show(stage);
         actionWindow.setX(windowX + (window.getWidth() - actionWindow.getWidth()) / 2);
         actionWindow.setY(windowY + 50);
     }
