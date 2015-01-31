@@ -26,7 +26,7 @@ public final class ActionWindowController extends FxController {
 
     private class CommandRowCell extends ListCell<Action> {
 
-        private ActionRowController actionRowController;
+        private final ActionRowController actionRowController;
 
         public CommandRowCell() {
             actionRowController = FxController.loadView(ActionRowController.class);
@@ -167,8 +167,7 @@ public final class ActionWindowController extends FxController {
                 action.handle(new ActionEvent());
             }).setAccelerator(KeyCode.ENTER).build();
 
-        Action closeWindow =
-            new ActionBuilder().setHandler(actionWindow::hide).setAccelerator(KeyCode.ESCAPE).build();
+        Action closeWindow = new ActionBuilder().setHandler(actionWindow::hide).setAccelerator(KeyCode.ESCAPE).build();
 
         ActionListener actionListener = new ActionListener(nextCommand, prevCommand, acceptCommand, closeWindow);
         actionListener.install(textSearch);
