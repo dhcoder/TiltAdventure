@@ -11,8 +11,6 @@ import javafx.stage.StageStyle;
  */
 public final class TilesetWindow extends Stage {
 
-    private static final int DEFAULT_HEIGHT = 200;
-    private static final int DEFAULT_WIDTH = 600;
     private final TilesetWindowController controller;
 
     public TilesetWindow() {
@@ -20,7 +18,7 @@ public final class TilesetWindow extends Stage {
         setTitle("Tileset Window");
 
         controller = FxController.loadView(TilesetWindowController.class);
-        setScene(new Scene(controller.getRoot(), DEFAULT_WIDTH, DEFAULT_HEIGHT));
+        setScene(new Scene(controller.getRoot()));
     }
 
     public TilesetWindow setTileset(final Tileset tileset) {
