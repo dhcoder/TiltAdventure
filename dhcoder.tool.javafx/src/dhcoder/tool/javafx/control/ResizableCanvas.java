@@ -16,7 +16,10 @@ public class ResizableCanvas extends Canvas {
     public ResizableCanvas(final double width, final double height) {
         super(width, height);
         // Redraw canvas when size changes.
-        InvalidationListener sizeListener = evt -> draw();
+        InvalidationListener sizeListener = evt -> {
+            draw();
+            refresh();
+        };
 
         widthProperty().addListener(sizeListener);
         heightProperty().addListener(sizeListener);
@@ -25,6 +28,16 @@ public class ResizableCanvas extends Canvas {
     @Override
     public boolean isResizable() {
         return true;
+    }
+
+    @Override
+    public double minWidth(final double height) {
+        return 0d;
+    }
+
+    @Override
+    public double minHeight(final double width) {
+        return 0d;
     }
 
     @Override
@@ -37,11 +50,31 @@ public class ResizableCanvas extends Canvas {
         return getHeight();
     }
 
+    @Override
+    public double maxHeight(final double width) {
+        return Double.MAX_VALUE;
+    }
+
+    @Override
+    public double maxWidth(final double height) {
+        return Double.MAX_VALUE;
+    }
+
+    @Override
+    public void resize(final double width, final double height) {
+        setWidth(width);
+        setHeight(height);
+    }
+
+    protected void refresh() {}
+
     private void draw() {
         double width = getWidth();
         double height = getHeight();
 
         GraphicsContext gc = getGraphicsContext2D();
         gc.clearRect(0, 0, width, height);
+
+        refresh();
     }
 }

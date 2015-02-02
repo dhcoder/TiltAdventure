@@ -2,6 +2,7 @@ package tiltadv.tools.scene.view;
 
 import dhcoder.tool.javafx.game.model.Scene;
 import dhcoder.tool.javafx.utils.FxController;
+import dhcoder.tool.javafx.utils.PaneUtils;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Tab;
@@ -79,10 +80,7 @@ public final class ScenesController extends FxController {
     private void initialize() {
         sceneController = FxController.loadView(SceneController.class);
         Parent scenePaneContents = sceneController.getRoot();
-        AnchorPane.setBottomAnchor(scenePaneContents, 0.0);
-        AnchorPane.setTopAnchor(scenePaneContents, 0.0);
-        AnchorPane.setLeftAnchor(scenePaneContents, 0.0);
-        AnchorPane.setRightAnchor(scenePaneContents, 0.0);
+        PaneUtils.setAnchors(scenePaneContents, 0.0);
         scenePane.getChildren().add(scenePaneContents);
 
         tabScenes.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {

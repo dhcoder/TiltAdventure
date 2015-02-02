@@ -11,7 +11,7 @@
             <ListView fx:id="listSceneItems" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
          </children>
       </AnchorPane>
-          <AnchorPane fx:id="sceneGridPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
+      <ScrollPane fx:id="sceneGridPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
           <AnchorPane fx:id="propertySheetPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" SplitPane.resizableWithParent="false" />
     </items>
  </SplitPane>

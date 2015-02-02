@@ -262,7 +262,8 @@ public final class GridCanvas extends ResizableCanvas {
         }
     }
 
-    private void refresh() {
+    @Override
+    protected void refresh() {
         refreshRequested = false;
         if (imageInvalidated) {
             imageInvalidated = false;
@@ -278,14 +279,13 @@ public final class GridCanvas extends ResizableCanvas {
         }
 
         GraphicsContext g = getGraphicsContext2D();
+        g.setFill(backgroundColor.getValue());
+        g.fillRect(0, 0, getWidth(), getHeight());
         if (!resampledImageOpt.hasValue()) {
-            g.clearRect(0, 0, getWidth(), getHeight());
             return;
         }
 
         Image image = resampledImageOpt.getValue();
-        g.setFill(backgroundColor.getValue());
-        g.fillRect(0, 0, getWidth(), getHeight());
         g.drawImage(image, 0, 0, getWidth(), getHeight());
 
         g.setStroke(Color.BLACK);

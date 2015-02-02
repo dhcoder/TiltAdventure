@@ -152,7 +152,9 @@ public final class SceneTool extends Application {
             NewSceneDialog.Result newSceneValues = resultOpt.getValue();
             try {
                 Tileset tileset = TilesetLoader.load(gson, appSettings.getAssetDir(), newSceneValues.getTilesetFile());
-                scenesController.addScene(new Scene(tileset), newSceneValues.getSceneName());
+                int numRows = newSceneValues.getNumRows();
+                int numCols = newSceneValues.getNumCols();
+                scenesController.addScene(new Scene(tileset, numRows, numCols), newSceneValues.getSceneName());
             } catch (IOException e) {
                 e.printStackTrace();
             }
