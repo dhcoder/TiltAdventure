@@ -109,6 +109,8 @@ public final class SceneTool extends Application {
         scenesController.setOnSceneAdding(scene -> {
             if (!appPane.getChildren().contains(scenesController.getRoot())) {
                 appPane.getChildren().add(scenesController.getRoot());
+
+                tilesetWindow.show();
             }
 
             SceneContext context = new SceneContext(scene);
@@ -117,6 +119,8 @@ public final class SceneTool extends Application {
         scenesController.setOnSceneRemoved(scene -> {
             if (scenesController.getSceneCount() == 0) {
                 appPane.getChildren().remove(scenesController.getRoot());
+                tilesetWindow.hide();
+
                 contextOpt.clear();
                 eventBus.post(new ContextChangedEventArgs());
             }
