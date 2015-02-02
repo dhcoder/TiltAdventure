@@ -1,5 +1,6 @@
 package tiltadv.tools.scene.view;
 
+import com.google.common.eventbus.Subscribe;
 import dhcoder.tool.javafx.game.model.Scene;
 import dhcoder.tool.javafx.utils.FxController;
 import javafx.fxml.FXML;
@@ -7,7 +8,9 @@ import javafx.scene.Parent;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.AnchorPane;
+import tiltadv.tools.scene.SceneContext;
 import tiltadv.tools.scene.SceneTool;
+import tiltadv.tools.scene.events.ContextChangedEventArgs;
 
 import java.util.function.Consumer;
 
@@ -18,10 +21,10 @@ public final class ScenesController extends FxController {
     @FXML private AnchorPane scenePane;
     @FXML private TabPane tabScenes;
 
+    private SceneTool sceneTool;
     private Consumer<Scene> onSceneAdding;
     private Consumer<Scene> onSceneSelected;
     private Consumer<Scene> onSceneRemoved;
-    private SceneController sceneController;
 
     /**
      * Return the number of open scenes.
@@ -52,7 +55,8 @@ public final class ScenesController extends FxController {
     }
 
     public void setSceneTool(final SceneTool sceneTool) {
-        sceneController.setSceneTool(sceneTool);
+        this.sceneTool = sceneTool;
+        sceneTool.getEventBus().register(this);
     }
 
     public void addScene(final Scene gameScene, final String name) {
@@ -63,6 +67,10 @@ public final class ScenesController extends FxController {
         fireOnSceneAdded(gameScene);
         tabScenes.getTabs().add(tabScene);
         tabScenes.getSelectionModel().select(tabScene);
+
+        if (tabScenes.getTabs().size() == 1) {
+            sceneTool.getTilesetWindow().show();
+        }
     }
 
     public void closeActiveScene() {
@@ -73,11 +81,28 @@ public final class ScenesController extends FxController {
         Tab tabActive = tabScenes.getSelectionModel().getSelectedItem();
         tabScenes.getTabs().remove(tabActive);
         fireOnSceneClosed((Scene)tabActive.getUserData());
+
+        if (tabScenes.getTabs().size() == 0) {
+            sceneTool.getTilesetWindow().hide();
+        }
+    }
+
+    @Subscribe
+    public void onSceneContextChanged(final ContextChangedEventArgs args) {
+        if (!args.getContextOpt().hasValue()) {
+            sceneTool.getTilesetWindow().clear();
+            return;
+        }
+
+        SceneContext context = args.getContextOpt().getValue();
+        Scene gameScene = context.getScene();
+
+        sceneTool.getTilesetWindow().setTileset(gameScene.getTileset());
     }
 
     @FXML
     private void initialize() {
-        sceneController = FxController.loadView(SceneController.class);
+        SceneController sceneController = FxController.loadView(SceneController.class);
         Parent scenePaneContents = sceneController.getRoot();
         AnchorPane.setBottomAnchor(scenePaneContents, 0.0);
         AnchorPane.setTopAnchor(scenePaneContents, 0.0);

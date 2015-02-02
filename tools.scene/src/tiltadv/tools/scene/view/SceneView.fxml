@@ -4,23 +4,14 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-
- <SplitPane dividerPositions="0.2895069532237674" prefHeight="526.0" prefWidth="614.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tiltadv.tools.scene.view.SceneController">
+<SplitPane dividerPositions="0.2, 0.8" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tiltadv.tools.scene.view.SceneController">
     <items>
-        <AnchorPane SplitPane.resizableWithParent="false">
+        <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" SplitPane.resizableWithParent="false">
          <children>
-            <ListView fx:id="listSceneItems" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            <ListView fx:id="listSceneItems" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
          </children>
       </AnchorPane>
-        <AnchorPane>
-           <children>
-               <SplitPane dividerPositions="0.5656934306569343" layoutY="6.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                  <items>
-                      <AnchorPane fx:id="sceneGridPane" />
-                      <AnchorPane fx:id="propertySheetPane" SplitPane.resizableWithParent="false" />
-                  </items>
-               </SplitPane>
-           </children>
-        </AnchorPane>
+          <AnchorPane fx:id="sceneGridPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
+          <AnchorPane fx:id="propertySheetPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" SplitPane.resizableWithParent="false" />
     </items>
  </SplitPane>
