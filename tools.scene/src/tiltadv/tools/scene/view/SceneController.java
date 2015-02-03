@@ -6,12 +6,15 @@ import dhcoder.tool.javafx.game.model.Scene;
 import dhcoder.tool.javafx.utils.FxController;
 import dhcoder.tool.javafx.utils.PaneUtils;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import org.controlsfx.control.PropertySheet;
+import org.controlsfx.property.BeanPropertyUtils;
 import tiltadv.tools.scene.SceneContext;
 import tiltadv.tools.scene.SceneTool;
 import tiltadv.tools.scene.events.ContextChangedEventArgs;
@@ -29,6 +32,7 @@ public final class SceneController extends FxController {
 
     private SceneTool sceneTool;
     private GridCanvas gridCanvas;
+    private PropertySheet propertySheet;
 
     public void setSceneTool(final SceneTool sceneTool) {
         this.sceneTool = sceneTool;
@@ -52,17 +56,22 @@ public final class SceneController extends FxController {
         gridCanvas.setHeight(gameScene.getNumCols() * gameScene.getTileset().getTileHeight());
         gridCanvas.setTileWidth(gameScene.getTileset().getTileWidth());
         gridCanvas.setTileHeight(gameScene.getTileset().getTileHeight());
+
+        final ObservableList<PropertySheet.Item> properties = BeanPropertyUtils.getProperties(gameScene);
+        propertySheet.getItems().setAll(BeanPropertyUtils.getProperties(gameScene));
     }
 
     @FXML private void initialize() {
-        listSceneItems.setItems(FXCollections.observableArrayList("Scene"));
+        listSceneItems.setItems(FXCollections.emptyObservableList());
 
         gridCanvas = new GridCanvas();
         gridCanvas.setBackgroundColor(Color.BLACK);
+        gridCanvas.setZoomFactor(2);
+        gridCanvas.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         PaneUtils.setAnchors(gridCanvas, 0.0);
         sceneGridPane.setContent(gridCanvas);
 
-        PropertySheet propertySheet = new PropertySheet();
+        propertySheet = new PropertySheet();
         PaneUtils.setAnchors(propertySheet, 0.0);
         propertySheetPane.getChildren().add(propertySheet);
     }
