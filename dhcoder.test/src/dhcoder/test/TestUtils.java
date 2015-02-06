@@ -1,7 +1,5 @@
 package dhcoder.test;
 
-import dhcoder.support.text.StringUtils;
-
 import static junit.framework.TestCase.fail;
 
 public final class TestUtils {
@@ -26,10 +24,10 @@ public final class TestUtils {
 
         if (exceptionThrown == null || exceptionThrown.getClass() != exceptionClass) {
             StringBuilder builder = new StringBuilder();
-            builder.append(StringUtils.format("{0}\n", reason));
-            builder.append(StringUtils.format("Expected: {0}\n", exceptionClass));
+            builder.append(String.format("%1$s\n", reason));
+            builder.append(String.format("Expected: %1$s\n", exceptionClass));
             if (exceptionThrown != null) {
-                builder.append(StringUtils.format("Actual: {0}", exceptionThrown.getClass()));
+                builder.append(String.format("Actual: %1$s", exceptionThrown.getClass()));
             }
             fail(builder.toString());
         }
