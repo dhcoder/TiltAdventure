@@ -19,6 +19,8 @@ allprojects {
         controlsFxVersion='8.20.8'
         gsonVersion='1.7.2'
         guavaVersion='18.0'
+        junitVersion='4.12'
+        hamcrestVersion='1.3'
     }
 
     repositories {

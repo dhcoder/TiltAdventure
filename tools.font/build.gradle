@@ -10,7 +10,6 @@ dependencies {
     compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
 }
 
-sourceCompatibility = 1.6
 sourceSets.main.java.srcDirs = ["src/"]
 
 project.ext.mainClassName = "tiltadv.tools.font.Main"

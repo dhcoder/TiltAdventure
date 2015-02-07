@@ -7,7 +7,6 @@ dependencies {
     compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
 }
 
-sourceCompatibility = 1.6
 sourceSets.main.java.srcDirs = ["src/"]
 
 project.ext.mainClassName = "tiltadv.desktop.DesktopLauncher"

@@ -8,18 +8,10 @@ dependencies {
     compile "org.controlsfx:controlsfx:$controlsFxVersion"
     compile "com.google.code.gson:gson:$gsonVersion"
     compile "com.google.guava:guava:$guavaVersion"
-//    compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-//    compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
-//    compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-//    compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
 }
 
-sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = ["src/"]
 sourceSets.main.resources.srcDirs = sourceSets.main.java.srcDirs
-
-//src.options.fork = true;
-//compile.options.forkOptions.executable='/Library/Java/JavaVirtualMachines/jdk1.8.0_25.jdk/Contents/Home/bin'
 
 project.ext.mainClassName = "tiltadv.tools.scene.SceneTool"
 project.ext.assetsDir = new File("../android/assets");
