@@ -17,7 +17,7 @@ import static dhcoder.support.text.StringUtils.format;
  * JavaFX control for rendering an image overlaid with a grid, furthermore allowing you to select a tile or range of
  * tiles.
  */
-public final class GridCanvas extends ResizableCanvas {
+public final class TileCanvas extends ResizableCanvas {
 
     public static class Tile {
         private final int x;
@@ -89,7 +89,7 @@ public final class GridCanvas extends ResizableCanvas {
             enqueueRefresh(false);
         }
     };
-    private final GridCanvasSelectionModel selectionModel = new GridCanvasSelectionModel(this);
+    private final TileCanvasSelectionModel selectionModel = new TileCanvasSelectionModel(this);
     private final SimpleObjectProperty<Image> image = new SimpleObjectProperty<Image>() {
         @Override
         protected void invalidated() {
@@ -103,7 +103,7 @@ public final class GridCanvas extends ResizableCanvas {
     private boolean imageInvalidated;
     private boolean refreshRequested;
 
-    public GridCanvas(final double width, final double height) {
+    public TileCanvas(final double width, final double height) {
         super(width, height);
         selectionModel.getSelectedIndices().addListener((Observable observable) -> enqueueRefresh(false));
 
@@ -111,7 +111,7 @@ public final class GridCanvas extends ResizableCanvas {
         initSelectionLogic();
     }
 
-    public GridCanvas() {
+    public TileCanvas() {
         this(0, 0);
     }
 
@@ -147,7 +147,7 @@ public final class GridCanvas extends ResizableCanvas {
 
     public SimpleIntegerProperty zoomFactorProperty() { return zoomFactor; }
 
-    public GridCanvasSelectionModel getSelectionModel() { return selectionModel; }
+    public TileCanvasSelectionModel getSelectionModel() { return selectionModel; }
 
     /**
      * Given a 1D index, get the 2D coordinate associated with it. The tiles count from left to right, then top to

@@ -10,28 +10,28 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * A selection model for selected tiles in a {@link GridCanvas}
+ * A selection model for selected tiles in a {@link TileCanvas}
  */
-public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridCanvas.Tile> {
+public final class TileCanvasSelectionModel extends MultipleSelectionModel<TileCanvas.Tile> {
 
-    private final GridCanvas gridCanvas;
+    private final TileCanvas tileCanvas;
     private final List<Integer> selectedIndices = new ArrayList<>();
-    private final List<GridCanvas.Tile> selectedTiles = new ArrayList<>();
+    private final List<TileCanvas.Tile> selectedTiles = new ArrayList<>();
     private final ObservableList<Integer> observedIndices = FXCollections.observableArrayList();
-    private final ObservableList<GridCanvas.Tile> observedTiles = FXCollections.observableArrayList();
+    private final ObservableList<TileCanvas.Tile> observedTiles = FXCollections.observableArrayList();
 
     private boolean ignoreUpdates;
 
-    public GridCanvasSelectionModel(final GridCanvas gridCanvas) {
-        this.gridCanvas = gridCanvas;
+    public TileCanvasSelectionModel(final TileCanvas tileCanvas) {
+        this.tileCanvas = tileCanvas;
     }
 
     @Override
     public void clearAndSelect(final int index) {
-        clearAndSelect(gridCanvas.getTile(index));
+        clearAndSelect(tileCanvas.getTile(index));
     }
 
-    public void clearAndSelect(final GridCanvas.Tile tile) {
+    public void clearAndSelect(final TileCanvas.Tile tile) {
         if (Objects.equals(getSelectedItem(), tile)) {
             return;
         }
@@ -50,7 +50,7 @@ public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridC
         }
     }
 
-    public void toggle(final GridCanvas.Tile tile) {
+    public void toggle(final TileCanvas.Tile tile) {
         if (isSelected(tile)) {
             clearSelection(tile);
         }
@@ -61,15 +61,15 @@ public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridC
 
     @Override
     public void select(final int index) {
-        select(gridCanvas.getTile(index));
+        select(tileCanvas.getTile(index));
     }
 
     @Override
-    public void select(final GridCanvas.Tile tile) {
+    public void select(final TileCanvas.Tile tile) {
         if (Objects.equals(getSelectedItem(), tile)) {return;}
 
         setSelectedItem(tile);
-        int index = gridCanvas.getIndex(tile);
+        int index = tileCanvas.getIndex(tile);
         setSelectedIndex(index);
 
         if (getSelectionMode() == SelectionMode.SINGLE) {
@@ -86,13 +86,13 @@ public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridC
 
     @Override
     public void clearSelection(final int index) {
-        clearSelection(gridCanvas.getTile(index));
+        clearSelection(tileCanvas.getTile(index));
     }
 
-    public void clearSelection(final GridCanvas.Tile tile) {
+    public void clearSelection(final TileCanvas.Tile tile) {
         if (selectedTiles.contains(tile)) {
 
-            final int index = gridCanvas.getIndex(tile);
+            final int index = tileCanvas.getIndex(tile);
             selectedIndices.remove(Integer.valueOf(index));
             selectedTiles.remove(tile);
 
@@ -129,7 +129,7 @@ public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridC
         return selectedIndices.contains(index);
     }
 
-    public boolean isSelected(final GridCanvas.Tile tile) { return selectedTiles.contains(tile); }
+    public boolean isSelected(final TileCanvas.Tile tile) { return selectedTiles.contains(tile); }
 
     @Override
     public boolean isEmpty() {
@@ -139,14 +139,14 @@ public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridC
     @Override
     public void selectPrevious() {
         if (getSelectedIndex() >= 0) {
-            select(gridCanvas.getIndexBefore(getSelectedIndex()));
+            select(tileCanvas.getIndexBefore(getSelectedIndex()));
         }
     }
 
     @Override
     public void selectNext() {
         if (getSelectedIndex() >= 0) {
-            select(gridCanvas.getIndexAfter(getSelectedIndex()));
+            select(tileCanvas.getIndexAfter(getSelectedIndex()));
         }
     }
 
@@ -154,7 +154,7 @@ public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridC
         return selectedIndices.size() > 0 && index == 0;
     }
 
-    public boolean isAnchor(final GridCanvas.Tile tile) {
+    public boolean isAnchor(final TileCanvas.Tile tile) {
         return selectedTiles.size() > 0 && selectedTiles.get(0).equals(tile);
     }
 
@@ -164,7 +164,7 @@ public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridC
     }
 
     @Override
-    public ObservableList<GridCanvas.Tile> getSelectedItems() {
+    public ObservableList<TileCanvas.Tile> getSelectedItems() {
         return observedTiles;
     }
 
@@ -183,8 +183,8 @@ public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridC
 
     @Override
     public void selectAll() {
-        int[] tailIndices = new int[gridCanvas.getLastIndex()];
-        for (int i = 1; i <= gridCanvas.getLastIndex(); i++) {
+        int[] tailIndices = new int[tileCanvas.getLastIndex()];
+        for (int i = 1; i <= tileCanvas.getLastIndex(); i++) {
             tailIndices[i - 1] = i;
         }
         selectIndices(0, tailIndices);
@@ -197,16 +197,16 @@ public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridC
 
     @Override
     public void selectLast() {
-        select(gridCanvas.getLastIndex());
+        select(tileCanvas.getLastIndex());
     }
 
-    public void rangeSelect(final GridCanvas.Tile tile) {
+    public void rangeSelect(final TileCanvas.Tile tile) {
         if (selectedTiles.size() == 0) {
             select(tile);
             return;
         }
 
-        GridCanvas.Tile anchor = selectedTiles.get(0);
+        TileCanvas.Tile anchor = selectedTiles.get(0);
 
         ignoreUpdates = true;
         clearSelection();
@@ -218,7 +218,7 @@ public final class GridCanvasSelectionModel extends MultipleSelectionModel<GridC
 
         for (int x = xStart; x <= xEnd; ++x) {
             for (int y = yStart; y <= yEnd; ++y) {
-                select(new GridCanvas.Tile(x, y));
+                select(new TileCanvas.Tile(x, y));
             }
         }
         ignoreUpdates = false;

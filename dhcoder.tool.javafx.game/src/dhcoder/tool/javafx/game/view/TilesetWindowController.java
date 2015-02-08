@@ -1,6 +1,6 @@
 package dhcoder.tool.javafx.game.view;
 
-import dhcoder.tool.javafx.control.GridCanvas;
+import dhcoder.tool.javafx.control.TileCanvas;
 import dhcoder.tool.javafx.utils.FxController;
 import javafx.fxml.FXML;
 import javafx.scene.control.ColorPicker;
@@ -9,7 +9,7 @@ import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 
 public final class TilesetWindowController extends FxController {
-    public final GridCanvas tilesetCanvas = new GridCanvas();
+    public final TileCanvas tilesetCanvas = new TileCanvas();
     public ToggleGroup zoomGroup;
     public ScrollPane contentPane;
     public ColorPicker colorPicker;

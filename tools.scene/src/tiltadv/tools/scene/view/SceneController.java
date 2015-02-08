@@ -1,7 +1,7 @@
 package tiltadv.tools.scene.view;
 
 import com.google.common.eventbus.Subscribe;
-import dhcoder.tool.javafx.control.GridCanvas;
+import dhcoder.tool.javafx.control.TileCanvas;
 import dhcoder.tool.javafx.game.model.Scene;
 import dhcoder.tool.javafx.utils.FxController;
 import dhcoder.tool.javafx.utils.PaneUtils;
@@ -31,7 +31,7 @@ public final class SceneController extends FxController {
     @FXML private AnchorPane propertySheetPane;
 
     private SceneTool sceneTool;
-    private GridCanvas gridCanvas;
+    private TileCanvas tileCanvas;
     private PropertySheet propertySheet;
 
     public void setSceneTool(final SceneTool sceneTool) {
@@ -51,11 +51,11 @@ public final class SceneController extends FxController {
 
         sceneTool.getTilesetWindow().setTileset(gameScene.getTileset());
 
-        gridCanvas.setImage(gameScene.getTileset().getImage());
-        gridCanvas.setWidth(gameScene.getNumRows() * gameScene.getTileset().getTileWidth());
-        gridCanvas.setHeight(gameScene.getNumCols() * gameScene.getTileset().getTileHeight());
-        gridCanvas.setTileWidth(gameScene.getTileset().getTileWidth());
-        gridCanvas.setTileHeight(gameScene.getTileset().getTileHeight());
+        tileCanvas.setImage(gameScene.getTileset().getImage());
+        tileCanvas.setWidth(gameScene.getNumRows() * gameScene.getTileset().getTileWidth());
+        tileCanvas.setHeight(gameScene.getNumCols() * gameScene.getTileset().getTileHeight());
+        tileCanvas.setTileWidth(gameScene.getTileset().getTileWidth());
+        tileCanvas.setTileHeight(gameScene.getTileset().getTileHeight());
 
         final ObservableList<PropertySheet.Item> properties = BeanPropertyUtils.getProperties(gameScene);
         propertySheet.getItems().setAll(BeanPropertyUtils.getProperties(gameScene));
@@ -64,12 +64,12 @@ public final class SceneController extends FxController {
     @FXML private void initialize() {
         listSceneItems.setItems(FXCollections.emptyObservableList());
 
-        gridCanvas = new GridCanvas();
-        gridCanvas.setBackgroundColor(Color.BLACK);
-        gridCanvas.setZoomFactor(2);
-        gridCanvas.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        PaneUtils.setAnchors(gridCanvas, 0.0);
-        sceneGridPane.setContent(gridCanvas);
+        tileCanvas = new TileCanvas();
+        tileCanvas.setBackgroundColor(Color.BLACK);
+        tileCanvas.setZoomFactor(2);
+        tileCanvas.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        PaneUtils.setAnchors(tileCanvas, 0.0);
+        sceneGridPane.setContent(tileCanvas);
 
         propertySheet = new PropertySheet();
         PaneUtils.setAnchors(propertySheet, 0.0);
