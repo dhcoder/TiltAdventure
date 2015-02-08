@@ -15,7 +15,6 @@ public final class GlobalActions {
     public final ActionGroup editScope;
     public final ActionGroup viewScope;
     public final Action showActionWindow;
-    public final Action showTilesetWindow;
     public final Action newScene;
     public final Action closeScene;
     public final Action exit;
@@ -34,11 +33,6 @@ public final class GlobalActions {
             .setText("Show Action Window",
                 "Opens the Action Window which allows for searching quickly through all commands")
             .setHandler(sceneTool::showCommandWindow).build();
-
-        showTilesetWindow = new ActionBuilder().setId("show_tileset_window").setParent(viewScope)
-            .setText("Show Tileset Window",
-                "Opens the Tileset Window which allows you to see a tileset associated with a scene")
-            .setHandler(sceneTool.getTilesetWindow()::show).build();
 
         newScene = new ActionBuilder().setId("new_scene").setParent(fileScope)
             .setText("New Scene", "Opens a new, blank scene to work on").setHandler(sceneTool::newScene).build();
