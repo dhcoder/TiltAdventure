@@ -4,6 +4,8 @@ import javafx.beans.InvalidationListener;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 
+import java.util.function.Consumer;
+
 /**
  * A canvas which can be resized dynamically.
  * <p/>
@@ -11,14 +13,21 @@ import javafx.scene.canvas.GraphicsContext;
  */
 public class ResizableCanvas extends Canvas {
 
+    private Consumer<ResizableCanvas> onResized;
+
     public ResizableCanvas() { this(0, 0); }
 
     public ResizableCanvas(final double width, final double height) {
         super(width, height);
+
         // Redraw canvas when size changes.
         InvalidationListener sizeListener = evt -> {
-            draw();
+            clear();
             refresh();
+
+            if (onResized != null) {
+                onResized.accept(this);
+            }
         };
 
         widthProperty().addListener(sizeListener);
@@ -51,12 +60,12 @@ public class ResizableCanvas extends Canvas {
     }
 
     @Override
-    public double maxHeight(final double width) {
+    public double maxWidth(final double height) {
         return Double.MAX_VALUE;
     }
 
     @Override
-    public double maxWidth(final double height) {
+    public double maxHeight(final double width) {
         return Double.MAX_VALUE;
     }
 
@@ -66,15 +75,19 @@ public class ResizableCanvas extends Canvas {
         setHeight(height);
     }
 
-    protected void refresh() {}
-
-    private void draw() {
+    public GraphicsContext clear() {
         double width = getWidth();
         double height = getHeight();
 
         GraphicsContext gc = getGraphicsContext2D();
         gc.clearRect(0, 0, width, height);
 
-        refresh();
+        return gc;
     }
+
+    public void setOnResized(final Consumer<ResizableCanvas> onResized) {
+        this.onResized = onResized;
+    }
+
+    protected void refresh() {}
 }

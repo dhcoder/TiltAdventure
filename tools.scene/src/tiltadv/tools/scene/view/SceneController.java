@@ -1,16 +1,18 @@
 package tiltadv.tools.scene.view;
 
+import com.google.common.collect.Lists;
 import com.google.common.eventbus.Subscribe;
-import dhcoder.tool.javafx.control.TileCanvas;
+import dhcoder.tool.javafx.control.ResizableCanvas;
+import dhcoder.tool.javafx.control.Tile;
 import dhcoder.tool.javafx.game.model.Scene;
+import dhcoder.tool.javafx.game.view.TiledImage;
 import dhcoder.tool.javafx.utils.FxController;
 import dhcoder.tool.javafx.utils.PaneUtils;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import org.controlsfx.control.PropertySheet;
@@ -21,7 +23,7 @@ import tiltadv.tools.scene.events.ContextChangedEventArgs;
 
 /**
  * UI for editing a scene. Contains a list of all actors in the scene, as well as a property editor and visual grid.
- *
+ * <p/>
  * Note that we actually re-use the same scene UI for all scenes - that is, we instantiate one set of controls and
  * toggle its contents depending on the active scene context.
  */
@@ -31,7 +33,7 @@ public final class SceneController extends FxController {
     @FXML private AnchorPane propertySheetPane;
 
     private SceneTool sceneTool;
-    private TileCanvas tileCanvas;
+    private ResizableCanvas sceneCanvas;
     private PropertySheet propertySheet;
 
     public void setSceneTool(final SceneTool sceneTool) {
@@ -42,6 +44,8 @@ public final class SceneController extends FxController {
     @Subscribe
     public void onSceneContextChanged(final ContextChangedEventArgs args) {
         if (!args.getContextOpt().hasValue()) {
+            sceneCanvas.clear();
+            sceneCanvas.setOnResized(null);
             sceneTool.getTilesetWindow().clear();
             return;
         }
@@ -51,28 +55,35 @@ public final class SceneController extends FxController {
 
         sceneTool.getTilesetWindow().setTileset(gameScene.getTileset());
 
-        tileCanvas.setImage(gameScene.getTileset().getImage());
-        tileCanvas.setWidth(gameScene.getNumRows() * gameScene.getTileset().getTileWidth());
-        tileCanvas.setHeight(gameScene.getNumCols() * gameScene.getTileset().getTileHeight());
-        tileCanvas.setTileWidth(gameScene.getTileset().getTileWidth());
-        tileCanvas.setTileHeight(gameScene.getTileset().getTileHeight());
+        TiledImage tiledImage = new TiledImage(gameScene.getTileset(), gameScene.getNumRows(), gameScene.getNumCols(),
+            Lists.newArrayList(new Tile(0, 0), new Tile(2, 0), new Tile(1, 0), new Tile(0, 2)));
+        tiledImage.getTileIndices().setAll(0, 0, 0, 0, 0, 0, 1, 0);
+        tiledImage.setBackgroundColor(Color.AQUA);
+        sceneCanvas.resize(tiledImage.getWidth(), tiledImage.getHeight());
 
-        final ObservableList<PropertySheet.Item> properties = BeanPropertyUtils.getProperties(gameScene);
+        tiledImage.setOnRefreshed(image -> {
+            final GraphicsContext g = sceneCanvas.clear();
+            g.drawImage(tiledImage, 0, 0);
+        });
+        sceneCanvas.setOnResized(canvas -> {
+            canvas.getGraphicsContext2D().drawImage(tiledImage, 0, 0);
+        });
+
+//        for debug checking properties in watch
+//        final ObservableList<PropertySheet.Item> properties = BeanPropertyUtils.getProperties(gameScene);
         propertySheet.getItems().setAll(BeanPropertyUtils.getProperties(gameScene));
     }
 
-    @FXML private void initialize() {
+    @FXML
+    private void initialize() {
         listSceneItems.setItems(FXCollections.emptyObservableList());
 
-        tileCanvas = new TileCanvas();
-        tileCanvas.setBackgroundColor(Color.BLACK);
-        tileCanvas.setZoomFactor(2);
-        tileCanvas.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        PaneUtils.setAnchors(tileCanvas, 0.0);
-        sceneGridPane.setContent(tileCanvas);
+        sceneCanvas = new ResizableCanvas();
+        PaneUtils.setAnchors(sceneCanvas, 0.0);
+        sceneGridPane.setContent(sceneCanvas);
 
-        propertySheet = new PropertySheet();
-        PaneUtils.setAnchors(propertySheet, 0.0);
-        propertySheetPane.getChildren().add(propertySheet);
+//        propertySheet = new PropertySheet();
+//        PaneUtils.setAnchors(propertySheet, 0.0);
+//        propertySheetPane.getChildren().add(propertySheet);
     }
 }

@@ -19,49 +19,6 @@ import static dhcoder.support.text.StringUtils.format;
  */
 public final class TileCanvas extends ResizableCanvas {
 
-    public static class Tile {
-        private final int x;
-        private final int y;
-
-        public Tile(final int x, final int y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        public int getX() {
-            return x;
-        }
-
-        public int getY() {
-            return y;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = x;
-            result = 31 * result + y;
-            return result;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-            if (this == o) { return true; }
-            if (o == null || getClass() != o.getClass()) { return false; }
-
-            Tile tile = (Tile)o;
-
-            if (x != tile.x) { return false; }
-            if (y != tile.y) { return false; }
-
-            return true;
-        }
-
-        @Override
-        public String toString() {
-            return format("Grid[{0}][{1}]", x, y);
-        }
-    }
-
     public static final int DEFAULT_GRID_WIDTH = 0;
     public static final int DEFAULT_GRID_HEIGHT = 0;
     private final Opt<Image> resampledImageOpt = Opt.withNoValue();
@@ -186,7 +143,7 @@ public final class TileCanvas extends ResizableCanvas {
         int intWidth = (int)getWidth();
         int numHorizTiles = intWidth / getTileWidth();
 
-        return tile.x + tile.y * numHorizTiles;
+        return tile.getX() + tile.getY() * numHorizTiles;
     }
 
     private void initSelectionLogic() {
@@ -307,8 +264,8 @@ public final class TileCanvas extends ResizableCanvas {
             }
 
             for (Tile tile : selectionModel.getSelectedItems()) {
-                int x = tile.x * tileWidthZoomed;
-                int y = tile.y * tileHeightZoomed;
+                int x = tile.getX() * tileWidthZoomed;
+                int y = tile.getY() * tileHeightZoomed;
                 g.setFill(Color.rgb(255, 255, 0, selectionModel.isAnchor(tile) ? 0.5 : 0.25));
                 g.fillRect(x, y, tileWidthZoomed, tileHeightZoomed);
                 g.setStroke(Color.WHITE);

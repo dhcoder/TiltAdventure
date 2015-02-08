@@ -26,4 +26,7 @@ public final class Scene {
     public int getNumCols() {
         return numCols;
     }
+
+    public int getWidth() { return numCols * tileset.getTileWidth(); }
+    public int getHeight() { return numRows * tileset.getTileHeight(); }
 }

@@ -29,4 +29,7 @@ public final class Tileset {
     public int getTileHeight() {
         return tileHeight;
     }
+
+    public int getNumRows() { return ((int)image.getHeight()) / tileHeight; }
+    public int getNumCols() { return ((int)image.getWidth()) / tileWidth; }
 }

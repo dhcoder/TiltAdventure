@@ -5,6 +5,7 @@ dependencies {
     compile project(':dhcoder.tool.javafx')
     compile "org.controlsfx:controlsfx:$controlsFxVersion"
     compile "com.google.code.gson:gson:$gsonVersion"
+    compile "com.google.guava:guava:$guavaVersion"
     testCompile project(':dhcoder.test')
     testCompile "junit:junit:$junitVersion"
     testCompile "org.hamcrest:hamcrest-core:$hamcrestVersion"

@@ -12,13 +12,13 @@ import java.util.Objects;
 /**
  * A selection model for selected tiles in a {@link TileCanvas}
  */
-public final class TileCanvasSelectionModel extends MultipleSelectionModel<TileCanvas.Tile> {
+public final class TileCanvasSelectionModel extends MultipleSelectionModel<Tile> {
 
     private final TileCanvas tileCanvas;
     private final List<Integer> selectedIndices = new ArrayList<>();
-    private final List<TileCanvas.Tile> selectedTiles = new ArrayList<>();
+    private final List<Tile> selectedTiles = new ArrayList<>();
     private final ObservableList<Integer> observedIndices = FXCollections.observableArrayList();
-    private final ObservableList<TileCanvas.Tile> observedTiles = FXCollections.observableArrayList();
+    private final ObservableList<Tile> observedTiles = FXCollections.observableArrayList();
 
     private boolean ignoreUpdates;
 
@@ -31,7 +31,7 @@ public final class TileCanvasSelectionModel extends MultipleSelectionModel<TileC
         clearAndSelect(tileCanvas.getTile(index));
     }
 
-    public void clearAndSelect(final TileCanvas.Tile tile) {
+    public void clearAndSelect(final Tile tile) {
         if (Objects.equals(getSelectedItem(), tile)) {
             return;
         }
@@ -50,7 +50,7 @@ public final class TileCanvasSelectionModel extends MultipleSelectionModel<TileC
         }
     }
 
-    public void toggle(final TileCanvas.Tile tile) {
+    public void toggle(final Tile tile) {
         if (isSelected(tile)) {
             clearSelection(tile);
         }
@@ -65,7 +65,7 @@ public final class TileCanvasSelectionModel extends MultipleSelectionModel<TileC
     }
 
     @Override
-    public void select(final TileCanvas.Tile tile) {
+    public void select(final Tile tile) {
         if (Objects.equals(getSelectedItem(), tile)) {return;}
 
         setSelectedItem(tile);
@@ -89,7 +89,7 @@ public final class TileCanvasSelectionModel extends MultipleSelectionModel<TileC
         clearSelection(tileCanvas.getTile(index));
     }
 
-    public void clearSelection(final TileCanvas.Tile tile) {
+    public void clearSelection(final Tile tile) {
         if (selectedTiles.contains(tile)) {
 
             final int index = tileCanvas.getIndex(tile);
@@ -129,7 +129,7 @@ public final class TileCanvasSelectionModel extends MultipleSelectionModel<TileC
         return selectedIndices.contains(index);
     }
 
-    public boolean isSelected(final TileCanvas.Tile tile) { return selectedTiles.contains(tile); }
+    public boolean isSelected(final Tile tile) { return selectedTiles.contains(tile); }
 
     @Override
     public boolean isEmpty() {
@@ -154,7 +154,7 @@ public final class TileCanvasSelectionModel extends MultipleSelectionModel<TileC
         return selectedIndices.size() > 0 && index == 0;
     }
 
-    public boolean isAnchor(final TileCanvas.Tile tile) {
+    public boolean isAnchor(final Tile tile) {
         return selectedTiles.size() > 0 && selectedTiles.get(0).equals(tile);
     }
 
@@ -164,7 +164,7 @@ public final class TileCanvasSelectionModel extends MultipleSelectionModel<TileC
     }
 
     @Override
-    public ObservableList<TileCanvas.Tile> getSelectedItems() {
+    public ObservableList<Tile> getSelectedItems() {
         return observedTiles;
     }
 
@@ -200,13 +200,13 @@ public final class TileCanvasSelectionModel extends MultipleSelectionModel<TileC
         select(tileCanvas.getLastIndex());
     }
 
-    public void rangeSelect(final TileCanvas.Tile tile) {
+    public void rangeSelect(final Tile tile) {
         if (selectedTiles.size() == 0) {
             select(tile);
             return;
         }
 
-        TileCanvas.Tile anchor = selectedTiles.get(0);
+        Tile anchor = selectedTiles.get(0);
 
         ignoreUpdates = true;
         clearSelection();
@@ -218,7 +218,7 @@ public final class TileCanvasSelectionModel extends MultipleSelectionModel<TileC
 
         for (int x = xStart; x <= xEnd; ++x) {
             for (int y = yStart; y <= yEnd; ++y) {
-                select(new TileCanvas.Tile(x, y));
+                select(new Tile(x, y));
             }
         }
         ignoreUpdates = false;
