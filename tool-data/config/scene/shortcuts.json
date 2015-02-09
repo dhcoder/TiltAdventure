@@ -21,6 +21,14 @@
       "commandId": "redo"
     },
     {
+      "shortcut": "shortcut+=",
+      "commandId": "zoom+"
+    },
+    {
+      "shortcut": "shortcut+-",
+      "commandId": "zoom-"
+    },
+    {
       "shortcut": "shortcut+Q",
       "commandId": "exit"
     }

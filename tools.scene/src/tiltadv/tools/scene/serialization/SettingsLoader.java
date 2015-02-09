@@ -1,6 +1,7 @@
 package tiltadv.tools.scene.serialization;
 
 import com.google.gson.Gson;
+import dhcoder.support.math.MathUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,8 +14,10 @@ import java.nio.file.Path;
 public final class SettingsLoader {
 
     public final static class AppSettings {
-        public int[] size;
-        public String assetDir;
+        public static final int MAX_ZOOM_FACTOR = 4;
+        private int[] size;
+        private String assetDir;
+        private int zoomFactor = 2;
 
         public int getWidth() { return size[0]; }
 
@@ -23,6 +26,14 @@ public final class SettingsLoader {
         public File getAssetDir() { return new File(assetDir); }
 
         public File getTilesetDir() { return new File(getAssetDir(), "data/tilesets"); }
+
+        public int getZoomFactor() {
+            return zoomFactor;
+        }
+
+        public void setZoomFactor(final int zoomFactor) {
+            this.zoomFactor = MathUtils.clamp(zoomFactor, 1, MAX_ZOOM_FACTOR);
+        }
     }
 
     public static AppSettings load(final Gson gson, final Path settingsPath) throws IOException {

@@ -28,24 +28,27 @@ public final class TiledImage extends WritableImage {
 
         return palette;
     }
+
     private final SimpleObjectProperty<Color> backgroundColor = new SimpleObjectProperty<Color>(Color.TRANSPARENT) {
         @Override
         protected void invalidated() {
             enqueueRefresh();
         }
     };
-    private final SimpleListProperty<Tile> tilePalette = new SimpleListProperty<Tile>() {
-        @Override
-        protected void invalidated() {
-            enqueueRefresh();
-        }
-    };
-    private final SimpleListProperty<Integer> tileIndices = new SimpleListProperty<Integer>() {
-        @Override
-        protected void invalidated() {
-            enqueueRefresh();
-        }
-    };
+    private final SimpleListProperty<Tile> tilePalette =
+        new SimpleListProperty<Tile>(FXCollections.observableArrayList()) {
+            @Override
+            protected void invalidated() {
+                enqueueRefresh();
+            }
+        };
+    private final SimpleListProperty<Integer> tileIndices =
+        new SimpleListProperty<Integer>(FXCollections.observableArrayList()) {
+            @Override
+            protected void invalidated() {
+                enqueueRefresh();
+            }
+        };
     private final Tileset tileset;
     private Consumer<TiledImage> onRefreshed;
     private boolean refreshRequested;
@@ -57,8 +60,7 @@ public final class TiledImage extends WritableImage {
     public TiledImage(final Tileset tileset, final int numRows, final int numCols, final List<Tile> tilePalette) {
         super(numCols * tileset.getTileWidth(), numRows * tileset.getTileHeight());
         this.tileset = tileset;
-        this.tilePalette.set(FXCollections.observableArrayList(tilePalette));
-        tileIndices.set(FXCollections.observableArrayList());
+        this.tilePalette.get().setAll(tilePalette);
     }
 
     public ObservableList<Tile> getTilePalette() { return tilePalette.getValue(); }

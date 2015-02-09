@@ -7,12 +7,14 @@ import dhcoder.tool.javafx.control.Tile;
 import dhcoder.tool.javafx.game.model.Scene;
 import dhcoder.tool.javafx.game.view.TiledImage;
 import dhcoder.tool.javafx.utils.FxController;
+import dhcoder.tool.javafx.utils.ImageUtils;
 import dhcoder.tool.javafx.utils.PaneUtils;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import org.controlsfx.control.PropertySheet;
@@ -59,19 +61,19 @@ public final class SceneController extends FxController {
             Lists.newArrayList(new Tile(0, 0), new Tile(2, 0), new Tile(1, 0), new Tile(0, 2)));
         tiledImage.getTileIndices().setAll(0, 0, 0, 0, 0, 0, 1, 0);
         tiledImage.setBackgroundColor(Color.AQUA);
-        sceneCanvas.resize(tiledImage.getWidth(), tiledImage.getHeight());
+        final int zoomFactor = sceneTool.getAppSettings().getZoomFactor();
+        sceneCanvas.resize(tiledImage.getWidth() * zoomFactor, tiledImage.getHeight() * zoomFactor);
 
-        tiledImage.setOnRefreshed(image -> {
-            final GraphicsContext g = sceneCanvas.clear();
-            g.drawImage(tiledImage, 0, 0);
-        });
-        sceneCanvas.setOnResized(canvas -> {
-            canvas.getGraphicsContext2D().drawImage(tiledImage, 0, 0);
-        });
+        tiledImage.setOnRefreshed(image -> renderScene(sceneCanvas.clear(), tiledImage));
+        sceneCanvas.setOnResized(canvas -> renderScene(canvas.getGraphicsContext2D(), tiledImage));
 
 //        for debug checking properties in watch
 //        final ObservableList<PropertySheet.Item> properties = BeanPropertyUtils.getProperties(gameScene);
         propertySheet.getItems().setAll(BeanPropertyUtils.getProperties(gameScene));
+    }
+
+    private void renderScene(final GraphicsContext g, final Image image) {
+        g.drawImage(ImageUtils.zoom(image, sceneTool.getAppSettings().getZoomFactor()), 0, 0);
     }
 
     @FXML

@@ -67,7 +67,7 @@ public final class ActionCollection extends AbstractCollection<Action> {
             stackPrefixes.push(actionGroup.getText());
         }
         else {
-            stackPrefixes.push(format("{0}.{1}", stackPrefixes.peek(), actionGroup.getText()));
+            stackPrefixes.push(format("{0}→{1}", stackPrefixes.peek(), actionGroup.getText()));
         }
 
         boolean groupAdded = addAll(actionGroup.getActions());
@@ -122,7 +122,7 @@ public final class ActionCollection extends AbstractCollection<Action> {
 
         if (stackPrefixes.size() > 0) {
             String prefix = stackPrefixes.peek();
-            fullNames.put(action, format("{0}: {1}", prefix, action.getText()));
+            fullNames.put(action, format("{0}:  {1}", prefix, action.getText()));
         }
         else {
             fullNames.put(action, action.getText());

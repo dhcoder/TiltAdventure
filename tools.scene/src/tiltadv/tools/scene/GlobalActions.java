@@ -14,18 +14,26 @@ public final class GlobalActions {
     public final ActionGroup fileScope;
     public final ActionGroup editScope;
     public final ActionGroup viewScope;
+    public final ActionGroup zoomScope;
     public final Action showActionWindow;
     public final Action newScene;
     public final Action closeScene;
     public final Action exit;
     public final Action undo;
     public final Action redo;
+    public final Action increaseZoom;
+    public final Action decreaseZoom;
+    public final Action setZoom1;
+    public final Action setZoom2;
+    public final Action setZoom3;
+    public final Action setZoom4;
 
     public GlobalActions(final SceneTool sceneTool, final ActionCollection actionCollection) {
         globalScope = new ActionGroup("Global");
         fileScope = new ActionGroup("File");
         editScope = new ActionGroup("Edit");
         viewScope = new ActionGroup("View");
+        zoomScope = new ActionGroup("Zoom");
 
         globalScope.getActions().addAll(fileScope, editScope, viewScope);
 
@@ -53,6 +61,31 @@ public final class GlobalActions {
             .setHandler(() -> sceneTool.getContextOpt().getValue().getHistory().redo()).setIsActive(
                 () -> sceneTool.getContextOpt().hasValue() &&
                     sceneTool.getContextOpt().getValue().getHistory().canRedo()).build();
+
+        viewScope.getActions().add(zoomScope);
+
+        increaseZoom = new ActionBuilder().setId("zoom+").setParent(zoomScope)
+            .setText("Zoom In", "Increase the global zoom factor")
+            .setHandler(() -> sceneTool.getAppSettings().setZoomFactor(sceneTool.getAppSettings().getZoomFactor()))
+            .build();
+
+        decreaseZoom = new ActionBuilder().setId("zoom-").setParent(zoomScope)
+            .setText("Zoom Out", "Decrease the global zoom factor")
+            .setHandler(() -> sceneTool.getAppSettings().setZoomFactor(sceneTool.getAppSettings().getZoomFactor()))
+            .build();
+
+        setZoom1 = new ActionBuilder().setId("zoom1").setParent(zoomScope)
+            .setText("Set Zoom x1", "Set the global zoom factor to no zoom")
+            .setHandler(() -> sceneTool.getAppSettings().setZoomFactor(1)).build();
+        setZoom2 = new ActionBuilder().setId("zoom2").setParent(zoomScope)
+            .setText("Set Zoom x2", "Set the global zoom factor to 2x zoom")
+            .setHandler(() -> sceneTool.getAppSettings().setZoomFactor(2)).build();
+        setZoom3 = new ActionBuilder().setId("zoom3").setParent(zoomScope)
+            .setText("Set Zoom x3", "Set the global zoom factor to 3x zoom")
+            .setHandler(() -> sceneTool.getAppSettings().setZoomFactor(3)).build();
+        setZoom4 = new ActionBuilder().setId("zoom4").setParent(zoomScope)
+            .setText("Set Zoom x4", "Set the global zoom factor to 4x zoom")
+            .setHandler(() -> sceneTool.getAppSettings().setZoomFactor(4)).build();
 
         // No reason to search for the command that brings up the action window when it is already showing
         ActionCollection.setUnsearchable(showActionWindow);
