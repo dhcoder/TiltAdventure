@@ -3,33 +3,21 @@ package tiltadv.tools.scene.view;
 import dhcoder.tool.javafx.control.TileCanvas;
 import dhcoder.tool.javafx.utils.FxController;
 import javafx.fxml.FXML;
-import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Toggle;
-import javafx.scene.control.ToggleGroup;
+import tiltadv.tools.scene.AppSettings;
 
 public final class SceneEditorController extends FxController {
+    public final TileCanvas sceneCanvas = new TileCanvas();
     public final TileCanvas tilesetCanvas = new TileCanvas();
-    public ToggleGroup zoomGroup;
-    public ScrollPane contentPane;
-    public ColorPicker colorPicker;
 
-    @FXML
-    private void initialize() {
-        contentPane.setContent(tilesetCanvas);
+    @FXML private ScrollPane scenePane;
+    @FXML private ScrollPane tilesetPane;
 
-        tilesetCanvas.setZoomFactor(getZoomFactor(zoomGroup.getSelectedToggle()));
-        zoomGroup.selectedToggleProperty().addListener((observable) -> {
-            Toggle toggle = zoomGroup.getSelectedToggle();
-            tilesetCanvas.setZoomFactor(getZoomFactor(toggle));
-        });
+    @FXML private void initialize() {
+        scenePane.setContent(sceneCanvas);
+        tilesetPane.setContent(tilesetCanvas);
 
-        colorPicker.setValue(tilesetCanvas.getBackgroundColor());
-        tilesetCanvas.backgroundColorProperty().bindBidirectional(colorPicker.valueProperty());
-    }
-
-    private int getZoomFactor(final Toggle toggle) {
-        // UserData specified in FXML
-        return Integer.parseInt((String)toggle.getUserData());
+        sceneCanvas.setZoomFactor(AppSettings.ZOOM_FACTOR);
+        tilesetCanvas.setZoomFactor(AppSettings.ZOOM_FACTOR);
     }
 }

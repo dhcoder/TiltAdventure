@@ -21,13 +21,12 @@ public final class SceneEditor extends Stage {
     }
 
     public SceneEditor setGameScene(final dhcoder.tool.javafx.game.model.Scene gameScene) {
-//        controller.tilesetCanvas.setImage(tileset.getImage());
-//        controller.tilesetCanvas.setTileWidth(tileset.getTileWidth());
-//        controller.tilesetCanvas.setTileHeight(tileset.getTileHeight());
+        controller.tilesetCanvas.setImage(gameScene.getTileset().getImage());
         return this;
     }
 
     public SceneEditor clear() {
+        controller.sceneCanvas.clearImage();
         controller.tilesetCanvas.clearImage();
         return this;
     }

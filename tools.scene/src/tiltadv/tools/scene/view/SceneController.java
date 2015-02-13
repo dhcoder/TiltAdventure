@@ -17,6 +17,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import org.controlsfx.control.PropertySheet;
+import tiltadv.tools.scene.AppSettings;
 import tiltadv.tools.scene.SceneContext;
 import tiltadv.tools.scene.SceneTool;
 import tiltadv.tools.scene.events.ContextChangedEventArgs;
@@ -58,7 +59,7 @@ public final class SceneController extends FxController {
         tiledImage.getTileIndices().setAll(0, 0, 0, 0, 0, 0, 1, 0);
 
         tiledImage.setOnRefreshed(image -> {
-            Image zoomedImage = ImageUtils.zoom(image, 2);
+            Image zoomedImage = ImageUtils.zoom(image, AppSettings.ZOOM_FACTOR);
             sceneCanvas.setOnResized(canvas -> canvas.getGraphicsContext2D().drawImage(zoomedImage, 0, 0));
             sceneCanvas.resize(zoomedImage.getWidth(), zoomedImage.getHeight());
         });

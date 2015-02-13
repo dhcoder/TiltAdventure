@@ -5,28 +5,10 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dhcoder.tool.javafx.game.view.TilesetWindowController">
-   <children>
-      <ToolBar>
-        <items>
-            <HBox spacing="10.0">
-               <children>
-                  <Label text="Zoom:" />
-                  <RadioButton mnemonicParsing="false" selected="true" text="1x" userData="1">
-                     <toggleGroup>
-                        <ToggleGroup fx:id="zoomGroup" />
-                     </toggleGroup>
-                  </RadioButton>
-                  <RadioButton mnemonicParsing="false" selected="true" text="2x" toggleGroup="$zoomGroup" userData="2" />
-                  <RadioButton mnemonicParsing="false" text="3x" toggleGroup="$zoomGroup" userData="3" />
-                  <RadioButton mnemonicParsing="false" text="4x" toggleGroup="$zoomGroup" userData="4" />
-               </children>
-            </HBox>
-            <Separator orientation="VERTICAL" />
-            <Label text="Background:" />
-            <ColorPicker fx:id="colorPicker" />
-        </items>
-      </ToolBar>
-      <ScrollPane fx:id="contentPane" style="-fx-background: #000000; -fx-background-color: #000000;" VBox.vgrow="ALWAYS" />
-   </children>
-</VBox>
+
+<SplitPane dividerPositions="0.7" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" orientation="VERTICAL" prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dhcoder.tool.javafx.game.view.TilesetWindowController">
+   <items>
+      <ScrollPane fx:id="scenePane" />
+      <ScrollPane fx:id="tilesetPane" VBox.vgrow="ALWAYS" />
+   </items>
+</SplitPane>

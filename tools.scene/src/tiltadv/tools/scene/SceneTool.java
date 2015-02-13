@@ -53,7 +53,7 @@ public final class SceneTool extends Application {
     private Parent rootPane;
     private ScenesController scenesController;
     private StackPane appPane;
-    private SettingsLoader.AppSettings appSettings;
+    private AppSettings appSettings;
 
     public SceneTool() {
         actionWindow = new ActionWindow();
@@ -64,7 +64,7 @@ public final class SceneTool extends Application {
         return eventBus;
     }
 
-    public SettingsLoader.AppSettings getAppSettings() {
+    public AppSettings getAppSettings() {
         return appSettings;
     }
 
