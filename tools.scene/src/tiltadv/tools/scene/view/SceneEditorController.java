@@ -1,4 +1,4 @@
-package dhcoder.tool.javafx.game.view;
+package tiltadv.tools.scene.view;
 
 import dhcoder.tool.javafx.control.TileCanvas;
 import dhcoder.tool.javafx.utils.FxController;
@@ -8,7 +8,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 
-public final class TilesetWindowController extends FxController {
+public final class SceneEditorController extends FxController {
     public final TileCanvas tilesetCanvas = new TileCanvas();
     public ToggleGroup zoomGroup;
     public ScrollPane contentPane;

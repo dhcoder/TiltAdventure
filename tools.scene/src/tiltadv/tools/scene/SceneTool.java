@@ -7,7 +7,6 @@ import dhcoder.tool.javafx.control.ActionWindow;
 import dhcoder.tool.javafx.game.model.Scene;
 import dhcoder.tool.javafx.game.model.Tileset;
 import dhcoder.tool.javafx.game.serialization.TilesetLoader;
-import dhcoder.tool.javafx.game.view.TilesetWindow;
 import dhcoder.tool.javafx.serialization.ShortcutsLoader;
 import dhcoder.tool.javafx.utils.ActionCollection;
 import javafx.application.Application;
@@ -48,7 +47,6 @@ public final class SceneTool extends Application {
     private final Opt<SceneContext> contextOpt = Opt.withNoValue();
     private final Map<Scene, SceneContext> sceneContextMap = new HashMap<>();
     private final ActionWindow actionWindow;
-    private final TilesetWindow tilesetWindow;
     private final Gson gson = new Gson();
     private final EventBus eventBus = new EventBus("scenetool");
     private Stage stage;
@@ -59,12 +57,7 @@ public final class SceneTool extends Application {
 
     public SceneTool() {
         actionWindow = new ActionWindow();
-        tilesetWindow = new TilesetWindow();
         globalActions = new GlobalActions(this, actionWindow.getAllActions());
-    }
-
-    public TilesetWindow getTilesetWindow() {
-        return tilesetWindow;
     }
 
     public EventBus getEventBus() {
@@ -109,8 +102,6 @@ public final class SceneTool extends Application {
         scenesController.setOnSceneAdding(scene -> {
             if (!appPane.getChildren().contains(scenesController.getRoot())) {
                 appPane.getChildren().add(scenesController.getRoot());
-
-                tilesetWindow.show();
             }
 
             SceneContext context = new SceneContext(scene);
@@ -119,7 +110,6 @@ public final class SceneTool extends Application {
         scenesController.setOnSceneRemoved(scene -> {
             if (scenesController.getSceneCount() == 0) {
                 appPane.getChildren().remove(scenesController.getRoot());
-                tilesetWindow.hide();
 
                 contextOpt.clear();
                 eventBus.post(new ContextChangedEventArgs());
@@ -139,8 +129,6 @@ public final class SceneTool extends Application {
 
         javafx.scene.Scene scene = new javafx.scene.Scene(rootPane, appSettings.getWidth(), appSettings.getHeight());
         stage.setScene(scene);
-
-        tilesetWindow.initOwner(stage);
 
         stage.show();
     }

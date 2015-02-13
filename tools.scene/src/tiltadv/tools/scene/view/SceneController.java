@@ -17,7 +17,6 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import org.controlsfx.control.PropertySheet;
-import org.controlsfx.property.BeanPropertyUtils;
 import tiltadv.tools.scene.SceneContext;
 import tiltadv.tools.scene.SceneTool;
 import tiltadv.tools.scene.events.ContextChangedEventArgs;
@@ -47,19 +46,16 @@ public final class SceneController extends FxController {
         if (!args.getContextOpt().hasValue()) {
             sceneCanvas.clear();
             sceneCanvas.setOnResized(null);
-            sceneTool.getTilesetWindow().clear();
             return;
         }
 
         SceneContext context = args.getContextOpt().getValue();
         Scene gameScene = context.getScene();
 
-        sceneTool.getTilesetWindow().setTileset(gameScene.getTileset());
-
         TiledImage tiledImage = new TiledImage(gameScene.getTileset(), gameScene.getNumRows(), gameScene.getNumCols(),
             Lists.newArrayList(new Tile(0, 0), new Tile(2, 0), new Tile(1, 0), new Tile(0, 2)));
+        tiledImage.setBackgroundColor(Color.BLACK);
         tiledImage.getTileIndices().setAll(0, 0, 0, 0, 0, 0, 1, 0);
-        tiledImage.setBackgroundColor(Color.AQUA);
 
         tiledImage.setOnRefreshed(image -> {
             Image zoomedImage = ImageUtils.zoom(image, 2);
@@ -69,7 +65,7 @@ public final class SceneController extends FxController {
 
 //        for debug checking properties in watch
 //        final ObservableList<PropertySheet.Item> properties = BeanPropertyUtils.getProperties(gameScene);
-        propertySheet.getItems().setAll(BeanPropertyUtils.getProperties(gameScene));
+//        propertySheet.getItems().setAll(BeanPropertyUtils.getProperties(gameScene));
     }
 
     @FXML

@@ -16,6 +16,9 @@ import javafx.scene.paint.Color;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * An image that is composed of tiles from a {@link Tileset}
+ */
 public final class TiledImage extends WritableImage {
 
     private static List<Tile> generateDefaultPalette(final Tileset tileset) {
