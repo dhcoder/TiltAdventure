@@ -24,7 +24,7 @@
       <HBox alignment="CENTER_LEFT">
          <children>
             <Label prefHeight="16.0" prefWidth="90.0" text="Cols x Rows:" />
-            <TextField fx:id="textCols" prefHeight="26.0" prefWidth="50.0" text="25" />
+            <TextField fx:id="textCols" prefHeight="26.0" prefWidth="50.0" text="20" />
             <Label text="x">
                <HBox.margin>
                   <Insets left="5.0" right="5.0" />
