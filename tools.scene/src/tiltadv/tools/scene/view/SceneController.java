@@ -17,6 +17,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import org.controlsfx.control.PropertySheet;
+import org.controlsfx.property.BeanPropertyUtils;
 import tiltadv.tools.scene.AppSettings;
 import tiltadv.tools.scene.SceneContext;
 import tiltadv.tools.scene.SceneTool;
@@ -66,7 +67,7 @@ public final class SceneController extends FxController {
 
 //        for debug checking properties in watch
 //        final ObservableList<PropertySheet.Item> properties = BeanPropertyUtils.getProperties(gameScene);
-//        propertySheet.getItems().setAll(BeanPropertyUtils.getProperties(gameScene));
+        propertySheet.getItems().setAll(BeanPropertyUtils.getProperties(gameScene));
     }
 
     @FXML
@@ -77,8 +78,8 @@ public final class SceneController extends FxController {
         PaneUtils.setAnchors(sceneCanvas, 0.0);
         sceneGridPane.setContent(sceneCanvas);
 
-//        propertySheet = new PropertySheet();
-//        PaneUtils.setAnchors(propertySheet, 0.0);
-//        propertySheetPane.getChildren().add(propertySheet);
+        propertySheet = new PropertySheet();
+        PaneUtils.setAnchors(propertySheet, 0.0);
+        propertySheetPane.getChildren().add(propertySheet);
     }
 }

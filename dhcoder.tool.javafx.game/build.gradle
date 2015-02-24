@@ -17,8 +17,3 @@ dependencies {
 sourceSets.main.java.srcDirs = ["src/"]
 sourceSets.main.resources.srcDirs = sourceSets.main.java.srcDirs
 sourceSets.test.java.srcDirs = ["test/"]
-
-tasks.withType(JavaCompile) {
-    options.fork = true;
-    options.forkOptions.executable = '/Library/Java/JavaVirtualMachines/jdk1.8.0_25.jdk/Contents/Home/bin/javac'
-}

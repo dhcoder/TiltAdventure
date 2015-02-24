@@ -2,6 +2,7 @@ package tiltadv.tools.scene.view;
 
 import dhcoder.tool.javafx.utils.FxController;
 import javafx.scene.Scene;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -18,6 +19,7 @@ public final class SceneEditor extends Stage {
 
         controller = FxController.loadView(SceneEditorController.class);
         setScene(new Scene(controller.getRoot()));
+        initModality(Modality.WINDOW_MODAL);
     }
 
     public SceneEditor setGameScene(final dhcoder.tool.javafx.game.model.Scene gameScene) {

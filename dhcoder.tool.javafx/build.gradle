@@ -6,8 +6,7 @@ dependencies {
     compile "com.google.code.gson:gson:$gsonVersion"
     testCompile project(':dhcoder.test')
     testCompile "junit:junit:$junitVersion"
-    testCompile "org.hamcrest:hamcrest-core:$hamcrestVersion"
-    testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
+    testCompile "com.google.truth:truth:$truthVersion"
 }
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
@@ -15,8 +14,3 @@ dependencies {
 sourceSets.main.java.srcDirs = ["src/"]
 sourceSets.main.resources.srcDirs = sourceSets.main.java.srcDirs
 sourceSets.test.java.srcDirs = ["test/"]
-
-tasks.withType(JavaCompile) {
-    options.fork = true;
-    options.forkOptions.executable = '/Library/Java/JavaVirtualMachines/jdk1.8.0_25.jdk/Contents/Home/bin/javac'
-}

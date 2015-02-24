@@ -5,7 +5,7 @@ package dhcoder.tool.javafx.game.model;
  */
 public final class Scene {
     private final Tileset tileset;
-    private final int numRows;
+    private int numRows;
     private final int numCols;
 
     public Scene(final Tileset tileset, final int numRows, final int numCols) {
@@ -22,6 +22,8 @@ public final class Scene {
     public int getNumRows() {
         return numRows;
     }
+
+    public void setNumRows(int numRows) { this.numRows = numRows; }
 
     public int getNumCols() {
         return numCols;
