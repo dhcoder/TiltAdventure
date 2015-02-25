@@ -16,5 +16,6 @@ public @interface PropertyDefn {
     String name() default "";
     String displayName() default "";
     String description() default "";
+    String category() default "";
     boolean exclude() default false;
 }

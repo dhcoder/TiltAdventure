@@ -11,7 +11,11 @@ import static dhcoder.support.text.StringUtils.format;
 
 public final class PropertyUtilsTest {
 
-    private static class SimplePropertiesClass {
+    public static class SimplePropertyClass {
+        public int getValue() { return -1; }
+    }
+
+    private static class EditablePropertiesClass {
         private int count;
         private String text;
 
@@ -62,25 +66,43 @@ public final class PropertyUtilsTest {
         public boolean getAlsoExcluded() { return false; }
     }
 
+    @PropertyDefn(name = "Width", category = "Size")
+    @PropertyDefn(name = "Height", category = "Size")
+    @PropertyDefn(name = "Name", category = "Info")
+    private static class CategoryPropertiesClass {
+        public int getWidth() { return 10; }
+        public int getHeight() { return 15; }
+        public String getName() { return "Dummy"; }
+    }
+
     @PropertyDefn(name = "Widht")
     private static class UnreferencedPropertyClass {
         public int getWidth() { return 10; }
     }
 
     @Test
-    public void testSimpleProperties() {
-        SimplePropertiesClass simplePropertiesInstance = new SimplePropertiesClass();
-        ObservableList<PropertySheet.Item> properties = PropertyUtils.getProperties(simplePropertiesInstance);
+    public void testDefaultPropertyValuesAreSensible() {
+        SimplePropertyClass simplePropertyInstance = new SimplePropertyClass();
+        ObservableList<PropertySheet.Item> properties = PropertyUtils.getProperties(simplePropertyInstance);
+        PropertySheet.Item propertyValue = assertContains(properties, "Value");
+        assertThat(propertyValue.getName().equals("Value"));
+        assertThat(propertyValue.getCategory()).isEmpty();
+        assertThat(propertyValue.getDescription()).isEmpty();
+        assertThat(propertyValue.isEditable()).isFalse();
+    }
+
+    @Test
+    public void testEditableProperties() {
+        EditablePropertiesClass editablePropertiesInstance = new EditablePropertiesClass();
+        ObservableList<PropertySheet.Item> properties = PropertyUtils.getProperties(editablePropertiesInstance);
 
         assertThat(properties.size()).is(2);
 
         PropertySheet.Item propertyText = assertContains(properties, "Text");
         assertThat(propertyText.isEditable()).isTrue();
-        assertThat(propertyText.getCategory()).isEmpty();
 
         PropertySheet.Item propertyCount = assertContains(properties, "Count");
         assertThat(propertyCount.isEditable()).isTrue();
-        assertThat(propertyText.getCategory()).isEmpty();
     }
 
     @Test
@@ -93,6 +115,23 @@ public final class PropertyUtilsTest {
         assertContains(properties, "Max Size");
         assertContains(properties, "UI Display Name");
     }
+
+    @Test
+    public void testCategoryProperties() {
+        CategoryPropertiesClass categoryPropertiesInstance = new CategoryPropertiesClass();
+        ObservableList<PropertySheet.Item> properties = PropertyUtils.getProperties(categoryPropertiesInstance);
+
+        assertThat(properties.size()).is(3);
+
+        PropertySheet.Item propertyWidth = assertContains(properties, "Width");
+        PropertySheet.Item propertyHeight = assertContains(properties, "Height");
+        PropertySheet.Item propertyName = assertContains(properties, "Name");
+
+        assertThat(propertyWidth.getCategory()).isEqualTo("Size");
+        assertThat(propertyHeight.getCategory()).isEqualTo("Size");
+        assertThat(propertyName.getCategory()).isEqualTo("Info");
+    }
+
 
     @Test
     public void testDescriptionProperties() {

@@ -1,8 +1,15 @@
 package dhcoder.tool.javafx.game.model;
 
+import dhcoder.tool.javafx.property.PropertyDefn;
+
 /**
  * Data class that corresponds to a TiltAdventure scene.
  */
+@PropertyDefn(name = "NumRows", category = "Grid Size")
+@PropertyDefn(name = "NumCols", displayName = "Num Columns", category = "Grid Size")
+@PropertyDefn(name = "Tileset", exclude = true)
+@PropertyDefn(name = "Width", category = "Size")
+@PropertyDefn(name = "Height", category = "Size")
 public final class Scene {
     private final Tileset tileset;
     private int numRows;

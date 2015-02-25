@@ -112,6 +112,9 @@ public final class PropertyUtils {
                 if (!propertyDefn.description().isEmpty()) {
                     propertyItem.setDescription(propertyDefn.description());
                 }
+                if (!propertyDefn.category().isEmpty()) {
+                    propertyItem.setCategory(propertyDefn.category());
+                }
             }
 
 

@@ -6,10 +6,12 @@ import dhcoder.tool.javafx.control.ResizableCanvas;
 import dhcoder.tool.javafx.control.Tile;
 import dhcoder.tool.javafx.game.model.Scene;
 import dhcoder.tool.javafx.game.view.TiledImage;
+import dhcoder.tool.javafx.property.PropertyUtils;
 import dhcoder.tool.javafx.utils.FxController;
 import dhcoder.tool.javafx.utils.ImageUtils;
 import dhcoder.tool.javafx.utils.PaneUtils;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
@@ -17,7 +19,6 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import org.controlsfx.control.PropertySheet;
-import org.controlsfx.property.BeanPropertyUtils;
 import tiltadv.tools.scene.AppSettings;
 import tiltadv.tools.scene.SceneContext;
 import tiltadv.tools.scene.SceneTool;
@@ -65,9 +66,9 @@ public final class SceneController extends FxController {
             sceneCanvas.resize(zoomedImage.getWidth(), zoomedImage.getHeight());
         });
 
-//        for debug checking properties in watch
+        ObservableList<PropertySheet.Item> properties = PropertyUtils.getProperties(gameScene);
 //        final ObservableList<PropertySheet.Item> properties = BeanPropertyUtils.getProperties(gameScene);
-        propertySheet.getItems().setAll(BeanPropertyUtils.getProperties(gameScene));
+        propertySheet.getItems().setAll(properties);
     }
 
     @FXML
