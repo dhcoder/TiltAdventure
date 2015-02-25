@@ -50,10 +50,12 @@ public final class PropertyUtils {
 
         Map<String, Method> getMethods = new HashMap<>();
         Map<String, Method> setMethods = new HashMap<>();
-        Map<String, PropertyMeta> metaData = new HashMap<>();
+        Map<String, PropertyDefn> propertyDefns = new HashMap<>();
+        Map<String, PropertyDefn> unreferencedProperties = new HashMap<>();
 
-        for (PropertyMeta propertyMeta : target.getClass().getAnnotationsByType(PropertyMeta.class)) {
-            metaData.put(propertyMeta.name(), propertyMeta);
+        for (PropertyDefn propertyDefn : target.getClass().getAnnotationsByType(PropertyDefn.class)) {
+            propertyDefns.put(propertyDefn.name(), propertyDefn);
+            unreferencedProperties.put(propertyDefn.name(), propertyDefn);
         }
 
         for (Method method : target.getClass().getDeclaredMethods()) {
@@ -66,13 +68,28 @@ public final class PropertyUtils {
         }
 
         for (String methodName : getMethods.keySet()) {
+            unreferencedProperties.remove(methodName);
+        }
+
+        if (!unreferencedProperties.isEmpty()) {
+            String firstKey = unreferencedProperties.keySet().iterator().next();
+            throw new UnreferencedPropertyException(unreferencedProperties.get(firstKey));
+        }
+
+        for (String methodName : getMethods.keySet()) {
 
             String displayName = null;
+            PropertyDefn propertyDefn = null;
 
-            if (metaData.containsKey(methodName)) {
-                PropertyMeta propertyMeta = metaData.get(methodName);
-                if (!propertyMeta.displayName().isEmpty()) {
-                    displayName = propertyMeta.displayName();
+            if (propertyDefns.containsKey(methodName)) {
+                propertyDefn = propertyDefns.get(methodName);
+
+                if (propertyDefn.exclude()) {
+                    continue;
+                }
+
+                if (!propertyDefn.displayName().isEmpty()) {
+                    displayName = propertyDefn.displayName();
                 }
             }
 
@@ -91,6 +108,12 @@ public final class PropertyUtils {
             if (setMethods.containsKey(methodName)) {
                 propertyItem.setSetMethod(setMethods.get(methodName));
             }
+            if (propertyDefn != null) {
+                if (!propertyDefn.description().isEmpty()) {
+                    propertyItem.setDescription(propertyDefn.description());
+                }
+            }
+
 
             list.add(propertyItem);
         }
